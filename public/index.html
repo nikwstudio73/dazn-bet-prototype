@@ -745,6 +745,15 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .choice.stk.sel .tt{color:#080e12}.choice.stk.sel .lb{color:#6d7377}
 .choice.stk.locked .tt,.choice.stk.locked .lb{color:#4d5457}
 .choice.stk.sel.locked .tt{color:#080e12}.choice.stk.sel.locked .lb{color:#6d7377}
+/* page of a finished match: the same Result / Disabled states on every market; nothing is tappable */
+.mkts .odd.res:not(.sel){background:rgba(249,250,250,.12)}
+.mkts .odd.dis:not(.sel){background:var(--odd-bg)} /* State=Disabled keeps fill/overlay-1 on every surface */
+div.odd:active,div.choice:active{transform:none}
+div.choice{cursor:default}
+.mkts .choice.res:not(.stk):not(.sel){background:var(--line-tile-bg)} /* Row Result: fill/overlay-2 */
+.mkts .choice.res:not(.stk) .lb{color:var(--t1)} /* .Bet/Choice tile State=Result: the label turns text/primary (Stacked looks like Default, as in Figma) */
+.mkts .choice.dis:not(.sel){background:var(--odd-bg)} /* State=Disabled: fill/overlay-1, every text in text/disabled */
+.mkts .choice.dis .cd,.mkts .choice.dis .tt,.mkts .choice.dis .lb,.mkts .choice.dis .ov{color:var(--tdis)}
 .mkts .legal{height:28px;width:342px;gap:0;margin-bottom:-4px} /* fixture: banner frame is 28 high and 342 wide, 12 to the first market */
 .fx-more{width:100%;height:48px;border-radius:8px;background:rgba(195,209,219,.10);font-weight:700;font-size:16px;line-height:24px;color:#f8f8f8}
 #phone.infx .bar{bottom:24px}
@@ -1164,13 +1173,26 @@ function fxOf(m){
  }
  mk.push({id:'dc',t:'Double Chance',glow:true,sub:'Pick two outcomes. You win if either one happens.',type:'list',opts:[{k:'1X',l:`${m.h} or Draw`,v:priceOf(p1+px)},{k:'12',l:`${m.h} or ${m.a}`,v:priceOf(p1+p2)},{k:'X2',l:`${m.a} or Draw`,v:priceOf(p2+px)}]});
  if(!m.live){
-  mk.push({id:'ou1h',t:'Total Goals - 1st Half',type:'lines',lines:lines(.5,4,goals*.44,0)});
+  if(!m.ft)mk.push({id:'ou1h',t:'Total Goals - 1st Half',type:'lines',lines:lines(.5,4,goals*.44,0)}); // finished: the half-time score is not in the data, so this market cannot be settled and is not shown
   mk.push({id:'rbtts',t:'Result & Both teams to score',glow:true,sub:'Both parts must happen for the bet to win.',type:'stack',opts:[{k:'1',c:'1 & BTTS',l:`${m.hs} to win and both teams to score`,v:priceOf(p1*.42)},{k:'X',c:'X & BTTS',l:'Draw and both teams to score',v:priceOf(px*.72)},{k:'2',c:'2 & BTTS',l:`${m.as} to win and both teams to score`,v:priceOf(p2*.42)}]});
  }
  mk.push({id:'dnb',t:'Draw no bet',glow:true,type:'dnb',opts:[{k:'1',v:priceOf(p1/(p1+p2))},{k:'2',v:priceOf(p2/(p1+p2))}]});
  return {league:L[0],comp:L[1],compImg:COMPS[m.comp].img,hiImg:'t_'+m.hi,aiImg:'t_'+m.ai,time:m.ko,date:'Today',markets:mk,scorers:SCORERS[m.id]||null};
 }
 INIT().forEach(m=>{if(!m.hid&&!FX[m.id])FX[m.id]=fxOf(m)});
+FT().forEach(m=>{FX[m.id]=fxOf(m)});
+/* finished match: did this outcome happen? Worked out from the final score (res = 1X2 result: 0 home, 1 draw, 2 away).
+   Draw no bet after a draw: no outcome happened, both stay grey. */
+function won(m,g,o){
+ const [id,line]=g.split(':'),both=m.sh>0&&m.sa>0,tot=m.sh+m.sa;
+ if(id==='1x2')return +o===m.res;
+ if(id==='ou')return o==='o'?tot>+line:tot<+line;
+ if(id==='btts')return (o==='y')===both;
+ if(id==='dc')return {'1X':m.res!==2,'12':m.res!==1,'X2':m.res!==0}[o];
+ if(id==='rbtts')return both&&{'1':0,'X':1,'2':2}[o]===m.res;
+ if(id==='dnb')return {'1':0,'2':2}[o]===m.res;
+ return false;
+}
 let S;
 /* st: dropped-out picks {"match|market":'suspended'|'locked'}; lk: locked odds in the feed ["match|market|outcome"]; day: 'today'|'yest' */
 function freshState(){return {matches:INIT(),ft:FT(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fav:false,cp:null,cpTab:'win'}}
@@ -1192,7 +1214,7 @@ function tileHTML(m){
  const lbl=[m.hs,'X',m.as]; // PRD: 3-letter team codes instead of 1 / 2, X stays
  const odds=m.ft?m.o.map((v,i)=>`<div class="odd ${i===m.res?'res':'dis'}"><span class="l">${lbl[i]}</span><span class="v"><span class="num">${f2(v)}</span></span></div>`).join('')
                 :m.o.map((v,i)=>oddBtn(m.id,'1x2',String(i),lbl[i],v)).join('');
- return `<div class="tile${m.live?' live':''}${m.ft?' ft':''}${S.oddsOn?' odds':''}" data-tile="${m.id}"${!m.ft&&FX[m.id]?` data-fx="${m.id}"`:''}>
+ return `<div class="tile${m.live?' live':''}${m.ft?' ft':''}${S.oddsOn?' odds':''}" data-tile="${m.id}"${FX[m.id]?` data-fx="${m.id}"`:''}>
   <div class="trow"><div class="tmain">${col}
    <div class="teams">
     <div class="team"><div class="n"><img src="${IMG[m.hi]}" alt="">${m.h}</div><div class="r" data-sh="${m.id}">${r(m.sh)}</div></div>
@@ -1514,8 +1536,10 @@ function minuteTick(){if(!LIVE)return;
 }
 
 /* ---------- fixture · Odds tab ---------- */
-function oddBtn(mid,g,o,label,v,cls=''){const st=oddState(mid,g,o);return `<button class="odd ${cls}${st.sel?' sel':''}${st.locked?' locked':''}" data-m="${mid}" data-g="${g}" data-o="${o}">${label?`<span class="l">${label}</span>`:''}<span class="v">${st.locked?LOCK:`<span class="arr">${ARROW}</span><span class="num">${f2(v)}</span>`}</span></button>`}
-function choiceBtn(mid,g,o,{code,label,icon,v,stack}){const st=oddState(mid,g,o);return `<button class="choice${stack?' stk':''}${st.sel?' sel':''}${st.locked?' locked':''}" data-m="${mid}" data-g="${g}" data-o="${o}"><span class="ld">${icon?`<img src="${IMG[icon]}" alt="">`:''}${code?`<span class="${stack?'tt':'cd'}">${code}</span>`:''}<span class="lb">${label}</span></span><span class="ov">${st.locked?LOCK:f2(v)}</span></button>`}
+function oddBtn(mid,g,o,label,v,cls=''){const fm=M(mid);if(fm.ft)return `<div class="odd ${cls?cls+' ':''}${won(fm,g,o)?'res':'dis'}">${label?`<span class="l">${label}</span>`:''}<span class="v"><span class="num">${f2(v)}</span></span></div>`; // finished match: not a button, no pick
+ const st=oddState(mid,g,o);return `<button class="odd ${cls}${st.sel?' sel':''}${st.locked?' locked':''}" data-m="${mid}" data-g="${g}" data-o="${o}">${label?`<span class="l">${label}</span>`:''}<span class="v">${st.locked?LOCK:`<span class="arr">${ARROW}</span><span class="num">${f2(v)}</span>`}</span></button>`}
+function choiceBtn(mid,g,o,{code,label,icon,v,stack}){const fm=M(mid);if(fm.ft)return `<div class="choice${stack?' stk':''} ${won(fm,g,o)?'res':'dis'}"><span class="ld">${icon?`<img src="${IMG[icon]}" alt="">`:''}${code?`<span class="${stack?'tt':'cd'}">${code}</span>`:''}<span class="lb">${label}</span></span><span class="ov">${f2(v)}</span></div>`;
+ const st=oddState(mid,g,o);return `<button class="choice${stack?' stk':''}${st.sel?' sel':''}${st.locked?' locked':''}" data-m="${mid}" data-g="${g}" data-o="${o}"><span class="ld">${icon?`<img src="${IMG[icon]}" alt="">`:''}${code?`<span class="${stack?'tt':'cd'}">${code}</span>`:''}<span class="lb">${label}</span></span><span class="ov">${st.locked?LOCK:f2(v)}</span></button>`}
 function marketHTML(m,k){
  let c='';const f=FX[m.id];
  if(k.type==='1x2')c=`<div class="who"><img src="${IMG[f.hiImg]}" alt=""><b>Who will win?</b><img src="${IMG[f.aiImg]}" alt=""></div><div class="o3">${[m.hs,'X',m.as].map((l,i)=>oddBtn(m.id,'1x2',String(i),l,m.o[i])).join('')}</div>`;
@@ -1538,7 +1562,7 @@ function openFixture(mid){
  $('#fxScroll').scrollTop=0;$('#phone').classList.add('infx');$('#phone').classList.remove('fxs');
  $('#fx').classList.add('show');$('#fx').setAttribute('aria-hidden','false');S.fx=mid;hideToast();
 }
-function renderMkts(mid=S.fx){const m=M(mid),f=FX[mid];$('#mkts').innerHTML=LEGAL+f.markets.map(k=>marketHTML(m,k)).join('')+`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`+
+function renderMkts(mid=S.fx){const m=M(mid),f=FX[mid];$('#mkts').innerHTML=LEGAL+f.markets.map(k=>marketHTML(m,k)).join('')+(m.ft?'':`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`)+
  (f.scorers?`<section class="gs"><div class="gs-h"><b>Goalscorer</b><span>In this match</span></div><div class="gs-row">${f.scorers.map(p=>`<div class="gs-card">${photoOf(p,p.img)}<b>${p.n}</b><span class="cl"><img src="${crest(p.cr)}" alt="">${p.team}</span>${oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only')}</div>`).join('')}</div></section>`:'')}
 function closeFixture(){$('#fx').classList.remove('show');$('#fx').setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},T.layout)}
 
