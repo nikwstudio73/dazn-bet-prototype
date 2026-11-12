@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>/* M1 · phone: a touch screen whose short side is at most 600 px opens the prototype as an app (html.app): full screen, no frame, no States panel, no size switch */
+if(matchMedia('(pointer:coarse) and (hover:none)').matches&&Math.min(screen.width,screen.height)<=600){document.documentElement.classList.add('app');document.querySelector('meta[name=viewport]').content+=',viewport-fit=cover,maximum-scale=1,user-scalable=no'}</script>
 <title>DAZN Bet in Scores — prototype</title>
 <style>
 @font-face{font-family:'DAZN Oscine';font-weight:400;src:url(assets/fonts/DAZN-Oscine-Regular.woff2) format('woff2');ascent-override:104.8%;descent-override:24%;line-gap-override:0%}
@@ -322,6 +324,21 @@ img{display:block}
 .seg button:not(.on):hover{color:var(--ui-t2)}
 .devsw{position:fixed;right:var(--ui-edge);bottom:var(--ui-edge);z-index:100;padding:var(--spacing-4);border-radius:12px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line)}
 .devsw button{border-radius:8px}
+
+/* ---------- M1 · on a phone (html.app, set in <head>) ----------
+   The prototype is the whole screen: no frame, no States panel, no size switch, no drawn status bar or home indicator (the phone has its own).
+   Width = the screen, height = the visible area (dvh follows Safari's address bar). The status strip keeps only its background and is as tall as
+   the real top inset; everything that stood on the drawn 34 px home-indicator zone (86 = 52 + 34, 96 = 62 + 34) stands on the real bottom inset. */
+html.app,html.app body{overflow:hidden;overscroll-behavior:none;touch-action:pan-x pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html.app body{background:var(--page)}
+html.app #stage{--sb:env(safe-area-inset-top,0px);position:fixed;left:0;top:0;width:100%;height:100%;height:100dvh;transform:none}
+html.app #phone{border-radius:0;box-shadow:none}
+html.app .island,html.app .status .time,html.app .status .sr,html.app .hind,html.app .nav,html.app .nav-open,html.app .devsw{display:none}
+html.app .navbar{height:calc(52px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)))}
+html.app .scroll,html.app .cp{bottom:calc(52px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)))}
+html.app .bar{bottom:calc(62px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)))}
+html.app .tongue{bottom:calc(62px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)) + var(--bar-h) - 10px)}
+html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} /* only the feed and the sheet content scroll, never the page */
 
 /* status bar */
 .status{position:absolute;top:0;left:0;right:0;height:var(--sb);background:var(--surface);z-index:5}
@@ -1379,8 +1396,8 @@ function closeSheet(){S.sheet=false;S.edit=false;$('#sheet').classList.remove('s
 let toastT;
 function showToast(text,btn,fn,ms=5000){
  $('#toastText').textContent=text;const b=$('#toastBtn');b.style.display=btn?'':'none';b.textContent=btn||'';b.onclick=()=>{hideToast();fn&&fn()};
- // same place as the collapsed bar: 96px above the nav in the feed, 24px on the fixture page
- const base=S.fx?24:96,barOn=$('#bar').classList.contains('show');
+ // same place as the collapsed bar: 10px above the nav in the feed (96 in the frame; on a phone the nav follows the real bottom inset), 24px on the fixture page
+ const base=S.fx?24:$('.navbar').offsetHeight+10,barOn=$('#bar').classList.contains('show');
  $('#toast').style.bottom=S.sheet?'110px':(barOn?base+77:base+(S.fx?0:4))+'px'; // no bar: the toast sits 100 above the bottom, as on the Undo screen
  $('#toast').classList.add('show');clearTimeout(toastT);toastT=setTimeout(hideToast,ms);
 }
@@ -1709,12 +1726,15 @@ dragSheet($('#fav'),[$('#fav .handle'),$('#fav .fav-h')],closeFav);
 
 /* fit phone to window */
 const DEV={mini:{w:375,h:812},max:{w:440,h:956}};let dev='mini';
+const APP=document.documentElement.classList.contains('app'); // M1: opened on a phone
 /* One scale for both devices (fitted to the biggest), so 17 Pro Max really looks bigger than the mini.
    Each device sits in the middle of the window; on a switch the phone grows or shrinks around that middle. */
-function fit(){const big=DEV.max,d=DEV[dev],ring=11;
+function fit(){if(APP){$('#stage').dataset.scale=1;return} // phone: the stage is the screen itself (CSS, html.app)
+ const big=DEV.max,d=DEV[dev],ring=11;
  const s=Math.min(1,(innerHeight-48)/(big.h+2*ring),(innerWidth-96)/(big.w+2*ring));
  const st=$('#stage');st.style.top=Math.max(24+ring*s,(innerHeight-d.h*s)/2)+'px';st.style.transform=`translateX(-50%) scale(${s})`;st.dataset.scale=s}
 addEventListener('resize',fit);
+if(APP)addEventListener('gesturestart',e=>e.preventDefault()); // Safari: no pinch zoom of the whole page
 let devT;
 document.querySelectorAll('.devsw button').forEach(b=>b.onclick=()=>{
  if(b.dataset.dev===dev)return;
