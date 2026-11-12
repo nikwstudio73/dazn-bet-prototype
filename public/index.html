@@ -271,8 +271,8 @@ if(matchMedia('(pointer:coarse) and (hover:none)').matches&&Math.min(screen.widt
      JS mirrors them in SOFT and T (see "soft motion helpers"). */
   --m-press:.12s;   /* press feedback */
   --m-quick:.2s;    /* colour, opacity, small state changes */
-  --m-std:.32s;     /* an element enters, a text swaps */
-  --m-layout:.44s;  /* heights and pages: odds reveal, summary and limit note, a removed card's place, fixture push */
+  --m-std:.32s;     /* an element enters, a text swaps, a removed card's place closes */
+  --m-layout:.44s;  /* heights and pages: odds reveal, summary and limit note, fixture push */
   --m-sheet:.5s;    /* sheets, collapsed bar, toast, DAZN Bet overlay */
   --exit:cubic-bezier(.4,0,.6,1);    /* gentle start and gentle landing: things that hide behind something (limit tongue) and the place of a removed card closing */
   --chg-in:.8s; --chg-fade:1.5s; --chg-fade-pick:.6s; /* odds change: tint in, tint + arrow out, arrow of my pick out */
@@ -543,10 +543,10 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 /* press feedback for the small controls (odds, choices, the bar and the main button have their own) */
 .tbtn:active,.fav-x:active,.fx-back:active,.fx-follow:active,.fx-more:active,.toast button:active,.livebadge:active,.day[data-day]:active{opacity:.6}
 .cards{display:flex;flex-direction:column;gap:var(--sheet-cards-gap)}
-/* A1: a removed card leaves in two phases, like an iOS list row: it fades and shrinks a little at full height (--m-quick), then its place closes (--m-layout on --exit: it starts and lands gently, so the cards below never jerk; it starts --m-press into the fade, while the card is almost gone, so there is no stop between the phases); removeSel() follows the same two steps */
-.cardwrap{flex:none;display:grid;grid-template-rows:1fr;transition:opacity var(--m-quick) ease-out,transform var(--m-quick) ease-out,grid-template-rows var(--m-layout) var(--exit) var(--m-press),margin var(--m-layout) var(--exit) var(--m-press)}
+/* A1: a removed card leaves in two phases, like an iOS list row: it fades and shrinks a little at full height (--m-quick), then its place closes (--m-std on --exit: it starts and lands gently, so the cards below never jerk; it starts --m-press into the fade, while the card is almost gone, so there is no stop between the phases); removeSel() follows the same two steps */
+.cardwrap{flex:none;display:grid;grid-template-rows:1fr;transition:opacity var(--m-quick) ease-out,transform var(--m-quick) ease-out,grid-template-rows var(--m-std) var(--exit) var(--m-press),margin var(--m-std) var(--exit) var(--m-press)}
 .cardwrap.gone{grid-template-rows:0fr;opacity:0;transform:scale(.96);margin-bottom:calc(-1 * var(--sheet-cards-gap));pointer-events:none}
-.cardwrap.gone>.card{overflow:hidden;min-height:0;padding-block:0;transition:padding var(--m-layout) var(--exit) var(--m-press)} /* B3: only a card that is collapsing may shrink and clip; at rest it keeps its full height (iOS Safari). A1: its padding closes with the place (the card is already invisible), otherwise the row stops at the padding height and jumps when it leaves the DOM */
+.cardwrap.gone>.card{overflow:hidden;min-height:0;padding-block:0;transition:padding var(--m-std) var(--exit) var(--m-press)} /* B3: only a card that is collapsing may shrink and clip; at rest it keeps its full height (iOS Safari). A1: its padding closes with the place (the card is already invisible), otherwise the row stops at the padding height and jumps when it leaves the DOM */
 .card>*{flex:none}
 .card{border-radius:var(--card-radius);background:var(--card-bg);padding:var(--card-pad);display:flex;flex-direction:column;gap:var(--card-gap)}
 /* live card: no glow and no LIVE plate any more (Figma Betslip/Card Live=True has the same fill as the other cards); live = red minute + pulsing dot */
@@ -1439,7 +1439,7 @@ function removeSel(k){
  const w=card();
  if(w){if(w.classList.contains('gone'))return;w.classList.add('gone')}
  // A1, two phases (CSS .cardwrap.gone): 1) the card fades at full height, 2) its place closes; the pick leaves the slip, and the total and the counter change, when phase 2 starts
- const fade=RM.matches?0:T.quick,close=RM.matches?0:T.layout;
+ const fade=RM.matches?0:T.quick,close=RM.matches?0:T.std;
  setTimeout(()=>{
   const i=S.sel.indexOf(item);if(i<0)return;       // look the pick up again: other cards may have been removed while this one was fading
   S.sel.splice(i,1);delete S.st[k];if(renderSheet.st)delete renderSheet.st[k];syncTiles();
