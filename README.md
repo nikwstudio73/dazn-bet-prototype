@@ -76,8 +76,8 @@ One system everywhere. The tokens live at the top of the hand-written CSS (`MOTI
 | `--ease` | `cubic-bezier(.2,.8,.2,1)` | state changes in place: colour, press, small moves |
 | `--m-press` | .12 s | press feedback |
 | `--m-quick` | .2 s | colour, opacity |
-| `--m-std` | .32 s | an element enters, a text swaps, a card collapses |
-| `--m-layout` | .44 s | heights and pages: odds reveal, sheet resize, fixture push |
+| `--m-std` | .32 s | an element enters, a text swaps |
+| `--m-layout` | .44 s | heights and pages: odds reveal, sheet resize, a removed card's place closes, fixture push |
 | `--m-sheet` | .5 s | sheets, collapsed bar, toast, DAZN Bet overlay |
 
 JS helpers: `soft()` (play an element in), `setTxt()` (swap a text), `smoothH()` (ease a height), `rise(dir)` (start position of a new number). With **Reduce motion** switched on in the system nothing travels, springs or pulses; states still change.
@@ -87,7 +87,7 @@ JS helpers: `soft()` (play an element in), `setTxt()` (swap a text), `smoothH()`
 - **Collapsed betslip:** appears with a short rise and fade; the selection list, bet type and total swap softly when they change. It does not hide for the sheet: the sheet slides over it and uncovers it again.
 - **Sheets (betslip, favourite-team popup):** native iOS behaviour: slide up from the bottom edge (`--soft`, `--m-sheet`), the dimming fades with it. Drag by the handle or by the header: the sheet follows the finger, the dimming lightens, pulling up gives a little rubber band. Releasing past a quarter of the height or with a quick flick closes it, otherwise it springs back; either way the release continues at the speed of the finger (`dragSheet()`).
 - **Inside the sheet:** a pick that becomes Suspended or Locked dims softly and its price swaps with a small rise; the summary and the limit message change height smoothly. "Goal!" fades in and out.
-- **Edit mode:** the × buttons appear one card after another, only for the cards on screen (max 6 steps). A removed card collapses on its own; several can be removed quickly one after another.
+- **Edit mode:** the × buttons appear one card after another, only for the cards on screen (max 6 steps). A removed card leaves in two phases, like an iOS list row: it fades and shrinks slightly at full height (`--m-quick`), then its place closes (`--m-layout`, `--soft`); Total odds, the return and the counter change when the place starts to close. Several can be removed quickly one after another.
 - **Limit 20 · tap on a 21st odd** (Figma N): nothing is added; the tapped odd gets a light press and a small spring back (no colour), an orange tongue slides out from behind the collapsed betslip ("You’ve reached maximum number of bets allowed.") and the counter pulses; the tongue hides after ~2.6 s (`denyLimit()`). With the sheet open the toast is used instead.
 - **Feed:** switching the day slides the list in from the side of that day (yesterday from the left, today from the right); the LIVE filter fades it in from below (`swapFeed()`). A tapped odd changes text colour together with its background.
 
