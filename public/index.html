@@ -528,7 +528,7 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .sheet.drag,.fvp.drag{transition:none}
 .handle{position:absolute;top:0;left:0;right:0;height:24px;display:flex;justify-content:center;padding-top:10px;cursor:grab;touch-action:none;z-index:3}
 .handle i{width:43px;height:4px;border-radius:2px;background:#9da1a4}
-.sbody{overflow-y:auto;padding:0 var(--sheet-pad-x);scrollbar-width:none;flex:1;min-height:0;border-radius:var(--sheet-radius) var(--sheet-radius) 0 0}
+.sbody{overflow-y:auto;overflow-x:hidden;padding:0 var(--sheet-pad-x);scrollbar-width:none;flex:1;min-height:0;border-radius:var(--sheet-radius) var(--sheet-radius) 0 0}
 .sbody::-webkit-scrollbar{display:none}
 /* Betslip/Sheet body: legal banner first, then the header (Figma 11.11). The banner scrolls away, the header sticks under the handle. */
 .shead{display:flex;align-items:center;justify-content:space-between;height:calc(var(--head-h) + 2 * var(--sheet-head-gap));margin:0 calc(-1 * var(--sheet-pad-x));padding:var(--sheet-head-gap) var(--sheet-pad-x);background:var(--sheet-bg);position:sticky;top:calc(var(--sheet-pad-t) - var(--sheet-head-gap));z-index:2;transition:box-shadow var(--m-quick);touch-action:none;cursor:grab} /* the header drags the sheet too */
@@ -542,9 +542,10 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 /* press feedback for the small controls (odds, choices, the bar and the main button have their own) */
 .tbtn:active,.fav-x:active,.fx-back:active,.fx-follow:active,.fx-more:active,.toast button:active,.livebadge:active,.day[data-day]:active{opacity:.6}
 .cards{display:flex;flex-direction:column;gap:var(--sheet-cards-gap)}
-.cardwrap{display:grid;grid-template-rows:1fr;transition:grid-template-rows var(--m-std) var(--soft),opacity var(--m-quick) ease-out,margin var(--m-std) var(--soft)}
+.cardwrap{flex:none;display:grid;grid-template-rows:1fr;transition:grid-template-rows var(--m-std) var(--soft),opacity var(--m-quick) ease-out,margin var(--m-std) var(--soft)}
 .cardwrap.gone{grid-template-rows:0fr;opacity:0;margin-bottom:calc(-1 * var(--sheet-cards-gap))}
-.cardwrap>.card{overflow:hidden;min-height:0}
+.cardwrap.gone>.card{overflow:hidden;min-height:0} /* B3: only a card that is collapsing may shrink and clip; at rest it keeps its full height (iOS Safari) */
+.card>*{flex:none}
 .card{border-radius:var(--card-radius);background:var(--card-bg);padding:var(--card-pad);display:flex;flex-direction:column;gap:var(--card-gap)}
 /* live card: no glow and no LIVE plate any more (Figma Betslip/Card Live=True has the same fill as the other cards); live = red minute + pulsing dot */
 .ctop{display:flex;align-items:flex-start;gap:var(--card-head-gap)}
@@ -632,7 +633,7 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .badge.nope{animation:nope .6s var(--soft)}
 @keyframes nope{0%{transform:scale(1)}30%{transform:scale(1.1)}60%{transform:scale(.98)}100%{transform:none}}
 .compliance{font-size:var(--compliance-size);line-height:var(--compliance-lh);color:var(--compliance-color);margin:var(--sheet-content-gap) 0 var(--sheet-foot-pad-t)}
-.sfoot{padding:var(--sheet-foot-pad-t) var(--sheet-foot-pad-x) var(--sheet-foot-pad-b);background:linear-gradient(180deg,rgba(12,22,28,0),rgb(12,22,28) 8px);position:relative}
+.sfoot{flex:none;padding:var(--sheet-foot-pad-t) var(--sheet-foot-pad-x) var(--sheet-foot-pad-b);background:linear-gradient(180deg,rgba(12,22,28,0),rgb(12,22,28) 8px);position:relative}
 
 .cta-main{width:100%;height:48px;border-radius:8px;background:var(--t1);color:#080e12;font-weight:700;font-size:16px;line-height:24px;transition:transform var(--m-press),background var(--m-quick),color var(--m-quick)}
 .cta-main:active{transform:scale(.98)}
@@ -1328,7 +1329,7 @@ const rise=d=>({opacity:0,transform:`translateY(${d<0?-5:5}px)`}),RISE=rise(1); 
 // change a text; if it really changed, the new text fades in and rises a little
 function setTxt(el,t,anim=true,from=RISE){t=String(t);if(el.textContent===t)return false;el.textContent=t;if(anim)soft(el,from);return true}
 // run fn; if it changed the height of el, ease the height instead of jumping
-function smoothH(el,fn,on=true){const h0=el.offsetHeight;fn();const h1=el.offsetHeight;if(!on||h0===h1||!el.animate||RM.matches)return;const ov=el.style.overflow;el.style.overflow='hidden';el.animate([{height:h0+'px'},{height:h1+'px'}],{duration:T.layout,easing:SOFT}).onfinish=()=>{el.style.overflow=ov}}
+function smoothH(el,fn,on=true){const h0=el.offsetHeight;fn();const h1=el.offsetHeight;if(!on||h0===h1||!el.animate||RM.matches)return;if(!el._sh){el._sh=0;el._ov=el.style.overflow}el._sh++;el.style.overflow='hidden';const a=el.animate([{height:h0+'px'},{height:h1+'px'}],{duration:T.layout,easing:SOFT});a.onfinish=a.oncancel=()=>{if(!--el._sh)el.style.overflow=el._ov}} // B3: runs may overlap; overflow goes back only after the last one, so 'hidden' is never left on the element
 
 function updateBar(bump,dir){ // dir: the total moved because a price moved (1 up, -1 down)
  const n=S.sel.length,bar=$('#bar'),anim=bar.classList.contains('show')&&lastCount>0; // texts animate only while the bar is on screen
