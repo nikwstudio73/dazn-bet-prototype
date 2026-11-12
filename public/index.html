@@ -274,7 +274,7 @@ if(matchMedia('(pointer:coarse) and (hover:none)').matches&&Math.min(screen.widt
   --m-std:.32s;     /* an element enters, a text swaps */
   --m-layout:.44s;  /* heights and pages: odds reveal, summary and limit note, a removed card's place, fixture push */
   --m-sheet:.5s;    /* sheets, collapsed bar, toast, DAZN Bet overlay */
-  --exit:cubic-bezier(.4,0,.6,1);    /* only for things that hide behind something (limit tongue) */
+  --exit:cubic-bezier(.4,0,.6,1);    /* gentle start and gentle landing: things that hide behind something (limit tongue) and the place of a removed card closing */
   --chg-in:.8s; --chg-fade:1.5s; --chg-fade-pick:.6s; /* odds change: tint in, tint + arrow out, arrow of my pick out */
   --ease:cubic-bezier(.2,.8,.2,1);   /* state changes in place */
   --soft:cubic-bezier(.32,.72,0,1); /* close to the UIKit sheet spring (critically damped, ~0.5 s) */ /* soft motion: quick start, long gentle landing (odds toggle, bar, sheet, text swaps) */
@@ -543,10 +543,10 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 /* press feedback for the small controls (odds, choices, the bar and the main button have their own) */
 .tbtn:active,.fav-x:active,.fx-back:active,.fx-follow:active,.fx-more:active,.toast button:active,.livebadge:active,.day[data-day]:active{opacity:.6}
 .cards{display:flex;flex-direction:column;gap:var(--sheet-cards-gap)}
-/* A1: a removed card leaves in two phases, like an iOS list row: it fades and shrinks a little at full height (--m-quick), then its place closes (--m-layout, starts when the fade ends); removeSel() follows the same two steps */
-.cardwrap{flex:none;display:grid;grid-template-rows:1fr;transition:opacity var(--m-quick) ease-out,transform var(--m-quick) ease-out,grid-template-rows var(--m-layout) var(--soft) var(--m-quick),margin var(--m-layout) var(--soft) var(--m-quick)}
+/* A1: a removed card leaves in two phases, like an iOS list row: it fades and shrinks a little at full height (--m-quick), then its place closes (--m-layout on --exit: it starts and lands gently, so the cards below never jerk; it starts --m-press into the fade, while the card is almost gone, so there is no stop between the phases); removeSel() follows the same two steps */
+.cardwrap{flex:none;display:grid;grid-template-rows:1fr;transition:opacity var(--m-quick) ease-out,transform var(--m-quick) ease-out,grid-template-rows var(--m-layout) var(--exit) var(--m-press),margin var(--m-layout) var(--exit) var(--m-press)}
 .cardwrap.gone{grid-template-rows:0fr;opacity:0;transform:scale(.96);margin-bottom:calc(-1 * var(--sheet-cards-gap));pointer-events:none}
-.cardwrap.gone>.card{overflow:hidden;min-height:0;padding-block:0;transition:padding var(--m-layout) var(--soft) var(--m-quick)} /* B3: only a card that is collapsing may shrink and clip; at rest it keeps its full height (iOS Safari). A1: its padding closes with the place (the card is already invisible), otherwise the row stops at the padding height and jumps when it leaves the DOM */
+.cardwrap.gone>.card{overflow:hidden;min-height:0;padding-block:0;transition:padding var(--m-layout) var(--exit) var(--m-press)} /* B3: only a card that is collapsing may shrink and clip; at rest it keeps its full height (iOS Safari). A1: its padding closes with the place (the card is already invisible), otherwise the row stops at the padding height and jumps when it leaves the DOM */
 .card>*{flex:none}
 .card{border-radius:var(--card-radius);background:var(--card-bg);padding:var(--card-pad);display:flex;flex-direction:column;gap:var(--card-gap)}
 /* live card: no glow and no LIVE plate any more (Figma Betslip/Card Live=True has the same fill as the other cards); live = red minute + pulsing dot */
