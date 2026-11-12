@@ -270,7 +270,7 @@
   --m-press:.12s;   /* press feedback */
   --m-quick:.2s;    /* colour, opacity, small state changes */
   --m-std:.32s;     /* an element enters, a text swaps, a card collapses */
-  --m-layout:.44s;  /* heights and pages: odds reveal, sheet resize, fixture push */
+  --m-layout:.44s;  /* heights and pages: odds reveal, summary and limit note, fixture push */
   --m-sheet:.5s;    /* sheets, collapsed bar, toast, DAZN Bet overlay */
   --exit:cubic-bezier(.4,0,.6,1);    /* only for things that hide behind something (limit tongue) */
   --chg-in:.8s; --chg-fade:1.5s; --chg-fade-pick:.6s; /* odds change: tint in, tint + arrow out, arrow of my pick out */
@@ -506,12 +506,9 @@ img{display:block}
 .backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity var(--m-sheet) var(--soft);z-index:20}
 .backdrop.drag{transition:none}
 .backdrop.show{opacity:1;pointer-events:auto}
-.sheet{position:absolute;left:0;right:0;bottom:0;max-height:calc(100% - 52px);background:var(--sheet-bg);border-radius:var(--sheet-radius) var(--sheet-radius) 0 0;z-index:21;display:flex;flex-direction:column;transform:translateY(105%);transition:transform var(--m-sheet) var(--soft)} /* iOS sheet: slides up from the bottom edge with the system spring, content moves with it */
+.sheet{position:absolute;left:0;right:0;bottom:0;height:calc(100% - 52px);background:var(--sheet-bg);border-radius:var(--sheet-radius) var(--sheet-radius) 0 0;z-index:21;display:flex;flex-direction:column;transform:translateY(105%);transition:transform var(--m-sheet) var(--soft)} /* iOS sheet: slides up from the bottom edge with the system spring, content moves with it; always full height: header on top, summary and button at the bottom edge, cards scroll in between */
 .sheet.show{transform:none}
 .sheet.drag,.fvp.drag{transition:none}
-/* edit mode freezes the sheet height (removed cards leave empty space at the bottom, nothing under the finger moves);
-   on Confirm the sheet eases once to its new height */
-.sheet.resizing{transition:transform var(--m-layout) var(--soft),height var(--m-layout) var(--soft)}
 .handle{position:absolute;top:0;left:0;right:0;height:24px;display:flex;justify-content:center;padding-top:10px;cursor:grab;touch-action:none;z-index:3}
 .handle i{width:43px;height:4px;border-radius:2px;background:#9da1a4}
 .sbody{overflow-y:auto;padding:0 var(--sheet-pad-x);scrollbar-width:none;flex:1;min-height:0;border-radius:var(--sheet-radius) var(--sheet-radius) 0 0}
@@ -583,7 +580,7 @@ img{display:block}
 /* reduced motion: nothing travels, springs or pulses; states still change (JS helpers check RM too) */
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}}
 /* Summary: no fill (Figma 06.10), 1px border/transparent/subtle on the sheet instance, stroke inside the padding */
-.summary{position:relative;border-radius:var(--sum-radius);border:1px solid var(--sum-border);padding:var(--sum-pad);display:flex;flex-direction:column;gap:var(--sum-gap);overflow:hidden;margin-top:var(--sheet-content-gap)}
+.summary{position:relative;border-radius:var(--sum-radius);border:1px solid var(--sum-border);padding:var(--sum-pad);display:flex;flex-direction:column;gap:var(--sum-gap);overflow:hidden}
 .srow[hidden],.sdiv[hidden]{display:none}
 .srow{position:relative;display:flex;justify-content:space-between;align-items:center;height:var(--sum-label-lh)}
 .srow .lb{font-size:var(--sum-label-size);line-height:var(--sum-label-lh);color:var(--sum-label-color)}
@@ -617,7 +614,7 @@ img{display:block}
 @keyframes deny{0%{transform:scale(1);animation-timing-function:cubic-bezier(.3,0,.4,1)}22%{transform:scale(.955);animation-timing-function:cubic-bezier(.3,.1,.3,1)}52%{transform:scale(1.014);animation-timing-function:ease-in-out}76%{transform:scale(.996);animation-timing-function:ease-in-out}100%{transform:none}}
 .badge.nope{animation:nope .6s var(--soft)}
 @keyframes nope{0%{transform:scale(1)}30%{transform:scale(1.1)}60%{transform:scale(.98)}100%{transform:none}}
-.compliance{font-size:var(--compliance-size);line-height:var(--compliance-lh);color:var(--compliance-color);margin:var(--sheet-content-gap) 0 0}
+.compliance{font-size:var(--compliance-size);line-height:var(--compliance-lh);color:var(--compliance-color);margin:var(--sheet-content-gap) 0 var(--sheet-foot-pad-t)}
 .sfoot{padding:var(--sheet-foot-pad-t) var(--sheet-foot-pad-x) var(--sheet-foot-pad-b);background:linear-gradient(180deg,rgba(12,22,28,0),rgb(12,22,28) 8px);position:relative}
 
 .cta-main{width:100%;height:48px;border-radius:8px;background:var(--t1);color:#080e12;font-weight:700;font-size:16px;line-height:24px;transition:transform var(--m-press),background var(--m-quick),color var(--m-quick)}
@@ -985,14 +982,15 @@ img{display:block}
      <button class="tbtn" id="editBtn"><img src="assets/img/settings.png" alt="">Edit</button>
    </div>
     <div class="cards" id="cards"></div>
+   </div>
+   <div class="sfoot">
     <div class="summary">
      <div class="srow" id="sumOddsRow"><span class="lbg"><span class="lb" id="sumOddsLabel">Total odds</span><span class="sn" id="sumNote" hidden></span></span><span class="tv cv" id="sumOdds"><span class="arr"><svg width="9" height="8" viewBox="0 0 9 8"><path d="M3.66137 1.29115C4.05567 0.684093 4.94433 0.684092 5.33863 1.29115L7.3938 4.45529C7.8259 5.12057 7.34846 6 6.55517 6H2.44483C1.65154 6 1.17409 5.12057 1.6062 4.4553L3.66137 1.29115Z" fill="currentColor"/></svg></span><span class="num">0.00</span></span></div>
      <div class="sdiv" id="sumDiv"></div>
      <div class="srow" id="sumRetRow"><span class="lb" id="sumReturnLabel">€10 may return</span><span class="gold" id="sumReturn">€0.00</span></div>
     </div>
     <p class="compliance">Interactive promotional advertisement. DAZN Bet registration required to place bets. Odds may vary. Gamble responsibly. 18+.</p>
-   </div>
-   <div class="sfoot"><div class="lnote" id="lnote" hidden><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.3v3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5.1" r=".9" fill="currentColor"/></svg><span>Maximum number of selections allowed is 20</span></div><button class="cta-main" id="placeBtn">Place bet on DAZN Bet</button></div>
+    <div class="lnote" id="lnote" hidden><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.3v3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5.1" r=".9" fill="currentColor"/></svg><span>Maximum number of selections allowed is 20</span></div><button class="cta-main" id="placeBtn">Place bet on DAZN Bet</button></div>
   </div>
 
   <div class="fvp" id="fav">
@@ -1347,22 +1345,10 @@ function staggerCards(){const b=$('#sbody').getBoundingClientRect();let k=0;docu
 function applyEdit(){
  const sh=$('#sheet'),flip=sh.classList.contains('editing')!==S.edit;
  if(flip)staggerCards();
- if(S.edit&&!sh.style.height)sh.style.height=sh.offsetHeight+'px';
- if(!S.edit)releaseHeight();
  sh.classList.toggle('editing',S.edit);
  $('#editBtn').innerHTML=S.edit?'Confirm':`<img src="${IMG.settings}" alt="">Edit`;if(flip&&S.sheet)soft($('#editBtn'),{opacity:0},T.quick);
  $('#placeBtn').disabled=S.edit||!act().length;
 }
-let resizeT;
-function releaseHeight(){
- const sh=$('#sheet');if(!sh.style.height)return;
- const from=sh.offsetHeight;sh.style.height='';const to=sh.offsetHeight;
- if(Math.abs(from-to)<1)return;
- sh.style.height=from+'px';void sh.offsetHeight;
- sh.classList.add('resizing');sh.style.height=to+'px';
- clearTimeout(resizeT);resizeT=setTimeout(()=>{sh.classList.remove('resizing');sh.style.height=''},T.layout);
-}
-function unfreeze(){clearTimeout(resizeT);const sh=$('#sheet');sh.classList.remove('resizing');sh.style.height=''}
 function updateSummary(dir){ // dir: the total moved because a price moved (1 up, -1 down)
  const a=act().length,t=totalOdds();
  // the sheet always reads as one combined bet: total = product of the active odds, return = €10 × total.
@@ -1384,8 +1370,8 @@ function updateSummary(dir){ // dir: the total moved because a price moved (1 up
  const lkd=a>0&&out.some(s=>S.st[key(s)]==='locked');$('#sumOdds').classList.toggle('struck',lkd);
  $('#placeBtn').disabled=S.edit||!a||lkd;
 }
-function openSheet(){if(!S.sel.length)return;S.sheet=true;unfreeze();renderSheet();$('#sbody').scrollTop=0;$('#sheet').classList.add('show');$('#backdrop').classList.add('show');updateBar();moreCheck();navSync()}
-function closeSheet(){S.sheet=false;S.edit=false;$('#sheet').classList.remove('show');$('#backdrop').classList.remove('show');$('#sheet').classList.remove('editing');setTimeout(()=>{if(!S.sheet){unfreeze();renderSheet()}},T.sheet+20);updateBar();navSync()}
+function openSheet(){if(!S.sel.length)return;S.sheet=true;renderSheet();$('#sbody').scrollTop=0;$('#sheet').classList.add('show');$('#backdrop').classList.add('show');updateBar();moreCheck();navSync()}
+function closeSheet(){S.sheet=false;S.edit=false;$('#sheet').classList.remove('show');$('#backdrop').classList.remove('show');$('#sheet').classList.remove('editing');setTimeout(()=>{if(!S.sheet)renderSheet()},T.sheet+20);updateBar();navSync()}
 
 /* remove + undo */
 let toastT;
@@ -1584,11 +1570,10 @@ const P3=()=>[{m:'m5',g:'1x2',o:'1'},{m:'m4',g:'1x2',o:'2'},{m:'m1',g:'1x2',o:'0
 const ONE=()=>[{m:'m1',g:'1x2',o:'0'}];
 function fill20(){for(const m of [...S.matches.filter(x=>!x.hid&&x.id!=='m2'&&x.id!=='m3'),...S.matches.filter(x=>x.hid)]){if(S.sel.length>=MAX)break;if(!S.sel.some(s=>s.m===m.id&&s.g==='1x2'))S.sel.unshift({m:m.id,g:'1x2',o:String(m.pick||0)})}}
 const showTile=id=>{const t=document.querySelector(`#scroll [data-tile="${id}"]`),sc=$('#scroll'),k=+$('#stage').dataset.scale||1;if(t)sc.scrollTop+=(t.getBoundingClientRect().bottom-$('#phone').getBoundingClientRect().top)/k-$('#bar').offsetTop+12}; // scroll until this tile ends 12 px above the bar (offsetTop: the bar may still be sliding in)
-const toEnd=()=>setTimeout(()=>{const b=$('#sbody');b.scrollTop=b.scrollHeight},80);
 const moved=()=>{changeOdd(M('m1'),0,0,1.30);changeOdd(M('m4'),2,0,4.10)};   // Real Madrid 1.36 -> 1.30, Atlético 3.90 -> 4.10: total 16.97 -> 17.06
 const STATES=[
  {g:'Betslip',k:'Three picks',v:'bar',n:'Picks from different matches make an ACCA: the odds multiply into one total. The sheet opens only when you tap the bar.',run(){S.sel=P3();refresh()}},
- {g:'Betslip',k:'Three picks',v:'sheet',n:'Cards, Total odds and "€10 may return". Try Edit (the sheet keeps its height until Confirm) and Place bet (closing DAZN Bet clears the betslip).',run(){S.sel=P3();refresh();openSheet()}},
+ {g:'Betslip',k:'Three picks',v:'sheet',n:'Cards, Total odds and "€10 may return". Try Edit (the total and the button stay at the bottom while cards are removed) and Place bet (closing DAZN Bet clears the betslip).',run(){S.sel=P3();refresh();openSheet()}},
  {g:'Betslip',k:'Odds changed',v:'bar',n:'PRD · Odds change: the total in the bar is recalculated; the arrow shows the direction. The selected tile stays white.',run(){S.sel=P3();refresh();moved()}},
  {g:'Betslip',k:'Odds changed',v:'sheet',n:'The price on the card takes the arrow and its colour; Total odds and "€10 may return" are recalculated.',run(){S.sel=P3();refresh();openSheet();moved()}},
  {g:'Suspended',k:'One of three bets',v:'bar',n:'PRD · Cancelled bet: its odds leave the total (3.20 × 1.36), the counter still says 3.',run(){S.sel=P3();S.st['m4|1x2']='suspended';refresh();showTile('m5')}},
@@ -1604,7 +1589,7 @@ const STATES=[
  {g:'Limit 20',k:'20 picks',v:'bar',n:'PRD · Maximum bets: at 20 selections the counter turns orange.',run(){fill20();refresh()}},
  {g:'Limit 20',k:'20 picks',v:'sheet',n:'The message is pinned above the button, so it is visible as soon as the sheet opens.',run(){fill20();refresh();openSheet()}},
  {g:'Limit 20',k:'Tap on a 21st odd',n:'Nothing is added and nothing is swapped. The odd presses and springs back slightly, an orange tongue slides out from behind the betslip and the counter pulses.',run(){fill20();refresh();toggleSel('m1','1x2','2')}},
- {g:'Limit 20',k:'Limit + suspended bet',n:'Both at once: the line under Total odds for the dropped bet and the limit message above the button.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet();toEnd()}},
+ {g:'Limit 20',k:'Limit + suspended bet',n:'Both at once: the line under Total odds for the dropped bet and the limit message above the button.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet()}},
  {g:'Other screens',k:'Finished matches',n:'Yesterday (Sat 3 Jan in the calendar): last prices stay, everything is disabled, the outcome that happened is white.',run(){setDay('yest')}},
  {g:'Other screens',k:'Favourite team popup',n:'The favourite team plays today: its win is preselected, "Add to my Betslip" puts the pick in the bar.',run(){openFav()}},
  {g:'Other screens',k:'Fixture · Odds tab',n:'Pre-match markets of one match (tap its tile in the feed). Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
@@ -1740,7 +1725,7 @@ document.querySelectorAll('.devsw button').forEach(b=>b.onclick=()=>{
 let timers=[];
 function init(){
  timers.forEach(clearInterval);hideToast();
- S=freshState();unfreeze();
+ S=freshState();
  for(const k in CHG)delete CHG[k];Object.values(chgTimers).flat().forEach(clearTimeout);document.querySelectorAll('.cv').forEach(e=>e.classList.remove('up','dn'));
  $('#oddsChip').classList.remove('off');$('#oddsChip').setAttribute('aria-checked','true');$('#liveBadge').classList.remove('on');
  $('#sheet').classList.remove('show','editing');$('#backdrop').classList.remove('show');$('#overlay').classList.remove('show');
