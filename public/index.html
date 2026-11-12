@@ -637,6 +637,9 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .compliance{font-size:var(--compliance-size);line-height:var(--compliance-lh);color:var(--compliance-color);margin:var(--sheet-content-gap) 0 0;text-align:center} /* S4: under the button, centred */
 .sfoot .cta-main{margin-top:var(--sheet-foot-pad-t)}
 .sfoot{flex:none;padding:var(--sheet-foot-pad-t) var(--sheet-foot-pad-x) var(--sheet-foot-pad-b);background:linear-gradient(180deg,rgba(12,22,28,0),rgb(12,22,28) 8px);position:relative}
+/* B3: while there are cards below the edge, they fade out softly into the footer instead of being cut by it (.more is set in moreCheck) */
+.sfoot::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:var(--spacer-spacer-xxl);background:linear-gradient(180deg,rgba(12,22,28,0),rgb(12,22,28));opacity:0;pointer-events:none;transition:opacity var(--m-quick) ease-out}
+.sheet.more .sfoot::before{opacity:1}
 
 .cta-main{width:100%;height:48px;border-radius:8px;background:var(--t1);color:#080e12;font-weight:700;font-size:16px;line-height:24px;transition:transform var(--m-press),background var(--m-quick),color var(--m-quick)}
 .cta-main:active{transform:scale(.98)}
