@@ -338,6 +338,7 @@ html.app .navbar{height:calc(52px + max(env(safe-area-inset-bottom,0px),var(--sp
 html.app .scroll,html.app .cp{bottom:calc(52px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)))}
 html.app .bar{bottom:calc(62px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)))}
 html.app .tongue{bottom:calc(62px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)) + var(--bar-h) - 10px)}
+html.app .sfoot{padding-bottom:max(var(--sheet-foot-pad-b),calc(env(safe-area-inset-bottom,0px) + var(--spacing-8)))} /* S4: the text under the button stays above the home indicator */
 html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} /* only the feed and the sheet content scroll, never the page */
 
 /* status bar */
@@ -613,8 +614,8 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .sn{font-size:12px;line-height:18px;color:var(--t3)}
 .sn[hidden]{display:none}
 /* .Betslip/Notice: limit of 20 picks, last line of the sheet content */
-/* .Betslip/Notice: limit message pinned above the button — orange icon + text (accent/warning-100), no box */
-.lnote{display:flex;align-items:flex-start;gap:6px;margin:-4px 0 16px;font-size:12px;line-height:18px;color:#ffae36}
+/* .Betslip/Notice: limit message pinned above the summary — orange icon + text (accent/warning-100), no box */
+.lnote{display:flex;align-items:flex-start;gap:6px;margin:0 0 var(--sheet-content-gap);font-size:12px;line-height:18px;color:#ffae36}
 .lnote svg{flex:none;margin-top:1px}
 .lnote[hidden]{display:none}
 .sbody .legal{margin-top:var(--sheet-pad-t);position:relative;z-index:3}
@@ -632,7 +633,8 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 @keyframes deny{0%{transform:scale(1);animation-timing-function:cubic-bezier(.3,0,.4,1)}22%{transform:scale(.955);animation-timing-function:cubic-bezier(.3,.1,.3,1)}52%{transform:scale(1.014);animation-timing-function:ease-in-out}76%{transform:scale(.996);animation-timing-function:ease-in-out}100%{transform:none}}
 .badge.nope{animation:nope .6s var(--soft)}
 @keyframes nope{0%{transform:scale(1)}30%{transform:scale(1.1)}60%{transform:scale(.98)}100%{transform:none}}
-.compliance{font-size:var(--compliance-size);line-height:var(--compliance-lh);color:var(--compliance-color);margin:var(--sheet-content-gap) 0 var(--sheet-foot-pad-t)}
+.compliance{font-size:var(--compliance-size);line-height:var(--compliance-lh);color:var(--compliance-color);margin:var(--sheet-content-gap) 0 0;text-align:center} /* S4: under the button, centred */
+.sfoot .cta-main{margin-top:var(--sheet-foot-pad-t)}
 .sfoot{flex:none;padding:var(--sheet-foot-pad-t) var(--sheet-foot-pad-x) var(--sheet-foot-pad-b);background:linear-gradient(180deg,rgba(12,22,28,0),rgb(12,22,28) 8px);position:relative}
 
 .cta-main{width:100%;height:48px;border-radius:8px;background:var(--t1);color:#080e12;font-weight:700;font-size:16px;line-height:24px;transition:transform var(--m-press),background var(--m-quick),color var(--m-quick)}
@@ -1004,13 +1006,14 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
     <div class="cards" id="cards"></div>
    </div>
    <div class="sfoot">
+    <div class="lnote" id="lnote" hidden><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.3v3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5.1" r=".9" fill="currentColor"/></svg><span>Maximum number of selections allowed is 20</span></div>
     <div class="summary">
      <div class="srow" id="sumOddsRow"><span class="lbg"><span class="lb" id="sumOddsLabel">Total odds</span><span class="sn" id="sumNote" hidden></span></span><span class="tv cv" id="sumOdds"><span class="arr"><svg width="9" height="8" viewBox="0 0 9 8"><path d="M3.66137 1.29115C4.05567 0.684093 4.94433 0.684092 5.33863 1.29115L7.3938 4.45529C7.8259 5.12057 7.34846 6 6.55517 6H2.44483C1.65154 6 1.17409 5.12057 1.6062 4.4553L3.66137 1.29115Z" fill="currentColor"/></svg></span><span class="num">0.00</span></span></div>
      <div class="sdiv" id="sumDiv"></div>
      <div class="srow" id="sumRetRow"><span class="lb" id="sumReturnLabel">€10 may return</span><span class="gold" id="sumReturn">€0.00</span></div>
     </div>
-    <p class="compliance">Interactive promotional advertisement. DAZN Bet registration required to place bets. Odds may vary. Gamble responsibly. 18+.</p>
-    <div class="lnote" id="lnote" hidden><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.3v3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5.1" r=".9" fill="currentColor"/></svg><span>Maximum number of selections allowed is 20</span></div><button class="cta-main" id="placeBtn">Place bet on DAZN Bet</button></div>
+    <button class="cta-main" id="placeBtn">Place bet on DAZN Bet</button>
+    <p class="compliance">Interactive promotional advertisement. DAZN Bet registration required to place bets. Odds may vary. Gamble responsibly. 18+.</p></div>
   </div>
 
   <div class="fvp" id="fav">
