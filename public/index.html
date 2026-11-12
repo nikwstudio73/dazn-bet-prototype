@@ -468,7 +468,7 @@ img{display:block}
 
 /* navbar */
 .navbar{position:absolute;left:0;right:0;bottom:0;height:86px;background:#080e12;border-top:1px solid #202327;padding:7px 24px 0;z-index:6}
-.navbar .tabs{display:flex;gap:22px;height:44px}
+.navbar .tabs{display:flex;justify-content:space-between;gap:22px;height:44px} /* 375: no spare width (tabs + gaps are 328 in a 327 box), so they start at the left edge as before; 440: the spare width goes between the tabs, 24 px stays on both edges */
 .nb{flex:none;width:48px;height:44px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;line-height:15px;letter-spacing:.01em;color:#858b93;white-space:nowrap}
 .nb.on{color:#f8f8f8}
 .nb:nth-child(n+4){position:relative;top:.5px}
