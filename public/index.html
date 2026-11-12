@@ -265,11 +265,21 @@
   --page:#080e12; --surface:#0c161c; --tile:#0c161c; --chip:#242d33; --line:#242d33;
   --t1:#f9fafa; --t2:#c5c7ca; --t3:#8d9295; --t4:#b3b9bb; --tdis:#4d5457; --navoff:#6d7377;
   --live:#d12424; --up:#6edb98; --down:#fd948e; --yellow:#f7ff1a;
-  --ease:cubic-bezier(.2,.8,.2,1);
+  /* MOTION TOKENS. Two curves and five durations for the whole product UI: use these, don't add literals.
+     JS mirrors them in SOFT and T (see "soft motion helpers"). */
+  --m-press:.12s;   /* press feedback */
+  --m-quick:.2s;    /* colour, opacity, small state changes */
+  --m-std:.32s;     /* an element enters, a text swaps, a card collapses */
+  --m-layout:.44s;  /* heights and pages: odds reveal, sheet resize, fixture push */
+  --m-sheet:.5s;    /* sheets, collapsed bar, toast, DAZN Bet overlay */
+  --exit:cubic-bezier(.4,0,.6,1);    /* only for things that hide behind something (limit tongue) */
+  --chg-in:.8s; --chg-fade:1.5s; --chg-fade-pick:.6s; /* odds change: tint in, tint + arrow out, arrow of my pick out */
+  --ease:cubic-bezier(.2,.8,.2,1);   /* state changes in place */
+  --soft:cubic-bezier(.32,.72,0,1); /* close to the UIKit sheet spring (critically damped, ~0.5 s) */ /* soft motion: quick start, long gentle landing (odds toggle, bar, sheet, text swaps) */
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{background:#1e1e1e;font-family:'DAZN Oscine',system-ui,sans-serif;color:var(--t1);-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;overflow:hidden}
+body{background:var(--ui-canvas);font-family:'DAZN Oscine',system-ui,sans-serif;color:var(--t1);-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;overflow:hidden}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 img{display:block}
 
@@ -277,28 +287,41 @@ img{display:block}
 @property --sb{syntax:"<length>";inherits:true;initial-value:44px}
 #stage{--sb:44px;--dev:.55s cubic-bezier(.3,.7,.2,1);position:absolute;left:50%;top:0;width:375px;height:812px;transform-origin:top center}
 /* device switch: size, scale, status-bar height and corner radius animate together */
-#stage.anim{transition:width var(--dev),height var(--dev),transform var(--dev),--sb var(--dev)}
+#stage.anim{transition:width var(--dev),height var(--dev),top var(--dev),transform var(--dev),--sb var(--dev)}
 #stage.anim #phone{transition:border-radius var(--dev)}
 #stage.max{--sb:62px;width:440px;height:956px}
 #stage.max #phone{border-radius:55px}
-.island{position:absolute;top:11px;left:50%;width:125px;height:37px;margin-left:-62.5px;border-radius:20px;background:#000;z-index:12;pointer-events:none;opacity:0;transform:scale(.4,.6);transition:opacity .3s,transform var(--dev)}
+.island{position:absolute;top:11px;left:50%;width:125px;height:37px;margin-left:-62.5px;border-radius:20px;background:#000;z-index:12;pointer-events:none;opacity:0;transform:scale(.4,.6);transition:opacity var(--m-std),transform var(--dev)}
 #stage.max .island{opacity:1;transform:none}
-.status .time,.status svg{transition:top var(--dev),left var(--dev),right var(--dev)}
+.status .time,.status .sr{transition:top var(--dev),left var(--dev),right var(--dev)}
 #stage.max .status .time{top:22px;left:32px}
-#stage.max .status svg{top:26px;right:28px}
+#stage.max .status .sr{top:26px;right:28px}
 #phone{position:absolute;inset:0;background:var(--page);border-radius:44px;overflow:hidden;overflow:clip;box-shadow:0 0 0 10px #000,0 0 0 11px #333,0 30px 80px rgba(0,0,0,.6);isolation:isolate}
-/* device switch = DS "Segmented Control" (Figma 3392:71978) */
-.devsw{position:fixed;top:16px;left:50%;transition:top .55s cubic-bezier(.3,.7,.2,1);transform:translateX(-50%);display:grid;grid-auto-flow:column;grid-auto-columns:1fr;align-items:center;padding:4px;border-radius:12px;background:#0d0e11;box-shadow:0 0 0 1px #060606,inset 0 0 0 1px #060606;z-index:100;font-family:'DAZN Oscine',system-ui,sans-serif}
-.devsw button{min-width:113px;height:32px;padding:2px 16px;border-radius:8px;font-weight:700;font-size:14px;line-height:18px;color:#858b93;white-space:nowrap;transition:background .2s,color .2s}
-.devsw button.on{background:rgba(116,128,138,.18);color:#f8f8f8}
-.devsw button:not(.on):hover{color:#c5c7ca}
-#reset{position:fixed;right:16px;bottom:14px;font-size:12px;color:#777;letter-spacing:.02em;padding:6px 10px;border-radius:6px}
-#reset:hover{color:#ccc;background:#2a2a2a}
+/* ---------- prototype chrome (everything outside the phone) ----------
+   Same Global foundation tokens as the product UI ("Color theme", dark). One accent: white (text/primary). No brand yellow, no orange. */
+:root{
+  --ui-canvas:var(--surface-container-2);          /* surface/container-2 */
+  --ui-panel:var(--surface-container-1);           /* surface/container-1 */
+  --ui-well:#080e12;                               /* surface/default-0 */
+  --ui-line:var(--border-full-color-subtle);       /* border/full-color/subtle */
+  --ui-hover:var(--fill-overlay-1);                /* fill/overlay-1 */
+  --ui-on:rgba(249,250,250,0.08);                  /* fill/overlay-2 */
+  --ui-thumb:var(--fill-overlay-3);                /* fill/overlay-3 */
+  --ui-t1:var(--modules-color-text-primary-default);/* text/primary */
+  --ui-t2:#c5c7ca;                                 /* text/secondary */
+  --ui-t3:var(--text-tertiary);                    /* text/tertiary */
+}
+/* segmented control (DS "Segmented Control", Figma 3392:71978): phone size in the bottom-right corner, betslip view inside the panel */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;align-items:center;padding:3px;border-radius:10px;background:var(--ui-well);font-family:'DAZN Oscine',system-ui,sans-serif}
+.seg button{height:28px;padding:0 12px;border-radius:7px;font-weight:700;font-size:12px;line-height:18px;color:var(--ui-t3);white-space:nowrap;transition:background .2s,color .2s}
+.seg button.on{background:var(--ui-thumb);color:var(--ui-t1)}
+.seg button:not(.on):hover{color:var(--ui-t2)}
+.devsw{position:fixed;right:16px;bottom:16px;z-index:100;padding:4px;border-radius:12px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line)}
 
 /* status bar */
 .status{position:absolute;top:0;left:0;right:0;height:var(--sb);background:var(--surface);z-index:5}
 .status .time{position:absolute;left:21px;top:12px;width:54px;text-align:center;font:500 15px/21px -apple-system,'SF Pro Text','Inter',system-ui,sans-serif;letter-spacing:-.2px}
-.status .sr{position:absolute;left:303.5px;top:17.3px;width:57px;height:10px}
+.status .sr{position:absolute;right:14.5px;top:17.3px;width:57px;height:10px}
 
 /* header */
 .header{position:absolute;top:var(--sb);left:0;right:0;height:64px;background:var(--surface);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:5}
@@ -307,8 +330,8 @@ img{display:block}
 .hactions{display:flex;align-items:center}
 .oddsTog{display:flex;align-items:center;gap:6px;height:48px;font-weight:700;font-size:12px;line-height:20px;color:var(--t1)}
 .oddsTog .ol{width:32px;text-align:center;position:relative;top:-1px}
-.oddsTog .sw{width:44px;height:24px;border-radius:9999px;padding:2px;background:#f7ff1a;transition:background .2s}
-.oddsTog .knob{display:block;width:20px;height:20px;border-radius:50%;background:#080e12;transform:translateX(20px);transition:transform .2s,background .2s}
+.oddsTog .sw{width:44px;height:24px;border-radius:9999px;padding:2px;background:#f7ff1a;transition:background var(--m-quick)}
+.oddsTog .knob{display:block;width:20px;height:20px;border-radius:50%;background:#080e12;transform:translateX(20px);transition:transform var(--m-quick) var(--ease),background var(--m-quick)}
 .oddsTog.off .sw{background:rgba(116,128,138,.43)}
 .oddsTog.off .knob{background:#f8f8f8;transform:none;box-shadow:0 1px 3px rgba(0,0,0,.24),0 1px 1px rgba(0,0,0,.12)}
 .hbtn{width:48px;height:48px;display:flex;align-items:center;justify-content:center}
@@ -324,13 +347,13 @@ img{display:block}
 /* calendar */
 .calendar{position:absolute;top:calc(var(--sb) + 123px);left:0;right:0;height:56px;background:var(--surface);display:flex;align-items:center;z-index:5}
 .cal-live{width:70px;height:56px;display:flex;align-items:center;justify-content:center}
-.livebadge{width:38px;height:19px;border-radius:4px;border:1px solid var(--t1);background:var(--tile);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;line-height:1;padding-bottom:2px;transition:background .2s,border-color .2s}
+.livebadge{width:38px;height:19px;border-radius:4px;border:1px solid var(--t1);background:var(--tile);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;line-height:1;padding-bottom:2px;transition:background var(--m-quick),border-color var(--m-quick)}
 .livebadge.on{background:var(--live);border-color:var(--live)}
 .vdiv{width:1px;height:30px;background:var(--line);flex:none}
 .days{flex:1;min-width:0;height:56px;overflow:hidden}
-.days-in{height:56px;display:flex;gap:4px;align-items:flex-end;transform:translateX(-54px);transition:transform .3s var(--ease)}
+.days-in{height:56px;display:flex;gap:4px;align-items:flex-end;transform:translateX(-54px);transition:transform var(--m-std) var(--ease)}
 .days.yest .days-in{transform:none}
-.day{flex:none;width:50px;height:48px;display:flex;flex-direction:column;align-items:center;padding-top:3px;color:var(--t4)}
+.day{flex:none;width:50px;height:48px;display:flex;flex-direction:column;align-items:center;padding-top:3px;color:var(--t4);border-bottom:2px solid transparent;transition:color var(--m-quick),border-color var(--m-quick)}
 .day b{font-weight:700;font-size:14px;line-height:22px}
 .day span{font-weight:400;font-size:14px;line-height:16px;white-space:nowrap;margin-top:-3px}
 .day[data-day]{cursor:pointer}
@@ -341,7 +364,7 @@ img{display:block}
 .cal-ic img{width:24px;height:24px}
 
 /* scroll area */
-.scroll{position:absolute;top:calc(var(--sb) + 179px);left:0;right:0;bottom:86px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.scroll{position:absolute;top:calc(var(--sb) + 179px);left:0;right:0;bottom:86px;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;overflow-anchor:none}
 .scroll::-webkit-scrollbar{display:none}
 .feed{padding:12px 16px 16px}
 #phone.hasbar .feed{padding-bottom:120px}
@@ -354,10 +377,15 @@ img{display:block}
 .legal .lp{flex:0 0 112px;gap:3px;border:1px solid #1f2223}
 .legal .lp span{font-weight:700;font-size:8px;line-height:6px;white-space:pre;width:63px}
 .legal .lp img{width:33px;height:17px}
-.feed .legal{margin-bottom:12px}
+.feed .legal{margin-bottom:12px;transition:height var(--o-dur) var(--soft),margin-bottom var(--o-dur) var(--soft),opacity var(--m-quick) ease-out .08s}
 /* Legal/Safe gambling footer, Style=Text: last line of every page with odds */
-.sgfoot{margin-top:4px;padding:0 16px;text-align:center;font-size:12px;line-height:18px;color:#8d9295}
-#feed.nood .legal,#feed.nood .sgfoot{display:none}
+.sgfoot{margin-top:4px;padding:0 16px;text-align:center;font-size:12px;line-height:18px;height:18px;overflow:hidden;color:#8d9295}
+#feed.nood .legal{height:0;margin-bottom:0;opacity:0;overflow:hidden;pointer-events:none;transition:height var(--o-dur) var(--soft) var(--o-close-d),margin-bottom var(--o-dur) var(--soft) var(--o-close-d),opacity var(--o-out) ease-out}
+.sgfoot{transition:opacity var(--m-quick) ease-out,height var(--o-dur) var(--soft),margin-top var(--o-dur) var(--soft)}
+#feed.nood .sgfoot{height:0;margin-top:0;opacity:0;overflow:hidden}
+/* Odds toggle motion (soft reveal): cards open one after another, prices fade in and rise a little.
+   --ti = cascade delay in ms, set per visible tile in setOddsOn(). */
+:root{--o-dur:var(--m-layout);--o-y:6px;--o-fade:var(--m-std);--o-fade-d:110ms;--o-out:.16s;--o-close-d:70ms}
 .following{height:16px;display:flex;align-items:center;gap:24px;margin-bottom:12px}
 .following i{flex:1;height:1px;background:var(--line)}
 .following span{display:flex;align-items:center;gap:8px;font-size:14px;line-height:22px}
@@ -374,7 +402,8 @@ img{display:block}
 .tiles{display:flex;flex-direction:column;gap:8px}
 
 /* match tile */
-.tile{border-radius:var(--tile-radius);background:var(--tile-bg);padding:var(--tile-pad-y) var(--tile-pad-r) var(--tile-pad-y) var(--tile-pad-l);display:flex;flex-direction:column;gap:var(--tile-gap);transition:padding .35s var(--ease)}
+.tile{border-radius:var(--tile-radius);background:var(--tile-bg);padding:var(--tile-pad-y) var(--tile-pad-r) var(--tile-pad-y) var(--tile-pad-l);display:flex;flex-direction:column;gap:var(--tile-gap);transition:padding var(--o-dur) var(--soft) calc(var(--ti,0) * 1ms)}
+.tile:not(.odds){transition-delay:calc(var(--ti,0) * 1ms + var(--o-close-d))}
 .tile.odds{padding:var(--tile-odds-pad-t) var(--tile-pad-r) var(--tile-odds-pad-b) var(--tile-pad-l)}
 .tile.live{background:radial-gradient(37.3% 131% at 0% 37.8%,rgba(209,36,36,0.160) 0.0%,rgba(197,35,36,0.150) 6.2%,rgba(184,34,35,0.140) 12.5%,rgba(172,33,34,0.130) 18.8%,rgba(160,32,34,0.120) 25.0%,rgba(147,32,34,0.110) 31.2%,rgba(135,31,33,0.100) 37.5%,rgba(123,30,32,0.090) 43.8%,rgba(110,29,32,0.080) 50.0%,rgba(98,28,32,0.070) 56.2%,rgba(86,27,31,0.060) 62.5%,rgba(74,26,30,0.050) 68.8%,rgba(61,26,30,0.040) 75.0%,rgba(49,25,30,0.030) 81.2%,rgba(37,24,29,0.020) 87.5%,rgba(24,23,28,0.010) 93.8%,rgba(12,22,28,0.000) 100.0%),var(--tile-bg)}
 .trow{display:flex;align-items:center;gap:var(--tile-main-gap);height:var(--tile-main-h)}
@@ -394,22 +423,21 @@ img{display:block}
 .cta .pc{width:24px;height:24px;border-radius:50%;background:var(--t1);display:flex;align-items:center;justify-content:center;padding-left:1px}
 .cta .pc img{width:16px;height:16px}
 .cta span{font-weight:700;font-size:10px;line-height:7px;letter-spacing:.1px;white-space:nowrap;margin-top:0}
-.orow{display:flex;gap:var(--tile-odds-gap);padding:0 var(--tile-odds-pad-r) 0 var(--tile-odds-pad-l);height:var(--tile-odds-h);overflow:hidden;transition:height .35s var(--ease),opacity .25s}
-.tile:not(.odds) .orow{height:0;opacity:0;margin-top:calc(-1 * var(--tile-gap))}
+.orow{display:flex;gap:var(--tile-odds-gap);padding:0 var(--tile-odds-pad-r) 0 var(--tile-odds-pad-l);height:var(--tile-odds-h);overflow:hidden;transition:height var(--o-dur) var(--soft) calc(var(--ti,0) * 1ms),margin-top var(--o-dur) var(--soft) calc(var(--ti,0) * 1ms),opacity var(--o-fade) ease-out calc(var(--ti,0) * 1ms + var(--o-fade-d)),transform var(--o-dur) var(--soft) calc(var(--ti,0) * 1ms + var(--o-fade-d))}
+.tile:not(.odds) .orow{height:0;opacity:0;margin-top:calc(-1 * var(--tile-gap));transform:translateY(var(--o-y));pointer-events:none;transition:height var(--o-dur) var(--soft) calc(var(--ti,0) * 1ms + var(--o-close-d)),margin-top var(--o-dur) var(--soft) calc(var(--ti,0) * 1ms + var(--o-close-d)),opacity var(--o-out) ease-out calc(var(--ti,0) * 1ms),transform var(--o-dur) var(--soft) calc(var(--ti,0) * 1ms)}
 
 /* odds tile */
-.odd{position:relative;flex:1;height:var(--tile-odds-h);border-radius:var(--odd-radius);background:var(--odd-bg);display:flex;align-items:center;justify-content:space-between;padding:var(--odd-pad-t) var(--odd-pad-r) var(--odd-pad-t) var(--odd-pad-l);font-weight:700;font-size:var(--odd-size);line-height:18px;letter-spacing:var(--odd-ls);overflow:hidden;transition:background .2s,transform .12s}
+.odd{position:relative;flex:1;height:var(--tile-odds-h);border-radius:var(--odd-radius);background:var(--odd-bg);display:flex;align-items:center;justify-content:space-between;padding:var(--odd-pad-t) var(--odd-pad-r) var(--odd-pad-t) var(--odd-pad-l);font-weight:700;font-size:var(--odd-size);line-height:18px;letter-spacing:var(--odd-ls);overflow:hidden;transition:background var(--m-quick),transform var(--m-press)}
 .odd:active{transform:scale(.97)}
-.odd::before{content:"";position:absolute;inset:0;border-radius:var(--odd-radius);opacity:0;transition:opacity 1.5s cubic-bezier(.2,.8,.2,1)}
+.odd::before{content:"";position:absolute;inset:0;border-radius:var(--odd-radius);opacity:0;transition:opacity var(--chg-fade) var(--ease)}
 .odd.up::before{background:var(--odd-up-tint)}
 .odd.down::before{background:var(--odd-down-tint)}
-.odd.flash::before{opacity:1;transition:opacity .8s cubic-bezier(.2,.8,.2,1)}
+.odd.flash::before{opacity:1;transition:opacity var(--chg-in) var(--ease)}
 /* State=Up keeps the base fill under the green tint, like Down (Figma 12.11) */
-.odd.up:not(.flash):not(.sel){transition:background 1.5s cubic-bezier(.2,.8,.2,1),transform .12s}
-.odd .l{color:var(--odd-label-color);position:relative}
-.odd .v{display:flex;align-items:center;gap:var(--odd-value-gap);position:relative;color:var(--odd-value-color)}
+.odd .l{color:var(--odd-label-color);position:relative;transition:color var(--m-quick)}
+.odd .v{display:flex;align-items:center;gap:var(--odd-value-gap);position:relative;color:var(--odd-value-color);transition:color var(--m-quick)}
 .odd .arr{width:9px;height:8px;margin-top:1px;display:none} /* .Bet/Odds change, one size everywhere (same as the betslip): 9×9 box = 9×8 arrow + 1px optical pad (top for Up, bottom for Down) */
-.odd.up .arr,.odd.down .arr{display:block}
+.odd.up .arr,.odd.down .arr{display:block;animation:arrIn var(--m-quick) ease-out}
 .odd .arr svg{display:block}
 .odd.down .arr{transform:rotate(180deg);margin-top:-1px}
 .odd.sel .arr{margin-top:3px}.odd.sel.down .arr{margin-top:1px} /* Figma: arrow-wrap of the Selected up / down tiles has 2px top padding, so the arrow sits 1px lower there */
@@ -417,11 +445,11 @@ img{display:block}
 .odd.sel.up .arr{color:#0c7a4a}.odd.sel.down .arr{color:#d12424}
 .odd.sel::before{display:none} /* State Selected up / Selected down: the tile stays white, only the arrow shows the move */
 .odd .num{display:inline-block;min-width:28px;text-align:right;position:relative}
-.odd .num.roll{animation:roll .45s var(--ease)}
-@keyframes roll{0%{transform:translateY(9px);opacity:0}100%{transform:none;opacity:1}}
+@keyframes arrIn{from{opacity:0}} /* the new price itself is played in from JS: rise(dir) in animateOdd() */
 .odd.sel{background:var(--odd-sel-bg)}
 .odd.sel .l,.odd.sel .v{color:var(--odd-sel-color)}
-.odd .arr.fade{opacity:0;transition:opacity 1.5s cubic-bezier(.2,.8,.2,1)} /* same curve as the line (.odd::before) */
+.odd .arr.fade{opacity:0;transition:opacity var(--chg-fade) var(--ease)} /* same curve as the tint (.odd::before) */
+.odd.sel .arr.fade{transition-duration:var(--chg-fade-pick)} /* my pick: the arrow lives as long as in the betslip (CHG_T in JS) */
 /* .Bet/Odds tile states Locked / Selected locked / Result / Disabled (Figma 3964:39156) */
 .lk{display:block;width:20px;height:20px;flex:none;background:currentColor;--lk:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAPoAAAD6AG1e1JrAAACkElEQVR4Xu2a4XHbMAyFH3j6X29QZ4ImEzSdoNkg7gTtBnUmaDpB0w2SCeINkk4QZwJ5g9dDRV19qiWXFkVSEr+ftE4WAQh8AARkMpnMjBFEgOQSwDmAhV3aAdiKyDOmCslLkrckS7bzQvIHybeYCiSXJO/pzvgNwcrrXR4/hkbEJcYIyWv6Y4UxJUGS7wB0JbSN/f0XgDcA6qTY5e2LUSRJkguS2xZPPnaFtM0Xek3b61CfGulC8mvLBtYIeI/UvL+GI/bIbFImHQUkVwce+gUn0mLMz/CIgV+uDqw5e3+PbwfW0j0WST4f8Nii5yvlLaIGh//yhAGMihRfAR72tBY5fSmbC32iajAD4G9lFwIVT8kZYJQITsSGoWr099b7Cytnm69AX/m63zfYl9L1/R9E5A4hDcCqoaEPkUq5utXjUUReMbQBmN7m942gBdNu6BywTnDzijrmC4aMAFbeT1eIVDnhzCUKCrjRTHI1muj++0890pTFdSKuk6RfSK6HLk48VIzXGDgHNNGuTiz6HrHwYYBRYzBzDGaOwcwxmDkGEbDt71vb6n6KOQYrEBg7NNk0KjwVL1ckP4QefhgExErph5bmia7pUGQxWQOgkq5doa6b/4gJG2Dp6ZrRGqA8dkHoosogLD+PXQDgHlM1gFR1etek6OaUttaojkERubGzjU97CfGPYUTkOwJTIAJqBPU2ST3/dyKi/bwoFIhIaNETPQekiMHMMZg5BjPHIKFJbYz/LtBfympdf4E4rPpKacG0JkPK0kVNGjhgBcswUxc/3Lls3jkCFPul5yPSQ0P/3NUABo6IyMbq+NQ2v3LdfC+OfNcbitI+w8kNVYEHbHKMgRZSTlk/k8lkMpkMan4Dybt6asQq6BsAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAAABJRU5ErkJggg==);-webkit-mask:var(--lk) center/20px 20px no-repeat;mask:var(--lk) center/20px 20px no-repeat} /* .Bet/Lock, always 20 px (DS action-lock), inlined: a CSS mask can't load a file:// image */
 .odd.locked,div.odd{cursor:default}
@@ -446,13 +474,14 @@ img{display:block}
 .bar{position:absolute;left:8px;right:8px;bottom:96px;height:var(--bar-h);border-radius:var(--bar-radius);border:1px solid var(--bar-border);
   background:var(--bar-bg);
   box-shadow:var(--bar-shadow);display:flex;align-items:center;padding:var(--bar-pad-y) var(--bar-pad-x);z-index:7;
-  transform:translateY(130px);opacity:0;transition:transform .45s var(--ease),opacity .3s;cursor:pointer}
-.bar.show{transform:none;opacity:1}
+  transform:translateY(18px) scale(.97);opacity:0;pointer-events:none;transition:transform var(--m-sheet) var(--soft),opacity var(--m-quick) ease-out;cursor:pointer}
+.bar.show{transform:none;opacity:1;pointer-events:auto}
+.bar.show:active{transform:scale(.985);transition-duration:var(--m-press)}
 .bar .left{flex:1;min-width:0}
 .bar .ttl{display:flex;align-items:center;gap:var(--bar-title-gap);height:var(--bar-title-lh)}
 .bar .ttl b{font-weight:700;font-size:var(--bar-title-size);line-height:var(--bar-title-lh)}
 .badge{min-width:var(--badge-h);height:var(--badge-h);border-radius:100px;background:var(--badge-bg);color:var(--badge-color);display:flex;align-items:center;justify-content:center;padding:0 var(--badge-pad-x);font-weight:700;font-size:var(--badge-size);letter-spacing:.16px;line-height:1}
-.badge.bump{animation:bump .4s var(--ease)}
+.badge.bump{animation:bump var(--m-layout) var(--ease)}
 .bar .badge{min-width:var(--barbadge-h);height:var(--barbadge-h);font-size:var(--barbadge-size);letter-spacing:.12px;padding:0 4px 1px}
 .bar .pill[hidden]{display:none}
 .bar .pill .num{min-width:20px;text-align:center} /* the dash sits in a 20px value box: pill 44 wide */
@@ -463,26 +492,27 @@ img{display:block}
 .pill{height:var(--pill-h);border-radius:9999px;background:var(--pill-bg);padding:0 var(--pill-pad-x) 2px;display:flex;align-items:center;font-weight:700;font-size:var(--pill-size);letter-spacing:.01em;line-height:var(--pill-lh)}
 
 /* toast */
-.toast{position:absolute;left:16px;right:16px;bottom:96px;min-height:36px;border-radius:var(--toast-radius);background:var(--toast-bg);border:1px solid var(--toast-border);box-shadow:var(--toast-shadow);display:flex;align-items:center;justify-content:space-between;padding:var(--toast-pad-y) var(--toast-pad-r) var(--toast-pad-y) var(--toast-pad-l);font-size:var(--toast-size);line-height:var(--toast-lh);z-index:30;opacity:0;transform:translateY(12px);transition:opacity .25s,transform .35s var(--ease);pointer-events:none}
+.toast{position:absolute;left:16px;right:16px;bottom:96px;min-height:36px;border-radius:var(--toast-radius);background:var(--toast-bg);border:1px solid var(--toast-border);box-shadow:var(--toast-shadow);display:flex;align-items:center;justify-content:space-between;padding:var(--toast-pad-y) var(--toast-pad-r) var(--toast-pad-y) var(--toast-pad-l);font-size:var(--toast-size);line-height:var(--toast-lh);z-index:30;opacity:0;transform:translateY(12px);transition:opacity var(--m-quick) ease-out,transform var(--m-sheet) var(--soft);pointer-events:none} /* same motion as the bar: it sits in the same place */
 .toast.show{opacity:1;transform:none;pointer-events:auto}
 .toast button{height:32px;font-weight:700;font-size:12px;letter-spacing:.01em;color:#f8f8f8;background:rgba(195,209,219,.10);/* Button/CTA Secondary sm (DS instance, not synced) */padding:var(--toast-btn-pad-y) var(--toast-btn-pad-x);border-radius:8px}
 .toast button:hover{background:rgba(195,209,219,.16)}
 
 /* sheet */
-.backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .35s;z-index:20}
+.backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity var(--m-sheet) var(--soft);z-index:20}
+.backdrop.drag{transition:none}
 .backdrop.show{opacity:1;pointer-events:auto}
-.sheet{position:absolute;left:0;right:0;bottom:0;max-height:calc(100% - 52px);background:var(--sheet-bg);border-radius:var(--sheet-radius) var(--sheet-radius) 0 0;z-index:21;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .42s var(--ease)}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:calc(100% - 52px);background:var(--sheet-bg);border-radius:var(--sheet-radius) var(--sheet-radius) 0 0;z-index:21;display:flex;flex-direction:column;transform:translateY(105%);transition:transform var(--m-sheet) var(--soft)} /* iOS sheet: slides up from the bottom edge with the system spring, content moves with it */
 .sheet.show{transform:none}
-.sheet.drag{transition:none}
+.sheet.drag,.fvp.drag{transition:none}
 /* edit mode freezes the sheet height (removed cards leave empty space at the bottom, nothing under the finger moves);
    on Confirm the sheet eases once to its new height */
-.sheet.resizing{transition:transform .42s var(--ease),height .4s var(--ease)}
-.handle{position:absolute;top:0;left:0;right:0;height:24px;display:flex;justify-content:center;padding-top:10px;cursor:grab;z-index:3}
+.sheet.resizing{transition:transform var(--m-layout) var(--soft),height var(--m-layout) var(--soft)}
+.handle{position:absolute;top:0;left:0;right:0;height:24px;display:flex;justify-content:center;padding-top:10px;cursor:grab;touch-action:none;z-index:3}
 .handle i{width:43px;height:4px;border-radius:2px;background:#9da1a4}
 .sbody{overflow-y:auto;padding:0 var(--sheet-pad-x);scrollbar-width:none;flex:1;min-height:0;border-radius:var(--sheet-radius) var(--sheet-radius) 0 0}
 .sbody::-webkit-scrollbar{display:none}
 /* Betslip/Sheet body: legal banner first, then the header (Figma 11.11). The banner scrolls away, the header sticks under the handle. */
-.shead{display:flex;align-items:center;justify-content:space-between;height:calc(var(--head-h) + 2 * var(--sheet-head-gap));margin:0 calc(-1 * var(--sheet-pad-x));padding:var(--sheet-head-gap) var(--sheet-pad-x);background:var(--sheet-bg);position:sticky;top:calc(var(--sheet-pad-t) - var(--sheet-head-gap));z-index:2;transition:box-shadow .2s}
+.shead{display:flex;align-items:center;justify-content:space-between;height:calc(var(--head-h) + 2 * var(--sheet-head-gap));margin:0 calc(-1 * var(--sheet-pad-x));padding:var(--sheet-head-gap) var(--sheet-pad-x);background:var(--sheet-bg);position:sticky;top:calc(var(--sheet-pad-t) - var(--sheet-head-gap));z-index:2;transition:box-shadow var(--m-quick);touch-action:none;cursor:grab} /* the header drags the sheet too */
 .shead::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:calc(var(--sheet-pad-t) - var(--sheet-head-gap));background:var(--sheet-bg)}
 .shead.scrolled{box-shadow:0 1px 0 var(--line)}
 .shead .ttl{display:flex;align-items:center;gap:var(--head-title-gap)}
@@ -490,8 +520,10 @@ img{display:block}
 .tbtn{display:flex;align-items:center;gap:var(--head-btn-gap);padding:var(--head-btn-pad-y) var(--head-btn-pad-x);border-radius:8px;font-weight:700;font-size:12px;line-height:20px;letter-spacing:.01em;color:#f8f8f8}
 .tbtn img{width:20px;height:20px}
 .tbtn:hover{background:rgba(255,255,255,.05)}
+/* press feedback for the small controls (odds, choices, the bar and the main button have their own) */
+.tbtn:active,.fav-x:active,.fx-back:active,.fx-follow:active,.fx-more:active,.toast button:active,.livebadge:active,.day[data-day]:active{opacity:.6}
 .cards{display:flex;flex-direction:column;gap:var(--sheet-cards-gap)}
-.cardwrap{display:grid;grid-template-rows:1fr;transition:grid-template-rows .3s var(--ease),opacity .25s,margin .3s}
+.cardwrap{display:grid;grid-template-rows:1fr;transition:grid-template-rows var(--m-std) var(--soft),opacity var(--m-quick) ease-out,margin var(--m-std) var(--soft)}
 .cardwrap.gone{grid-template-rows:0fr;opacity:0;margin-bottom:calc(-1 * var(--sheet-cards-gap))}
 .cardwrap>.card{overflow:hidden;min-height:0}
 .card{border-radius:var(--card-radius);background:var(--card-bg);padding:var(--card-pad);display:flex;flex-direction:column;gap:var(--card-gap)}
@@ -502,14 +534,15 @@ img{display:block}
 .ctop .selc em{font-style:normal;color:var(--card-pred-color)}
 .ctop .od{font-weight:700;color:var(--card-odds-color);font-size:var(--card-sel-size);letter-spacing:.01em;line-height:18px;padding-top:1px}
 .cv{display:inline-flex;align-items:center;gap:2px}
-.cv .arr{display:none;width:9px;height:8px;flex:none;color:var(--odd-up-arrow);transition:opacity .6s}
+.cv .arr{display:block;width:0;height:8px;margin-right:-2px;flex:none;overflow:hidden;opacity:0;color:var(--odd-up-arrow);transition:width var(--m-quick) var(--ease),margin var(--m-quick) var(--ease),opacity var(--m-quick) ease-out} /* hidden = zero width (margin eats the gap): the pill in the bar grows and shrinks smoothly */
 .cv .arr svg{display:block}
-.cv.up .arr,.cv.dn .arr{display:block}
+.cv.up .arr,.cv.dn .arr{width:9px;margin-right:0;opacity:1}
 .cv.dn .arr{color:var(--odd-down-arrow);transform:rotate(180deg)}
-.cv .arr.fade{opacity:0}
+.cv .arr.fade{opacity:0;transition:opacity var(--chg-fade-pick)}
 /* odds changed in the betslip: the number takes the arrow colour (card, total, bar) */
-.cv .num{transition:color .6s}
+.cv .num{transition:color var(--chg-fade-pick)}
 .cv.up .num{color:var(--odd-up-arrow)}.cv.dn .num{color:var(--odd-down-arrow)}
+.cv.up .num,.cv.dn .num{transition-duration:var(--m-quick)} /* colour comes fast, leaves slowly */
 /* bet dropped out (Betslip/Card Status Suspended / Locked): content at 30%, price replaced by the status */
 .bst{flex:none;display:flex;align-items:center;height:18px;margin-top:1px;font-size:14px;line-height:18px;letter-spacing:.01em;color:#8d9295;white-space:nowrap}
 .card.out .ctop>.sp,.card.out .ctop>.selc,.card.out .cinfo .mk,.card.out .cinfo .tm,.card.out .cinfo .ko,.card.out .cinfo .ev{opacity:.3} /* Suspended and Locked dim the same way (Figma 12.11) */
@@ -520,13 +553,13 @@ img{display:block}
 .rm img{width:16px;height:16px;flex:none}
 .rm:hover{background:rgba(249,250,250,.12)}
 .ctop>.sp,.ctop>.selc,.ctop>.od{margin-top:0}
-.rm,.ctop>.sp,.ctop>.selc,.ctop>.od{transition:width .32s var(--ease),height .32s var(--ease),margin .32s var(--ease),opacity .22s,transform .32s var(--ease),color .3s;transition-delay:calc(var(--i,0) * 45ms)}
+.rm,.ctop>.sp,.ctop>.selc,.ctop>.od{transition:width var(--m-std) var(--ease),height var(--m-std) var(--ease),margin var(--m-std) var(--ease),opacity var(--m-quick),transform var(--m-std) var(--ease),color var(--m-std);transition-delay:calc(var(--i,0) * 45ms)}
 .editing .rm{width:20px;height:20px;margin-left:0;opacity:1;transform:none;pointer-events:auto}
 /* Figma Edit example, first card: everything in the card at 30% except the × and the LIVE pill (card bg and glow stay) */
-.cinfo .mk,.cinfo .tm,.cinfo .ko{transition:opacity .32s var(--ease);transition-delay:calc(var(--i,0) * 45ms)}
+.cinfo .mk,.cinfo .tm,.cinfo .ko{transition:opacity var(--m-std) var(--ease);transition-delay:calc(var(--i,0) * 45ms)}
 .editing .ctop>.sp,.editing .ctop>.selc,.editing .ctop>.od,.editing .cinfo .mk,.editing .cinfo .tm,.editing .cinfo .ko{opacity:.3}
 .editing .cinfo .st .ev{opacity:.3}
-.summary{transition:opacity .3s}
+.summary{transition:opacity var(--m-std)}
 .editing .summary{opacity:.4}
 .cta-main:disabled{background:#ced0d2;color:#6d7377;cursor:default;transform:none} /* mobile/button state=disabled as on the approved Edit screen */
 .cinfo{display:flex;flex-direction:column;gap:var(--card-info-gap)}
@@ -535,14 +568,15 @@ img{display:block}
 .cinfo .mrow{display:flex;align-items:center;justify-content:space-between;gap:var(--mrow-gap);font-size:var(--mrow-size);line-height:var(--mrow-lh);color:var(--mrow-color)}
 .cinfo .mrow .st{display:flex;align-items:center;gap:var(--mrow-status-gap);color:var(--mrow-kickoff-color);white-space:nowrap}
 .cinfo .mrow .st .ev{color:var(--mrow-event-color)}
-.cinfo .mrow .st .ev .gl{opacity:0;transition:opacity .3s}
-.cinfo .mrow .st .ev.on .gl{opacity:1}
+.cinfo .mrow .st .ev .gl{display:inline-block;opacity:0;transform:translateY(4px);transition:opacity var(--m-std) ease-out,transform var(--m-std) var(--soft)}
+.cinfo .mrow .st .ev.on .gl{opacity:1;transform:none}
 .cinfo .mrow .st .ev:not(.on):not(.out){display:none} /* no event = no gap before the minute */
 .card.out .livepill{opacity:.3} /* suspended or locked pick: the live mark drops to 30% (Figma J, P) */
 .livepill{display:flex;align-items:center;gap:var(--livepill-gap);font-weight:700;font-size:14px;line-height:21px;color:var(--livepill-color)} /* .Betslip/Live pill: minute Bold 14 + 4px dot, both accent/notification, no plate */
 .livepill i{width:4px;height:4px;border-radius:50%;background:var(--livepill-color);animation:livedot 2.4s ease-in-out infinite}
 @keyframes livedot{0%,100%{opacity:1}50%{opacity:.2}} /* slow pulse (Nik 11.11) */
-@media (prefers-reduced-motion:reduce){.livepill i{animation:none}}
+/* reduced motion: nothing travels, springs or pulses; states still change (JS helpers check RM too) */
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}}
 /* Summary: no fill (Figma 06.10), 1px border/transparent/subtle on the sheet instance, stroke inside the padding */
 .summary{position:relative;border-radius:var(--sum-radius);border:1px solid var(--sum-border);padding:var(--sum-pad);display:flex;flex-direction:column;gap:var(--sum-gap);overflow:hidden;margin-top:var(--sheet-content-gap)}
 .srow[hidden],.sdiv[hidden]{display:none}
@@ -567,16 +601,27 @@ img{display:block}
 #sheet .handle{z-index:4;border-radius:var(--sheet-radius) var(--sheet-radius) 0 0;background:linear-gradient(180deg,var(--sheet-bg) 55%,rgba(12,22,28,0))} /* the banner scrolls away under the handle zone */
 /* limit reached: count badges turn orange (accent/warning-100) */
 .limit .badge{background:#ffae36;color:#080e12}
+/* Limit 20 · tap on a 21st odd (Figma N, 4081:158675): an orange tongue slides out from behind the collapsed betslip,
+   the tapped odd shakes "no" and the counter pulses. Nothing is added. */
+.tongue{position:absolute;left:16px;right:16px;bottom:calc(96px + var(--bar-h) - 10px);height:40px;padding:6px 16px 16px;border-radius:12px;
+  background:linear-gradient(rgba(255,174,54,.21),rgba(255,174,54,.21)),#0c161c;color:#ffae36;font-weight:700;font-size:12px;line-height:18px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  z-index:6;pointer-events:none;opacity:0;transform:translateY(30px);transition:transform var(--m-std) var(--exit),opacity var(--m-quick) ease-in .1s}
+.tongue.show{opacity:1;transform:none;transition:transform var(--m-layout) var(--soft),opacity var(--m-quick) ease-out}
+#phone.infx .tongue{bottom:calc(24px + var(--bar-h) - 10px)}
+.odd.deny,.choice.deny{animation:deny .6s linear} /* "not added": a light press and a small spring back, no colour change */
+@keyframes deny{0%{transform:scale(1);animation-timing-function:cubic-bezier(.3,0,.4,1)}22%{transform:scale(.955);animation-timing-function:cubic-bezier(.3,.1,.3,1)}52%{transform:scale(1.014);animation-timing-function:ease-in-out}76%{transform:scale(.996);animation-timing-function:ease-in-out}100%{transform:none}}
+.badge.nope{animation:nope .6s var(--soft)}
+@keyframes nope{0%{transform:scale(1)}30%{transform:scale(1.1)}60%{transform:scale(.98)}100%{transform:none}}
 .compliance{font-size:var(--compliance-size);line-height:var(--compliance-lh);color:var(--compliance-color);margin:var(--sheet-content-gap) 0 0}
 .sfoot{padding:var(--sheet-foot-pad-t) var(--sheet-foot-pad-x) var(--sheet-foot-pad-b);background:linear-gradient(180deg,rgba(12,22,28,0),rgb(12,22,28) 8px);position:relative}
 
-.cta-main{width:100%;height:48px;border-radius:8px;background:var(--t1);color:#080e12;font-weight:700;font-size:16px;line-height:24px;transition:transform .12s}
+.cta-main{width:100%;height:48px;border-radius:8px;background:var(--t1);color:#080e12;font-weight:700;font-size:16px;line-height:24px;transition:transform var(--m-press),background var(--m-quick),color var(--m-quick)}
 .cta-main:active{transform:scale(.98)}
 .cta-main.ico{display:flex;align-items:center;justify-content:center;gap:8px}
 .cta-main.ico svg{border-radius:50%;background:rgba(0,0,0,.15)} /* add-small: plus on a round plate */
 
 /* DAZN Bet overlay (mock) */
-.overlay{position:absolute;inset:0;background:#0b0f14;z-index:40;transform:translateY(100%);transition:transform .45s var(--ease);display:flex;flex-direction:column}
+.overlay{position:absolute;inset:0;background:#0b0f14;z-index:40;transform:translateY(100%);transition:transform var(--m-sheet) var(--soft);display:flex;flex-direction:column} /* same motion as the sheets */
 .overlay.show{transform:none}
 .ov-top{height:var(--sb);background:#0b0f14}
 .ov-bar{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 16px;border-bottom:1px solid #1d242b}
@@ -595,7 +640,7 @@ img{display:block}
 
 /* fixture page · Odds tab (values from Odds/Market, .Odds/* and .Match/Odds tile via generated.css; hero/tabs are not components) */
 .tile[data-fx]{cursor:pointer}
-.fx{position:absolute;inset:0;z-index:7;background:#080e12;transform:translateX(100%);transition:transform .38s var(--ease);overflow:hidden}
+.fx{position:absolute;inset:0;z-index:7;background:#080e12;transform:translateX(100%);transition:transform var(--m-layout) var(--soft);overflow:hidden}
 .fx.show{transform:none}
 #phone.infx .status{background:transparent;z-index:9}
 #phone.infx.fxs .status{background:transparent}
@@ -652,7 +697,7 @@ img{display:block}
 .c2 .choice .ld{gap:var(--choice-soft-gap)}
 .c2 .choice .lb{color:var(--choice-soft-label-color)}
 .clist{display:flex;flex-direction:column;gap:8px}
-.choice{height:var(--choice-h);border-radius:var(--choice-radius);background:var(--choice-bg);display:flex;align-items:center;justify-content:space-between;padding:0 var(--choice-pad-r) 0 var(--choice-pad-l);font-weight:700;font-size:14px;line-height:18px;letter-spacing:var(--odd-ls);text-align:left;transition:background .2s,transform .12s}
+.choice{height:var(--choice-h);border-radius:var(--choice-radius);background:var(--choice-bg);display:flex;align-items:center;justify-content:space-between;padding:0 var(--choice-pad-r) 0 var(--choice-pad-l);font-weight:700;font-size:14px;line-height:18px;letter-spacing:var(--odd-ls);text-align:left;transition:background var(--m-quick),transform var(--m-press)}
 .choice:active{transform:scale(.98)}
 .choice .ld{display:flex;align-items:center;gap:var(--choice-gap);min-width:0}
 .choice .ld img{width:24px;height:24px}
@@ -679,13 +724,13 @@ img{display:block}
 .fx-more{width:100%;height:48px;border-radius:8px;background:rgba(195,209,219,.10);font-weight:700;font-size:16px;line-height:24px;color:#f8f8f8}
 #phone.infx .bar{bottom:24px}
 #phone.infx.hasbar .mkts{padding-bottom:109px}
-.fx-top{position:absolute;left:0;right:0;top:0;height:calc(var(--sb) + 40px);padding:var(--sb) 16px 0;background:#080e12;border-bottom:1px solid #3d4549;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;line-height:20px;z-index:2;opacity:0;pointer-events:none;transition:opacity .2s}
+.fx-top{position:absolute;left:0;right:0;top:0;height:calc(var(--sb) + 40px);padding:var(--sb) 16px 0;background:#080e12;border-bottom:1px solid #3d4549;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;line-height:20px;z-index:2;opacity:0;pointer-events:none;transition:opacity var(--m-quick)}
 #phone.fxs .fx-top{opacity:1;pointer-events:auto}
 
 /* favourite-team popup (Figma section "Betting popup") */
-.fvp{position:absolute;left:0;right:0;bottom:0;background:#0c161c;border-radius:12px 12px 0 0;z-index:22;padding:24px 16px;display:flex;flex-direction:column;gap:16px;transform:translateY(105%);transition:transform .42s var(--ease)}
+.fvp{position:absolute;left:0;right:0;bottom:0;background:#0c161c;border-radius:12px 12px 0 0;z-index:22;padding:24px 16px;display:flex;flex-direction:column;gap:16px;transform:translateY(105%);transition:transform var(--m-sheet) var(--soft)} /* same native sheet motion as the betslip */
 .fvp.show{transform:none}
-.fvp .handle{cursor:default}
+.fav-h{touch-action:none;cursor:grab} /* drags like the betslip: by the handle or the header */
 .fvp .legal{margin-bottom:-4px} /* popup sheet: banner first, 12 to the title */
 .fav-h{display:flex;align-items:flex-start;justify-content:space-between}
 .fav-h b{display:block;font-weight:700;font-size:18px;line-height:25px}
@@ -700,43 +745,56 @@ img{display:block}
 .pwho b{font-weight:700;font-size:18px;line-height:25px}
 .pwho span{font-size:12px;line-height:18px;color:#c5c7ca}
 
-/* scenario panel (outside the phone): states from the PRD that need a trigger */
-.scn{position:fixed;left:16px;bottom:14px;width:216px;display:flex;flex-direction:column-reverse;padding:4px;border-radius:12px;background:#0d0e11;box-shadow:0 0 0 1px #060606,inset 0 0 0 1px #060606;z-index:100;font-family:'DAZN Oscine',system-ui,sans-serif}
-.scn-h{display:flex;align-items:center;justify-content:space-between;width:100%;height:32px;padding:0 12px;font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#858b93}
-.scn-h::after{content:"";width:6px;height:6px;border-right:1.5px solid;border-bottom:1.5px solid;transform:rotate(-135deg);margin-top:3px}
-.scn:not(.open) .scn-h::after{transform:rotate(45deg);margin-top:-3px}
-.scn-b{display:none;flex-direction:column;gap:2px;padding-bottom:2px}
-.scn.open .scn-b{display:flex}
-.scn-b button{height:32px;padding:0 12px;border-radius:8px;text-align:left;font-weight:700;font-size:13px;line-height:18px;color:#c5c7ca;white-space:nowrap}
-.scn-b button:hover{background:rgba(116,128,138,.18);color:#f8f8f8}
-.scn-b hr{border:0;height:1px;background:#1e2226;margin:4px 8px}
-/* ready-made states + walkthrough */
-.scn{width:252px;max-height:calc(100vh - 28px)}
-.scn-b{min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#2a2e33 transparent}
-#scnStates{display:flex;flex-direction:column;gap:2px}
-.scn-b button{flex:none;height:28px;display:flex;align-items:center;gap:8px;font-size:12.5px}
-.scn-b button i{flex:none;width:16px;font-style:normal;font-weight:400;font-size:10px;color:#5d646b;text-align:right}
-.scn-b button.on,.scn-b button.on:hover{background:rgba(247,255,26,.12);color:#f7ff1a}
-.scn-b button.on i{color:#f7ff1a}
-.scn-g{flex:none;padding:10px 12px 4px;font-weight:700;font-size:10px;line-height:14px;letter-spacing:.08em;text-transform:uppercase;color:#5d646b}
-.guide{position:fixed;right:16px;top:50%;transform:translateY(-50%);width:264px;padding:16px;border-radius:12px;background:#0d0e11;box-shadow:0 0 0 1px #060606,inset 0 0 0 1px #060606;z-index:100;display:flex;flex-direction:column;gap:8px}
-.guide .gd-n{font-weight:700;font-size:10px;line-height:14px;letter-spacing:.08em;text-transform:uppercase;color:#5d646b}
-.guide b{font-size:16px;line-height:22px;color:#f8f8f8}
-.guide p{margin:0;font-size:13px;line-height:19px;color:#c5c7ca;min-height:57px}
-.guide .gd-b{display:flex;align-items:center;gap:6px;margin-top:4px}
-.guide .gd-b button{width:36px;height:32px;border-radius:8px;background:rgba(116,128,138,.18);color:#f8f8f8;font-weight:700;font-size:15px}
-.guide .gd-b button:hover{background:rgba(116,128,138,.3)}
-.guide .gd-b button:disabled{opacity:.35;cursor:default}
-.guide .gd-b span{margin-left:6px;font-size:11px;color:#5d646b}
-@media(max-width:1180px){.guide{display:none}}
+/* navigation panel: Free play, then topics; a topic opens its states; the selected state shows what it demonstrates */
+.nav{position:fixed;left:16px;top:16px;width:280px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;border-radius:16px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);z-index:100;font-family:'DAZN Oscine',system-ui,sans-serif;color:var(--ui-t2);transition:opacity .24s ease-out,transform .44s var(--soft)}
+.nav.off{opacity:0;transform:translateX(-16px);pointer-events:none}
+.nav-h{flex:none;display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 8px 0 16px}
+.nav-h b{font-size:11px;line-height:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--ui-t3)}
+.nav-x,.nav-open{display:flex;align-items:center;justify-content:center;color:var(--ui-t3);transition:color .2s,background .2s}
+.nav-x{width:28px;height:28px;border-radius:8px}
+.nav-x:hover{color:var(--ui-t1);background:var(--ui-hover)}
+.nav-open{position:fixed;left:16px;top:16px;height:40px;gap:8px;padding:0 14px 0 12px;border-radius:12px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);z-index:99;font-family:'DAZN Oscine',system-ui,sans-serif;font-weight:700;font-size:13px;color:var(--ui-t1);opacity:0;pointer-events:none;transition:opacity .24s}
+.nav.off+.nav-open{opacity:1;pointer-events:auto}
+.nav-b{min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--ui-line) transparent;display:flex;flex-direction:column;gap:2px;padding:0 8px 8px}
+.nav-b hr{flex:none;border:0;height:1px;background:var(--ui-line);margin:6px 8px}
+/* a state (and Free play): title row + folding description */
+.nv-it{flex:none;border-radius:10px;transition:background .2s}
+.nv-it.on{background:var(--ui-on)}
+.nv-ih{display:flex;align-items:center}
+.nv-ib{flex:1;min-width:0;height:34px;padding:0 4px 0 12px;border-radius:10px;text-align:left;font-size:13px;line-height:18px;color:var(--ui-t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .2s,background .2s}
+.nv-tb .nv-ib{padding-left:28px}
+.nv-it:not(.on) .nv-ib:hover{background:var(--ui-hover);color:var(--ui-t1)}
+.nv-it.on .nv-ib{font-weight:700;color:var(--ui-t1)}
+.nv-re{flex:none;width:28px;height:28px;margin-right:4px;border-radius:8px;display:none;align-items:center;justify-content:center;color:var(--ui-t3);transition:color .2s,background .2s}
+.nv-it.on .nv-re{display:flex}
+.nv-re:hover{color:var(--ui-t1);background:var(--ui-hover)}
+.nv-re:active svg{transform:rotate(-90deg)}
+.nv-re svg{transition:transform .3s var(--soft)}
+.nv-d,.nv-tb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s var(--soft)}
+.nv-it.on>.nv-d,.nv-t.open>.nv-tb{grid-template-rows:1fr}
+.nv-d>div,.nv-tb>div{min-height:0;overflow:hidden}
+.nv-d>div{opacity:0;transition:opacity .2s}
+.nv-it.on>.nv-d>div{opacity:1;transition:opacity .3s .1s}
+.nv-d p{margin:0;padding:0 12px 12px;font-size:12px;line-height:17px;color:var(--ui-t2)}
+.nv-tb .nv-d p{padding-left:28px}
+.nv-d .seg{margin:0 12px 12px 28px}
+.nv-d .seg button{height:26px}
+/* a topic: header row + folding list of its states */
+.nv-t{flex:none}
+.nv-th{display:flex;align-items:center;gap:8px;width:100%;height:36px;padding:0 10px 0 12px;border-radius:10px;text-align:left;font-weight:700;font-size:13px;line-height:18px;color:var(--ui-t1);transition:background .2s}
+.nv-th:hover{background:var(--ui-hover)}
+.nv-th svg{flex:none;color:var(--ui-t3);transition:transform .4s var(--soft)}
+.nv-t.open .nv-th svg{transform:rotate(90deg)}
+.nv-th span{flex:1;min-width:0}
+.nv-th i{flex:none;font-style:normal;font-weight:400;font-size:11px;color:var(--ui-t3)}
+.nv-th u{flex:none;width:6px;height:6px;border-radius:50%;background:var(--ui-t1);opacity:0;transition:opacity .2s}
+.nv-t.has:not(.open) .nv-th u{opacity:1}
+.nv-tb>div{display:flex;flex-direction:column;gap:2px}
+.nv-tb>div::after{content:"";flex:none;height:4px}
 .fx-top .fx-back{left:8px;top:calc(var(--sb) + 4px)}
 </style>
 </head>
 <body>
-<div class="devsw" role="tablist" aria-label="Device">
- <button role="tab" class="on" data-dev="mini" aria-selected="true">iPhone 13 mini · 375</button>
- <button role="tab" data-dev="max" aria-selected="false">iPhone 17 Pro Max · 440</button>
-</div>
 <div id="stage">
  <div id="phone"><div class="island"></div>
   <div class="status"><div class="time">9:41</div>
@@ -792,6 +850,7 @@ img{display:block}
     <div class="mkts" id="mkts"></div>
    </div>
   </div>
+  <div class="tongue" id="tongue">You’ve reached maximum number of bets allowed.</div>
   <div class="bar" id="bar">
    <div class="left"><div class="ttl"><b>Betslip</b><div class="badge" id="barCount">0</div></div><div class="items" id="barItems"></div></div>
    <div class="tot"><span id="barType">Single</span><div class="pill cv" id="barTotal"><span class="arr"><svg width="9" height="8" viewBox="0 0 9 8"><path d="M3.66137 1.29115C4.05567 0.684093 4.94433 0.684092 5.33863 1.29115L7.3938 4.45529C7.8259 5.12057 7.34846 6 6.55517 6H2.44483C1.65154 6 1.17409 5.12057 1.6062 4.4553L3.66137 1.29115Z" fill="currentColor"/></svg></span><span class="num">0.00</span></div></div>
@@ -847,21 +906,15 @@ img{display:block}
   </div>
  </div>
 </div>
-<button id="reset">Reset ⟲</button>
-<div class="scn" id="scn"><button class="scn-h" id="scnT">Scenarios</button><div class="scn-b">
- <div id="scnStates"></div>
- <div class="scn-g">On the current betslip</div>
- <button data-scn="chg">Odds change on my pick</button>
- <button data-scn="susp">Suspend my pick</button>
- <button data-scn="lock">Lock my pick</button>
- <button data-scn="mlock">Lock a market in the feed</button>
- <button data-scn="fill">Fill betslip to 20</button>
- <button data-scn="clear">Restore odds</button>
- <hr>
- <button id="liveT">Live odds: moving</button>
-</div></div>
-<div class="guide" id="guide"><div class="gd-n" id="gdN"></div><b id="gdT"></b><p id="gdP"></p><div class="gd-b"><button id="gdPrev" aria-label="Previous">←</button><button id="gdNext" aria-label="Next">→</button><span>or the arrow keys</span></div></div>
-
+<aside class="nav" id="nav" aria-label="Prototype states">
+ <div class="nav-h"><b>Prototype states</b><button class="nav-x" id="navX" aria-label="Hide the panel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3.5 5.5 8 10 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+ <div class="nav-b" id="navB"></div>
+</aside>
+<button class="nav-open" id="navOpen" aria-label="Show the states panel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 4h11M2.5 8h11M2.5 12h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>States</button>
+<div class="devsw seg" role="tablist" aria-label="Phone size">
+ <button role="tab" class="on" data-dev="mini" aria-selected="true">iPhone 13 mini</button>
+ <button role="tab" data-dev="max" aria-selected="false">iPhone 17 Pro Max</button>
+</div>
 <script>
 const IMG={rm:'assets/img/rm.png',psg:'assets/img/psg.png',che:'assets/img/che.png',new:'assets/img/new.png',bay:'assets/img/bay.png',psv:'assets/img/psv.png',
  bar:'assets/img/bar.png',atm:'assets/img/atm.png',val:'assets/img/val.png',vil:'assets/img/vil.png',bet:'assets/img/bet.png',ath:'assets/img/ath.png',ars:'assets/img/ars.png',liv:'assets/img/liv.png',mci:'assets/img/mci.png',
@@ -952,13 +1005,35 @@ function renderFeed(){
 /* the Odds toggle only affects the feed: no odds, no top warning, no footer */
 function setOddsOn(on){
  S.oddsOn=on;$('#oddsChip').classList.toggle('off',!on);$('#oddsChip').setAttribute('aria-checked',on);
- document.querySelectorAll('.tile').forEach(t=>t.classList.toggle('odds',on));$('#feed').classList.toggle('nood',!on);
+ // cascade: visible tiles start one after another, the rest switch at once
+ const feed=$('#feed'),scEl=$('#scroll'),sc=scEl.getBoundingClientRect(),hold=holdAnchor(scEl);let k=0;
+ document.querySelectorAll('.tile').forEach(t=>{const r=t.getBoundingClientRect(),vis=r.bottom>sc.top&&r.top<sc.bottom;t.style.setProperty('--ti',vis?Math.min(k++,6)*32:0);t.classList.toggle('odds',on)});
+ feed.classList.toggle('nood',!on);hold();
  updateBar();
+}
+/* the feed is scrolled and tiles above the screen change height (Odds toggle): keep the first visible tile where it is.
+   Returns a function that starts the correction; it stops by itself, or as soon as the user scrolls. */
+function holdAnchor(sc,ms=800){
+ if(sc.scrollTop<1)return()=>{};
+ const top=sc.getBoundingClientRect().top,a=[...sc.querySelectorAll('.tile')].find(t=>t.getBoundingClientRect().bottom>top+1);if(!a)return()=>{};
+ const y0=a.getBoundingClientRect().top,t0=performance.now();let stop=false;const off=()=>{stop=true};
+ sc.addEventListener('wheel',off,{once:true,passive:true});sc.addEventListener('touchstart',off,{once:true,passive:true});
+ const step=()=>{if(stop||!a.isConnected)return;const d=(a.getBoundingClientRect().top-y0)/(+$('#stage').dataset.scale||1);if(Math.abs(d)>.25)sc.scrollTop+=d;if(performance.now()-t0<ms)requestAnimationFrame(step)};
+ return()=>requestAnimationFrame(step);
+}
+/* the list changes: the old one leaves quickly, the new one comes in.
+   dir -1: from the left (an earlier day), 1: from the right (a later day), 0: rises (same day, LIVE filter) */
+function swapFeed(dir){
+ const f=$('#feed'),from=dir?{opacity:0,transform:`translateX(${dir*20}px)`}:{opacity:0,transform:'translateY(8px)'};
+ let done=false;const go=()=>{if(done)return;done=true;renderFeed();$('#scroll').scrollTop=0;soft(f,from,T.std)};
+ if(HOLD||RM.matches||!f.animate){go();return}        // ready-made states and reduced motion: no exit step
+ f.animate([{opacity:1,transform:'none'},{opacity:0,transform:dir?`translateX(${-dir*10}px)`:'none'}],{duration:120,easing:'ease-in'}).onfinish=go;
+ setTimeout(go,160);                                  // the tab is in the background and animations don't tick: swap anyway
 }
 function setDay(d){
  if(S.day===d)return;S.day=d;S.liveOnly=false;$('#liveBadge').classList.remove('on');
  document.querySelectorAll('.day').forEach(e=>e.classList.toggle('sel',e.dataset.day===d));$('#days').classList.toggle('yest',d==='yest');
- renderFeed();$('#scroll').scrollTop=0;
+ swapFeed(d==='yest'?-1:1);
 }
 
 /* ---------- selections ----------
@@ -986,11 +1061,22 @@ function selInfo(s){
  if(id==='dnb')return {m,subj:s.o==='1'?m.h:m.a,pred:'to win',mk:'Draw no bet',odds};
  if(id==='dc'){const t={'1X':[m.h,'or draw'],'12':[m.h+' or '+m.a,''],'X2':[m.a,'or draw']}[s.o];return {m,subj:t[0],pred:t[1],mk:'Double chance',odds}}
 }
+/* 21st pick: nothing is added. Micro-feedback in one beat: the odd presses and springs back slightly, the tongue slides out from behind the bar, the counter pulses */
+let tongueT;
+function replay(el,cls){if(!el)return;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls)}
+function denyLimit(mid,g,o){
+ document.querySelectorAll(`[data-m="${mid}"][data-g="${g}"][data-o="${o}"]`).forEach(b=>replay(b,'deny'));
+ try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}
+ const t=$('#tongue');
+ if(S.sheet||!$('#bar').classList.contains('show')){showToast(LIMIT_MSG,null,null,HOLD?6e5:2500);return} // no bar on screen (e.g. sheet open): fall back to the toast
+ t.classList.add('show');setTimeout(()=>replay($('#barCount'),'nope'),90);
+ clearTimeout(tongueT);tongueT=setTimeout(()=>t.classList.remove('show'),HOLD?6e5:2600);
+}
 function toggleSel(mid,g,o){
  o=String(o);const i=S.sel.findIndex(s=>s.m===mid&&s.g===g);
  if(i>-1&&S.st[mid+'|'+g])return;              // dropped-out pick: its odd is not tappable (remove it in Edit)
  if(i>-1&&S.sel[i].o===o){S.sel.splice(i,1)}
- else if(S.sel.length>=MAX){showToast(LIMIT_MSG,null,null,HOLD?6e5:2500);return} // PRD: max 20, every other odd is dead: no add, no swap
+ else if(S.sel.length>=MAX){denyLimit(mid,g,o);return} // PRD: max 20, every other odd is dead: no add, no swap
  else if(i>-1){S.sel[i].o=o}                 // same match + same market/line, other outcome -> replace
  else {S.sel.unshift({m:mid,g,o})}
  syncTiles();updateBar(true);renderSheet();
@@ -1002,16 +1088,30 @@ function totalOdds(){const a=act();return a.length?a.reduce((p,s)=>p*oddsOf(s),1
 
 /* ---------- collapsed bar ---------- */
 let lastCount=0;
-function updateBar(bump){
- const n=S.sel.length,bar=$('#bar');
- bar.classList.toggle('show',n>0&&!S.sheet);$('#phone').classList.toggle('hasbar',n>0);$('#phone').classList.toggle('limit',n>=MAX);
+/* ---------- soft motion helpers ---------- */
+const SOFT=getComputedStyle(document.documentElement).getPropertyValue('--soft').trim()||'cubic-bezier(.32,.72,0,1)'; // the one travel curve, defined in CSS
+const T={quick:200,std:320,layout:440,sheet:500};   // ms, mirror --m-quick / --m-std / --m-layout / --m-sheet
+const RM=matchMedia('(prefers-reduced-motion:reduce)'); // reduced motion: helpers fade only, nothing travels
+// play an element in from `from` to wherever it rests now
+function soft(el,from,ms=T.std,delay=0){if(!el||!el.animate)return;const o=getComputedStyle(el).opacity;if(RM.matches){if(from.opacity===undefined)return;from={opacity:from.opacity};ms=120;delay=0}el.animate([from,{opacity:o,transform:'none'}],{duration:ms,delay,easing:SOFT,fill:'backwards'})}
+const rise=d=>({opacity:0,transform:`translateY(${d<0?-5:5}px)`}),RISE=rise(1); // d<0: the new value comes down from above (a price that fell)
+// change a text; if it really changed, the new text fades in and rises a little
+function setTxt(el,t,anim=true,from=RISE){t=String(t);if(el.textContent===t)return false;el.textContent=t;if(anim)soft(el,from);return true}
+// run fn; if it changed the height of el, ease the height instead of jumping
+function smoothH(el,fn,on=true){const h0=el.offsetHeight;fn();const h1=el.offsetHeight;if(!on||h0===h1||!el.animate||RM.matches)return;const ov=el.style.overflow;el.style.overflow='hidden';el.animate([{height:h0+'px'},{height:h1+'px'}],{duration:T.layout,easing:SOFT}).onfinish=()=>{el.style.overflow=ov}}
+
+function updateBar(bump,dir){ // dir: the total moved because a price moved (1 up, -1 down)
+ const n=S.sel.length,bar=$('#bar'),anim=bar.classList.contains('show')&&lastCount>0; // texts animate only while the bar is on screen
+ bar.classList.toggle('show',n>0);if(n<MAX||S.sheet)$('#tongue').classList.remove('show'); // the bar does not hide for the sheet: the sheet slides over it and uncovers it again
+ $('#phone').classList.toggle('hasbar',n>0);$('#phone').classList.toggle('limit',n>=MAX);
  if(!n){lastCount=0;return}
  $('#barCount').textContent=n;
  if(bump&&n!==lastCount){const b=$('#barCount');b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}
  lastCount=n;
- const names=S.sel.map(s=>selInfo(s).subj);$('#barItems').textContent=n>3?names.slice(0,3).join(', ')+' +'+(n-3):names.join(', ');
- const bt=betType();$('#barType').textContent=bt;
- $('#barTotal').hidden=bt==='Singles';$('#barTotal .num').textContent=act().length?fT(totalOdds()):'–'; // no active pick: a dash, not 0 (odds are never 0); the PRD says 0, open with the PM
+ const names=S.sel.map(s=>selInfo(s).subj);setTxt($('#barItems'),n>3?names.slice(0,3).join(', ')+' +'+(n-3):names.join(', '),anim);
+ const bt=betType();setTxt($('#barType'),bt,anim);
+ const pill=$('#barTotal'),hide=bt==='Singles',was=pill.hidden;pill.hidden=hide;if(was&&!hide&&anim)soft(pill,{opacity:0,transform:'scale(.9)'});
+ setTxt($('#barTotal .num'),act().length?fT(totalOdds()):'–',anim&&!was,dir?rise(dir):RISE); // no active pick: a dash, not 0 (odds are never 0); the PRD says 0, open with the PM
 }
 
 /* ---------- sheet ---------- */
@@ -1031,19 +1131,35 @@ function snapW(root){root.querySelectorAll('.tm>span,.selc>span').forEach(e=>{e.
 function renderSheet(){
  const n=S.sel.length;
  $('#cards').innerHTML=S.sel.map(cardHTML).join('');snapW($('#cards'));restoreArrows();
+ // a pick dropped out (Suspended / Locked) or came back while the sheet is open: the card dims or lights up softly, the price swaps with a small rise
+ const prev=renderSheet.st||{},cur={};S.sel.forEach(x=>cur[key(x)]=S.st[key(x)]||'');
+ if(S.sheet)for(const k in cur){if(!(k in prev)||prev[k]===cur[k])continue;const w=document.querySelector(`[data-card="${k}"]`);if(!w)continue;
+  const from=cur[k]?1:.3;w.querySelectorAll('.ctop>.sp,.ctop>.selc,.cinfo .mk,.cinfo .tm,.cinfo .ko,.cinfo .ev,.livepill').forEach(e=>soft(e,{opacity:from,transform:'none'},T.layout));
+  soft(w.querySelector('.bst,.od'),RISE,T.std,60)}
+ // a card that was not there before (added while the sheet is open): it rises in
+ if(S.sheet&&renderSheet.st)for(const k in cur)if(!(k in prev))soft(document.querySelector(`[data-card="${k}"]`),RISE,T.std);
+ renderSheet.st=cur;
+ sheetMeta();
+}
+/* everything in the sheet except the cards: counter, limit message, edit mode, summary */
+function sheetMeta(){
+ const n=S.sel.length;
  $('#sheetCount').textContent=n;
- $('#lnote').hidden=n<MAX;
+ smoothH($('#sheet .sfoot'),()=>{const ln=$('#lnote'),was=ln.hidden;ln.hidden=n<MAX;if(was&&!ln.hidden&&S.sheet)soft(ln,RISE,T.std,80)},S.sheet);
  applyEdit();
  updateSummary();
  moreCheck();
 }
 function moreCheck(){const b=$('#sbody');$('#sheet').classList.toggle('more',b.scrollHeight-b.scrollTop-b.clientHeight>2)}
+/* edit cascade: only the cards on screen go one after another (max 6 steps), the rest switch at once */
+function staggerCards(){const b=$('#sbody').getBoundingClientRect();let k=0;document.querySelectorAll('#cards .cardwrap').forEach(w=>{const r=w.getBoundingClientRect(),vis=r.bottom>b.top&&r.top<b.bottom;w.style.setProperty('--i',vis?Math.min(k++,6):0)})}
 function applyEdit(){
- const sh=$('#sheet');
+ const sh=$('#sheet'),flip=sh.classList.contains('editing')!==S.edit;
+ if(flip)staggerCards();
  if(S.edit&&!sh.style.height)sh.style.height=sh.offsetHeight+'px';
  if(!S.edit)releaseHeight();
  sh.classList.toggle('editing',S.edit);
- $('#editBtn').innerHTML=S.edit?'Confirm':`<img src="${IMG.settings}" alt="">Edit`;
+ $('#editBtn').innerHTML=S.edit?'Confirm':`<img src="${IMG.settings}" alt="">Edit`;if(flip&&S.sheet)soft($('#editBtn'),{opacity:0},T.quick);
  $('#placeBtn').disabled=S.edit||!act().length;
 }
 let resizeT;
@@ -1053,28 +1169,32 @@ function releaseHeight(){
  if(Math.abs(from-to)<1)return;
  sh.style.height=from+'px';void sh.offsetHeight;
  sh.classList.add('resizing');sh.style.height=to+'px';
- clearTimeout(resizeT);resizeT=setTimeout(()=>{sh.classList.remove('resizing');sh.style.height=''},420);
+ clearTimeout(resizeT);resizeT=setTimeout(()=>{sh.classList.remove('resizing');sh.style.height=''},T.layout);
 }
 function unfreeze(){clearTimeout(resizeT);const sh=$('#sheet');sh.classList.remove('resizing');sh.style.height=''}
-function updateSummary(){
+function updateSummary(dir){ // dir: the total moved because a price moved (1 up, -1 down)
  const a=act().length,t=totalOdds();
  // the sheet always reads as one combined bet: total = product of the active odds, return = €10 × total.
  // Dropped picks are explained under the label: "Excludes N suspended selection(s)".
  // No active bets (every pick is suspended or locked): a dash instead of a price, "Your selection is locked", no return line, CTA disabled.
  const out=S.sel.filter(isOut),ns=out.filter(s=>S.st[key(s)]==='suspended').length,kind=ns&&ns<out.length?'unavailable':ns?'suspended':'locked',many=out.length>1;
  const note=!out.length?'':a?`Excludes ${out.length} ${kind} selection${many?'s':''}`:`Your selection${many?'s are':' is'} ${kind}`;
- $('#sumNote').textContent=note;$('#sumNote').hidden=!note;
- $('#sumOddsLabel').textContent='Total odds';
- $('#sumOdds .num').textContent=a?fT(t):'–';
- $('#sumDiv').hidden=!a;$('#sumRetRow').hidden=!a;
- $('#sumReturnLabel').innerHTML='<b>€10</b> may return';
- $('#sumReturn').textContent=money(10*t);
+ const on=S.sheet; // animate only while the sheet is open
+ smoothH($('#sheet .summary'),()=>{
+  const sn=$('#sumNote'),snWas=sn.hidden,rr=$('#sumRetRow'),rrWas=rr.hidden;
+  const ch=setTxt(sn,note,false);sn.hidden=!note;if(on&&note&&(ch||snWas))soft(sn,RISE,T.std,60);
+  $('#sumOddsLabel').textContent='Total odds';
+  setTxt($('#sumOdds .num'),a?fT(t):'–',on,dir?rise(dir):RISE);
+  $('#sumDiv').hidden=!a;rr.hidden=!a;if(on&&rrWas&&a)soft(rr,RISE,T.std,80);
+  $('#sumReturnLabel').innerHTML='<b>€10</b> may return';
+  setTxt($('#sumReturn'),money(10*t),on&&!rrWas);
+ },on);
  // a locked pick blocks the whole slip until its odds reopen (Figma screen J, Nik 11.11): total struck through, CTA off
  const lkd=a>0&&out.some(s=>S.st[key(s)]==='locked');$('#sumOdds').classList.toggle('struck',lkd);
  $('#placeBtn').disabled=S.edit||!a||lkd;
 }
-function openSheet(){if(!S.sel.length)return;S.sheet=true;unfreeze();renderSheet();$('#sbody').scrollTop=0;$('#sheet').classList.add('show');$('#backdrop').classList.add('show');updateBar();moreCheck()}
-function closeSheet(){S.sheet=false;S.edit=false;$('#sheet').classList.remove('show');$('#backdrop').classList.remove('show');$('#sheet').classList.remove('editing');setTimeout(()=>{if(!S.sheet){unfreeze();renderSheet()}},450);updateBar()}
+function openSheet(){if(!S.sel.length)return;S.sheet=true;unfreeze();renderSheet();$('#sbody').scrollTop=0;$('#sheet').classList.add('show');$('#backdrop').classList.add('show');updateBar();moreCheck();navSync()}
+function closeSheet(){S.sheet=false;S.edit=false;$('#sheet').classList.remove('show');$('#backdrop').classList.remove('show');$('#sheet').classList.remove('editing');setTimeout(()=>{if(!S.sheet){unfreeze();renderSheet()}},T.sheet+20);updateBar();navSync()}
 
 /* remove + undo */
 let toastT;
@@ -1087,18 +1207,19 @@ function showToast(text,btn,fn,ms=5000){
 }
 function hideToast(){$('#toast').classList.remove('show')}
 function removeSel(k){
- const i=S.sel.findIndex(s=>key(s)===k);if(i<0)return;
- const item=S.sel[i];const label=selInfo(item);
+ const item=S.sel.find(s=>key(s)===k);if(!item)return;
+ const label=selInfo(item);
  const w=document.querySelector(`[data-card="${k}"]`);
- if(w)w.classList.add('gone');
+ if(w){if(w.classList.contains('gone'))return;w.classList.add('gone')}
  setTimeout(()=>{
-  S.sel.splice(i,1);delete S.st[k];syncTiles();
+  const i=S.sel.indexOf(item);if(i<0)return;       // look the pick up again: other cards may have been removed while this one was collapsing
+  S.sel.splice(i,1);delete S.st[k];if(renderSheet.st)delete renderSheet.st[k];syncTiles();
   if(!S.sel.length){
    closeSheet();updateBar();
    // betslip emptied: the Undo toast appears where the bar was
    setTimeout(()=>showToast(`${label.subj}${label.pred?' '+label.pred:''} removed`,'Undo',()=>{hideToast();S.sel.splice(0,0,item);syncTiles();renderSheet();updateBar(true)}),300);
-  }else{renderSheet();updateBar();}
- },280);
+  }else{if(w)w.remove();sheetMeta();updateBar()}   // only this card leaves the DOM: cards that are still collapsing keep animating
+ },T.std);
 }
 
 /* place a bet -> overlay */
@@ -1111,7 +1232,7 @@ function closeOverlay(){
  S.sel=[];S.st={};S.edit=false;refresh();
  S.sheet=false;$('#sheet').classList.remove('show');$('#backdrop').classList.remove('show');
  renderSheet();updateBar();
- setTimeout(()=>showToast('Your betslip was cleared',null,null,3000),450);
+ setTimeout(()=>showToast('Your betslip was cleared',null,null,3000),T.sheet);
 }
 
 /* ---------- live engine ---------- */
@@ -1137,35 +1258,43 @@ function changeOdd(m,o,dir,nv){
   const k=`${m.id}|1x2`;
   markChg(k,dir);
   const el=document.querySelector(`[data-codd="${k}"]`);
-  if(el){el.querySelector('.num').textContent=f2(nv);showArrow(el,k,dir)}
+  const td=totalOdds()>t0?1:-1;                    // direction of the total
+  if(el){setTxt(el.querySelector('.num'),f2(nv),true,rise(dir));showArrow(el,k,dir)}
   flashEvent(k);
-  updateSummary();updateBar();
-  const td=totalOdds()>t0?1:-1;markChg('total',td);showArrow($('#sumOdds'),'total:sum',td);showArrow($('#barTotal'),'total:bar',td);
+  updateSummary(td);updateBar(false,td);
+  markChg('total',td);showArrow($('#sumOdds'),'total:sum',td);showArrow($('#barTotal'),'total:bar',td);
  }
 }
+/* ONE pattern for a price that moves, wherever it is shown (feed tile, fixture tile, betslip card, Total odds, bar total):
+   the new number comes in along the direction of the move (up: rises from below, down: drops from above) and an arrow shows the direction.
+   Timings: a tile that is not picked keeps tint + arrow ~2 s and fades 1.5 s (Nik 06.10); everything that belongs to my pick
+   (its tile, its card, the totals) keeps the arrow ~5 s and fades .6 s. Mirrors --chg-fade / --chg-fade-pick in CSS. */
+const CHG_T={hold:2000,fade:1500,pickHold:5000,pickFade:600};
 const oddTimers={};
 function animateOdd(mid,o,dir){
- const b=document.querySelector(`.odd[data-m="${mid}"][data-g="1x2"][data-o="${o}"]`);if(!b||b.classList.contains('locked'))return;
- const key=mid+o;(oddTimers[key]||[]).forEach(clearTimeout);
- const num=b.querySelector('.num'),arr=b.querySelector('.arr');
- b.classList.remove('up','down','flash');arr.classList.remove('fade');void b.offsetWidth;
- b.classList.add(dir>0?'up':'down');
- num.textContent=f2(M(mid).o[o]);num.classList.remove('roll');void num.offsetWidth;num.classList.add('roll');
- b.classList.add('flash');                                   // dissolve in 800ms (Step 1 -> 2)
- oddTimers[key]=HOLD?[]:[                      // HOLD: a ready-made state keeps the arrow on screen
-  // line + tint (::before) and the arrow stay ~2s and fade out together over 1.5s (Nik 06.10)
-  setTimeout(()=>{b.classList.remove('flash');arr.classList.add('fade')},2000),
-  setTimeout(()=>{b.classList.remove('up','down');arr.classList.remove('fade')},3500)
- ];
+ const key=mid+o;(oddTimers[key]||[]).forEach(clearTimeout);oddTimers[key]=[];
+ document.querySelectorAll(`.odd[data-m="${mid}"][data-g="1x2"][data-o="${o}"]`).forEach(b=>{   // the feed tile and the same odd on the fixture page
+  if(b.classList.contains('locked'))return;
+  const num=b.querySelector('.num'),arr=b.querySelector('.arr'),mine=b.classList.contains('sel');
+  b.classList.remove('up','down','flash');arr.classList.remove('fade');void b.offsetWidth;
+  b.classList.add(dir>0?'up':'down');
+  num.textContent=f2(M(mid).o[o]);soft(num,rise(dir));
+  b.classList.add('flash');                                  // tint dissolves in over --chg-in
+  if(HOLD)return;                                            // a ready-made state keeps the arrow on screen
+  const hold=mine?CHG_T.pickHold:CHG_T.hold,fade=mine?CHG_T.pickFade:CHG_T.fade;
+  oddTimers[key].push(
+   setTimeout(()=>{b.classList.remove('flash');arr.classList.add('fade')},hold),
+   setTimeout(()=>{b.classList.remove('up','down');arr.classList.remove('fade')},hold+fade));
+ });
 }
 /* live event on a betslip card: visible ~1s only when that pick's odds change */
 const evTimers={};
 function flashEvent(k){
  const e=document.querySelector(`[data-cev="${k}"]`);if(!e)return;(evTimers[k]||[]).forEach(clearTimeout);
- e.classList.remove('out');e.classList.add('on');
- evTimers[k]=[setTimeout(()=>{e.classList.remove('on');e.classList.add('out')},1000),setTimeout(()=>e.classList.remove('out'),1300)];
+ e.classList.add('out');void e.offsetWidth;e.classList.remove('out');e.classList.add('on'); // idle = display:none, so show it first, then let it fade in
+ evTimers[k]=[setTimeout(()=>{e.classList.remove('on');e.classList.add('out')},1000),setTimeout(()=>e.classList.remove('out'),1000+T.std)];
 }
-/* odds changed in the betslip: same arrow + timing as the feed tile (arrow ~5 s, fade .6 s) */
+/* odds changed in the betslip: arrow + colour for ~5 s, fade .6 s (CHG_T.pick*). The feed tile of that pick uses the same timing. */
 const CHG={},chgTimers={};
 function markChg(k,dir){CHG[k]={dir,until:Date.now()+(HOLD?6e5:5000)}}
 function showArrow(el,tk,dir,ms=5000){
@@ -1203,7 +1332,7 @@ function openFixture(mid){
  $('#fx').classList.add('show');$('#fx').setAttribute('aria-hidden','false');S.fx=mid;hideToast();
 }
 function renderMkts(mid=S.fx){const m=M(mid),f=FX[mid];$('#mkts').innerHTML=LEGAL+f.markets.map(k=>marketHTML(m,k)).join('')+`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`}
-function closeFixture(){$('#fx').classList.remove('show');$('#fx').setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},380)}
+function closeFixture(){$('#fx').classList.remove('show');$('#fx').setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},T.layout)}
 
 /* ---------- favourite-team popup (Figma section "Betting popup") ----------
  1X2 of the favourite team's match over the feed. Tapping an odd selects it, then the popup closes and the pick
@@ -1218,49 +1347,17 @@ function openFav(){
 let favT;
 function closeFav(){clearTimeout(favT);S.fav=false;$('#fav').classList.remove('show');if(!S.sheet)$('#backdrop').classList.remove('show')}
 function favAdd(){const o=S.favPick||'0',i=S.sel.findIndex(s=>s.m==='m4'&&s.g==='1x2');closeFav();
- if(i>-1&&S.st['m4|1x2'])return;if(i>-1)S.sel[i].o=o;else if(S.sel.length>=MAX){showToast(LIMIT_MSG,null,null,HOLD?6e5:2500);return}else S.sel.unshift({m:'m4',g:'1x2',o});
+ if(i>-1&&S.st['m4|1x2'])return;if(i>-1)S.sel[i].o=o;else if(S.sel.length>=MAX){denyLimit('m4','1x2',o);return}else S.sel.unshift({m:'m4',g:'1x2',o});
  syncTiles();updateBar(true);renderSheet();}
 
-/* ---------- scenarios (panel in the bottom-left corner) ----------
- States from the PRD that the real app gets from DAZN Bet and that need a trigger in a prototype. */
+/* ---------- redraw everything after a state change ---------- */
 function refresh(){const y=$('#scroll').scrollTop;renderFeed();$('#scroll').scrollTop=y;if(S.fx)renderMkts();if(S.fav)openFav();renderSheet();updateBar(true)}
-function ensurePick(){ // scenarios act on a pick: an active live 1X2 pick if there is one, else any active 1X2 pick, else add one
- let s=act().find(x=>x.g==='1x2'&&M(x.m).live)||act().find(x=>x.g==='1x2');
- if(!s){
-  if(S.sel.length>=MAX)return act()[0]||null;
-  const free=x=>!x.hid&&!S.sel.some(y=>y.m===x.id&&y.g==='1x2'),m=S.matches.find(x=>x.live&&free(x))||S.matches.find(free);
-  if(!m)return null;s={m:m.id,g:'1x2',o:'0'};S.sel.unshift(s);syncTiles();renderSheet();updateBar(true);
- }
- return s;
-}
-let chgDir=-1;
-function runScn(k){
- if(k==='fav'){S.fav?closeFav():openFav();return}
- if(k==='ft'){if(S.fav)closeFav();closeFixture();setDay(S.day==='yest'?'today':'yest');return}
- if(k==='clear'){S.st={};S.lk=[];refresh();return}
- if(k==='fill'){ // top the betslip up to 20: 1X2 picks on the feed matches, then on matches outside the feed
-  for(const m of [...S.matches.filter(x=>!x.hid),...S.matches.filter(x=>x.hid)]){
-   if(S.sel.length>=MAX)break;
-   if(!S.sel.some(s=>s.m===m.id&&s.g==='1x2'))S.sel.unshift({m:m.id,g:'1x2',o:String(m.pick||0)});
-  }
-  syncTiles();renderSheet();updateBar(true);return;
- }
- if(k==='mlock'){ // whole 1X2 market of Chelsea v Newcastle: lock instead of prices; a pick on it becomes a locked bet
-  const g='m2|1x2',on=S.lk.some(x=>x.startsWith(g+'|'));
-  S.lk=S.lk.filter(x=>!x.startsWith(g+'|'));
-  if(on){if(S.st[g]==='locked')delete S.st[g]}
-  else{[0,1,2].forEach(o=>S.lk.push(g+'|'+o));if(S.sel.some(s=>key(s)===g))S.st[g]='locked'}
-  if(S.fav)closeFav();setDay('today');refresh();if(!S.fx&&!S.sheet)$('#scroll').scrollTop=0;return;
- }
- const s=ensurePick();if(!s)return;
- if(k==='chg'){chgDir=-chgDir;const mm=M(s.m),old=mm.o[+s.o];changeOdd(mm,+s.o,chgDir,Math.max(1.01,+(old*(1+chgDir*.05)).toFixed(2)));return}
- if(k==='susp'||k==='lock'){S.st[key(s)]=k==='susp'?'suspended':'locked';refresh()}
-}
-
-/* ---------- ready-made states (Scenarios panel) and walkthrough ----------
+/* ---------- ready-made states (navigation panel) ----------
  Each state sets the whole screen by itself (picks, statuses, prices, sheet open or closed), whatever was on screen before.
- Order = the story told on a call; rows follow the Figma section "Betslip states · PRD". Arrow keys step through them.
- LIVE: live prices are moving. HOLD: set while a state is being built, so arrows and the limit toast stay on screen. */
+ g = topic in the panel, k = name of the state, v = betslip view when the state exists both collapsed ('bar') and opened ('sheet'):
+ the two are one row in the panel with a Collapsed / Opened switch. n = what the state demonstrates. The order is the story told on a call;
+ the left / right arrow keys step through all of them.
+ LIVE: live prices are moving. HOLD: set while a state is being built, so arrows and the limit message stay on screen. */
 let LIVE=true,HOLD=false,cur=-1;
 const P3=()=>[{m:'m5',g:'1x2',o:'1'},{m:'m4',g:'1x2',o:'2'},{m:'m1',g:'1x2',o:'0'}]; // Draw (Valencia), Atlético Madrid, Real Madrid (live)
 const ONE=()=>[{m:'m1',g:'1x2',o:'0'}];
@@ -1269,51 +1366,86 @@ const showTile=id=>{const t=document.querySelector(`#scroll [data-tile="${id}"]`
 const toEnd=()=>setTimeout(()=>{const b=$('#sbody');b.scrollTop=b.scrollHeight},80);
 const moved=()=>{changeOdd(M('m1'),0,0,1.30);changeOdd(M('m4'),2,0,4.10)};   // Real Madrid 1.36 -> 1.30, Atlético 3.90 -> 4.10: total 16.97 -> 17.06
 const STATES=[
- {g:'Flow',t:'Scores · odds off',n:'Odds toggle OFF: no prices, no gambling warning and no footer in the feed.',run(){setOddsOn(false)}},
- {g:'Flow',t:'Odds on',n:'Default in betting countries: 1X2 under every match, team codes instead of 1 / 2, legal banner on top.',run(){}},
- {g:'Flow',t:'Live odds moving',n:'A price that moves shows a green or red arrow next to it for a few seconds.',live:true,run(){setTimeout(()=>{if(LIVE)changeOdd(M('m2'),0,-1)},400);setTimeout(()=>{if(LIVE)changeOdd(M('m1'),1,1)},1100)}},
- {g:'Flow',t:'First pick',n:'The odd turns white and goes to the collapsed bar. The sheet does not open by itself.',run(){S.sel=ONE();refresh()}},
- {g:'Flow',t:'Three picks',n:'Picks from different matches make an ACCA: the odds multiply into one total.',run(){S.sel=P3();refresh()}},
- {g:'Flow',t:'Betslip opened',n:'Tap the bar: cards, Total odds, "€10 may return" and Place bet on DAZN Bet.',run(){S.sel=P3();refresh();openSheet()}},
- {g:'Flow',t:'Edit mode',n:'Remove picks with ×. The sheet keeps its height until Confirm, so nothing jumps under the finger.',run(){S.sel=P3();refresh();openSheet();S.edit=true;applyEdit()}},
- {g:'Odds change',t:'Odds changed · bar',n:'PRD · Odds change: the total in the bar is recalculated; the arrow shows the direction. The selected tile stays white.',run(){S.sel=P3();refresh();moved()}},
- {g:'Odds change',t:'Odds changed · sheet',n:'The price on the card takes the arrow and its colour; Total odds and "€10 may return" are recalculated.',run(){S.sel=P3();refresh();openSheet();moved()}},
- {g:'Suspended',t:'Bet suspended · bar',n:'PRD · Cancelled bet: its odds leave the total (3.20 × 1.36), the counter still says 3.',run(){S.sel=P3();S.st['m4|1x2']='suspended';refresh();showTile('m5')}},
- {g:'Suspended',t:'Bet suspended · sheet',n:'"Suspended" replaces the price. The line under Total odds says what is not included.',run(){S.sel=P3();S.st['m4|1x2']='suspended';refresh();openSheet()}},
- {g:'Suspended',t:'Only bet suspended · bar',n:'One pick and it is suspended: the counter stays 1, the total shows a dash (the PRD says 0; odds are never 0).',run(){S.sel=ONE();S.st['m1|1x2']='suspended';refresh()}},
- {g:'Suspended',t:'Only bet suspended · sheet',n:'The card stays, there is no return line, the button is disabled.',run(){S.sel=ONE();S.st['m1|1x2']='suspended';refresh();openSheet()}},
- {g:'Locked',t:'Locked odd · feed',n:'PRD · Locked bet: grey text, a lock instead of the price, the odd is not tappable.',run(){S.lk=['m1|1x2|0'];refresh()}},
- {g:'Locked',t:'Market locked · feed',n:'The whole 1X2 market of a match is closed: three locks.',run(){S.lk=['m1|1x2|0','m1|1x2|1','m1|1x2|2'];refresh()}},
- {g:'Locked',t:'Bet locked · bar',n:'A pick that gets locked stays white with a lock; its odds leave the total.',run(){S.sel=P3();S.st['m1|1x2']='locked';refresh()}},
- {g:'Locked',t:'Bet locked · sheet',n:'A lock replaces the price on the card. Same rules as a suspended bet.',run(){S.sel=P3();S.st['m1|1x2']='locked';refresh();openSheet()}},
- {g:'Locked',t:'Only bet locked · bar',n:'One pick and it is locked: the counter stays 1, the total shows a dash.',run(){S.sel=ONE();S.st['m1|1x2']='locked';refresh()}},
- {g:'Locked',t:'Only bet locked · sheet',n:'A dash instead of the total, "Your selection is locked", the button is disabled.',run(){S.sel=ONE();S.st['m1|1x2']='locked';refresh();openSheet()}},
- {g:'Limit 20',t:'Limit 20 · bar',n:'PRD · Maximum bets: at 20 selections the counter turns orange.',run(){fill20();refresh()}},
- {g:'Limit 20',t:'Tap on a 21st odd',n:'Nothing is added and nothing is swapped. A short toast says why.',run(){fill20();refresh();toggleSel('m1','1x2','2')}},
- {g:'Limit 20',t:'Limit 20 · sheet',n:'The message is pinned above the button, so it is visible as soon as the sheet opens.',run(){fill20();refresh();openSheet()}},
- {g:'Limit 20',t:'Limit 20 + suspended bet',n:'Both at once: the line under Total odds for the dropped bet and the limit message above the button.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet();toEnd()}},
- {g:'More',t:'Place bet → DAZN Bet',n:'The bet is placed in the DAZN Bet overlay. Nothing comes back: closing it clears the betslip.',run(){S.sel=P3();refresh();openSheet();placeBet()}},
- {g:'More',t:'Finished matches',n:'Yesterday: last prices stay, everything is disabled, the outcome that happened is white.',run(){setDay('yest')}},
- {g:'More',t:'Favourite team popup',n:'The favourite team plays today: its win is preselected, "Add to my Betslip" puts the pick in the bar.',run(){openFav()}},
- {g:'More',t:'Fixture · Odds tab',n:'Pre-match markets of one match. Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}}
+ {g:'Scores feed',k:'Odds off',n:'Odds toggle OFF: no prices, no gambling warning and no footer in the feed.',run(){setOddsOn(false)}},
+ {g:'Scores feed',k:'Odds on',n:'Default in betting countries: 1X2 under every match, team codes instead of 1 / 2, legal banner on top.',run(prev){if(prev===0){S.oddsOn=false;renderFeed();void $('#feed').offsetHeight;setOddsOn(true)}}}, // coming from "Odds off": play the reveal
+ {g:'Scores feed',k:'Live odds moving',n:'A price that moves shows a green or red arrow next to it for a few seconds.',live:true,run(){setTimeout(()=>{if(LIVE)changeOdd(M('m2'),0,-1)},400);setTimeout(()=>{if(LIVE)changeOdd(M('m1'),1,1)},1100)}},
+ {g:'Scores feed',k:'Finished matches',n:'Yesterday: last prices stay, everything is disabled, the outcome that happened is white.',run(){setDay('yest')}},
+ {g:'Betslip',k:'First pick',n:'The odd turns white and goes to the collapsed bar. The sheet does not open by itself.',run(){S.sel=ONE();refresh()}},
+ {g:'Betslip',k:'Three picks',v:'bar',n:'Picks from different matches make an ACCA: the odds multiply into one total.',run(){S.sel=P3();refresh()}},
+ {g:'Betslip',k:'Three picks',v:'sheet',n:'Tap the bar: cards, Total odds, "€10 may return" and Place bet on DAZN Bet.',run(){S.sel=P3();refresh();openSheet()}},
+ {g:'Betslip',k:'Odds changed',v:'bar',n:'PRD · Odds change: the total in the bar is recalculated; the arrow shows the direction. The selected tile stays white.',run(){S.sel=P3();refresh();moved()}},
+ {g:'Betslip',k:'Odds changed',v:'sheet',n:'The price on the card takes the arrow and its colour; Total odds and "€10 may return" are recalculated.',run(){S.sel=P3();refresh();openSheet();moved()}},
+ {g:'Betslip',k:'Edit mode',n:'Remove picks with ×. The sheet keeps its height until Confirm, so nothing jumps under the finger.',run(){S.sel=P3();refresh();openSheet();S.edit=true;applyEdit()}},
+ {g:'Betslip',k:'Place bet → DAZN Bet',n:'The bet is placed in the DAZN Bet overlay. Nothing comes back: closing it clears the betslip.',run(){S.sel=P3();refresh();openSheet();placeBet()}},
+ {g:'Suspended',k:'One of three bets',v:'bar',n:'PRD · Cancelled bet: its odds leave the total (3.20 × 1.36), the counter still says 3.',run(){S.sel=P3();S.st['m4|1x2']='suspended';refresh();showTile('m5')}},
+ {g:'Suspended',k:'One of three bets',v:'sheet',n:'"Suspended" replaces the price. The line under Total odds says what is not included.',run(){S.sel=P3();S.st['m4|1x2']='suspended';refresh();openSheet()}},
+ {g:'Suspended',k:'The only bet',v:'bar',n:'One pick and it is suspended: the counter stays 1, the total shows a dash (the PRD says 0; odds are never 0).',run(){S.sel=ONE();S.st['m1|1x2']='suspended';refresh()}},
+ {g:'Suspended',k:'The only bet',v:'sheet',n:'The card stays, there is no return line, the button is disabled.',run(){S.sel=ONE();S.st['m1|1x2']='suspended';refresh();openSheet()}},
+ {g:'Locked',k:'Odd in the feed',n:'PRD · Locked bet: grey text, a lock instead of the price, the odd is not tappable.',run(){S.lk=['m1|1x2|0'];refresh()}},
+ {g:'Locked',k:'Whole market in the feed',n:'The whole 1X2 market of a match is closed: three locks.',run(){S.lk=['m1|1x2|0','m1|1x2|1','m1|1x2|2'];refresh()}},
+ {g:'Locked',k:'One of three bets',v:'bar',n:'A pick that gets locked stays white with a lock; its odds leave the total.',run(){S.sel=P3();S.st['m1|1x2']='locked';refresh()}},
+ {g:'Locked',k:'One of three bets',v:'sheet',n:'A lock replaces the price on the card. Same rules as a suspended bet.',run(){S.sel=P3();S.st['m1|1x2']='locked';refresh();openSheet()}},
+ {g:'Locked',k:'The only bet',v:'bar',n:'One pick and it is locked: the counter stays 1, the total shows a dash.',run(){S.sel=ONE();S.st['m1|1x2']='locked';refresh()}},
+ {g:'Locked',k:'The only bet',v:'sheet',n:'A dash instead of the total, "Your selection is locked", the button is disabled.',run(){S.sel=ONE();S.st['m1|1x2']='locked';refresh();openSheet()}},
+ {g:'Limit 20',k:'20 picks',v:'bar',n:'PRD · Maximum bets: at 20 selections the counter turns orange.',run(){fill20();refresh()}},
+ {g:'Limit 20',k:'20 picks',v:'sheet',n:'The message is pinned above the button, so it is visible as soon as the sheet opens.',run(){fill20();refresh();openSheet()}},
+ {g:'Limit 20',k:'Tap on a 21st odd',n:'Nothing is added and nothing is swapped. The odd presses and springs back slightly, an orange tongue slides out from behind the betslip and the counter pulses.',run(){fill20();refresh();toggleSel('m1','1x2','2')}},
+ {g:'Limit 20',k:'Limit + suspended bet',n:'Both at once: the line under Total odds for the dropped bet and the limit message above the button.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet();toEnd()}},
+ {g:'Other screens',k:'Favourite team popup',n:'The favourite team plays today: its win is preselected, "Add to my Betslip" puts the pick in the bar.',run(){openFav()}},
+ {g:'Other screens',k:'Fixture · Odds tab',n:'Pre-match markets of one match. Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}}
 ];
+STATES.forEach(s=>s.t=s.g+' · '+s.k+(s.v?' · '+s.v:''));        // full unique name (tests, logs)
+/* panel model: topics -> items; an item is one state, or a collapsed + opened pair */
+const TOPICS=[],ITEM=[];
+STATES.forEach((s,i)=>{
+ let t=TOPICS[TOPICS.length-1];if(!t||t.g!==s.g)TOPICS.push(t={g:s.g,items:[]});
+ let it=t.items[t.items.length-1];if(!it||it.k!==s.k)t.items.push(it={k:s.k,ix:[],topic:TOPICS.length-1});
+ it.ix.push(i);ITEM[i]=it;
+});
+const FREE='Everything on the phone works: tap the odds, the betslip, the Odds toggle. Or open a topic below and jump straight to a ready-made state.';
+let openT=-1;                                       // topic that is unfolded in the panel (one at a time)
 function setState(i){
  if(i<0||i>=STATES.length)return;
- cur=i;chgDir=-1;init();LIVE=!!STATES[i].live;
- HOLD=true;STATES[i].run();HOLD=false;paintDemo();
+ const prev=cur;cur=i;init();LIVE=!!STATES[i].live;openT=ITEM[i].topic;
+ HOLD=true;STATES[i].run(prev);HOLD=false;paintNav(true);
 }
-function paintDemo(){
- document.querySelectorAll('[data-st]').forEach(b=>{const on=+b.dataset.st===cur;b.classList.toggle('on',on);if(on)b.scrollIntoView({block:'nearest'})});
- const st=STATES[cur];
- $('#gdN').textContent=st?`${cur+1} / ${STATES.length} · ${st.g}`:'Walkthrough';
- $('#gdT').textContent=st?st.t:'Free play';
- $('#gdP').textContent=st?st.n:`Press → to start. ${STATES.length} ready-made states in the order of the story; each one sets the whole screen by itself.`;
- $('#gdPrev').disabled=cur<=0;$('#gdNext').disabled=cur>=STATES.length-1;
- $('#liveT').textContent='Live odds: '+(LIVE?'moving':'paused');
+function freePlay(){LIVE=true;cur=-1;init();paintNav()}
+/* the user opened or closed the sheet by hand inside a collapsed / opened pair: the panel follows, the screen is not rebuilt */
+function navSync(){
+ if(HOLD||cur<0)return;const it=ITEM[cur];if(it.ix.length<2)return;
+ const i=it.ix[S.sheet?1:0];if(i!==cur){cur=i;paintNav()}
 }
-function buildPanel(){
- let g='',h='';STATES.forEach((s,i)=>{if(s.g!==g){g=s.g;h+=`<div class="scn-g">${g}</div>`}h+=`<button data-st="${i}"><i>${i+1}</i>${s.t}</button>`});
- $('#scnStates').innerHTML=h;document.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>setState(+b.dataset.st));
+function paintNav(reveal){
+ const it=cur<0?null:ITEM[cur];
+ $('#reset').closest('.nv-it').classList.toggle('on',!it);
+ document.querySelectorAll('.nv-t').forEach(t=>{const n=+t.dataset.t;t.classList.toggle('open',n===openT);t.classList.toggle('has',!!it&&it.topic===n);
+  t.querySelector('.nv-th').setAttribute('aria-expanded',n===openT)});
+ document.querySelectorAll('.nv-it[data-it]').forEach(e=>{
+  const x=TOPICS[+e.dataset.tp].items[+e.dataset.it],on=x===it;e.classList.toggle('on',on);
+  if(on){e.querySelector('p').textContent=STATES[cur].n;
+   e.querySelectorAll('.seg button').forEach((b,n)=>{b.classList.toggle('on',x.ix[n]===cur);b.setAttribute('aria-selected',x.ix[n]===cur)});
+   if(reveal)setTimeout(()=>e.scrollIntoView({block:'nearest',behavior:'smooth'}),420)}
+ });
+}
+const ICO_CH='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ ICO_RE='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.8v2.4h2.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function buildNav(){
+ const item=(title,attrs,body)=>`<div class="nv-it" ${attrs}><div class="nv-ih"><button class="nv-ib" ${attrs.includes('data-it')?'':'id="reset"'}>${title}</button><button class="nv-re" aria-label="Start this state again" title="Start again">${ICO_RE}</button></div><div class="nv-d"><div>${body}</div></div></div>`;
+ let h=item('Free play','data-free',`<p>${FREE}</p>`)+'<hr>';
+ TOPICS.forEach((t,ti)=>{
+  h+=`<div class="nv-t" data-t="${ti}"><button class="nv-th" aria-expanded="false">${ICO_CH}<span>${t.g}</span><u></u><i>${t.items.length}</i></button><div class="nv-tb"><div>`+
+   t.items.map((x,n)=>item(x.k,`data-tp="${ti}" data-it="${n}"`,'<p></p>'+(x.ix.length>1?'<div class="seg" role="tablist" aria-label="Betslip"><button role="tab" data-v="0">Collapsed</button><button role="tab" data-v="1">Opened</button></div>':''))).join('')+
+   '</div></div></div>';
+ });
+ $('#navB').innerHTML=h;
+ $('#navB').onclick=e=>{
+  const th=e.target.closest('.nv-th');if(th){const n=+th.parentNode.dataset.t;openT=openT===n?-1:n;paintNav();return}
+  const el=e.target.closest('.nv-it');if(!el)return;
+  if(el.hasAttribute('data-free')){freePlay();return}
+  const x=TOPICS[+el.dataset.tp].items[+el.dataset.it],v=e.target.closest('[data-v]');
+  if(v){setState(x.ix[+v.dataset.v]);return}
+  if(e.target.closest('.nv-ib,.nv-re'))setState(ITEM[cur]===x?cur:x.ix[0]);   // the selected row or the round arrow: start the same state again
+ };
 }
 
 /* ---------- events ---------- */
@@ -1326,46 +1458,52 @@ document.addEventListener('click',e=>{
 $('#fxBack').onclick=closeFixture;$('#fxBack2').onclick=closeFixture;
 $('#fxScroll').addEventListener('scroll',e=>$('#phone').classList.toggle('fxs',e.target.scrollTop>150));
 $('#oddsChip').onclick=()=>setOddsOn(!S.oddsOn);
-$('#liveBadge').onclick=()=>{S.liveOnly=!S.liveOnly;$('#liveBadge').classList.toggle('on',S.liveOnly);renderFeed();$('#scroll').scrollTop=0};
+$('#liveBadge').onclick=()=>{S.liveOnly=!S.liveOnly;$('#liveBadge').classList.toggle('on',S.liveOnly);swapFeed(0)};
 $('#bar').onclick=openSheet;
 $('#backdrop').onclick=()=>{S.fav?closeFav():closeSheet()};
 $('#favX').onclick=closeFav;$('#favCta').onclick=favAdd;
 $('#favOdds').addEventListener('click',e=>{const b=e.target.closest('[data-fo]');if(!b)return;S.favPick=b.dataset.fo;document.querySelectorAll('#favOdds .odd').forEach(x=>x.classList.toggle('sel',x===b))});
 document.querySelectorAll('.day[data-day]').forEach(d=>d.onclick=()=>setDay(d.dataset.day));
-document.querySelectorAll('[data-scn]').forEach(b=>b.onclick=()=>runScn(b.dataset.scn));
-$('#scnT').onclick=()=>$('#scn').classList.toggle('open');
-$('#scn').classList.toggle('open',innerWidth>=1040);
+$('#navX').onclick=()=>$('#nav').classList.add('off');$('#navOpen').onclick=()=>$('#nav').classList.remove('off');
 $('#editBtn').onclick=()=>{S.edit=!S.edit;applyEdit()};
 $('#placeBtn').onclick=placeBet;
 $('#ovClose').onclick=closeOverlay;
-$('#reset').onclick=()=>{LIVE=true;cur=-1;chgDir=-1;init();paintDemo()};
-$('#liveT').onclick=()=>{LIVE=!LIVE;paintDemo()};
-$('#gdPrev').onclick=()=>setState(cur-1);$('#gdNext').onclick=()=>setState(cur+1);
 addEventListener('keydown',e=>{
  if(e.metaKey||e.ctrlKey||e.altKey)return;
  if(e.key==='ArrowRight'){e.preventDefault();setState(Math.min(STATES.length-1,cur+1))}
  else if(e.key==='ArrowLeft'){e.preventDefault();setState(Math.max(0,cur-1))}
- else if(e.key==='l'||e.key==='L'){LIVE=!LIVE;paintDemo()}
+ else if(e.key==='l'||e.key==='L')LIVE=!LIVE;              // pause / resume the live price ticker
 });
 $('#sbody').addEventListener('scroll',e=>{$('#shead').classList.toggle('scrolled',e.target.scrollTop>42);moreCheck()});
 
-/* drag sheet down to close */
-(()=>{let y0=null,dy=0;const sh=$('#sheet'),hd=$('#handle');
- const down=e=>{y0=e.clientY;dy=0;sh.classList.add('drag');hd.setPointerCapture(e.pointerId)};
- const move=e=>{if(y0===null)return;const sc=+$('#stage').dataset.scale||1;dy=Math.max(0,(e.clientY-y0)/sc);sh.style.transform=`translateY(${dy}px)`};
- const up=()=>{if(y0===null)return;sh.classList.remove('drag');sh.style.transform='';if(dy>90)closeSheet();y0=null};
- hd.addEventListener('pointerdown',down);hd.addEventListener('pointermove',move);hd.addEventListener('pointerup',up);hd.addEventListener('pointercancel',up);
-})();
+/* drag a sheet down to close it: by the handle or by its header (not by a button in it).
+   The release continues at the speed of the finger: --soft starts at 2.25x its average speed, so the duration is chosen
+   to make the first frame as fast as the finger was (220 ms .. --m-sheet). */
+function dragSheet(sh,grips,close){let y0=null,dy=0,vy=0,ly=0,lt=0;const bd=$('#backdrop');
+ const down=e=>{if(e.target.closest('button'))return;y0=e.clientY;dy=0;vy=0;ly=e.clientY;lt=performance.now();sh.classList.add('drag');bd.classList.add('drag');try{e.currentTarget.setPointerCapture(e.pointerId)}catch(x){}};
+ const move=e=>{if(y0===null)return;const sc=+$('#stage').dataset.scale||1,raw=(e.clientY-y0)/sc,now=performance.now();
+  vy=((e.clientY-ly)/sc)/Math.max(1,now-lt);ly=e.clientY;lt=now;
+  dy=raw>=0?raw:-Math.sqrt(-raw)*2.2;                       // above the rest position the sheet only gives a little (rubber band)
+  sh.style.transform=`translateY(${dy}px)`;bd.style.opacity=String(Math.max(0,1-Math.max(0,dy)/sh.offsetHeight))};
+ const up=()=>{if(y0===null)return;y0=null;if(performance.now()-lt>80)vy=0;   // the finger stopped before letting go: no flick
+  const h=sh.offsetHeight,shut=dy>h*.25||(vy>.5&&dy>20);     // dismiss: past a quarter of the height or a quick flick down
+  const dist=shut?h-dy:Math.abs(dy),ms=RM.matches?0:Math.round(Math.min(T.sheet,Math.max(220,2.25*dist/Math.max(Math.abs(vy),.3))));
+  sh.classList.remove('drag');bd.classList.remove('drag');
+  if(ms){sh.style.transitionDuration=bd.style.transitionDuration=ms+'ms';setTimeout(()=>{sh.style.transitionDuration=bd.style.transitionDuration=''},ms+40)}
+  sh.style.transform='';bd.style.opacity='';
+  if(shut)close()};
+ grips.forEach(g=>{g.addEventListener('pointerdown',down);g.addEventListener('pointermove',move);g.addEventListener('pointerup',up);g.addEventListener('pointercancel',up)});
+}
+dragSheet($('#sheet'),[$('#handle'),$('#shead')],closeSheet);
+dragSheet($('#fav'),[$('#fav .handle'),$('#fav .fav-h')],closeFav);
 
 /* fit phone to window */
 const DEV={mini:{w:375,h:812},max:{w:440,h:956}};let dev='mini';
 /* One scale for both devices (fitted to the biggest), so 17 Pro Max really looks bigger than the mini.
-   Switch stays put; the phone hangs 20px below it and grows/shrinks downward. */
-function fit(){const big=DEV.max,ring=11;
- const s=Math.min(1,(innerHeight-24-60-24)/(big.h+2*ring),(innerWidth-96)/(big.w+2*ring));
- const block=60+(big.h+2*ring)*s,top=Math.max(12,(innerHeight-block)/2);
- const st=$('#stage');st.style.top=(top+60+ring*s)+'px';st.style.transform=`translateX(-50%) scale(${s})`;st.dataset.scale=s;
- $('.devsw').style.top=top+'px'}
+   Each device sits in the middle of the window; on a switch the phone grows or shrinks around that middle. */
+function fit(){const big=DEV.max,d=DEV[dev],ring=11;
+ const s=Math.min(1,(innerHeight-48)/(big.h+2*ring),(innerWidth-96)/(big.w+2*ring));
+ const st=$('#stage');st.style.top=Math.max(24+ring*s,(innerHeight-d.h*s)/2)+'px';st.style.transform=`translateX(-50%) scale(${s})`;st.dataset.scale=s}
 addEventListener('resize',fit);
 let devT;
 document.querySelectorAll('.devsw button').forEach(b=>b.onclick=()=>{
@@ -1389,7 +1527,8 @@ function init(){
  renderFeed();renderSheet();updateBar();$('#scroll').scrollTop=0;
  timers=[setInterval(liveTick,2600),setInterval(minuteTick,20000)];
 }
-buildPanel();fit();init();paintDemo();
+buildNav();fit();init();paintNav();
+if(innerWidth<1000)$('#nav').classList.add('off');      // narrow window: the panel would cover the phone, so it starts folded
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{snapW($('#cards'));document.querySelectorAll('.fx-tabs span').forEach(e=>{e.style.width='';const w=parseFloat(getComputedStyle(e).width);if(w>0)e.style.width=Math.ceil(w-.01)+'px'})});
 </script>
 </body>
