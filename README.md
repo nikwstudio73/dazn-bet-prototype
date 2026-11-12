@@ -14,7 +14,7 @@ Design source: Figma file **DAZN-Bet-in-Scores**, https://www.figma.com/design/J
 
 ```
 public/index.html   the whole prototype: CSS (top), markup, JS (bottom)
-public/assets/img/  71 PNGs and SVGs: club crests, player photos, competition logos, nav and header icons, DAZN Bet logo
+public/assets/img/  83 PNGs and SVGs: club crests, player photos, competition logos, nav and header icons, DAZN Bet logo
 public/assets/fonts/ DAZN Oscine Regular / Bold (woff2)
 vercel.json         tells search engines not to index the site
 build.py            public/ -> dist/ single file (not needed for the website)
@@ -46,12 +46,13 @@ The **Prototype states** panel on the left is the only navigation (see the next 
    - The sheet keeps its height while cards are removed, so nothing moves under the finger. On Confirm it eases to its new height.
    - Removing the last pick closes the sheet and shows an Undo toast.
 6. **Place bet on DAZN Bet.** Opens a mock DAZN Bet overlay. Closing it clears the betslip, as in the real flow, because nothing comes back from DAZN Bet.
-7. **Fixture page.** Tap the Real Madrid v Atlético Madrid tile to open the Odds tab with the pre-match markets: Match Results, Total Goals, BTTS, Double Chance, 1st-half goals, Result & Both teams to score, Draw no bet. Picks stay in sync with the feed. Under "More bets on DAZN Bet" there is a **Goalscorer** carousel ("In this match", round photo): every player is his own pick, so several can be in the betslip.
+7. **Fixture page.** Every match of today opens its own page: tap its tile. Real Madrid v Atlético Madrid is the one drawn in Figma; the other seven use the same template with generated demo data (see "Demo data" below). A live match shows the score and the running minute in the header and only the markets that still make sense for the score. The drawn page has the pre-match markets: Match Results, Total Goals, BTTS, Double Chance, 1st-half goals, Result & Both teams to score, Draw no bet. Picks stay in sync with the feed. Under "More bets on DAZN Bet" there is a **Goalscorer** carousel ("In this match", round photo): every player is his own pick, so several can be in the betslip.
 8. **Finished matches.** Tap **Sat 3 Jan** in the calendar (or the state *Other screens → Finished matches*). FT tiles keep their last odds, nothing is tappable, the outcome that happened is white and the rest are grey. **Today** goes back.
-9. **Competition page · Odds tab.** Tap the **UEFA Champions League** header in the feed. The page has the tabs Matches / Table / Odds / Playoff / Team stats (only Odds is built) and sub-tabs as chips:
+9. **Competition page · Odds tab.** Tap a competition header in the feed: **UEFA Champions League** (drawn in Figma), **LaLiga** or **Premier League** (same template, demo data). The page has the tabs Matches / Table / Odds / Playoff / Team stats (only Odds is built) and sub-tabs as chips:
    - **Competition winner:** a table of teams with the price to win the season.
    - **Top scorer** (Figma "Top scorer v3.2"): two **Top Picks** cards, then the list of players. A picked Top Pick turns white as a whole, with the price on a dark tile.
    - **Relegation:** the chip is in the design, its content is not designed, so it does nothing.
+   - The whole card or row is the tap target, not only the price (the same on the Goalscorer cards of a match).
    - These are outright (season-long) picks. One pick per market: tapping another team or player replaces it. In the betslip the card shows the competition and the season instead of a match. The collapsed bar and the bottom nav stay on screen.
 
 ## Navigation: the "Prototype states" panel
@@ -112,8 +113,8 @@ JS helpers: `soft()` (play an element in), `setTxt()` (swap a text), `smoothH()`
 
 ## Showing it on a call: ready-made states
 
-- **24 screens in 17 rows.** Seven rows are a Collapsed / Opened pair. The topics follow the rows of the Figma section "Betslip states · PRD".
-- **Keyboard.** **→ / ←** step through all 24 screens in order (the panel follows). **L** pauses and resumes the live price ticker.
+- **25 screens in 18 rows.** Seven rows are a Collapsed / Opened pair. The topics follow the rows of the Figma section "Betslip states · PRD".
+- **Keyboard.** **→ / ←** step through all 25 screens in order (the panel follows). **L** pauses and resumes the live price ticker.
 - **Repeatable numbers.** A ready-made state pauses the live price ticker and uses fixed prices, so the totals are the same every time (for example Odds changed: 16.97 → 17.06). Arrows and the limit message stay on screen while the state is shown. Free play turns the ticker back on.
 - To add or reorder a state, edit the `STATES` array in `index.html`: `g` = topic, `k` = name of the row, `v` = `'bar'` / `'sheet'` for a Collapsed / Opened pair (two neighbouring entries with the same `g` and `k`), `n` = the note under the row, `run()` = what to set. The panel is built from this array.
 
@@ -129,6 +130,14 @@ JS helpers: `soft()` (play an element in), `setTxt()` (swap a text), `smoothH()`
 - Picks on the same match are labelled "Singles" in the bar, but the sheet still shows Total odds. This is open with the PM.
 - There is no stake input and no login. DAZN Bet handles those inside its overlay.
 - Legal copy (top warning, footer, text under the summary) is fixed by legal; don't rewrite it.
+
+### Demo data (not from Figma, not real prices)
+
+- **Match pages.** `fxOf()` builds the markets of a match from its 1X2 prices in the feed: implied chances, expected goals, a 6 % margin, prices rounded the way a bookmaker rounds them. So the numbers are consistent with each other and plausible, but invented. Live matches: goal lines start above the goals already scored; no 1st-half and no "Result & both teams to score" market; no "Both teams to score" once both have scored. Goalscorers per match are in `SCORERS`.
+- **LaLiga and Premier League pages.** Teams, players and prices in `CP` are close to the real season, not real odds. LaLiga has seven teams in the winner table because the Figma crest set has only those seven Spanish clubs.
+- **Photos.** The Figma file has photos of eleven players. They are reused wherever that player appears; everyone else shows initials on the same round plate.
+- **Crests.** From the Figma set "Football club assets 2026–27". `t_*.png` are the feed crests without their inner padding.
+- **Not drawn in Figma:** the header of a live match (score + red minute), the tabs of a league page (Matches / Table / Odds / Team stats / Player stats). Yesterday's finished matches have no page.
 
 ### Open points of the new pages (ask Roey / Marko)
 

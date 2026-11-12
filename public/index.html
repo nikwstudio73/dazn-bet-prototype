@@ -815,8 +815,10 @@ img{display:block}
 .cp-name>span{display:flex;align-items:center;margin-top:-2px;font-size:14px;line-height:16px;color:#f9fafa}
 .cp-name span svg{margin-top:2px}
 .cp-tabs{flex:none;padding-left:0;margin:0 -3px;overflow:hidden} /* five tabs are 381 wide in a 375 frame: they stick out 3 px on each side, as in Figma */
-.cp-tabs span,.cp-tabs span:first-child{flex:none;padding-left:0;padding-right:0;text-align:center}
-.cp-tabs span:nth-child(1){width:84px}.cp-tabs span:nth-child(2){width:65px}.cp-tabs span:nth-child(3){width:64px}.cp-tabs span:nth-child(4){width:76px}.cp-tabs span:nth-child(5){width:92px}
+.cp-tabs span:first-child{padding-left:16px;padding-right:16px}
+/* .w5 = the five tabs drawn in Figma (UEFA Champions League), with their exact widths; other competitions use natural widths */
+.cp-tabs.w5 span,.cp-tabs.w5 span:first-child{flex:none;padding-left:0;padding-right:0;text-align:center}
+.cp-tabs.w5 span:nth-child(1){width:84px}.cp-tabs.w5 span:nth-child(2){width:65px}.cp-tabs.w5 span:nth-child(3){width:64px}.cp-tabs.w5 span:nth-child(4){width:76px}.cp-tabs.w5 span:nth-child(5){width:92px}
 .cp-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;overscroll-behavior:contain;padding:12px 16px 0}
 .cp-scroll::-webkit-scrollbar{display:none}
 .cp-scroll .legal{height:28px;margin-bottom:12px}
@@ -842,7 +844,7 @@ img{display:block}
 .tp-in{height:111px;padding:0 4px;display:flex;flex-direction:column}
 .tp-top{display:flex;justify-content:space-between;align-items:flex-start;height:44px;margin-bottom:6px}
 .tp-top i{font-style:normal;font-size:16px;line-height:21px;color:#4d5457}
-.tp-top img{width:44px;height:44px;border-radius:50%;background:#242d33}
+.tp-top img{width:44px;height:44px;border-radius:50%;background:#242d33;object-fit:cover;object-position:center top}
 .tp-in>span{position:relative;top:-1px;height:10px;font-size:14px;line-height:10px;color:#c5c7ca;white-space:nowrap}
 .tp-in>b{position:relative;top:-1px;height:14px;margin-top:6px;font-weight:700;font-size:20px;line-height:14px;color:#f9fafa;white-space:nowrap}
 .tp-club{display:flex;align-items:center;gap:6px;height:16px;margin-top:11px;font-size:12px;line-height:16px;letter-spacing:.01em;color:#c5c7ca;white-space:nowrap}
@@ -878,6 +880,19 @@ img{display:block}
 .gs-card .cl img{width:20px;height:20px;object-fit:contain}
 .gs-card .odd{flex:none;align-self:stretch;width:auto;height:40px;margin-top:12px;background:rgba(249,250,250,.12)}
 .gs-card .odd.sel{background:var(--odd-sel-bg)}
+/* the whole card or row is the tap target of its price (Top Picks, players, teams, goalscorers) */
+.tp,.sc-row,.cp-row,.gs-card{cursor:pointer}
+.tp,.gs-card{transition:background var(--m-quick),transform var(--m-press)}
+.tp:active,.gs-card:active{transform:scale(.985)}
+.sc-row,.cp-row{transition:opacity var(--m-press)}
+.sc-row:active,.cp-row:active{opacity:.7}
+/* a player without a photo in the Figma file: initials on the same round plate */
+.ini{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;line-height:1;letter-spacing:.02em;color:#8d9295}
+.tp-top .ini{width:44px;height:44px;border-radius:50%;background:#242d33}
+.gs-card .ini{font-size:28px}
+.sc-row .ph{object-fit:cover;object-position:center top}
+.fx-team img{object-fit:contain}
+.fx-mid .lv{font-weight:700;color:var(--live)} /* live match: score, then the minute in red */
 </style>
 </head>
 <body>
@@ -931,7 +946,7 @@ img{display:block}
       <div class="fx-team"><img id="fxAi" src="" alt=""><span id="fxA"></span></div>
      </div>
     </div>
-    <div class="fx-comp"><div class="c"><i><img src="assets/img/laliga.png" alt=""></i><span id="fxComp">LA Liga EA Sports</span></div><button class="fx-follow">Follow</button></div>
+    <div class="fx-comp"><div class="c"><i><img id="fxCompImg" src="assets/img/laliga.png" alt=""></i><span id="fxComp">LA Liga EA Sports</span></div><button class="fx-follow">Follow</button></div>
     <div class="fx-tabs"><span>Overview</span><span>H2H</span><span class="on">Odds</span><span>Box score</span><span>Stats</span><span>Live updates</span></div>
     <div class="mkts" id="mkts"></div>
    </div>
@@ -944,7 +959,7 @@ img{display:block}
     </div>
     <button class="fx-follow">Follow</button>
    </div>
-   <div class="fx-tabs cp-tabs"><span>Matches</span><span>Table</span><span class="on">Odds</span><span>Playoff</span><span>Team stats</span></div>
+   <div class="fx-tabs cp-tabs" id="cpTabs"></div>
    <div class="cp-scroll" id="cpScroll"></div>
   </div>
   <div class="tongue" id="tongue">You’ve reached maximum number of bets allowed.</div>
@@ -1062,22 +1077,76 @@ FX.m4.scorers=[{k:'mbappe',n:'Kylian Mbappe',team:'Real Madrid',img:'gs_mbappe',
    win: [crest, team, price] in the order of the Figma table; Figma shows a 3.30 placeholder in every row, the prices here are demo values
    from favourite to outsider (PRD: the list is sorted by odds). picks / scorers: Top scorer v3.2, names, clubs and prices as in Figma.
    One pick per market: tapping another team or player replaces it (same rule as the outcomes of one match market). */
-Object.assign(IMG,{t_bay:'assets/img/t_bay.png',t_mci:'assets/img/t_mci.png',t_bar:'assets/img/t_bar.png',t_psg:'assets/img/t_psg.png',t_ars:'assets/img/t_ars.png',t_che:'assets/img/t_che.png',t_psv:'assets/img/t_psv.png',t_new:'assets/img/t_new.png',t_rm:'assets/img/t_rm.png', // t_*: the feed crests without their inner padding
- bvb:'assets/img/bvb.png',fen:'assets/img/fen.png',nap:'assets/img/nap.png',juv:'assets/img/juv.svg',stu:'assets/img/stu.png',avl:'assets/img/avl.png',brg:'assets/img/brg.png',
+['bay','mci','bar','psg','ars','che','psv','new','rm','atm','val','vil','bet','ath','liv'].forEach(k=>IMG['t_'+k]='assets/img/t_'+k+'.png'); // t_*: the feed crests without their inner padding
+['mun','tot','bha','nfo','cry','eve'].forEach(k=>IMG[k]='assets/img/'+k+'.png');
+Object.assign(IMG,{bvb:'assets/img/bvb.png',fen:'assets/img/fen.png',nap:'assets/img/nap.png',juv:'assets/img/juv.svg',stu:'assets/img/stu.png',avl:'assets/img/avl.png',brg:'assets/img/brg.png',
  gs_mbappe:'assets/img/gs_mbappe.png',gs_alvarez:'assets/img/gs_alvarez.png',
  pl_haaland:'assets/img/pl_haaland.png',pl_kane:'assets/img/pl_kane.png',pl_mbappe:'assets/img/pl_mbappe.png',pl_dembele:'assets/img/pl_dembele.png',pl_raphinha:'assets/img/pl_raphinha.png',
  pl_torres:'assets/img/pl_torres.png',pl_demirovic:'assets/img/pl_demirovic.png',pl_jackson:'assets/img/pl_jackson.png',pl_tresoldi:'assets/img/pl_tresoldi.png',pl_yamal:'assets/img/pl_yamal.png'});
-const CP={ucl:{t:'UEFA Champions league',season:'2026/27',img:'ucl',
+const CP={ucl:{t:'UEFA Champions league',season:'2026/27',img:'ucl',tabs:['Matches','Table','Odds','Playoff','Team stats'],
  win:[['bay','Bayern München',3.30],['bvb','Borussia Dortmund',4.50],['mci','Man City',5.00],['bar','Barcelona',5.50],['psg','PSG',6.00],['ars','Arsenal',7.50],
   ['che','Chelsea',13.00],['psv','PSV',21.00],['fen','Fenerbahce',34.00],['nap','Napoli',41.00],['new','Newcastle',51.00],['juv','Juventus',67.00]],
  picks:[{k:'haaland',f:'Erling',l:'Haaland',n:'Erling Haaland',team:'Man City',cr:'mci',v:2.10},{k:'kane',f:'Harry',l:'Kane',n:'Harry Kane',team:'Bayern Munich',cr:'bay',v:2.80}],
  scorers:[{k:'mbappe',n:'Kylian Mbappé',team:'Real Madrid',cr:'rm',v:6.00},{k:'dembele',n:'Ousmane Dembélé',team:'Paris Saint-Germain',cr:'psg',v:13.00},{k:'raphinha',n:'Raphinha',team:'Barcelona',cr:'bar',v:17.00},
   {k:'torres',n:'Ferran Torres',team:'Paris Saint-Germain',cr:'psg',v:21.00},{k:'demirovic',n:'Ermedin Demirović',team:'Stuttgart',cr:'stu',v:26.00},{k:'jackson',n:'Nicolas Jackson',team:'Aston Villa',cr:'avl',v:29.00},
-  {k:'tresoldi',n:'Nicolò Tresoldi',team:'Club Brugge',cr:'brg',v:29.00},{k:'yamal',n:'Lamine Yamal',team:'Barcelona',cr:'bar',v:34.00}]}};
+  {k:'tresoldi',n:'Nicolò Tresoldi',team:'Club Brugge',cr:'brg',v:29.00},{k:'yamal',n:'Lamine Yamal',team:'Barcelona',cr:'bar',v:34.00}]},
+ /* LaLiga and Premier League are not drawn in Figma: same template, demo data close to the real season.
+    ph = photo; the Figma file has photos of eleven players only, everyone else (ph:null) gets initials. Crests are from the same Figma set. */
+ laliga:{t:'LaLiga EA Sports',season:'2026/27',img:'laliga',tabs:['Matches','Table','Odds','Team stats','Player stats'],
+ win:[['rm','Real Madrid',1.90],['bar','Barcelona',2.10],['atm','Atlético Madrid',9.00],['ath','Athletic Club',34.00],['vil','Villarreal',41.00],['bet','Real Betis',81.00],['val','Valencia',151.00]],
+ picks:[{k:'mbappe',f:'Kylian',l:'Mbappé',n:'Kylian Mbappé',team:'Real Madrid',cr:'rm',v:2.25},{k:'yamal',f:'Lamine',l:'Yamal',n:'Lamine Yamal',team:'Barcelona',cr:'bar',v:6.00}],
+ scorers:[{k:'lewandowski',n:'Robert Lewandowski',team:'Barcelona',cr:'bar',ph:null,v:6.50},{k:'alvarez',n:'Julián Álvarez',team:'Atlético Madrid',cr:'atm',ph:'gs_alvarez',v:7.00},{k:'raphinha',n:'Raphinha',team:'Barcelona',cr:'bar',v:9.00},
+  {k:'vinicius',n:'Vinícius Júnior',team:'Real Madrid',cr:'rm',ph:null,v:11.00},{k:'sorloth',n:'Alexander Sørloth',team:'Atlético Madrid',cr:'atm',ph:null,v:17.00},{k:'torres',n:'Ferran Torres',team:'Barcelona',cr:'bar',v:21.00},
+  {k:'ayoze',n:'Ayoze Pérez',team:'Villarreal',cr:'vil',ph:null,v:26.00},{k:'williams',n:'Iñaki Williams',team:'Athletic Club',cr:'ath',ph:null,v:34.00}]},
+ pl:{t:'Premier League',season:'2026/27',img:'pl',tabs:['Matches','Table','Odds','Team stats','Player stats'],
+ win:[['liv','Liverpool',3.00],['ars','Arsenal',3.25],['mci','Man City',3.75],['che','Chelsea',9.00],['new','Newcastle',21.00],['mun','Man United',26.00],
+  ['tot','Tottenham',34.00],['avl','Aston Villa',41.00],['bha','Brighton',101.00],['nfo','Nottingham Forest',151.00],['cry','Crystal Palace',201.00],['eve','Everton',251.00]],
+ picks:[{k:'haaland',f:'Erling',l:'Haaland',n:'Erling Haaland',team:'Man City',cr:'mci',v:2.00},{k:'isak',f:'Alexander',l:'Isak',n:'Alexander Isak',team:'Liverpool',cr:'liv',ph:null,v:5.00}],
+ scorers:[{k:'salah',n:'Mohamed Salah',team:'Liverpool',cr:'liv',ph:null,v:7.00},{k:'gyokeres',n:'Viktor Gyökeres',team:'Arsenal',cr:'ars',ph:null,v:7.50},{k:'palmer',n:'Cole Palmer',team:'Chelsea',cr:'che',ph:null,v:13.00},
+  {k:'watkins',n:'Ollie Watkins',team:'Aston Villa',cr:'avl',ph:null,v:17.00},{k:'saka',n:'Bukayo Saka',team:'Arsenal',cr:'ars',ph:null,v:21.00},{k:'mbeumo',n:'Bryan Mbeumo',team:'Man United',cr:'mun',ph:null,v:26.00},
+  {k:'woltemade',n:'Nick Woltemade',team:'Newcastle',cr:'new',ph:null,v:29.00},{k:'solanke',n:'Dominic Solanke',team:'Tottenham',cr:'tot',ph:null,v:34.00}]}};
 /* an outright pick has no match: this stands in for it in the betslip (card line and DAZN Bet overlay) */
-const OUT={ucl:{id:'ucl',out:true,h:'UEFA Champions League',a:'',when:'2026/27',live:false}};
+const OUT={ucl:{id:'ucl',out:true,h:'UEFA Champions League',a:'',when:'2026/27',live:false},laliga:{id:'laliga',out:true,h:'LaLiga EA Sports',a:'',when:'2026/27',live:false},pl:{id:'pl',out:true,h:'Premier League',a:'',when:'2026/27',live:false}};
 const crest=k=>IMG['t_'+k]||IMG[k];
 const cpPlayer=(c,k)=>[...c.picks,...c.scorers].find(x=>x.k===k);
+/* photo of a player (img tag), or his initials when the Figma file has no photo of him */
+const photoOf=(p,key)=>{const k=key!==undefined?key:(p.ph!==undefined?p.ph:'pl_'+p.k);return k?`<img class="ph" src="${IMG[k]}" alt="">`:`<span class="ph ini">${p.n.split(' ').map(w=>w[0]).slice(0,2).join('')}</span>`};
+
+/* ---------- generated fixture pages ----------
+ Only Real Madrid v Atlético is drawn in Figma (FX.m4 above). Every other match of the feed gets a page of the same template.
+ Its markets are derived from the 1X2 prices of the feed (implied chances, expected goals, 6 % margin), so the numbers are plausible, not real.
+ A live match gets only the markets that still make sense for the score: goal lines above the goals already scored,
+ no 1st-half and no "Result & both teams to score" market, no "Both teams to score" once both have scored. */
+const SCORERS={
+ m1:[{k:'mbappe',n:'Kylian Mbappe',team:'Real Madrid',img:'gs_mbappe',cr:'rm',v:2.40},{k:'dembele',n:'Ousmane Dembélé',team:'PSG',img:'pl_dembele',cr:'psg',v:3.75},{k:'vinicius',n:'Vinícius Júnior',team:'Real Madrid',img:null,cr:'rm',v:3.20}],
+ m2:[{k:'palmer',n:'Cole Palmer',team:'Chelsea',img:null,cr:'che',v:2.60},{k:'woltemade',n:'Nick Woltemade',team:'Newcastle',img:null,cr:'new',v:3.40},{k:'joaopedro',n:'João Pedro',team:'Chelsea',img:null,cr:'che',v:3.00}],
+ m3:[{k:'kane',n:'Harry Kane',team:'Bayern Munich',img:'pl_kane',cr:'bay',v:1.90},{k:'olise',n:'Michael Olise',team:'Bayern Munich',img:null,cr:'bay',v:2.75},{k:'pepi',n:'Ricardo Pepi',team:'PSV',img:null,cr:'psv',v:5.50}],
+ m5:[{k:'duro',n:'Hugo Duro',team:'Valencia',img:null,cr:'val',v:2.90},{k:'moreno',n:'Gerard Moreno',team:'Villarreal',img:null,cr:'vil',v:2.70},{k:'ayoze',n:'Ayoze Pérez',team:'Villarreal',img:null,cr:'vil',v:3.10}],
+ m6:[{k:'cucho',n:'Cucho Hernández',team:'Real Betis',img:null,cr:'bet',v:2.60},{k:'williams',n:'Iñaki Williams',team:'Athletic Club',img:null,cr:'ath',v:2.80},{k:'antony',n:'Antony',team:'Real Betis',img:null,cr:'bet',v:3.20}],
+ m7:[{k:'gyokeres',n:'Viktor Gyökeres',team:'Arsenal',img:null,cr:'ars',v:2.20},{k:'salah',n:'Mohamed Salah',team:'Liverpool',img:null,cr:'liv',v:2.30},{k:'saka',n:'Bukayo Saka',team:'Arsenal',img:null,cr:'ars',v:2.75}],
+ m8:[{k:'haaland',n:'Erling Haaland',team:'Man City',img:'pl_haaland',cr:'mci',v:1.65},{k:'palmer',n:'Cole Palmer',team:'Chelsea',img:null,cr:'che',v:3.20},{k:'foden',n:'Phil Foden',team:'Man City',img:null,cr:'mci',v:3.00}]};
+const poisCum=(l,k)=>{if(k<0)return 0;let p=Math.exp(-l),t=p;for(let i=1;i<=k;i++){p*=l/i;t+=p}return t};       // chance of k goals or fewer when l are expected
+const priceOf=p=>{const v=1/(Math.min(.985,Math.max(.012,p))*1.06),st=v<3?.05:v<6?.25:v<15?.5:1;return Math.min(51,Math.max(1.01,+(Math.round(v/st)*st).toFixed(2)))}; // chance -> price with margin, rounded like a bookmaker does
+function fxOf(m){
+ const inv=m.o.map(x=>1/x),sum=inv[0]+inv[1]+inv[2],[p1,px,p2]=inv.map(x=>x/sum),gap=Math.abs(p1-p2);
+ const goals=2.45+1.1*gap,scored=m.live?m.sh+m.sa:0,left=m.live?goals*(90-m.min)/90:goals;                    // goals expected in the match / still to come
+ const lines=(from,n,exp,done)=>Array.from({length:n},(_,i)=>{const ln=from+i,po=1-poisCum(exp,Math.floor(ln)-done);return [ln.toFixed(1),priceOf(po),priceOf(1-po)]});
+ const L={ucl:['UEFA ・Champions League','UEFA Champions League'],laliga:['Spain ・LA Liga','LA Liga EA Sports'],pl:['England ・Premier League','Premier League']}[m.comp];
+ const mk=[{id:'1x2',t:'Match Results',type:'1x2',glow:true},{id:'ou',t:'Total Goals',type:'lines',lines:m.live?lines(scored+.5,2,left,scored):lines(1.5,5,goals,0)}];
+ if(!(m.live&&m.sh>0&&m.sa>0)){
+  let py=Math.min(.68,Math.max(.36,.6-.35*gap));
+  if(m.live){const lh=left*(.5+(p1-p2)*.4),la=left-lh;py=(m.sh>0?1:1-Math.exp(-lh))*(m.sa>0?1:1-Math.exp(-la))}        // only the side still on 0 has to score
+  mk.push({id:'btts',t:'Both Teams To Score',type:'two',opts:[{k:'y',l:'Yes',v:priceOf(py)},{k:'n',l:'No',v:priceOf(1-py)}]});
+ }
+ mk.push({id:'dc',t:'Double Chance',glow:true,sub:'Pick two outcomes. You win if either one happens.',type:'list',opts:[{k:'1X',l:`${m.h} or Draw`,v:priceOf(p1+px)},{k:'12',l:`${m.h} or ${m.a}`,v:priceOf(p1+p2)},{k:'X2',l:`${m.a} or Draw`,v:priceOf(p2+px)}]});
+ if(!m.live){
+  mk.push({id:'ou1h',t:'Total Goals - 1st Half',type:'lines',lines:lines(.5,4,goals*.44,0)});
+  mk.push({id:'rbtts',t:'Result & Both teams to score',glow:true,sub:'Both parts must happen for the bet to win.',type:'stack',opts:[{k:'1',c:'1 & BTTS',l:`${m.hs} to win and both teams to score`,v:priceOf(p1*.42)},{k:'X',c:'X & BTTS',l:'Draw and both teams to score',v:priceOf(px*.72)},{k:'2',c:'2 & BTTS',l:`${m.as} to win and both teams to score`,v:priceOf(p2*.42)}]});
+ }
+ mk.push({id:'dnb',t:'Draw no bet',glow:true,type:'dnb',opts:[{k:'1',v:priceOf(p1/(p1+p2))},{k:'2',v:priceOf(p2/(p1+p2))}]});
+ return {league:L[0],comp:L[1],compImg:COMPS[m.comp].img,hiImg:'t_'+m.hi,aiImg:'t_'+m.ai,time:m.ko,date:'Today',markets:mk,scorers:SCORERS[m.id]||null};
+}
+INIT().forEach(m=>{if(!m.hid&&!FX[m.id])FX[m.id]=fxOf(m)});
 let S;
 /* st: dropped-out picks {"match|market":'suspended'|'locked'}; lk: locked odds in the feed ["match|market|outcome"]; day: 'today'|'yest' */
 function freshState(){return {matches:INIT(),ft:FT(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fav:false,cp:null,cpTab:'win'}}
@@ -1099,7 +1168,7 @@ function tileHTML(m){
  const lbl=[m.hs,'X',m.as]; // PRD: 3-letter team codes instead of 1 / 2, X stays
  const odds=m.ft?m.o.map((v,i)=>`<div class="odd ${i===m.res?'res':'dis'}"><span class="l">${lbl[i]}</span><span class="v"><span class="num">${f2(v)}</span></span></div>`).join('')
                 :m.o.map((v,i)=>oddBtn(m.id,'1x2',String(i),lbl[i],v)).join('');
- return `<div class="tile${m.live?' live':''}${m.ft?' ft':''}${S.oddsOn?' odds':''}" data-tile="${m.id}"${m.fx?` data-fx="${m.id}"`:''}>
+ return `<div class="tile${m.live?' live':''}${m.ft?' ft':''}${S.oddsOn?' odds':''}" data-tile="${m.id}"${!m.ft&&FX[m.id]?` data-fx="${m.id}"`:''}>
   <div class="trow"><div class="tmain">${col}
    <div class="teams">
     <div class="team"><div class="n"><img src="${IMG[m.hi]}" alt="">${m.h}</div><div class="r" data-sh="${m.id}">${r(m.sh)}</div></div>
@@ -1447,14 +1516,17 @@ function marketHTML(m,k){
 }
 function openFixture(mid){
  const m=M(mid),f=FX[mid];if(!f)return;
- $('#fxLeague').textContent=f.league;$('#fxH').textContent=m.h;$('#fxA').textContent=m.a;$('#fxHi').src=IMG[f.hiImg];$('#fxAi').src=IMG[f.aiImg];$('#fxComp').textContent=f.comp;
- $('#fxTime').textContent=f.time;$('#fxTitle').textContent=m.h+' vs '+m.a;$('#fxDate').textContent=f.date;
+ $('#fxLeague').textContent=f.league;$('#fxH').textContent=m.h;$('#fxA').textContent=m.a;$('#fxHi').src=IMG[f.hiImg];$('#fxAi').src=IMG[f.aiImg];$('#fxComp').textContent=f.comp;$('#fxCompImg').src=IMG[f.compImg||'laliga'];
+ $('#fxTitle').textContent=m.h+' vs '+m.a;
+ const ft=$('#fxTime'),fd=$('#fxDate');                 // kick-off time and day; a live match shows the score and the running minute
+ ft.textContent=m.live?m.sh+' - '+m.sa:f.time;fd.textContent=m.live?m.min+'’':f.date;ft.classList.toggle('lv',false);fd.classList.toggle('lv',!!m.live);
+ if(m.live)fd.dataset.min=m.id;else fd.removeAttribute('data-min');
  renderMkts(mid);
  $('#fxScroll').scrollTop=0;$('#phone').classList.add('infx');$('#phone').classList.remove('fxs');
  $('#fx').classList.add('show');$('#fx').setAttribute('aria-hidden','false');S.fx=mid;hideToast();
 }
 function renderMkts(mid=S.fx){const m=M(mid),f=FX[mid];$('#mkts').innerHTML=LEGAL+f.markets.map(k=>marketHTML(m,k)).join('')+`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`+
- (f.scorers?`<section class="gs"><div class="gs-h"><b>Goalscorer</b><span>In this match</span></div><div class="gs-row">${f.scorers.map(p=>`<div class="gs-card"><img class="ph" src="${IMG[p.img]}" alt=""><b>${p.n}</b><span class="cl"><img src="${IMG[p.cr]}" alt="">${p.team}</span>${oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only')}</div>`).join('')}</div></section>`:'')}
+ (f.scorers?`<section class="gs"><div class="gs-h"><b>Goalscorer</b><span>In this match</span></div><div class="gs-row">${f.scorers.map(p=>`<div class="gs-card">${photoOf(p,p.img)}<b>${p.n}</b><span class="cl"><img src="${crest(p.cr)}" alt="">${p.team}</span>${oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only')}</div>`).join('')}</div></section>`:'')}
 function closeFixture(){$('#fx').classList.remove('show');$('#fx').setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},T.layout)}
 
 /* ---------- competition page · Odds tab (Figma section "Odds in Competition") ----------
@@ -1465,8 +1537,8 @@ function compHTML(id){
  const club=p=>`<img src="${crest(p.cr)}" alt="">${p.team}`;
  const body=tab==='win'
   ?`<div class="cp-table">${c.win.map(([k,n,v],i)=>`<div class="cp-row"><span class="rk">${i+1}</span><span class="cr"><img src="${crest(k)}" alt=""></span><span class="nm">${n}</span>${oddBtn(id,'win',k,'',v,'only')}</div>`).join('')}</div>`
-  :`<div class="cp-h">Top Picks</div><div class="tps">${c.picks.map((p,i)=>`<div class="tp"><div class="tp-in"><div class="tp-top"><i>0${i+1}</i><img src="${IMG['pl_'+p.k]}" alt=""></div><span>${p.f}</span><b>${p.l}</b><div class="tp-club">${club(p)}</div></div>${oddBtn(id,'scorer',p.k,'',p.v,'only')}</div>`).join('')}</div>
-   <div class="sc-list">${c.scorers.map(p=>`<div class="sc-row"><img class="ph" src="${IMG['pl_'+p.k]}" alt=""><div class="tx"><b>${p.n}</b><span>${club(p)}</span></div>${oddBtn(id,'scorer',p.k,'',p.v,'only')}</div>`).join('')}</div>`;
+  :`<div class="cp-h">Top Picks</div><div class="tps">${c.picks.map((p,i)=>`<div class="tp"><div class="tp-in"><div class="tp-top"><i>0${i+1}</i>${photoOf(p)}</div><span>${p.f}</span><b>${p.l}</b><div class="tp-club">${club(p)}</div></div>${oddBtn(id,'scorer',p.k,'',p.v,'only')}</div>`).join('')}</div>
+   <div class="sc-list">${c.scorers.map(p=>`<div class="sc-row">${photoOf(p)}<div class="tx"><b>${p.n}</b><span>${club(p)}</span></div>${oddBtn(id,'scorer',p.k,'',p.v,'only')}</div>`).join('')}</div>`;
  return LEGAL+`<div class="cp-chips">${chips}</div><div id="cpBody">${body}</div><div class="cp-foot">+18. Juega con responsabilidad. Publi.</div>`;
 }
 function renderComp(){$('#cpScroll').innerHTML=compHTML(S.cp)}
@@ -1474,6 +1546,7 @@ function openComp(id,tab){
  const c=CP[id];if(!c)return;if(S.fav)closeFav();closeFixture();
  S.cp=id;if(tab)S.cpTab=tab;
  $('#cpLogo').src=IMG[c.img];$('#cpName').textContent=c.t;$('#cpSeason').textContent=c.season;
+ const tb=$('#cpTabs');tb.classList.toggle('w5',id==='ucl');tb.innerHTML=c.tabs.map(t=>`<span${t==='Odds'?' class="on"':''}>${t}</span>`).join('');
  renderComp();$('#cpScroll').scrollTop=0;
  $('#phone').classList.add('incp');$('#cp').classList.add('show');$('#cp').setAttribute('aria-hidden','false');hideToast();
 }
@@ -1535,6 +1608,7 @@ const STATES=[
  {g:'Other screens',k:'Finished matches',n:'Yesterday (Sat 3 Jan in the calendar): last prices stay, everything is disabled, the outcome that happened is white.',run(){setDay('yest')}},
  {g:'Other screens',k:'Favourite team popup',n:'The favourite team plays today: its win is preselected, "Add to my Betslip" puts the pick in the bar.',run(){openFav()}},
  {g:'Other screens',k:'Fixture · Odds tab',n:'Pre-match markets of one match (tap its tile in the feed). Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
+ {g:'Other screens',k:'Fixture · Live match',n:'Every match of the feed has its page. A live one shows the score and the minute, and only the markets that still make sense for the score.',run(){openFixture('m1')}},
  {g:'Other screens',k:'Fixture · Goalscorer',n:'Under the markets: a carousel of goalscorers. Every player is his own pick, so several can be in the betslip.',run(){openFixture('m4');setTimeout(()=>{const f=$('#fxScroll');f.scrollTop=f.scrollHeight},80)}},
  {g:'Other screens',k:'Competition · Winner',n:'Odds tab of a competition (tap its header in the feed): who wins the season. One pick per market; it goes to the same betslip.',run(){openComp('ucl','win')}},
  {g:'Other screens',k:'Competition · Top scorer',n:'Second sub-tab: two Top Picks cards and the list of players. A picked Top Pick turns white as a whole.',run(){openComp('ucl','scorer')}}
@@ -1597,7 +1671,8 @@ function buildNav(){
 document.addEventListener('click',e=>{
  const odd=e.target.closest('[data-g]');if(odd){if(!odd.classList.contains('locked'))toggleSel(odd.dataset.m,odd.dataset.g,odd.dataset.o);return}
  const rm=e.target.closest('[data-rm]');if(rm){removeSel(rm.dataset.rm);return}
- if(e.target.closest('#fxMore')){showToast('Opens Real Madrid vs Atlético in DAZN Bet',null,null,2500);return}
+ const card=e.target.closest('.tp,.sc-row,.cp-row,.gs-card');if(card){const o=card.querySelector('.odd');if(o&&!o.classList.contains('locked'))toggleSel(o.dataset.m,o.dataset.g,o.dataset.o);return} // the whole card picks its price
+ if(e.target.closest('#fxMore')){showToast(`Opens ${M(S.fx).h} vs ${M(S.fx).a} in DAZN Bet`,null,null,2500);return}
  const t=e.target.closest('.tile[data-fx]');if(t){openFixture(t.dataset.fx);return}
  const ch=e.target.closest('[data-cpt]');if(ch){setCompTab(ch.dataset.cpt);return}
  const cp=e.target.closest('.comp[data-cp]');if(cp){openComp(cp.dataset.cp);return}
