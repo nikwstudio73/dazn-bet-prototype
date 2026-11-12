@@ -47,7 +47,7 @@ The **Prototype states** panel on the left is the only navigation (see the next 
    - Removing the last pick closes the sheet and shows an Undo toast.
 6. **Place bet on DAZN Bet.** Opens a mock DAZN Bet overlay. Closing it clears the betslip, as in the real flow, because nothing comes back from DAZN Bet.
 7. **Fixture page.** Every match of today opens its own page: tap its tile. Real Madrid v Atlético Madrid is the one drawn in Figma; the other seven use the same template with generated demo data (see "Demo data" below). A live match shows the score and the running minute in the header and only the markets that still make sense for the score. The drawn page has the pre-match markets: Match Results, Total Goals, BTTS, Double Chance, 1st-half goals, Result & Both teams to score, Draw no bet. Picks stay in sync with the feed. Under "More bets on DAZN Bet" there is a **Goalscorer** carousel ("In this match", round photo): every player is his own pick, so several can be in the betslip.
-8. **Finished matches.** Tap **Sat 3 Jan** in the calendar (or the state *Other screens → Finished matches*). FT tiles keep their last odds, nothing is tappable, the outcome that happened is white and the rest are grey. **Today** goes back.
+8. **Finished matches.** Tap **Sat 3 Jan** in the calendar (or the state *Other screens → Finished matches*). FT tiles keep their last odds, nothing is tappable, the outcome that happened is white and the rest are grey. Tap a tile: its page shows the final score with "FT" and the same rule on every market. **Today** goes back.
 9. **Competition page · Odds tab.** Tap a competition header in the feed: **UEFA Champions League** (drawn in Figma), **LaLiga** or **Premier League** (same template, demo data). The page has the tabs Matches / Table / Odds / Playoff / Team stats (only Odds is built) and sub-tabs as chips:
    - **Competition winner:** a table of teams with the price to win the season.
    - **Top scorer** (Figma "Top scorer v3.2"): two **Top Picks** cards, then the list of players. A picked Top Pick turns white as a whole, with the price on a dark tile.
@@ -137,7 +137,7 @@ JS helpers: `soft()` (play an element in), `setTxt()` (swap a text), `smoothH()`
 - **LaLiga and Premier League pages.** Teams, players and prices in `CP` are close to the real season, not real odds. LaLiga has seven teams in the winner table because the Figma crest set has only those seven Spanish clubs.
 - **Photos.** The Figma file has photos of eleven players. They are reused wherever that player appears; everyone else shows initials on the same round plate.
 - **Crests.** From the Figma set "Football club assets 2026–27". `t_*.png` are the feed crests without their inner padding.
-- **Not drawn in Figma:** the header of a live match (score + red minute), the tabs of a league page (Matches / Table / Odds / Team stats / Player stats). Yesterday's finished matches have no page.
+- **Not drawn in Figma:** the header of a live match (score + red minute), the tabs of a league page (Matches / Table / Odds / Team stats / Player stats). The page of a finished match (built from the live header and the Result / Disabled states of the odds components; outcomes that happened are worked out from the final score, the 1st-half market is left out).
 
 ### Open points of the new pages (ask Roey / Marko)
 
