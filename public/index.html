@@ -797,6 +797,87 @@ img{display:block}
 .nv-tb>div{display:flex;flex-direction:column;gap:var(--spacing-2)}
 .nv-tb>div::after{content:"";flex:none;height:var(--spacing-2)}
 .fx-top .fx-back{left:8px;top:calc(var(--sb) + 4px)}
+/* ---------- competition page · Odds tab (Figma "Odds in Competition" 3544:19722) ----------
+   Covers the feed chrome; the collapsed betslip and the bottom nav stay on top of it. Sub-tabs: Competition winner, Top scorer (v3.2). */
+.comp[data-cp]{cursor:pointer}
+.cp{position:absolute;left:0;right:0;top:0;bottom:86px;z-index:6;background:#080e12;transform:translateX(100%);transition:transform var(--m-layout) var(--soft);display:flex;flex-direction:column;padding-top:var(--sb)}
+.cp.show{transform:none}
+#phone.incp .status{background:transparent;z-index:9}
+.cp-head{flex:none;height:72px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px}
+.cp-id{display:flex;align-items:center;gap:8px;min-width:0}
+.cp-back{flex:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
+.cp-back svg{width:12px;height:12px}
+.cp-back:active{opacity:.6}
+.cp-logo{flex:none;width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+.cp-logo img{max-width:32px;max-height:32px}
+.cp-name{display:flex;flex-direction:column;min-width:0;position:relative;top:-3px}
+.cp-name b{font-weight:700;font-size:16px;line-height:20px;white-space:nowrap}
+.cp-name>span{display:flex;align-items:center;margin-top:-2px;font-size:14px;line-height:16px;color:#f9fafa}
+.cp-name span svg{margin-top:2px}
+.cp-tabs{flex:none;padding-left:0;margin:0 -3px;overflow:hidden} /* five tabs are 381 wide in a 375 frame: they stick out 3 px on each side, as in Figma */
+.cp-tabs span,.cp-tabs span:first-child{flex:none;padding-left:0;padding-right:0;text-align:center}
+.cp-tabs span:nth-child(1){width:84px}.cp-tabs span:nth-child(2){width:65px}.cp-tabs span:nth-child(3){width:64px}.cp-tabs span:nth-child(4){width:76px}.cp-tabs span:nth-child(5){width:92px}
+.cp-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;overscroll-behavior:contain;padding:12px 16px 0}
+.cp-scroll::-webkit-scrollbar{display:none}
+.cp-scroll .legal{height:28px;margin-bottom:12px}
+.cp-chips{display:flex;gap:8px;margin:0 -16px 16px;padding:0 16px;overflow-x:auto;scrollbar-width:none}
+.cp-chips::-webkit-scrollbar{display:none}
+.cp-chip{flex:none;height:36px;padding:0 16px 1px;border-radius:9999px;box-shadow:inset 0 0 0 1px #3d4549;font-weight:700;font-size:14px;line-height:18px;letter-spacing:.01em;color:#c5c7ca;white-space:nowrap;transition:background var(--m-quick),color var(--m-quick),box-shadow var(--m-quick)}
+.cp-chip.on{background:#f9fafa;color:#080e12;box-shadow:none}
+.cp-chip:not(.off):active{opacity:.6}
+.cp-chip.off{cursor:default} /* Relegation: the chip is in the design, its content is not designed yet */
+/* Competition winner: one table, a row per team (local component "row" 3598:78738) */
+.cp-table{position:relative;border-radius:14px;background:radial-gradient(55% 340px at 50% 0,rgba(56,71,231,.15),rgba(56,71,231,0)),rgba(255,255,255,.04);padding-bottom:8px;overflow:hidden}
+.cp-table::after{content:"";position:absolute;inset:0;border-radius:14px;box-shadow:inset 0 0 0 1px #242d33;pointer-events:none}
+.cp-row{height:58px;display:flex;align-items:center;padding-right:12px;background:linear-gradient(rgba(255,255,255,.05),rgba(255,255,255,.05)) bottom/100% 1px no-repeat} /* 0.5px line at 10% */
+.cp-row .rk{flex:none;width:30px;margin-left:4px;text-align:center;font-weight:700;font-size:12px;line-height:16px;letter-spacing:.01em}
+.cp-row .cr{flex:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
+.cp-row .cr img{width:auto;height:auto;max-width:28px;max-height:34px} /* crests fill the 28 px slot by width; a tall one (Arsenal) may stick out, as in Figma */
+.cp-row .nm{flex:1;min-width:0;margin:0 8px;font-weight:700;font-size:12px;line-height:16px;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cp-row .odd{flex:none;width:84px;padding-left:12px;padding-right:12px}
+/* Top scorer v3.2: two Top Picks cards, then the list */
+.cp-h{font-weight:700;font-size:18px;line-height:25px;margin-bottom:12px}
+.tps{display:flex;gap:12px;margin-bottom:12px}
+.tp{flex:1;min-width:0;border-radius:10px;background:rgba(249,250,250,.08);padding:8px;display:flex;flex-direction:column;gap:12px;transition:background var(--m-quick)}
+.tp-in{height:111px;padding:0 4px;display:flex;flex-direction:column}
+.tp-top{display:flex;justify-content:space-between;align-items:flex-start;height:44px;margin-bottom:6px}
+.tp-top i{font-style:normal;font-size:16px;line-height:21px;color:#4d5457}
+.tp-top img{width:44px;height:44px;border-radius:50%;background:#242d33}
+.tp-in>span{position:relative;top:-1px;height:10px;font-size:14px;line-height:10px;color:#c5c7ca;white-space:nowrap}
+.tp-in>b{position:relative;top:-1px;height:14px;margin-top:6px;font-weight:700;font-size:20px;line-height:14px;color:#f9fafa;white-space:nowrap}
+.tp-club{display:flex;align-items:center;gap:6px;height:16px;margin-top:11px;font-size:12px;line-height:16px;letter-spacing:.01em;color:#c5c7ca;white-space:nowrap}
+.tp-club img{width:16px;height:16px;object-fit:contain}
+.tp-top i,.tp-in>span,.tp-in>b,.tp-club{transition:color var(--m-quick)}
+.tp .odd{flex:none;width:auto;padding-left:12px;padding-right:12px;background:rgba(8,14,18,.64)}
+/* picked Top Pick (Figma "Pro Max size"): the whole card turns white, the price sits on a dark tile */
+.tp:has(.odd.sel){background:#f9fafa}
+.tp:has(.odd.sel) .tp-top i,.tp:has(.odd.sel) .tp-in>span,.tp:has(.odd.sel) .tp-in>b,.tp:has(.odd.sel) .tp-club{color:#080e12}
+.tp .odd.sel{background:#080e12}
+.tp .odd.sel .v{color:#f9fafa}
+.sc-row{height:69px;display:flex;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:12px}
+.sc-row:last-child{margin-bottom:0}
+.sc-row .ph{flex:none;width:44px;height:44px;border-radius:50%;background:#1b2326}
+.sc-row .tx{flex:1;min-width:0;margin-left:4px}
+.sc-row .tx b{display:block;font-weight:700;font-size:14px;line-height:21px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-row .tx span{display:flex;align-items:center;gap:6px;height:16px;margin-top:2px;font-size:14px;line-height:16px;color:#b3b9bb;white-space:nowrap}
+.sc-row .tx span img{width:16px;height:16px;object-fit:contain}
+.sc-row .odd{flex:none;width:96px;padding-left:12px;padding-right:12px;background:rgba(249,250,250,.12)}
+.sc-row .odd.sel{background:var(--odd-sel-bg)}
+.cp-foot{padding:16px 0;font-size:12px;line-height:15px;letter-spacing:.01em;color:#c5c7ca}
+#phone.hasbar .cp-foot{padding-bottom:95px}
+/* fixture · Goalscorer carousel under "More bets" (Figma 4199:155577, round photo) */
+.gs{display:flex;flex-direction:column;gap:12px}
+.gs-h b{display:block;font-weight:700;font-size:18px;line-height:25px;color:#fff}
+.gs-h span{display:block;font-size:14px;line-height:18px;letter-spacing:.01em;color:#c5c7ca}
+.gs-row{display:flex;gap:12px;margin:0 -16px;padding:0 16px;overflow-x:auto;scrollbar-width:none}
+.gs-row::-webkit-scrollbar{display:none}
+.gs-card{flex:none;width:210px;border-radius:12px;background:#1b2326;padding:12px 8px;display:flex;flex-direction:column;align-items:center}
+.gs-card .ph{width:96px;height:96px;border-radius:50%;background:rgba(249,250,250,.08);object-fit:cover;object-position:center top}
+.gs-card b{margin-top:8px;font-weight:700;font-size:14px;line-height:21px;color:#fff}
+.gs-card .cl{display:flex;align-items:center;gap:6px;height:20px;margin-top:1px;font-size:14px;line-height:20px;color:#b3b9bb}
+.gs-card .cl img{width:20px;height:20px;object-fit:contain}
+.gs-card .odd{flex:none;align-self:stretch;width:auto;height:40px;margin-top:12px;background:rgba(249,250,250,.12)}
+.gs-card .odd.sel{background:var(--odd-sel-bg)}
 </style>
 </head>
 <body>
@@ -851,9 +932,20 @@ img{display:block}
      </div>
     </div>
     <div class="fx-comp"><div class="c"><i><img src="assets/img/laliga.png" alt=""></i><span id="fxComp">LA Liga EA Sports</span></div><button class="fx-follow">Follow</button></div>
-    <div class="fx-tabs"><span>Overview</span><span>H2H</span><span class="on">Odds</span><span>Box score</span><span>Stats</span></div>
+    <div class="fx-tabs"><span>Overview</span><span>H2H</span><span class="on">Odds</span><span>Box score</span><span>Stats</span><span>Live updates</span></div>
     <div class="mkts" id="mkts"></div>
    </div>
+  </div>
+  <div class="cp" id="cp" aria-hidden="true">
+   <div class="cp-head">
+    <div class="cp-id"><button class="cp-back" id="cpBack" aria-label="Back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.3266 15.9932L3.33337 8L11.3266 0.00679016L12.6667 1.34691L6.01362 8L12.6667 14.6531L11.3266 15.9932Z" fill="#F9FAFA"/></svg></button>
+     <div class="cp-logo"><img id="cpLogo" src="" alt=""></div>
+     <div class="cp-name"><b id="cpName"></b><span><span id="cpSeason"></span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5 6.5 8 10l3.5-3.5" stroke="#F9FAFA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+    </div>
+    <button class="fx-follow">Follow</button>
+   </div>
+   <div class="fx-tabs cp-tabs"><span>Matches</span><span>Table</span><span class="on">Odds</span><span>Playoff</span><span>Team stats</span></div>
+   <div class="cp-scroll" id="cpScroll"></div>
   </div>
   <div class="tongue" id="tongue">You’ve reached maximum number of bets allowed.</div>
   <div class="bar" id="bar">
@@ -964,11 +1056,33 @@ const FX={m4:{league:'Spain ・LA Liga',comp:'LA Liga EA Sports',hiImg:'rmfx',ai
  {id:'dnb',t:'Draw no bet',glow:true,type:'dnb',opts:[{k:'1',v:1.45},{k:'2',v:2.20}]}
 ]}};
 
+/* fixture · Goalscorer carousel: every player is his own pick (group "gs:<player>"), so several can be in the betslip */
+FX.m4.scorers=[{k:'mbappe',n:'Kylian Mbappe',team:'Real Madrid',img:'gs_mbappe',cr:'rmfx',v:1.80},{k:'alvarez',n:'Julian Alvarez',team:'Atletico Madrid',img:'gs_alvarez',cr:'atmfx',v:3.20}];
+/* Competition page · Odds tab: outright markets (season-long bets) of one competition.
+   win: [crest, team, price] in the order of the Figma table; Figma shows a 3.30 placeholder in every row, the prices here are demo values
+   from favourite to outsider (PRD: the list is sorted by odds). picks / scorers: Top scorer v3.2, names, clubs and prices as in Figma.
+   One pick per market: tapping another team or player replaces it (same rule as the outcomes of one match market). */
+Object.assign(IMG,{t_bay:'assets/img/t_bay.png',t_mci:'assets/img/t_mci.png',t_bar:'assets/img/t_bar.png',t_psg:'assets/img/t_psg.png',t_ars:'assets/img/t_ars.png',t_che:'assets/img/t_che.png',t_psv:'assets/img/t_psv.png',t_new:'assets/img/t_new.png',t_rm:'assets/img/t_rm.png', // t_*: the feed crests without their inner padding
+ bvb:'assets/img/bvb.png',fen:'assets/img/fen.png',nap:'assets/img/nap.png',juv:'assets/img/juv.svg',stu:'assets/img/stu.png',avl:'assets/img/avl.png',brg:'assets/img/brg.png',
+ gs_mbappe:'assets/img/gs_mbappe.png',gs_alvarez:'assets/img/gs_alvarez.png',
+ pl_haaland:'assets/img/pl_haaland.png',pl_kane:'assets/img/pl_kane.png',pl_mbappe:'assets/img/pl_mbappe.png',pl_dembele:'assets/img/pl_dembele.png',pl_raphinha:'assets/img/pl_raphinha.png',
+ pl_torres:'assets/img/pl_torres.png',pl_demirovic:'assets/img/pl_demirovic.png',pl_jackson:'assets/img/pl_jackson.png',pl_tresoldi:'assets/img/pl_tresoldi.png',pl_yamal:'assets/img/pl_yamal.png'});
+const CP={ucl:{t:'UEFA Champions league',season:'2026/27',img:'ucl',
+ win:[['bay','Bayern München',3.30],['bvb','Borussia Dortmund',4.50],['mci','Man City',5.00],['bar','Barcelona',5.50],['psg','PSG',6.00],['ars','Arsenal',7.50],
+  ['che','Chelsea',13.00],['psv','PSV',21.00],['fen','Fenerbahce',34.00],['nap','Napoli',41.00],['new','Newcastle',51.00],['juv','Juventus',67.00]],
+ picks:[{k:'haaland',f:'Erling',l:'Haaland',n:'Erling Haaland',team:'Man City',cr:'mci',v:2.10},{k:'kane',f:'Harry',l:'Kane',n:'Harry Kane',team:'Bayern Munich',cr:'bay',v:2.80}],
+ scorers:[{k:'mbappe',n:'Kylian Mbappé',team:'Real Madrid',cr:'rm',v:6.00},{k:'dembele',n:'Ousmane Dembélé',team:'Paris Saint-Germain',cr:'psg',v:13.00},{k:'raphinha',n:'Raphinha',team:'Barcelona',cr:'bar',v:17.00},
+  {k:'torres',n:'Ferran Torres',team:'Paris Saint-Germain',cr:'psg',v:21.00},{k:'demirovic',n:'Ermedin Demirović',team:'Stuttgart',cr:'stu',v:26.00},{k:'jackson',n:'Nicolas Jackson',team:'Aston Villa',cr:'avl',v:29.00},
+  {k:'tresoldi',n:'Nicolò Tresoldi',team:'Club Brugge',cr:'brg',v:29.00},{k:'yamal',n:'Lamine Yamal',team:'Barcelona',cr:'bar',v:34.00}]}};
+/* an outright pick has no match: this stands in for it in the betslip (card line and DAZN Bet overlay) */
+const OUT={ucl:{id:'ucl',out:true,h:'UEFA Champions League',a:'',when:'2026/27',live:false}};
+const crest=k=>IMG['t_'+k]||IMG[k];
+const cpPlayer=(c,k)=>[...c.picks,...c.scorers].find(x=>x.k===k);
 let S;
 /* st: dropped-out picks {"match|market":'suspended'|'locked'}; lk: locked odds in the feed ["match|market|outcome"]; day: 'today'|'yest' */
-function freshState(){return {matches:INIT(),ft:FT(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fav:false}}
+function freshState(){return {matches:INIT(),ft:FT(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fav:false,cp:null,cpTab:'win'}}
 const $=s=>document.querySelector(s);
-const M=id=>S.matches.find(m=>m.id===id)||S.ft.find(m=>m.id===id);
+const M=id=>S.matches.find(m=>m.id===id)||S.ft.find(m=>m.id===id)||OUT[id];
 const f2=n=>n.toFixed(2);
 const fT=n=>n.toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2}); // totals: 14,112.27
 const MAX=20,LIMIT_MSG='Maximum number of selections allowed is 20';
@@ -1002,7 +1116,7 @@ function renderFeed(){
   const ms=list.filter(m=>m.comp===g&&(!S.liveOnly||m.live));
   if(!ms.length)continue;
   const c=COMPS[g];
-  h+=`<div class="group"><div class="comp"><div class="logo"><img src="${IMG[c.img]}" alt=""></div><div class="txt"><div class="t">${c.t}</div><div class="m">${c.m}</div></div><img class="chev" src="${IMG.chev}" alt=""></div><div class="tiles">${ms.map(tileHTML).join('')}</div></div>`;
+  h+=`<div class="group"><div class="comp"${CP[g]?` data-cp="${g}"`:''}><div class="logo"><img src="${IMG[c.img]}" alt=""></div><div class="txt"><div class="t">${c.t}</div><div class="m">${c.m}</div></div><img class="chev" src="${IMG.chev}" alt=""></div><div class="tiles">${ms.map(tileHTML).join('')}</div></div>`;
  }
  h+='<div class="sgfoot">+18. Juega con responsabilidad. Publi.</div>';
  $('#feed').innerHTML=h;$('#feed').classList.toggle('nood',!S.oddsOn);
@@ -1051,13 +1165,16 @@ const act=()=>S.sel.filter(s=>!isOut(s));      // picks that still have a price
 function oddState(mid,g,o){const sel=isSel(mid,g,o);return {sel,locked:(sel&&!!S.st[mid+'|'+g])||S.lk.includes(mid+'|'+g+'|'+o)}}
 function mkt(mid,id){const f=FX[mid];return f&&f.markets.find(x=>x.id===id)}
 function oddsOf(s){
- const m=M(s.m);if(s.g==='1x2')return m.o[+s.o];
- const [id,line]=s.g.split(':');const k=mkt(s.m,id);
+ const m=M(s.m);if(m.out){const c=CP[s.m];return s.g==='win'?c.win.find(x=>x[0]===s.o)[2]:cpPlayer(c,s.o).v} // outright: Competition winner / Top scorer
+ if(s.g==='1x2')return m.o[+s.o];
+ const [id,line]=s.g.split(':');if(id==='gs')return FX[s.m].scorers.find(x=>x.k===line).v;const k=mkt(s.m,id);
  if(k.type==='lines'){const r=k.lines.find(x=>x[0]===line);return s.o==='o'?r[1]:r[2]}
  return k.opts.find(x=>x.k===s.o).v;
 }
 function selInfo(s){
  const m=M(s.m),odds=oddsOf(s);const [id,line]=s.g.split(':');
+ if(m.out){const c=CP[s.m];return s.g==='win'?{m,subj:c.win.find(x=>x[0]===s.o)[1],pred:'',mk:'Competition winner',odds}:{m,subj:cpPlayer(c,s.o).n,pred:'',mk:'Top scorer',odds}}
+ if(id==='gs')return {m,subj:FX[s.m].scorers.find(x=>x.k===line).n,pred:'to score',mk:'Goalscorer',odds};
  if(s.g==='1x2'){const subj=s.o==='1'?'Draw':(s.o==='0'?m.h:m.a);return {m,subj,pred:s.o==='1'?'':'to win',mk:'Match result',odds}}
  if(id==='ou')return {m,subj:(s.o==='o'?'Over ':'Under ')+line,pred:'goals',mk:'Total goals',odds};
  if(id==='ou1h')return {m,subj:(s.o==='o'?'Over ':'Under ')+line,pred:'goals in 1st half',mk:'Total goals – 1st half',odds};
@@ -1126,7 +1243,7 @@ function cardHTML(s,i){
                 :`<span class="od cv" data-codd="${key(s)}"><span class="arr">${ARROW}</span><span class="num">${f2(odds)}</span></span>`;
  const status=m.live?`<span class="st"><span class="ev" data-cev="${key(s)}"><span class="gl">Goal!</span></span><span class="livepill"><span data-cmin="${m.id}">${m.min}’</span><i></i></span></span>`
                     :`<span class="st"><span class="ko">${m.when||'Today, '+m.ko}</span></span>`;
- const match=m.live?`<span>${m.h}</span><span data-csc="${m.id}">${m.sh}:${m.sa}</span><span>${m.a}</span>`:`<span>${m.h}</span><span>vs</span><span>${m.a}</span>`; // wrapped in .tm below
+ const match=m.live?`<span>${m.h}</span><span data-csc="${m.id}">${m.sh}:${m.sa}</span><span>${m.a}</span>`:m.out?`<span>${m.h}</span>`:`<span>${m.h}</span><span>vs</span><span>${m.a}</span>`; // wrapped in .tm below; an outright shows its competition
  return `<div class="cardwrap" data-card="${key(s)}" style="--i:${i}"><div class="card${m.live?' live':''}${out?' out':''}${out==='locked'?' lkd':''}">
   <div class="ctop">${SPORT}<div class="selc"><span>${subj}</span>${pred?`<em>${pred}</em>`:''}</div>${price}<button class="rm" data-rm="${key(s)}" aria-label="Remove"><img src="${IMG.close}" alt=""></button></div>
   <div class="cinfo"><div class="mk">${mk}</div><div class="mrow"><span class="tm">${match}</span>${status}</div></div>
@@ -1229,7 +1346,7 @@ function removeSel(k){
 
 /* place a bet -> overlay */
 function placeBet(){
- $('#ovList').innerHTML=act().map(s=>{const x=selInfo(s);return `<div class="ov-item"><div>${x.subj}${x.pred?' '+x.pred:''}<span>${x.m.h} vs ${x.m.a}</span></div><b>${f2(x.odds)}</b></div>`}).join('');
+ $('#ovList').innerHTML=act().map(s=>{const x=selInfo(s);return `<div class="ov-item"><div>${x.subj}${x.pred?' '+x.pred:''}<span>${x.m.out?x.m.h:x.m.h+' vs '+x.m.a}</span></div><b>${f2(x.odds)}</b></div>`}).join('');
  $('#overlay').classList.add('show');
 }
 function closeOverlay(){
@@ -1336,14 +1453,38 @@ function openFixture(mid){
  $('#fxScroll').scrollTop=0;$('#phone').classList.add('infx');$('#phone').classList.remove('fxs');
  $('#fx').classList.add('show');$('#fx').setAttribute('aria-hidden','false');S.fx=mid;hideToast();
 }
-function renderMkts(mid=S.fx){const m=M(mid),f=FX[mid];$('#mkts').innerHTML=LEGAL+f.markets.map(k=>marketHTML(m,k)).join('')+`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`}
+function renderMkts(mid=S.fx){const m=M(mid),f=FX[mid];$('#mkts').innerHTML=LEGAL+f.markets.map(k=>marketHTML(m,k)).join('')+`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`+
+ (f.scorers?`<section class="gs"><div class="gs-h"><b>Goalscorer</b><span>In this match</span></div><div class="gs-row">${f.scorers.map(p=>`<div class="gs-card"><img class="ph" src="${IMG[p.img]}" alt=""><b>${p.n}</b><span class="cl"><img src="${IMG[p.cr]}" alt="">${p.team}</span>${oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only')}</div>`).join('')}</div></section>`:'')}
 function closeFixture(){$('#fx').classList.remove('show');$('#fx').setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},T.layout)}
+
+/* ---------- competition page · Odds tab (Figma section "Odds in Competition") ----------
+ Opens from the competition header in the feed (competitions listed in CP). Sub-tabs are chips; only Competition winner and Top scorer are designed. */
+function compHTML(id){
+ const c=CP[id],tab=S.cpTab;
+ const chips=[['win','Competition winner'],['scorer','Top scorer'],['rel','Relegation']].map(([k,l])=>`<button class="cp-chip${k===tab?' on':''}${k==='rel'?' off':''}"${k==='rel'?'':` data-cpt="${k}"`}>${l}</button>`).join('');
+ const club=p=>`<img src="${crest(p.cr)}" alt="">${p.team}`;
+ const body=tab==='win'
+  ?`<div class="cp-table">${c.win.map(([k,n,v],i)=>`<div class="cp-row"><span class="rk">${i+1}</span><span class="cr"><img src="${crest(k)}" alt=""></span><span class="nm">${n}</span>${oddBtn(id,'win',k,'',v,'only')}</div>`).join('')}</div>`
+  :`<div class="cp-h">Top Picks</div><div class="tps">${c.picks.map((p,i)=>`<div class="tp"><div class="tp-in"><div class="tp-top"><i>0${i+1}</i><img src="${IMG['pl_'+p.k]}" alt=""></div><span>${p.f}</span><b>${p.l}</b><div class="tp-club">${club(p)}</div></div>${oddBtn(id,'scorer',p.k,'',p.v,'only')}</div>`).join('')}</div>
+   <div class="sc-list">${c.scorers.map(p=>`<div class="sc-row"><img class="ph" src="${IMG['pl_'+p.k]}" alt=""><div class="tx"><b>${p.n}</b><span>${club(p)}</span></div>${oddBtn(id,'scorer',p.k,'',p.v,'only')}</div>`).join('')}</div>`;
+ return LEGAL+`<div class="cp-chips">${chips}</div><div id="cpBody">${body}</div><div class="cp-foot">+18. Juega con responsabilidad. Publi.</div>`;
+}
+function renderComp(){$('#cpScroll').innerHTML=compHTML(S.cp)}
+function openComp(id,tab){
+ const c=CP[id];if(!c)return;if(S.fav)closeFav();closeFixture();
+ S.cp=id;if(tab)S.cpTab=tab;
+ $('#cpLogo').src=IMG[c.img];$('#cpName').textContent=c.t;$('#cpSeason').textContent=c.season;
+ renderComp();$('#cpScroll').scrollTop=0;
+ $('#phone').classList.add('incp');$('#cp').classList.add('show');$('#cp').setAttribute('aria-hidden','false');hideToast();
+}
+function closeComp(){$('#cp').classList.remove('show');$('#cp').setAttribute('aria-hidden','true');S.cp=null;setTimeout(()=>{if(!S.cp)$('#phone').classList.remove('incp')},T.layout)}
+function setCompTab(t){if(S.cpTab===t)return;S.cpTab=t;renderComp();$('#cpScroll').scrollTop=0;soft($('#cpBody'),RISE,T.std)} // the new list rises in, like the LIVE filter in the feed
 
 /* ---------- favourite-team popup (Figma section "Betting popup") ----------
  1X2 of the favourite team's match over the feed. Tapping an odd selects it, then the popup closes and the pick
  sits in the collapsed bar. The CTA is enabled only while a pick from this match is selected. */
 function openFav(){
- const m=M('m4'),f=FX.m4;closeSheet();closeFixture();setDay('today');hideToast();
+ const m=M('m4'),f=FX.m4;closeSheet();closeFixture();closeComp();setDay('today');hideToast();
  $('#favHi').src=IMG[f.hiImg];$('#favAi').src=IMG[f.aiImg];$('#favWhen').textContent='Today, '+m.ko;
  const cur=S.sel.find(s=>s.m==='m4'&&s.g==='1x2');if(!S.fav)S.favPick=cur?cur.o:'0';
  $('#favOdds').innerHTML=[m.hs,'X',m.as].map((l,i)=>`<button class="odd${S.favPick===String(i)?' sel':''}" data-fo="${i}"><span class="l">${l}</span><span class="v"><span class="num">${f2(m.o[i])}</span></span></button>`).join('');
@@ -1356,7 +1497,7 @@ function favAdd(){const o=S.favPick||'0',i=S.sel.findIndex(s=>s.m==='m4'&&s.g===
  syncTiles();updateBar(true);renderSheet();}
 
 /* ---------- redraw everything after a state change ---------- */
-function refresh(){const y=$('#scroll').scrollTop;renderFeed();$('#scroll').scrollTop=y;if(S.fx)renderMkts();if(S.fav)openFav();renderSheet();updateBar(true)}
+function refresh(){const y=$('#scroll').scrollTop;renderFeed();$('#scroll').scrollTop=y;if(S.fx)renderMkts();if(S.cp)renderComp();if(S.fav)openFav();renderSheet();updateBar(true)}
 /* ---------- ready-made states (navigation panel) ----------
  Each state sets the whole screen by itself (picks, statuses, prices, sheet open or closed), whatever was on screen before.
  Only states that cannot be reached by tapping the phone are here (prices that move in a pick, suspended and locked bets, the limit of 20)
@@ -1393,7 +1534,10 @@ const STATES=[
  {g:'Limit 20',k:'Limit + suspended bet',n:'Both at once: the line under Total odds for the dropped bet and the limit message above the button.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet();toEnd()}},
  {g:'Other screens',k:'Finished matches',n:'Yesterday (Sat 3 Jan in the calendar): last prices stay, everything is disabled, the outcome that happened is white.',run(){setDay('yest')}},
  {g:'Other screens',k:'Favourite team popup',n:'The favourite team plays today: its win is preselected, "Add to my Betslip" puts the pick in the bar.',run(){openFav()}},
- {g:'Other screens',k:'Fixture · Odds tab',n:'Pre-match markets of one match (tap its tile in the feed). Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}}
+ {g:'Other screens',k:'Fixture · Odds tab',n:'Pre-match markets of one match (tap its tile in the feed). Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
+ {g:'Other screens',k:'Fixture · Goalscorer',n:'Under the markets: a carousel of goalscorers. Every player is his own pick, so several can be in the betslip.',run(){openFixture('m4');setTimeout(()=>{const f=$('#fxScroll');f.scrollTop=f.scrollHeight},80)}},
+ {g:'Other screens',k:'Competition · Winner',n:'Odds tab of a competition (tap its header in the feed): who wins the season. One pick per market; it goes to the same betslip.',run(){openComp('ucl','win')}},
+ {g:'Other screens',k:'Competition · Top scorer',n:'Second sub-tab: two Top Picks cards and the list of players. A picked Top Pick turns white as a whole.',run(){openComp('ucl','scorer')}}
 ];
 STATES.forEach(s=>s.t=s.g+' · '+s.k+(s.v?' · '+s.v:''));        // full unique name (tests, logs)
 /* panel model: topics -> items; an item is one state, or a collapsed + opened pair */
@@ -1455,8 +1599,10 @@ document.addEventListener('click',e=>{
  const rm=e.target.closest('[data-rm]');if(rm){removeSel(rm.dataset.rm);return}
  if(e.target.closest('#fxMore')){showToast('Opens Real Madrid vs Atlético in DAZN Bet',null,null,2500);return}
  const t=e.target.closest('.tile[data-fx]');if(t){openFixture(t.dataset.fx);return}
+ const ch=e.target.closest('[data-cpt]');if(ch){setCompTab(ch.dataset.cpt);return}
+ const cp=e.target.closest('.comp[data-cp]');if(cp){openComp(cp.dataset.cp);return}
 });
-$('#fxBack').onclick=closeFixture;$('#fxBack2').onclick=closeFixture;
+$('#cpBack').onclick=closeComp;$('#fxBack').onclick=closeFixture;$('#fxBack2').onclick=closeFixture;
 $('#fxScroll').addEventListener('scroll',e=>$('#phone').classList.toggle('fxs',e.target.scrollTop>150));
 $('#oddsChip').onclick=()=>setOddsOn(!S.oddsOn);
 $('#liveBadge').onclick=()=>{S.liveOnly=!S.liveOnly;$('#liveBadge').classList.toggle('on',S.liveOnly);swapFeed(0)};
@@ -1523,7 +1669,7 @@ function init(){
  for(const k in CHG)delete CHG[k];Object.values(chgTimers).flat().forEach(clearTimeout);document.querySelectorAll('.cv').forEach(e=>e.classList.remove('up','dn'));
  $('#oddsChip').classList.remove('off');$('#oddsChip').setAttribute('aria-checked','true');$('#liveBadge').classList.remove('on');
  $('#sheet').classList.remove('show','editing');$('#backdrop').classList.remove('show');$('#overlay').classList.remove('show');
- $('#fx').classList.remove('show');$('#phone').classList.remove('infx','fxs','limit');
+ $('#fx').classList.remove('show');$('#cp').classList.remove('show');$('#phone').classList.remove('infx','fxs','incp','limit');
  clearTimeout(favT);$('#fav').classList.remove('show');document.querySelectorAll('.day').forEach(e=>e.classList.toggle('sel',e.dataset.day==='today'));$('#days').classList.remove('yest');
  renderFeed();renderSheet();updateBar();$('#scroll').scrollTop=0;
  timers=[setInterval(liveTick,2600),setInterval(minuteTick,20000)];

@@ -14,7 +14,7 @@ Design source: Figma file **DAZN-Bet-in-Scores**, https://www.figma.com/design/J
 
 ```
 public/index.html   the whole prototype: CSS (top), markup, JS (bottom)
-public/assets/img/  43 PNGs and SVGs: club crests, competition logos, nav and header icons, DAZN Bet logo
+public/assets/img/  71 PNGs and SVGs: club crests, player photos, competition logos, nav and header icons, DAZN Bet logo
 public/assets/fonts/ DAZN Oscine Regular / Bold (woff2)
 vercel.json         tells search engines not to index the site
 build.py            public/ -> dist/ single file (not needed for the website)
@@ -46,8 +46,13 @@ The **Prototype states** panel on the left is the only navigation (see the next 
    - The sheet keeps its height while cards are removed, so nothing moves under the finger. On Confirm it eases to its new height.
    - Removing the last pick closes the sheet and shows an Undo toast.
 6. **Place bet on DAZN Bet.** Opens a mock DAZN Bet overlay. Closing it clears the betslip, as in the real flow, because nothing comes back from DAZN Bet.
-7. **Fixture page.** Tap the Real Madrid v Atlético Madrid tile to open the Odds tab with the pre-match markets: Match Results, Total Goals, BTTS, Double Chance, 1st-half goals, Result & Both teams to score, Draw no bet. Picks stay in sync with the feed.
+7. **Fixture page.** Tap the Real Madrid v Atlético Madrid tile to open the Odds tab with the pre-match markets: Match Results, Total Goals, BTTS, Double Chance, 1st-half goals, Result & Both teams to score, Draw no bet. Picks stay in sync with the feed. Under "More bets on DAZN Bet" there is a **Goalscorer** carousel ("In this match", round photo): every player is his own pick, so several can be in the betslip.
 8. **Finished matches.** Tap **Sat 3 Jan** in the calendar (or the state *Other screens → Finished matches*). FT tiles keep their last odds, nothing is tappable, the outcome that happened is white and the rest are grey. **Today** goes back.
+9. **Competition page · Odds tab.** Tap the **UEFA Champions League** header in the feed. The page has the tabs Matches / Table / Odds / Playoff / Team stats (only Odds is built) and sub-tabs as chips:
+   - **Competition winner:** a table of teams with the price to win the season.
+   - **Top scorer** (Figma "Top scorer v3.2"): two **Top Picks** cards, then the list of players. A picked Top Pick turns white as a whole, with the price on a dark tile.
+   - **Relegation:** the chip is in the design, its content is not designed, so it does nothing.
+   - These are outright (season-long) picks. One pick per market: tapping another team or player replaces it. In the betslip the card shows the competition and the season instead of a match. The collapsed bar and the bottom nav stay on screen.
 
 ## Navigation: the "Prototype states" panel
 
@@ -107,8 +112,8 @@ JS helpers: `soft()` (play an element in), `setTxt()` (swap a text), `smoothH()`
 
 ## Showing it on a call: ready-made states
 
-- **21 screens in 14 rows.** Seven rows are a Collapsed / Opened pair. The topics follow the rows of the Figma section "Betslip states · PRD".
-- **Keyboard.** **→ / ←** step through all 21 screens in order (the panel follows). **L** pauses and resumes the live price ticker.
+- **24 screens in 17 rows.** Seven rows are a Collapsed / Opened pair. The topics follow the rows of the Figma section "Betslip states · PRD".
+- **Keyboard.** **→ / ←** step through all 24 screens in order (the panel follows). **L** pauses and resumes the live price ticker.
 - **Repeatable numbers.** A ready-made state pauses the live price ticker and uses fixed prices, so the totals are the same every time (for example Odds changed: 16.97 → 17.06). Arrows and the limit message stay on screen while the state is shown. Free play turns the ticker back on.
 - To add or reorder a state, edit the `STATES` array in `index.html`: `g` = topic, `k` = name of the row, `v` = `'bar'` / `'sheet'` for a Collapsed / Opened pair (two neighbouring entries with the same `g` and `k`), `n` = the note under the row, `run()` = what to set. The panel is built from this array.
 
@@ -125,10 +130,18 @@ JS helpers: `soft()` (play an element in), `setTxt()` (swap a text), `smoothH()`
 - There is no stake input and no login. DAZN Bet handles those inside its overlay.
 - Legal copy (top warning, footer, text under the summary) is fixed by legal; don't rewrite it.
 
+### Open points of the new pages (ask Roey / Marko)
+
+- **Winner prices.** Figma shows 3.30 in every row (a placeholder). The prototype uses demo prices from favourite to outsider, because the PRD says the list is sorted by odds.
+- **Outright + match picks in one betslip.** Not in the spec. The prototype follows the existing rule: picks that share a match or a competition are labelled "Singles" in the bar, the sheet still shows Total odds.
+- **Top Picks numbers.** Both cards say "01" in Figma; the prototype numbers them 01 and 02.
+- **Top scorer on 375.** Built as on the "Pro Max size" frame: legal banner and chips on top, then Top Picks (the 375 frame "v3.2" has no banner and chips).
+- **Goalscorer.** Two variants are drawn under "More bets"; the one with the round photo is built (Nik, 12 Nov). The market name on the betslip card is "Goalscorer", as the title in Figma (Roey's list calls it "Anytime Goalscorer").
+
 ## Not in the prototype yet
 
 - **Top Bet / Bet Boost** cards exist in Figma (`Odds/Top Bet`, `.Bet/Price button`) but not here.
-- The **DAZN Bet promo banner** on top of the feed, and odds on the **Competition** and **Team** pages.
+- The **DAZN Bet promo banner** on top of the feed, odds on the **Team** page, and on the **Competition** page everything except the Odds tab (Matches tab with 1X2, Relegation sub-tab).
 - **Live Updates** carousels after match events.
 - English legal texts: DAZN Bet has not sent them, the Spanish ones are shown.
 
