@@ -892,7 +892,9 @@ img{display:block}
 .gs-card .ini{font-size:28px}
 .sc-row .ph{object-fit:cover;object-position:center top}
 .fx-team img{object-fit:contain}
-.fx-mid .lv{font-weight:700;color:var(--live)} /* live match: score, then the minute in red */
+.fx-mid{flex:1 1 0;min-width:0;white-space:nowrap} /* takes the space between the crests; a wide score spills evenly to both sides and never squeezes the teams */
+.fx-mid .sc{font-weight:700;font-size:28px;line-height:28px;color:var(--t1)} /* live and finished: the score is the loudest thing in the header (heading/h2 size, no Figma style for it yet) */
+.fx-mid .lv{font-weight:700;color:var(--live)} /* live match: the minute in red under the score */
 </style>
 </head>
 <body>
@@ -1519,7 +1521,8 @@ function openFixture(mid){
  $('#fxLeague').textContent=f.league;$('#fxH').textContent=m.h;$('#fxA').textContent=m.a;$('#fxHi').src=IMG[f.hiImg];$('#fxAi').src=IMG[f.aiImg];$('#fxComp').textContent=f.comp;$('#fxCompImg').src=IMG[f.compImg||'laliga'];
  $('#fxTitle').textContent=m.h+' vs '+m.a;
  const ft=$('#fxTime'),fd=$('#fxDate');                 // kick-off time and day; a live match shows the score and the running minute
- ft.textContent=m.live?m.sh+' - '+m.sa:f.time;fd.textContent=m.live?m.min+'’':f.date;ft.classList.toggle('lv',false);fd.classList.toggle('lv',!!m.live);
+ const sc=!!(m.live||m.ft);                             // started or finished: big white score instead of the kick-off time
+ ft.textContent=sc?m.sh+' - '+m.sa:f.time;fd.textContent=m.live?m.min+'’':m.ft?'FT':f.date;ft.classList.toggle('sc',sc);fd.classList.toggle('lv',!!m.live);
  if(m.live)fd.dataset.min=m.id;else fd.removeAttribute('data-min');
  renderMkts(mid);
  $('#fxScroll').scrollTop=0;$('#phone').classList.add('infx');$('#phone').classList.remove('fxs');
