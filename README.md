@@ -47,14 +47,14 @@ The **Prototype states** panel on the left is the only navigation (see the next 
    - Removing the last pick closes the sheet and shows an Undo toast.
 6. **Place bet on DAZN Bet.** Opens a mock DAZN Bet overlay. Closing it clears the betslip, as in the real flow, because nothing comes back from DAZN Bet.
 7. **Fixture page.** Tap the Real Madrid v Atlético Madrid tile to open the Odds tab with the pre-match markets: Match Results, Total Goals, BTTS, Double Chance, 1st-half goals, Result & Both teams to score, Draw no bet. Picks stay in sync with the feed.
-8. **Finished matches.** Tap **Sat 3 Jan** in the calendar (or the state *Scores feed → Finished matches*). FT tiles keep their last odds, nothing is tappable, the outcome that happened is white and the rest are grey. **Today** goes back.
+8. **Finished matches.** Tap **Sat 3 Jan** in the calendar (or the state *Other screens → Finished matches*). FT tiles keep their last odds, nothing is tappable, the outcome that happened is white and the rest are grey. **Today** goes back.
 
 ## Navigation: the "Prototype states" panel
 
 One panel on the left, nothing else on screen except the phone and the phone-size switch.
 
 - **Free play** (selected when the page opens). Everything on the phone works by hand. Clicking it again, or the round arrow next to it, starts over.
-- **Topics.** Scores feed, Betslip, Suspended, Locked, Limit 20, Other screens. A topic opens its states; only one topic is open at a time. Opening a topic does not change the phone. A dot next to a folded topic marks where the current state lives.
+- **Topics.** Betslip, Suspended, Locked, Limit 20, Other screens. They hold only what cannot be reached by tapping the phone (a price that moves in a pick, suspended and locked bets, the limit of 20) plus three screens that are not obvious to find. The main flow (Odds toggle, picks, betslip, Edit, Place bet) is done by hand in Free play; its description says what to try. A topic opens its states; only one topic is open at a time. Opening a topic does not change the phone. A dot next to a folded topic marks where the current state lives.
 - **States.** One click sets the whole screen (picks, statuses, prices, sheet open or closed), whatever was on screen before. The selected state shows one or two lines about the rule it demonstrates. Click it again, or the round arrow, to start the same state again.
 - **Collapsed / Opened.** States that exist with the betslip folded and unfolded are one row with this switch. If you open or close the betslip on the phone by hand, the switch follows.
 - The **‹** button folds the panel into a small "States" button (it starts folded in windows narrower than 1000 px).
@@ -84,7 +84,6 @@ JS helpers: `soft()` (play an element in), `setTxt()` (swap a text), `smoothH()`
 - **Edit mode:** the × buttons appear one card after another, only for the cards on screen (max 6 steps). A removed card collapses on its own; several can be removed quickly one after another.
 - **Limit 20 · tap on a 21st odd** (Figma N): nothing is added; the tapped odd gets a light press and a small spring back (no colour), an orange tongue slides out from behind the collapsed betslip ("You’ve reached maximum number of bets allowed.") and the counter pulses; the tongue hides after ~2.6 s (`denyLimit()`). With the sheet open the toast is used instead.
 - **Feed:** switching the day slides the list in from the side of that day (yesterday from the left, today from the right); the LIVE filter fades it in from below (`swapFeed()`). A tapped odd changes text colour together with its background.
-- **Ready-made states:** stepping from "Odds off" to "Odds on" plays the odds reveal.
 
 ### Club crests
 
@@ -108,9 +107,9 @@ JS helpers: `soft()` (play an element in), `setTxt()` (swap a text), `smoothH()`
 
 ## Showing it on a call: ready-made states
 
-- **27 screens in 20 rows.** Seven rows are a Collapsed / Opened pair. The topics follow the rows of the Figma section "Betslip states · PRD".
-- **Keyboard.** **→ / ←** step through all 27 screens in story order (the panel follows). **L** pauses and resumes the live price ticker.
-- **Repeatable numbers.** A ready-made state pauses the live price ticker and uses fixed prices, so the totals are the same every time (for example Odds changed: 16.97 → 17.06). Arrows and the limit message stay on screen while the state is shown. Only "Live odds moving" lets prices tick. Free play turns the ticker back on.
+- **21 screens in 14 rows.** Seven rows are a Collapsed / Opened pair. The topics follow the rows of the Figma section "Betslip states · PRD".
+- **Keyboard.** **→ / ←** step through all 21 screens in order (the panel follows). **L** pauses and resumes the live price ticker.
+- **Repeatable numbers.** A ready-made state pauses the live price ticker and uses fixed prices, so the totals are the same every time (for example Odds changed: 16.97 → 17.06). Arrows and the limit message stay on screen while the state is shown. Free play turns the ticker back on.
 - To add or reorder a state, edit the `STATES` array in `index.html`: `g` = topic, `k` = name of the row, `v` = `'bar'` / `'sheet'` for a Collapsed / Opened pair (two neighbouring entries with the same `g` and `k`), `n` = the note under the row, `run()` = what to set. The panel is built from this array.
 
 ## Product rules baked in

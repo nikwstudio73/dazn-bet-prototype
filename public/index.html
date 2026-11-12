@@ -298,7 +298,8 @@ img{display:block}
 #stage.max .status .sr{top:26px;right:28px}
 #phone{position:absolute;inset:0;background:var(--page);border-radius:44px;overflow:hidden;overflow:clip;box-shadow:0 0 0 10px #000,0 0 0 11px #333,0 30px 80px rgba(0,0,0,.6);isolation:isolate}
 /* ---------- prototype chrome (everything outside the phone) ----------
-   Same Global foundation tokens as the product UI ("Color theme", dark). One accent: white (text/primary). No brand yellow, no orange. */
+   Same Global foundation tokens as the product UI ("Color theme", dark). One accent: white (text/primary). No brand yellow, no orange.
+   Spacing on the 4 px scale (spacing-2 / 4 / 8 / 12 / 16), type 14/20 and 12/18, radii 16 > 8 and 12 > 8 (outer minus padding). */
 :root{
   --ui-canvas:var(--surface-container-2);          /* surface/container-2 */
   --ui-panel:var(--surface-container-1);           /* surface/container-1 */
@@ -310,13 +311,17 @@ img{display:block}
   --ui-t1:var(--modules-color-text-primary-default);/* text/primary */
   --ui-t2:#c5c7ca;                                 /* text/secondary */
   --ui-t3:var(--text-tertiary);                    /* text/tertiary */
+  --ui-edge:var(--spacing-16);                     /* panel and switch: distance from the window edges */
 }
+.nav,.nav-open,.devsw{font-family:'DAZN Oscine',system-ui,sans-serif}
+.nav button:focus-visible,.nav-open:focus-visible,.devsw button:focus-visible{outline:2px solid var(--ui-t1);outline-offset:-2px}
 /* segmented control (DS "Segmented Control", Figma 3392:71978): phone size in the bottom-right corner, betslip view inside the panel */
-.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;align-items:center;padding:3px;border-radius:10px;background:var(--ui-well);font-family:'DAZN Oscine',system-ui,sans-serif}
-.seg button{height:28px;padding:0 12px;border-radius:7px;font-weight:700;font-size:12px;line-height:18px;color:var(--ui-t3);white-space:nowrap;transition:background .2s,color .2s}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;align-items:center;padding:var(--spacing-2);border-radius:8px;background:var(--ui-well)}
+.seg button{height:28px;padding:0 var(--spacing-12);border-radius:6px;font-weight:700;font-size:12px;line-height:18px;color:var(--ui-t3);white-space:nowrap;transition:background .2s,color .2s}
 .seg button.on{background:var(--ui-thumb);color:var(--ui-t1)}
 .seg button:not(.on):hover{color:var(--ui-t2)}
-.devsw{position:fixed;right:16px;bottom:16px;z-index:100;padding:4px;border-radius:12px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line)}
+.devsw{position:fixed;right:var(--ui-edge);bottom:var(--ui-edge);z-index:100;padding:var(--spacing-4);border-radius:12px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line)}
+.devsw button{border-radius:8px}
 
 /* status bar */
 .status{position:absolute;top:0;left:0;right:0;height:var(--sb);background:var(--surface);z-index:5}
@@ -745,27 +750,28 @@ img{display:block}
 .pwho b{font-weight:700;font-size:18px;line-height:25px}
 .pwho span{font-size:12px;line-height:18px;color:#c5c7ca}
 
-/* navigation panel: Free play, then topics; a topic opens its states; the selected state shows what it demonstrates */
-.nav{position:fixed;left:16px;top:16px;width:280px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;border-radius:16px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);z-index:100;font-family:'DAZN Oscine',system-ui,sans-serif;color:var(--ui-t2);transition:opacity .24s ease-out,transform .44s var(--soft)}
+/* navigation panel: Free play, then topics; a topic opens its states; the selected state shows what it demonstrates.
+   Left text edge 20 px (labels of topics and their states 44 px), right icon axis 24 px from the panel edge. */
+.nav{position:fixed;left:var(--ui-edge);top:var(--ui-edge);width:280px;max-height:calc(100vh - 2*var(--ui-edge));display:flex;flex-direction:column;border-radius:16px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);z-index:100;font-size:14px;line-height:20px;color:var(--ui-t2);transition:opacity .24s ease-out,transform .44s var(--soft)}
 .nav.off{opacity:0;transform:translateX(-16px);pointer-events:none}
-.nav-h{flex:none;display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 8px 0 16px}
-.nav-h b{font-size:11px;line-height:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--ui-t3)}
+.nav-h{flex:none;display:flex;align-items:center;justify-content:space-between;height:48px;padding:var(--spacing-4) 10px 0 20px}
+.nav-h b{font-size:12px;line-height:18px;color:var(--ui-t3)}
 .nav-x,.nav-open{display:flex;align-items:center;justify-content:center;color:var(--ui-t3);transition:color .2s,background .2s}
 .nav-x{width:28px;height:28px;border-radius:8px}
 .nav-x:hover{color:var(--ui-t1);background:var(--ui-hover)}
-.nav-open{position:fixed;left:16px;top:16px;height:40px;gap:8px;padding:0 14px 0 12px;border-radius:12px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);z-index:99;font-family:'DAZN Oscine',system-ui,sans-serif;font-weight:700;font-size:13px;color:var(--ui-t1);opacity:0;pointer-events:none;transition:opacity .24s}
+.nav-open{position:fixed;left:var(--ui-edge);top:var(--ui-edge);height:36px;gap:var(--spacing-8);padding:0 var(--spacing-16) 0 var(--spacing-12);border-radius:12px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);z-index:99;font-weight:700;font-size:14px;line-height:20px;color:var(--ui-t1);opacity:0;pointer-events:none;transition:opacity .24s}
 .nav.off+.nav-open{opacity:1;pointer-events:auto}
-.nav-b{min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--ui-line) transparent;display:flex;flex-direction:column;gap:2px;padding:0 8px 8px}
-.nav-b hr{flex:none;border:0;height:1px;background:var(--ui-line);margin:6px 8px}
+.nav-b{min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--ui-line) transparent;display:flex;flex-direction:column;gap:var(--spacing-2);padding:0 var(--spacing-8) var(--spacing-8)}
+.nav-b hr{flex:none;border:0;height:1px;background:var(--ui-line);margin:var(--spacing-6) var(--spacing-12)}
 /* a state (and Free play): title row + folding description */
-.nv-it{flex:none;border-radius:10px;transition:background .2s}
+.nv-it{flex:none;border-radius:8px;transition:background .2s}
 .nv-it.on{background:var(--ui-on)}
 .nv-ih{display:flex;align-items:center}
-.nv-ib{flex:1;min-width:0;height:34px;padding:0 4px 0 12px;border-radius:10px;text-align:left;font-size:13px;line-height:18px;color:var(--ui-t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .2s,background .2s}
-.nv-tb .nv-ib{padding-left:28px}
+.nv-ib{flex:1;min-width:0;height:36px;padding:0 var(--spacing-4) 0 var(--spacing-12);border-radius:8px;text-align:left;color:var(--ui-t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .2s,background .2s}
+.nv-tb .nv-ib{height:32px;padding-left:36px}
 .nv-it:not(.on) .nv-ib:hover{background:var(--ui-hover);color:var(--ui-t1)}
 .nv-it.on .nv-ib{font-weight:700;color:var(--ui-t1)}
-.nv-re{flex:none;width:28px;height:28px;margin-right:4px;border-radius:8px;display:none;align-items:center;justify-content:center;color:var(--ui-t3);transition:color .2s,background .2s}
+.nv-re{flex:none;width:28px;height:28px;margin-right:var(--spacing-2);border-radius:8px;display:none;align-items:center;justify-content:center;color:var(--ui-t3);transition:color .2s,background .2s}
 .nv-it.on .nv-re{display:flex}
 .nv-re:hover{color:var(--ui-t1);background:var(--ui-hover)}
 .nv-re:active svg{transform:rotate(-90deg)}
@@ -775,22 +781,21 @@ img{display:block}
 .nv-d>div,.nv-tb>div{min-height:0;overflow:hidden}
 .nv-d>div{opacity:0;transition:opacity .2s}
 .nv-it.on>.nv-d>div{opacity:1;transition:opacity .3s .1s}
-.nv-d p{margin:0;padding:0 12px 12px;font-size:12px;line-height:17px;color:var(--ui-t2)}
-.nv-tb .nv-d p{padding-left:28px}
-.nv-d .seg{margin:0 12px 12px 28px}
-.nv-d .seg button{height:26px}
+.nv-d p{margin:0;padding:0 var(--spacing-12) var(--spacing-12);font-size:12px;line-height:18px;color:var(--ui-t2)}
+.nv-tb .nv-d p{padding-left:36px}
+.nv-d .seg{margin:0 var(--spacing-12) var(--spacing-12) 36px}
 /* a topic: header row + folding list of its states */
 .nv-t{flex:none}
-.nv-th{display:flex;align-items:center;gap:8px;width:100%;height:36px;padding:0 10px 0 12px;border-radius:10px;text-align:left;font-weight:700;font-size:13px;line-height:18px;color:var(--ui-t1);transition:background .2s}
+.nv-th{display:flex;align-items:center;gap:var(--spacing-8);width:100%;height:36px;padding:0 var(--spacing-8) 0 var(--spacing-12);border-radius:8px;text-align:left;font-weight:700;color:var(--ui-t1);transition:background .2s}
 .nv-th:hover{background:var(--ui-hover)}
 .nv-th svg{flex:none;color:var(--ui-t3);transition:transform .4s var(--soft)}
 .nv-t.open .nv-th svg{transform:rotate(90deg)}
 .nv-th span{flex:1;min-width:0}
-.nv-th i{flex:none;font-style:normal;font-weight:400;font-size:11px;color:var(--ui-t3)}
+.nv-th i{flex:none;width:16px;text-align:center;font-style:normal;font-weight:400;font-size:12px;line-height:18px;color:var(--ui-t3)}
 .nv-th u{flex:none;width:6px;height:6px;border-radius:50%;background:var(--ui-t1);opacity:0;transition:opacity .2s}
 .nv-t.has:not(.open) .nv-th u{opacity:1}
-.nv-tb>div{display:flex;flex-direction:column;gap:2px}
-.nv-tb>div::after{content:"";flex:none;height:4px}
+.nv-tb>div{display:flex;flex-direction:column;gap:var(--spacing-2)}
+.nv-tb>div::after{content:"";flex:none;height:var(--spacing-2)}
 .fx-top .fx-back{left:8px;top:calc(var(--sb) + 4px)}
 </style>
 </head>
@@ -1354,9 +1359,11 @@ function favAdd(){const o=S.favPick||'0',i=S.sel.findIndex(s=>s.m==='m4'&&s.g===
 function refresh(){const y=$('#scroll').scrollTop;renderFeed();$('#scroll').scrollTop=y;if(S.fx)renderMkts();if(S.fav)openFav();renderSheet();updateBar(true)}
 /* ---------- ready-made states (navigation panel) ----------
  Each state sets the whole screen by itself (picks, statuses, prices, sheet open or closed), whatever was on screen before.
+ Only states that cannot be reached by tapping the phone are here (prices that move in a pick, suspended and locked bets, the limit of 20)
+ plus three screens that are not obvious to find. The main flow (Odds toggle, picks, betslip, Edit, Place bet) is done by hand in Free play.
  g = topic in the panel, k = name of the state, v = betslip view when the state exists both collapsed ('bar') and opened ('sheet'):
- the two are one row in the panel with a Collapsed / Opened switch. n = what the state demonstrates. The order is the story told on a call;
- the left / right arrow keys step through all of them.
+ the two are one row in the panel with a Collapsed / Opened switch. n = what the state demonstrates.
+ The left / right arrow keys step through all of them in this order.
  LIVE: live prices are moving. HOLD: set while a state is being built, so arrows and the limit message stay on screen. */
 let LIVE=true,HOLD=false,cur=-1;
 const P3=()=>[{m:'m5',g:'1x2',o:'1'},{m:'m4',g:'1x2',o:'2'},{m:'m1',g:'1x2',o:'0'}]; // Draw (Valencia), Atlético Madrid, Real Madrid (live)
@@ -1366,17 +1373,10 @@ const showTile=id=>{const t=document.querySelector(`#scroll [data-tile="${id}"]`
 const toEnd=()=>setTimeout(()=>{const b=$('#sbody');b.scrollTop=b.scrollHeight},80);
 const moved=()=>{changeOdd(M('m1'),0,0,1.30);changeOdd(M('m4'),2,0,4.10)};   // Real Madrid 1.36 -> 1.30, Atlético 3.90 -> 4.10: total 16.97 -> 17.06
 const STATES=[
- {g:'Scores feed',k:'Odds off',n:'Odds toggle OFF: no prices, no gambling warning and no footer in the feed.',run(){setOddsOn(false)}},
- {g:'Scores feed',k:'Odds on',n:'Default in betting countries: 1X2 under every match, team codes instead of 1 / 2, legal banner on top.',run(prev){if(prev===0){S.oddsOn=false;renderFeed();void $('#feed').offsetHeight;setOddsOn(true)}}}, // coming from "Odds off": play the reveal
- {g:'Scores feed',k:'Live odds moving',n:'A price that moves shows a green or red arrow next to it for a few seconds.',live:true,run(){setTimeout(()=>{if(LIVE)changeOdd(M('m2'),0,-1)},400);setTimeout(()=>{if(LIVE)changeOdd(M('m1'),1,1)},1100)}},
- {g:'Scores feed',k:'Finished matches',n:'Yesterday: last prices stay, everything is disabled, the outcome that happened is white.',run(){setDay('yest')}},
- {g:'Betslip',k:'First pick',n:'The odd turns white and goes to the collapsed bar. The sheet does not open by itself.',run(){S.sel=ONE();refresh()}},
- {g:'Betslip',k:'Three picks',v:'bar',n:'Picks from different matches make an ACCA: the odds multiply into one total.',run(){S.sel=P3();refresh()}},
- {g:'Betslip',k:'Three picks',v:'sheet',n:'Tap the bar: cards, Total odds, "€10 may return" and Place bet on DAZN Bet.',run(){S.sel=P3();refresh();openSheet()}},
+ {g:'Betslip',k:'Three picks',v:'bar',n:'Picks from different matches make an ACCA: the odds multiply into one total. The sheet opens only when you tap the bar.',run(){S.sel=P3();refresh()}},
+ {g:'Betslip',k:'Three picks',v:'sheet',n:'Cards, Total odds and "€10 may return". Try Edit (the sheet keeps its height until Confirm) and Place bet (closing DAZN Bet clears the betslip).',run(){S.sel=P3();refresh();openSheet()}},
  {g:'Betslip',k:'Odds changed',v:'bar',n:'PRD · Odds change: the total in the bar is recalculated; the arrow shows the direction. The selected tile stays white.',run(){S.sel=P3();refresh();moved()}},
  {g:'Betslip',k:'Odds changed',v:'sheet',n:'The price on the card takes the arrow and its colour; Total odds and "€10 may return" are recalculated.',run(){S.sel=P3();refresh();openSheet();moved()}},
- {g:'Betslip',k:'Edit mode',n:'Remove picks with ×. The sheet keeps its height until Confirm, so nothing jumps under the finger.',run(){S.sel=P3();refresh();openSheet();S.edit=true;applyEdit()}},
- {g:'Betslip',k:'Place bet → DAZN Bet',n:'The bet is placed in the DAZN Bet overlay. Nothing comes back: closing it clears the betslip.',run(){S.sel=P3();refresh();openSheet();placeBet()}},
  {g:'Suspended',k:'One of three bets',v:'bar',n:'PRD · Cancelled bet: its odds leave the total (3.20 × 1.36), the counter still says 3.',run(){S.sel=P3();S.st['m4|1x2']='suspended';refresh();showTile('m5')}},
  {g:'Suspended',k:'One of three bets',v:'sheet',n:'"Suspended" replaces the price. The line under Total odds says what is not included.',run(){S.sel=P3();S.st['m4|1x2']='suspended';refresh();openSheet()}},
  {g:'Suspended',k:'The only bet',v:'bar',n:'One pick and it is suspended: the counter stays 1, the total shows a dash (the PRD says 0; odds are never 0).',run(){S.sel=ONE();S.st['m1|1x2']='suspended';refresh()}},
@@ -1391,8 +1391,9 @@ const STATES=[
  {g:'Limit 20',k:'20 picks',v:'sheet',n:'The message is pinned above the button, so it is visible as soon as the sheet opens.',run(){fill20();refresh();openSheet()}},
  {g:'Limit 20',k:'Tap on a 21st odd',n:'Nothing is added and nothing is swapped. The odd presses and springs back slightly, an orange tongue slides out from behind the betslip and the counter pulses.',run(){fill20();refresh();toggleSel('m1','1x2','2')}},
  {g:'Limit 20',k:'Limit + suspended bet',n:'Both at once: the line under Total odds for the dropped bet and the limit message above the button.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet();toEnd()}},
+ {g:'Other screens',k:'Finished matches',n:'Yesterday (Sat 3 Jan in the calendar): last prices stay, everything is disabled, the outcome that happened is white.',run(){setDay('yest')}},
  {g:'Other screens',k:'Favourite team popup',n:'The favourite team plays today: its win is preselected, "Add to my Betslip" puts the pick in the bar.',run(){openFav()}},
- {g:'Other screens',k:'Fixture · Odds tab',n:'Pre-match markets of one match. Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}}
+ {g:'Other screens',k:'Fixture · Odds tab',n:'Pre-match markets of one match (tap its tile in the feed). Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}}
 ];
 STATES.forEach(s=>s.t=s.g+' · '+s.k+(s.v?' · '+s.v:''));        // full unique name (tests, logs)
 /* panel model: topics -> items; an item is one state, or a collapsed + opened pair */
@@ -1402,12 +1403,12 @@ STATES.forEach((s,i)=>{
  let it=t.items[t.items.length-1];if(!it||it.k!==s.k)t.items.push(it={k:s.k,ix:[],topic:TOPICS.length-1});
  it.ix.push(i);ITEM[i]=it;
 });
-const FREE='Everything on the phone works: tap the odds, the betslip, the Odds toggle. Or open a topic below and jump straight to a ready-made state.';
+const FREE='Everything on the phone works by hand: Odds toggle, odds, betslip, Edit, Place bet. The topics below show what tapping cannot do.';
 let openT=-1;                                       // topic that is unfolded in the panel (one at a time)
 function setState(i){
  if(i<0||i>=STATES.length)return;
- const prev=cur;cur=i;init();LIVE=!!STATES[i].live;openT=ITEM[i].topic;
- HOLD=true;STATES[i].run(prev);HOLD=false;paintNav(true);
+ cur=i;init();LIVE=!!STATES[i].live;openT=ITEM[i].topic;
+ HOLD=true;STATES[i].run();HOLD=false;paintNav(true);
 }
 function freePlay(){LIVE=true;cur=-1;init();paintNav()}
 /* the user opened or closed the sheet by hand inside a collapsed / opened pair: the panel follows, the screen is not rebuilt */
