@@ -1,4 +1,6 @@
 dist/
 .DS_Store
 .vercel
-.claude/
+.claude/*
+!.claude/agents/
+!.claude/launch.json
