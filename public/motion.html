@@ -239,6 +239,10 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
 .today li{margin-bottom:8px}
 .adv>.lbl{padding-top:16px}
 #why{margin-top:8px;padding:12px}
+/* the three viewing switches sit together, always in sight */
+.tgl{display:flex;flex-direction:column}
+.tgl .chk{min-height:40px}
+.tgl .chk+.chk{border-top:1px solid var(--ui-line)}
 </style>
 </head>
 <body>
@@ -271,13 +275,15 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
    <p class="pd" id="pDesc"></p>
    <div class="pr" id="basic"></div>
    <div class="dh"><div class="seg" id="speedD" role="tablist" aria-label="Speed"><button role="tab" data-r="1" class="on">1×</button><button role="tab" data-r="0.5">0.5×</button><button role="tab" data-r="0.1">0.1×</button></div><span class="sp"></span><button class="btn q" id="againD">Play again</button></div>
-   <label class="chk"><span>Compare with Current</span><input type="checkbox" id="cmp"></label>
+   <div class="tgl">
+    <label class="chk"><span>Compare with Current</span><input type="checkbox" id="cmp"></label>
+    <label class="chk"><span>Zoom</span><input type="checkbox" id="zoom"></label>
+    <label class="chk"><span>Loop</span><input type="checkbox" id="loop"></label>
+   </div>
    <button class="btn big" id="applyB">Apply</button>
    <!-- advanced: the exact values as sliders, viewing options, what it replaces, a note -->
    <details class="adv" id="advD"><summary>Advanced</summary>
     <div class="pr" id="mo"></div>
-    <label class="chk"><span>Loop</span><input type="checkbox" id="loop"></label>
-    <label class="chk"><span>Zoom</span><input type="checkbox" id="zoom"></label>
     <details class="today"><summary>Today</summary><ul id="todayL"></ul></details>
     <label class="lbl" for="why">Note</label><textarea id="why" rows="2"></textarea>
    </details>
