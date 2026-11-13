@@ -293,6 +293,30 @@ body{grid-template-columns:248px minmax(520px,1fr);gap:12px;padding:12px;min-wid
 .prm svg{display:block;width:28px;height:28px;border-radius:6px;background:var(--ui-well);color:var(--ui-t1)}
 .prm.bz{grid-template-columns:84px 1fr}
 .prm .cvin .num{height:26px;font-size:12px}
+
+/* v10 */
+.today{font-size:12px;line-height:17px;color:var(--ui-t2)}
+.today ul{margin:6px 0 0 16px}.today li{margin-bottom:3px;color:var(--ui-t3)}
+.dock .chk{font-size:12px}
+.dock .blk .dh{padding-bottom:2px}
+.tip{color:var(--ui-t1);min-height:0}
+#why{width:100%;resize:vertical;min-height:44px;padding:6px 8px;border-radius:6px;border:0;background:var(--ui-well);font:inherit;font-size:12px;line-height:17px;color:var(--ui-t1)}
+.ends{grid-column:2;display:flex;justify-content:space-between;margin-top:-6px;font-size:10px;line-height:12px;color:var(--ui-t3)}
+.pl svg{flex:none;width:20px;height:20px;color:var(--ui-t3)}
+.pl.on svg{color:var(--ui-t1)}
+.pl small{font-size:11px;line-height:14px}
+.grid.solo:not(.tall){grid-template-columns:repeat(var(--n,1),1fr)}
+.grid.solo .cl{cursor:default}
+.tr.ro{grid-template-columns:1fr auto;min-height:32px}
+.tr.ro>b{font-weight:400;font-size:12px;color:var(--ui-t2);text-align:right}
+.sr small{grid-column:2/-1;font-size:12px;line-height:17px;color:var(--ui-t3)}
+.sum .acts{margin-top:20px;gap:8px;justify-content:flex-start}
+.sum .acts .btn{margin:0}
+
+/* v11: no explanations in the interface — names and values only */
+.qh p,#pDesc,#dHint,#status:empty{display:none}
+.ql small:empty{display:none}
+.df span{flex:1}
 </style>
 </head>
 <body>
@@ -309,7 +333,7 @@ body{grid-template-columns:248px minmax(520px,1fr);gap:12px;padding:12px;min-wid
   <div class="grid" id="grid" hidden></div>
   <div class="panel sum scroll" id="sum" hidden></div>
   <div class="panel drawer" id="drawer" hidden>
-   <div class="ph"><b>Steps</b><span>What moves, and the token behind each time and curve.</span></div>
+   <div class="ph"><b>Steps</b></div>
    <div class="scroll det" id="det"></div>
   </div>
  </div>
@@ -322,11 +346,18 @@ body{grid-template-columns:248px minmax(520px,1fr);gap:12px;padding:12px;min-wid
    <span class="lbl">Presets</span>
    <div class="chips" id="presets"></div>
    <p class="pd" id="pDesc"></p>
+   <details class="today"><summary>Today</summary><ul id="todayL"></ul></details>
    <div class="blk" id="fxBlk"><span class="lbl">Effect</span><div class="pr" id="fx"></div></div>
    <div class="blk" id="moBlk"><span class="lbl" id="moLbl">Motion</span><div class="pr" id="mo"></div></div>
-   <div class="dh"><label class="chk"><input type="checkbox" id="slow">Slow motion</label><span class="sp"></span><button class="btn q" id="againD">Play again</button></div>
-   <button class="btn big" id="applyB">Apply to the whole group</button>
-   <div class="df"><button class="btn q" id="prevQ">Back</button><span id="dHint"></span><button class="btn q" id="nextQ">Next</button></div>
+   <div class="blk"><span class="lbl">Preview</span>
+    <div class="dh"><div class="seg" id="speedD" role="tablist" aria-label="Speed"><button role="tab" data-r="1" class="on">1×</button><button role="tab" data-r="0.5">0.5×</button><button role="tab" data-r="0.1">0.1×</button></div><span class="sp"></span><button class="btn q" id="againD">Play again</button></div>
+    <label class="chk"><input type="checkbox" id="loop">Loop</label>
+    <label class="chk"><input type="checkbox" id="cmp">Compare with Current</label>
+    <label class="chk"><input type="checkbox" id="zoom">Zoom</label>
+       </div>
+   <div class="blk"><label class="lbl" for="why">Note</label><textarea id="why" rows="2"></textarea></div>
+   <button class="btn big" id="applyB">Apply</button>
+   <div class="df"><button class="btn q" id="prevQ">Back</button><span id="dHint"></span><button class="btn q" id="nextQ">Skip</button></div>
   </div>
   <!-- All animations: speed, replay, steps, tokens -->
   <div class="panel dock" id="dockB" hidden>
@@ -337,9 +368,8 @@ body{grid-template-columns:248px minmax(520px,1fr);gap:12px;padding:12px;min-wid
     </div><span class="sp"></span>
     <button class="btn" id="again">Play again</button>
    </div>
-   <div class="dh"><button class="lnk" id="stepsBtn" aria-expanded="false">Show steps</button><button class="lnk" id="allBtn" aria-pressed="false">Tune tokens</button></div>
+   <div class="dh"><button class="lnk" id="stepsBtn" aria-expanded="false">Show steps</button><button class="lnk" id="allBtn" aria-pressed="false">Tokens</button></div>
    <div class="tk" id="tk" hidden></div>
-   <div class="df"><span id="chN"></span><button class="btn q" id="resetTk">Reset</button><button class="btn q" id="copyTk">Copy changes</button></div>
    <pre id="copyOut" hidden></pre>
   </div>
  </aside>
@@ -569,7 +599,7 @@ const FOCUS={M01:'#feed .odd[data-m="m1"][data-o="1"]',M02:'#mkts .choice',M03:'
 /* groups about one element are shown close up; groups about the whole screen (sheets, pages, layout) show the whole phone */
 const WHOLE=new Set([3,4,5,6,7]);
 function makeProto(F,vp,whole){
- const P={F,vp,W:null,D:null,ready:false,runId:0,pressed:[],dragEl:null,dev:'mini',anim:null,onready:null,ov:null};
+ const P={F,vp,W:null,D:null,ready:false,runId:0,pressed:[],dragEl:null,dev:'mini',anim:null,onready:null,ov:null,ring:false};
  const q=s=>P.D.querySelector(s),scale=()=>+q('#stage').dataset.scale||1;
  const G={                                  // helpers for the scenarios; live on the prototype's window as G
   after:(ms,fn)=>P.W.setTimeout(fn,ms),     // the prototype's clock: slowed with everything else, dropped on the next run
@@ -614,9 +644,13 @@ function makeProto(F,vp,whole){
  /* a small phone in a group: zoom the frame to the element that moves */
  P.frameOn=a=>{
   const ph=q('#phone'),sel=a.f||FOCUS[a.id],el=(!whole&&sel&&q(sel))||ph,r=el.getBoundingClientRect(),vw=vp.clientWidth,vh=vp.clientHeight;
-  const z=el===ph?Math.min(vw/(r.width+36),vh/(r.height+36)):Math.min(1.5,vw*.78/r.width,vh*.6/r.height);
+  const z=el===ph?Math.min(vw/(r.width+36),vh/(r.height+36)):Math.min(vp.closest('.solo')?3:1.5,vw*.78/r.width,vh*.6/r.height);
   F.style.transform=`translate(${vw/2-(r.left+r.width/2)*z}px,${vh/2-(r.top+r.height/2)*z}px) scale(${z})`;
  };
+ /* a ring around the element of this place, so it is clear what to look at or press; it sits above the page and fades */
+ P.showRing=a=>{const el=q(a.f||FOCUS[a.id]);if(!el)return;const r=el.getBoundingClientRect(),d=P.D.createElement('div');d.className='mg-ring';
+  d.style.cssText=`position:fixed;left:${r.left-5}px;top:${r.top-5}px;width:${r.width+10}px;height:${r.height+10}px;border-radius:14px;box-shadow:0 0 0 2px #f9fafa;pointer-events:none;z-index:999`;
+  P.D.body.appendChild(d);const an=d.animate([{opacity:0},{opacity:1,offset:.15},{opacity:1,offset:.6},{opacity:0}],{duration:1800,fill:'forwards'});an.onfinish=()=>d.remove()};
  P.run=a=>{
   P.anim=a;if(!P.ready)return;const root=P.D.documentElement;
   try{
@@ -624,6 +658,7 @@ function makeProto(F,vp,whole){
    /* Decide mode: "what if every place did this" — extra CSS on top of the prototype's, and where the value lives in JS, a wrapped function */
    let ov=P.D.getElementById('mg-ov');if(!ov){ov=P.D.createElement('style');ov.id='mg-ov';P.D.head.appendChild(ov)}ov.textContent=(P.ov&&P.ov.css)||'';
    if(!P.W.__o)P.W.__o={soft:P.W.soft,setOddsOn:P.W.setOddsOn};Object.assign(P.W,P.W.__o);if(P.ov&&P.ov.js)P.ov.js(P.W,P.W.__o);
+   P.D.querySelectorAll('.mg-ring').forEach(e=>e.remove());
    root.classList.add('mg-freeze');                 // set the state instantly: no entrance of the bar, the sheet or the page
    P.reset();const id=P.runId;
    if(a.setup)P.W.eval(a.setup);
@@ -631,7 +666,7 @@ function makeProto(F,vp,whole){
    void P.D.body.offsetWidth;P.D.getAnimations().forEach(x=>x.cancel());
    if(vp)P.frameOn(a);
    requestAnimationFrame(()=>{if(id!==P.runId)return;root.classList.remove('mg-freeze');void P.D.body.offsetWidth;
-    requestAnimationFrame(()=>{if(id!==P.runId)return;try{if(a.play)P.W.eval(a.play)}catch(e){status(a.id+' · error: '+e.message);console.error(e)}})});
+    requestAnimationFrame(()=>{if(id!==P.runId)return;if(P.ring)P.showRing(a);try{if(a.play)P.W.eval(a.play)}catch(e){status(a.id+' · error: '+e.message);console.error(e)}})});
   }catch(e){root.classList.remove('mg-freeze');status(a.id+' · error: '+e.message);console.error(e)}
  };
  F.addEventListener('load',P.boot);
@@ -643,10 +678,11 @@ function makeProto(F,vp,whole){
  app 'decide': a question with the places it concerns. app 'browse': one animation on the big phone, or a group side by side. */
 const main=makeProto($('#frame'),null,false);
 let app='decide',mode='group',grp=0,cur=0,cards=[],qi=0;
+const LASTA=ANIMS.filter(a=>a.g<7).length-1;   // the last group is the prototype's own chrome: listed in notes/MOTION.md, not shown here
 const inGroup=g=>ANIMS.filter(a=>a.g===g&&a.slow!=='none');
 const shown=()=>mode==='one'?[ANIMS[cur]]:inGroup(grp);
 function replay(){
- if(app==='decide'){if(qi<QS.length)playDecide();return}
+ if(app==='decide'){if(qi<QS.length)playDecide(false);return}
  const one=mode==='one',a=ANIMS[cur];
  status(RMON?'Reduce motion is on in your system: nothing will travel':!one?`${cards.length} animations side by side`:a.slow==='none'?'Not shown in this gallery':a.slow==='part'?'One part is not slowed: see the steps':a.slow==='sim'?'The press is made by this page':a.play?'':'Runs all the time');
  if(one)main.run(a);else if(cards.every(c=>c.ready))cards.forEach(c=>c.run(c.anim));
@@ -654,26 +690,22 @@ function replay(){
 /* small phones that leave the screen must not keep playing: stop their pending steps before their frames are removed */
 function dropCards(){cards.forEach(c=>{c.runId++;c.onready=null;c.anim=null;try{c.W.MOTION.clear()}catch(e){}});cards=[]}
 /* a row of small prototypes, one per item; label(item) is the html of its title */
-function showCards(items,whole,label){
+function showCards(items,whole,label,solo){
  dropCards();$('#frame').classList.add('off');if(main.ready)main.reset();$('#sum').hidden=true;
- const grid=$('#grid');grid.hidden=false;grid.scrollTop=0;grid.classList.toggle('tall',whole);
+ const grid=$('#grid');grid.hidden=false;grid.scrollTop=0;grid.classList.toggle('tall',whole);grid.classList.toggle('solo',!!solo);
  grid.innerHTML=items.map((a,n)=>`<div class="card"><button class="cl" data-n="${n}">${label(a)}</button><div class="vp"><iframe src="index.html?embed" title="${esc(a.n)}"></iframe></div></div>`).join('');
  sizeCards();
  cards=[...grid.querySelectorAll('.vp')].map((vp,n)=>{const c=makeProto(vp.firstElementChild,vp,whole);c.anim=items[n];c.onready=()=>{if(cards.every(x=>x.ready))replay()};return c}); // they start together, once the last one has loaded
 }
 function showOne(i){
- mode='one';cur=Math.max(0,Math.min(ANIMS.length-1,i));grp=ANIMS[cur].g;
+ mode='one';cur=Math.max(0,Math.min(LASTA,i));grp=ANIMS[cur].g;
  dropCards();$('#grid').innerHTML='';$('#grid').hidden=true;$('#sum').hidden=true;$('#frame').classList.remove('off');
  paintAll();replay();
 }
-function showGroup(g){
- mode='group';grp=g;
- showCards(inGroup(g),WHOLE.has(g),a=>`<span title="Open on the big phone">${esc(a.n)}</span>`);
- paintAll();replay();
-}
 function sizeCards(){   // the whole set fits the stage when it can: phones in one row, close-ups in as many rows as needed
- const g=$('#grid'),tall=g.classList.contains('tall'),n=g.children.length||1,gw=g.clientWidth-2,gh=g.clientHeight-2;
- if(tall){const w=Math.floor(Math.max(180,Math.min(340,(gh-48)*411/848,(gw-12*(n-1))/n-1)));g.style.setProperty('--cw',w+'px');g.style.setProperty('--vh',Math.floor(w*848/411)+'px')}
+ const g=$('#grid'),tall=g.classList.contains('tall'),solo=g.classList.contains('solo'),n=g.children.length||1,gw=g.clientWidth-2,gh=g.clientHeight-2;g.style.setProperty('--n',n);
+ if(tall){const w=Math.floor(Math.max(180,Math.min(solo?411:340,(gh-48)*411/848,(gw-12*(n-1))/n-1)));g.style.setProperty('--cw',w+'px');g.style.setProperty('--vh',Math.floor(w*848/411)+'px')}
+ else if(solo)g.style.setProperty('--vh',Math.max(200,gh-48)+'px');
  else{const cols=Math.max(1,Math.floor((gw+12)/312)),rows=Math.ceil(n/cols);g.style.setProperty('--vh',Math.round(Math.max(150,Math.min(420,(gh-12*(rows-1))/rows-44)))+'px')}
 }
 addEventListener('resize',()=>{if($('#grid').hidden)return;sizeCards();cards.forEach(c=>{if(c.ready)c.frameOn(c.anim)})});
@@ -690,7 +722,7 @@ const PL=(id,n,more)=>Object.assign({},ANIMS.find(a=>a.id===id),{n},more||{});
 /* Easing, named as in Figma: curves (cubic-bezier) and springs. A spring is given by duration and bounce (as in SwiftUI and Motion)
    and is played as a real damped spring: its curve is sampled into a CSS linear() easing. */
 const EZ=[['linear','Linear',[0,0,1,1]],['in','Ease in',[.42,0,1,1]],['out','Ease out',[0,0,.58,1]],['inout','Ease in and out',[.42,0,.58,1]],['outback','Ease out back',[.34,1.56,.64,1]],
- ['soft','Soft landing (today, --soft)',[.32,.72,0,1]],['emph','Emphasised (Material)',[.2,0,0,1]],['custom','Custom bezier',null]];
+ ['soft','Soft landing (today, --soft)',[.32,.72,0,1]],['emph','Emphasised (Material)',[.2,0,0,1]]];
 const SP=[['gentle','Gentle',{dur:500,bounce:.15}],['quick','Quick',{dur:300,bounce:.1}],['bouncy','Bouncy',{dur:450,bounce:.4}],['slow','Slow',{dur:800,bounce:0}],['spring','Custom spring',null]];
 const isSpring=e=>SP.some(x=>x[0]===e),ezName=e=>(EZ.find(x=>x[0]===e)||SP.find(x=>x[0]===e))[1];
 const bezOf=m=>m.ease==='custom'?m.bez:EZ.find(x=>x[0]===m.ease)[2];
@@ -712,7 +744,8 @@ const QS=[
  {id:'press',t:'Press feedback',s:'What an element does under the finger and when it is let go: odds, outcome buttons, the main button, cards, rows, the betslip bar, small buttons.',
   places:[PL('M01','Odds tile'),PL('M02','Outcome button'),PL('M05','Main button'),PL('M06','Betslip bar'),PL('M03','Top Pick card'),PL('M04','List row'),PL('M07','Edit button')],
   none:f=>f.scale>=1&&f.op>=1,noneText:'Scale 100% and Opacity 100% mean nothing happens on press. Move a slider to the left to see an effect.',
-  ml:'Motion · release',fx:[{k:'scale',l:'Scale',min:.88,max:1,step:.005,fmt:pct},{k:'op',l:'Opacity',min:.4,max:1,step:.05,fmt:pct}],
+  self:true,lp:1500,today:['Scale: 97% odds tile, 98% outcome and main button, 98.5% bar and cards.','Rows dim to 70% with a fade; small buttons dim to 60% at once.','Release: 0.12 s everywhere, 0.5 s on the betslip bar.'],
+  ml:'Motion · release',fx:[{k:'scale',l:'Scale',min:.88,max:1,step:.005,fmt:pct,ends:['deeper','none']},{k:'op',l:'Opacity',min:.4,max:1,step:.05,fmt:pct,ends:['dimmer','none']}],
   presets:[{n:'Subtle',d:'Barely moves. Quiet, for dense screens.',fx:{scale:.985,op:1},m:M('out',120)},
    {n:'iOS-like',d:'A clear press and a soft, slower return.',fx:{scale:.96,op:1},m:M('soft',320)},
    {n:'Bouncy',d:'Presses deep and springs back past its size.',fx:{scale:.93,op:1},m:M('bouncy')},
@@ -721,12 +754,14 @@ const QS=[
   apply:(f,k)=>({css:`${PRESS}{transition:transform ${k.t}ms ${k.e},opacity ${k.t}ms ${k.flat},background var(--m-quick),color var(--m-quick)}html .bar{transition:transform ${k.t}ms ${k.e},opacity var(--m-quick) ease-out}${act(PRESS)},html .bar.show:active{transform:scale(${f.scale});opacity:${f.op};transition-duration:var(--m-press);transition-timing-function:ease-out}`})},
  {id:'state',t:'State change',s:'A thing changes on the spot: an odd is picked, a switch flips, a button turns on or off. Colour and fill.',
   places:[PL('M09','Odd picked'),PL('M10','Top Pick card picked'),PL('M11','Odds switch'),PL('M12','LIVE badge'),PL('M15','Place bet on / off')],
+  today:['0.2 s (--m-quick) everywhere.','Three curves: browser default, ease-out, --ease.','On the match page the text of an outcome switches at once.'],
   fx:[],presets:[{n:'Instant',d:'No fade at all. Feels fast and a bit hard.',fx:{},m:M('linear',0)},{n:'Quick',d:'A short fade that is felt more than seen.',fx:{},m:M('out',120)},
    {n:'Standard',d:'The usual 0.2 s fade.',fx:{},m:M('inout',200)},{n:'Smooth',d:'A visible, calm fade.',fx:{},m:M('soft',380)}],
   apply:(f,k)=>({css:`html:root{--m-quick:${k.t}ms}html .odd,html .choice,html .tp,html .gs-card,html .cta-main,html .odd .l,html .odd .v,html .livebadge,html .oddsTog .sw,html .oddsTog .knob,html .day,html .cp-chip,html .tp-top i,html .tp-in>span,html .tp-in>b,html .tp-club{transition-timing-function:${k.flat}}`})}, // these all sit on --m-quick: the preview moves that token and sets one curve
  {id:'swap',t:'Numbers and texts that change',s:'A price moves, a total is recalculated, a list is replaced: the new value comes in.',
   places:[PL('M21','Price on a tile'),PL('M23','Prices in the betslip'),PL('M24','Total in the bar'),PL('M27','Bar texts'),PL('M42','Competition list')],
-  fx:[{k:'off',l:'Offset',min:0,max:24,step:1,fmt:px}],none:f=>f.off<=0,noneText:'Offset 0 px: the new value only fades in, it does not travel.',
+  today:['Rises 5 px in 0.32 s on --soft.','Lists rise 8 px; day switch slides 20 px.'],
+  fx:[{k:'off',l:'Offset',min:0,max:24,step:1,fmt:px,ends:['none','far']}],none:f=>f.off<=0,noneText:'Offset 0 px: the new value only fades in, it does not travel.',
   presets:[{n:'Crossfade',d:'The new value just fades in. No movement.',fx:{off:0},m:M('out',200)},{n:'Small rise',d:'A short rise, close to what it is today.',fx:{off:5},m:M('soft',320)},
    {n:'Big rise',d:'The value clearly rolls in. Draws the eye.',fx:{off:14},m:M('soft',380)},{n:'Springy',d:'Arrives with a small overshoot and settles.',fx:{off:10},m:M('bouncy')}],
   apply:(f,k)=>({js:(W,o)=>{const base=W.soft;W.soft=(el,from,t,d)=>{if(!el||!el.animate)return;
@@ -734,6 +769,7 @@ const QS=[
     return base(el,from,t,d)}}})},
  {id:'cascade',t:'Reveal and cascade',s:'Several things open one after another: odds under the tiles when Odds is switched on, the × on cards in Edit mode.',
   places:[PL('M28','Odds toggle'),PL('M17','Edit mode')],
+  lp:3600,today:['Tiles: 0.44 s on --soft, 32 ms apart.','Cards in Edit: 0.32 s, 45 ms apart.'],
   fx:[],delay:'Delay per item',
   presets:[{n:'All at once',d:'Everything opens together. Fast and plain.',fx:{},m:M('soft',440,{delay:0})},{n:'Quick ripple',d:'A short, tight ripple.',fx:{},m:M('soft',300,{delay:20})},
    {n:'Flowing',d:'A clear wave from top to bottom.',fx:{},m:M('soft',560,{delay:60})},{n:'Slow wave',d:'Long and showy.',fx:{},m:M('soft',720,{delay:110})}],
@@ -741,11 +777,13 @@ const QS=[
    js:(W,o)=>{W.setOddsOn=on=>{o.setOddsOn(on);W.document.querySelectorAll('.tile').forEach(t=>{const n=+t.style.getPropertyValue('--ti')||0;t.style.setProperty('--ti',n/32*m.delay)})}}})},
  {id:'sheets',t:'Sheets, bar, toast, overlay',s:'Things that slide in over the screen from the bottom: the betslip sheet, the popup, the DAZN Bet overlay, the collapsed bar, the toast.',
   places:[PL('M32','Betslip sheet'),PL('M34','Favourite-team popup'),PL('M37','DAZN Bet overlay'),PL('M31','Collapsed bar'),PL('M35','Toast')],
+  lp:3400,today:['0.5 s (--m-sheet) on --soft for all of them.'],
   fx:[],presets:[{n:'iOS sheet',d:'Quick start, long soft landing. What it is today.',fx:{},m:M('soft',500)},{n:'Material',d:'Shorter, with a firm start and a firm stop.',fx:{},m:M('emph',300)},
    {n:'Quick',d:'Out of the way fast. Efficient, less elegant.',fx:{},m:M('out',220)},{n:'Springy',d:'Overshoots a little and settles. Playful.',fx:{},m:M('gentle')},{n:'Slow',d:'Heavy and calm.',fx:{},m:M('slow')}],
   apply:(f,k)=>({css:`html .sheet,html .fvp,html .overlay{transition:transform ${k.t}ms ${k.e}}html .backdrop{transition:opacity ${k.t}ms ${k.flat}}html .bar{transition:transform ${k.t}ms ${k.e},opacity var(--m-quick) ease-out}html .toast{transition:opacity var(--m-quick) ease-out,transform ${k.t}ms ${k.e}}`})},
  {id:'pages',t:'Pages',s:'A match page or a competition page slides in from the right and back.',
   places:[PL('M38','Match page'),PL('M39','Competition page')],
+  lp:3400,today:['0.44 s (--m-layout) on --soft.','The betslip bar jumps to its new place without motion.'],
   fx:[],presets:[{n:'iOS push',d:'Soft landing, a little longer than today.',fx:{},m:M('soft',500)},{n:'Material',d:'Short and firm.',fx:{},m:M('emph',300)},
    {n:'Quick',d:'Almost a cut.',fx:{},m:M('out',220)},{n:'Springy',d:'Arrives with a small overshoot.',fx:{},m:M('gentle')}],
   apply:(f,k)=>({css:`html .fx,html .cp{transition:transform ${k.t}ms ${k.e}}`})}
@@ -755,10 +793,21 @@ const DEVNOTES=['Today similar things differ slightly from place to place (press
  'Heights are eased in three ways: summary and sheet footer in JS, a removed card’s place in CSS on --exit, odds rows in CSS on --soft.',
  'Hold and fade times of a price change are written twice: CSS variables and numbers in JS.','Rows that appear use three small delays: 60, 80 and 110 ms.',
  'The betslip bar jumps without motion when a match page opens.','README still describes a sheet that eases its height on Confirm; the code no longer does that.'];
+/* a small glyph per place, by the kind of element */
+const GL={tile:'<rect x="4" y="7" width="12" height="6" rx="2"/>',button:'<rect x="2" y="6" width="16" height="8" rx="3" fill="currentColor"/>',bar:'<rect x="4" y="2" width="12" height="16" rx="3" opacity=".4"/><rect x="5.5" y="11.5" width="9" height="3.5" rx="1.5" fill="currentColor"/>',
+ card:'<rect x="5" y="3" width="10" height="14" rx="2"/><path d="M8 13h4"/>',row:'<circle cx="5" cy="10" r="1.5" fill="currentColor"/><path d="M9 10h8"/>',small:'<circle cx="10" cy="10" r="3.5"/>',
+ sw:'<rect x="3" y="6.5" width="14" height="7" rx="3.5"/><circle cx="13.5" cy="10" r="2" fill="currentColor"/>',sheet:'<rect x="4" y="2" width="12" height="16" rx="3" opacity=".4"/><path d="M4 9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v9H4z" fill="currentColor"/>',
+ page:'<rect x="4" y="2" width="12" height="16" rx="3"/><path d="M9 7.5 11.5 10 9 12.5"/>',text:'<path d="M5 14V7l-1.5 1M9.5 8.5A2 2 0 1 1 13 10l-3.5 4H14"/>',list:'<path d="M4 6h12M4 10h12M4 14h12"/>'};
+const GLY={M01:'tile',M02:'button',M03:'card',M04:'row',M05:'button',M06:'bar',M07:'small',M09:'tile',M10:'card',M11:'sw',M12:'small',M15:'button',M21:'text',M23:'sheet',M24:'bar',M27:'bar',M42:'list',M28:'list',M17:'sheet',M32:'sheet',M34:'sheet',M37:'page',M31:'bar',M35:'bar',M38:'page',M39:'page'};
+const WHERE={M01:'1X2 button under a match',M02:'on the match page',M03:'Top scorer tab',M04:'winner table',M05:'Place bet in the betslip',M06:'collapsed betslip',M07:'in the betslip header',M09:'in the feed',M10:'Top scorer tab',M11:'in the header',M12:'in the calendar row',M15:'in the betslip',
+ M21:'in the feed',M23:'card, total, return',M24:'collapsed betslip',M27:'collapsed betslip',M42:'competition page',M28:'the whole feed',M17:'cards in the betslip',M32:'from the bar',M34:'favourite team',M37:'after Place bet',M31:'first pick',M35:'above the nav',M38:'from a match tile',M39:'from a competition header'};
+const glyph=id=>`<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${GL[GLY[id]]||GL.small}</svg>`;
 /* per group: what is on the phone (pi = place), which preset is being tried (ps: -1 = Current) and its values (pp = {fx, m}) */
-let dec={};try{dec=JSON.parse(localStorage.getItem('motionPresets2')||'{}')||{}}catch(e){}
+let dec={},notes={};try{dec=JSON.parse(localStorage.getItem('motionPresets3')||'{}')||{};notes=JSON.parse(localStorage.getItem('motionNotes')||'{}')||{}}catch(e){}
+/* a link made with "Copy link" carries the decisions and notes in its #d=… part */
+try{const h=location.hash.match(/^#d=(.+)$/);if(h){const o=JSON.parse(decodeURIComponent(escape(atob(h[1]))));if(o&&o.dec){dec=o.dec;notes=o.notes||{}}}}catch(e){}
 let pi=0,ps=-1,pp=null;
-const saveDec=()=>{try{localStorage.setItem('motionPresets2',JSON.stringify(dec))}catch(e){}};
+const saveDec=()=>{try{localStorage.setItem('motionPresets3',JSON.stringify(dec));localStorage.setItem('motionNotes',JSON.stringify(notes))}catch(e){}};
 const clone=x=>JSON.parse(JSON.stringify(x)),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const edited=(q,i,p)=>i>=0&&!same({fx:q.presets[i].fx,m:q.presets[i].m},p);
 /* a Motion setting in words, the way a developer needs it */
@@ -767,13 +816,28 @@ function moText(q,m){const k=mo(m);
 function decText(q){const d=dec[q.id];if(!d)return '';if(d.i<0)return 'Current (no change)';
  const fx=q.fx.map(f=>f.l.toLowerCase()+' '+f.fmt(d.p.fx[f.k])).join(', ');
  return q.presets[d.i].n+(edited(q,d.i,d.p)?' (edited)':'')+' — '+(fx?fx+'; ':'')+moText(q,d.p.m)}
-/* the phone plays: every group that already has an applied preset, plus what is being tried in this group */
-function playDecide(){
+/* what is put on top of the prototype: every group that already has an applied preset, plus what is being tried in this group */
+function ovNow(){
  const q=QS[qi],parts=[];
  QS.forEach(x=>{const p=x===q?(ps<0?null:pp):dec[x.id]&&dec[x.id].i>=0?dec[x.id].p:null;if(p)parts.push(x.apply(p.fx,mo(p.m),p.m))});
- main.ov=parts.length?{css:parts.slice().reverse().map(o=>o.css||'').join(''),   // reversed: the press rules come last, so their curve wins on buttons
+ return parts.length?{css:parts.slice().reverse().map(o=>o.css||'').join(''),   // reversed: the press rules come last, so their curve wins on buttons
   js:(W,o)=>parts.forEach(x=>x.js&&x.js(W,o))}:null;
- main.run(q.places[pi]);
+}
+/* how the place is shown: one big phone; or, with Compare or Zoom on, one or two framed prototypes (left = Current, right = the preset) */
+let cmp=false,zoom=false,loopOn=false,loopT;
+function decideView(){
+ const q=QS[qi],a=q.places[pi],grid=$('#grid');
+ if(!cmp&&!zoom){if(cards.length||!grid.hidden){dropCards();grid.innerHTML='';grid.hidden=true}$('#frame').classList.remove('off');return}
+ const items=cmp?[Object.assign({},a,{tag:'Current'}),Object.assign({},a,{tag:'Your preset'})]:[Object.assign({},a,{tag:a.n})];
+ showCards(items,!zoom,x=>`<span>${esc(x.tag)}</span>`,true);
+}
+function playDecide(rebuild=true){
+ clearTimeout(loopT);if(qi>=QS.length)return;
+ const q=QS[qi],ov=ovNow(),framed=cmp||zoom;
+ if(rebuild||framed!==!$('#grid').hidden)decideView();
+ if(framed){cards.forEach((c,n)=>{c.ov=n===cards.length-1?ov:null;c.ring=!!q.self});if(cards.every(c=>c.ready))cards.forEach(c=>c.run(c.anim))}   // not loaded yet: they start by themselves when ready
+ else{main.ov=ov;main.ring=!!q.self;main.run(q.places[pi])}
+ if(loopOn)loopT=setTimeout(()=>playDecide(false),(q.lp||2800)/rate);
 }
 function pick(i){const q=QS[qi];ps=i;pp=i<0?null:clone({fx:q.presets[i].fx,m:q.presets[i].m})}
 function showQuestion(n){
@@ -781,7 +845,7 @@ function showQuestion(n){
  if(qi===QS.length){showSummary();return}
  const q=QS[qi],d=dec[q.id];pi=0;
  if(d&&d.i>=0){ps=d.i;pp=clone(d.p)}else pick(-1);   // a decided group opens on its preset
- dropCards();$('#grid').innerHTML='';$('#grid').hidden=true;$('#sum').hidden=true;$('#frame').classList.remove('off');
+ $('#sum').hidden=true;
  paintDecide();playDecide();
 }
 const presetName=(q,d)=>d.i<0?'Current':q.presets[d.i].n+(edited(q,d.i,d.p)?' (edited)':'');
@@ -789,11 +853,11 @@ const presetName=(q,d)=>d.i<0?'Current':q.presets[d.i].n+(edited(q,d.i,d.p)?' (e
 function easeSvg(m){let d;if(isSpring(m.ease)){const sp=springSamples(m.dur,m.bounce,32).pts,mx=Math.max(1.05,...sp);d='M'+sp.map((y,i)=>`${(i/32*24).toFixed(1)} ${(24-y/mx*22).toFixed(1)}`).join('L')}
  else{const b=bezOf(m);d=`M0 24C${b[0]*24} ${24-b[1]*24} ${b[2]*24} ${24-b[3]*24} 24 0`}
  return `<svg viewBox="-2 -6 28 34" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
-const sl=(grp,k,l,min,max,step,v,t)=>`<div class="prm"><span>${esc(l)}</span><input type="range" data-g="${grp}" data-k="${k}" min="${min}" max="${max}" step="${step}" value="${v}" aria-label="${esc(l)}"><b>${esc(t)}</b></div>`;
+const sl=(grp,k,l,min,max,step,v,t,ends)=>`<div class="prm"><span>${esc(l)}</span><input type="range" data-g="${grp}" data-k="${k}" min="${min}" max="${max}" step="${step}" value="${v}" aria-label="${esc(l)}"><b>${esc(t)}</b>${ends?`<small class="ends"><span>${ends[0]}</span><span>${ends[1]}</span></small>`:''}</div>`;
 function paintParams(){
  const q=QS[qi],on=ps>=0;$('#fxBlk').hidden=!on||!q.fx.length;$('#moBlk').hidden=!on;if(!on)return;
  const m=pp.m,spring=isSpring(m.ease);
- $('#fx').innerHTML=q.fx.map(f=>sl('fx',f.k,f.l,f.min,f.max,f.step,pp.fx[f.k],f.fmt(pp.fx[f.k]))).join('');
+ $('#fx').innerHTML=q.fx.map(f=>sl('fx',f.k,f.l,f.min,f.max,f.step,pp.fx[f.k],f.fmt(pp.fx[f.k]),f.ends)).join('');
  $('#moLbl').textContent=q.ml||'Motion';
  $('#mo').innerHTML=`<div class="prm sel"><span>Easing</span><select id="ezSel" aria-label="Easing"><optgroup label="Curve">${EZ.map(x=>`<option value="${x[0]}"${m.ease===x[0]?' selected':''}>${esc(x[1])}</option>`).join('')}</optgroup><optgroup label="Spring">${SP.map(x=>`<option value="${x[0]}"${m.ease===x[0]?' selected':''}>${esc(x[1])}</option>`).join('')}</optgroup></select>${easeSvg(m)}</div>`+
   (m.ease==='custom'?`<div class="prm bz"><span>Bezier</span><div class="cvin">${[0,1,2,3].map(j=>`<input class="num" type="number" step=".01" min="${j%2?-1:0}" max="${j%2?2:1}" data-bz="${j}" value="${n2(m.bez[j])}" title="${['x1','y1','x2','y2'][j]}" aria-label="${['x1','y1','x2','y2'][j]}">`).join('')}</div></div>`:'')+
@@ -804,28 +868,30 @@ function paintParams(){
 function paintDecide(){
  const sumOn=qi===QS.length,q=QS[qi],n=QS.filter(x=>dec[x.id]).length;
  document.querySelectorAll('.ql').forEach(b=>{const i=+b.dataset.q,x=QS[i];b.classList.toggle('on',i===qi);
-  if(x){b.classList.toggle('done',!!dec[x.id]);b.querySelector('small').textContent=dec[x.id]?presetName(x,dec[x.id]):'Not decided'}else b.querySelector('small').textContent=`${n} of ${QS.length} decided`});
+  if(x){b.classList.toggle('done',!!dec[x.id]);b.querySelector('small').textContent=dec[x.id]?presetName(x,dec[x.id]):''}else b.querySelector('small').textContent=`${n} / ${QS.length}`});
  $('#qh').hidden=sumOn;$('#dockD').hidden=sumOn;$('#places').hidden=sumOn;if(sumOn)return;
  const d=dec[q.id];
- $('#qN').textContent=`Group ${qi+1} of ${QS.length}`;$('#qT').textContent=q.t;$('#qS').textContent=q.s;
- $('#places').innerHTML='<b>Watch it on</b>'+q.places.map((x,i)=>`<button class="pl${i===pi?' on':''}" data-p="${i}"><i></i><div><b>${esc(x.n)}</b></div></button>`).join('');
+ $('#qN').textContent=`${qi+1} / ${QS.length}`;$('#qT').textContent=q.t;$('#qS').textContent=q.s;
+ $('#places').innerHTML='<b>Watch it on</b>'+q.places.map((x,i)=>`<button class="pl${i===pi?' on':''}" data-p="${i}">${glyph(x.id)}<div><b>${esc(x.n)}</b></div></button>`).join('');
+ $('#todayL').innerHTML=q.today.map(t=>`<li>${esc(t)}</li>`).join('');if(document.activeElement!==$('#why'))$('#why').value=notes[q.id]||'';
  $('#presets').innerHTML=`<button class="chip2${ps<0?' on':''}${d&&d.i<0?' ap':''}" data-ps="-1">Current</button>`+q.presets.map((x,i)=>`<button class="chip2${ps===i?' on':''}${d&&d.i===i?' ap':''}" data-ps="${i}">${esc(x.n)}</button>`).join('');
  paintParams();paintStatus();
- $('#prevQ').disabled=qi===0;$('#nextQ').textContent=qi===QS.length-1?'My decisions':'Next';
+ $('#prevQ').disabled=qi===0;
 }
 function paintStatus(){
  const q=QS[qi],d=dec[q.id],ok=d&&d.i===ps&&(ps<0||same(d.p,pp)),ab=$('#applyB');
  const off=ps>=0&&q.none&&q.none(pp.fx);
  $('#pDesc').textContent=ps<0?'The prototype as it is today. Pick a preset to feel the difference, then fine-tune it.':off?q.noneText:q.presets[ps].d+(edited(q,ps,pp)?' (edited)':'');
- ab.textContent=ok?'Applied to the whole group ✓':ps<0?'Keep the group as it is':'Apply to the whole group';ab.classList.toggle('q',!!ok);
+ ab.textContent=ok?'Applied ✓':ps<0?'Keep current':'Apply';
  $('#dHint').textContent=d?'Applied: '+presetName(q,d):'Nothing applied yet';
 }
 $('#places').onclick=e=>{const b=e.target.closest('.pl');if(!b)return;pi=+b.dataset.p;paintDecide();playDecide()};
-$('#presets').onclick=e=>{const b=e.target.closest('.chip2');if(!b)return;pick(+b.dataset.ps);paintDecide();playDecide()};
-let prT;const later=()=>{clearTimeout(prT);prT=setTimeout(playDecide,300)};
+$('#presets').onclick=e=>{const b=e.target.closest('.chip2');if(!b)return;pick(+b.dataset.ps);paintDecide();playDecide(false)};
+let prT;const later=()=>{clearTimeout(prT);prT=setTimeout(()=>playDecide(false),300)};
 /* sliders: Effect values, and Duration / Bounce / Delay of the Motion. Touching Duration or Bounce of a named spring makes it a custom spring */
 $('#dockD').addEventListener('input',e=>{const r=e.target,q=QS[qi];if(ps<0)return;
  if(r.type==='range'){const v=+r.value;
+  if(!r.dataset.g)return;
   if(r.dataset.g==='fx'){pp.fx[r.dataset.k]=v;r.nextElementSibling.textContent=q.fx.find(f=>f.k===r.dataset.k).fmt(v)}
   else{pp.m[r.dataset.k]=v;r.nextElementSibling.textContent=r.dataset.k==='bounce'?Math.round(v*100)+'%':v+' ms';
    if(isSpring(pp.m.ease)&&r.dataset.k!=='delay'&&pp.m.ease!=='spring'){pp.m.ease='spring';$('#ezSel').value='spring'}
@@ -835,23 +901,29 @@ $('#dockD').addEventListener('input',e=>{const r=e.target,q=QS[qi];if(ps<0)retur
 $('#dockD').addEventListener('change',e=>{if(e.target.id!=='ezSel'||ps<0)return;const v=e.target.value,m=pp.m,sp=SP.find(x=>x[0]===v);
  if(v==='custom'&&m.ease!=='custom'&&!isSpring(m.ease))m.bez=bezOf(m).slice();   // start the custom curve from the one that was selected
  m.ease=v;if(sp&&sp[2]){m.dur=sp[2].dur;m.bounce=sp[2].bounce}
- paintParams();paintStatus();playDecide()});
-$('#applyB').onclick=()=>{const q=QS[qi];dec[q.id]={i:ps,p:pp?clone(pp):null};saveDec();paintDecide()};
+ paintParams();paintStatus();playDecide(false)});
+$('#applyB').onclick=()=>{const q=QS[qi];dec[q.id]={i:ps,p:pp?clone(pp):null};saveDec();showQuestion(qi+1)};   // apply, then on to the next group
+$('#why').oninput=e=>{const q=QS[qi],v=e.target.value.trim();if(v)notes[q.id]=v;else delete notes[q.id];saveDec()};
+$('#loop').onchange=e=>{loopOn=e.target.checked;playDecide(false)};
+$('#cmp').onchange=e=>{cmp=e.target.checked;playDecide(true)};
+$('#zoom').onchange=e=>{zoom=e.target.checked;playDecide(true)};
+$('#speedD').onclick=e=>{const b=e.target.closest('button');if(!b)return;rate=+b.dataset.r;document.querySelectorAll('#speedD button').forEach(x=>x.classList.toggle('on',x===b));playDecide(false)};
 function decisionsText(){
- return 'Motion presets — DAZN Bet in Scores\n'+QS.map((q,i)=>`${i+1}. ${q.t}: ${decText(q)||'not decided'}`).join('\n')+'\n\nFor development:\n'+DEVNOTES.map(t=>'- '+t).join('\n');
+ return 'Motion presets — DAZN Bet in Scores\n'+QS.map((q,i)=>`${i+1}. ${q.t}: ${decText(q)||'not decided'}`+(notes[q.id]?`\n   Why: ${notes[q.id]}`:'')).join('\n')+'\n\nFor development:\n'+DEVNOTES.map(t=>'- '+t).join('\n');
 }
+const shareLink=()=>location.href.split('#')[0]+'#d='+btoa(unescape(encodeURIComponent(JSON.stringify({dec,notes}))));
 function showSummary(){
- dropCards();$('#grid').innerHTML='';$('#grid').hidden=true;$('#frame').classList.add('off');if(main.ready)main.reset();
- const s=$('#sum');s.hidden=false;
- s.innerHTML=`<h1>My decisions</h1><p>Click a row to go back to that group.</p>`+QS.map((q,i)=>`<div class="sr" data-q="${i}" role="button" tabindex="0"><i>${i+1}</i><b>${esc(q.t)}</b><span${dec[q.id]?'':' class="no"'}>${esc(decText(q)||'Not decided')}</span></div>`).join('')+
-  `<button class="btn" id="copyDec">Copy decisions</button><h2>Also goes to development</h2><ul>${DEVNOTES.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
+ clearTimeout(loopT);dropCards();$('#grid').innerHTML='';$('#grid').hidden=true;$('#frame').classList.add('off');if(main.ready)main.reset();
+ const s=$('#sum');s.hidden=false;main.ov=null;
+ s.innerHTML=`<h1>My decisions</h1>`+QS.map((q,i)=>`<div class="sr" data-q="${i}" role="button" tabindex="0"><i>${i+1}</i><b>${esc(q.t)}</b><span${dec[q.id]?'':' class="no"'}>${esc(decText(q)||'Not decided')}</span>${notes[q.id]?`<small>Why: ${esc(notes[q.id])}</small>`:''}</div>`).join('')+
+  `<div class="acts"><button class="btn" id="copyDec">Copy decisions</button><button class="btn q" id="copyLink" title="A link that opens this page with the same decisions">Copy link</button></div><h2>For development</h2><ul>${DEVNOTES.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
  paintDecide();
 }
 $('#sum').onclick=e=>{const r=e.target.closest('.sr');if(r){showQuestion(+r.dataset.q);return}
- const b=e.target.closest('#copyDec');if(b)copyText(decisionsText(),b,'Copy decisions')};
+ if(e.target.closest('#copyDec'))copyText(decisionsText(),$('#copyDec'),'Copy decisions');
+ else if(e.target.closest('#copyLink'))copyText(shareLink(),$('#copyLink'),'Copy link')};
 $('#prevQ').onclick=()=>showQuestion(qi-1);$('#nextQ').onclick=()=>showQuestion(qi+1);
 $('#againD').onclick=replay;
-$('#slow').onchange=e=>{rate=e.target.checked?0.2:1;replay()};
 function buildQList(){
  let h='',last='';QS.forEach((q,i)=>{const sc=SECT[q.id];if(sc!==last){h+=`<div class="lg">${esc(sc)}</div>`;last=sc}
   h+=`<button class="ql" data-q="${i}"><i>${i+1}</i><div><b>${esc(q.t)}</b><small></small></div></button>`});
@@ -861,26 +933,26 @@ function buildQList(){
 function setApp(a){
  app=a;document.querySelectorAll('#appSeg button').forEach(b=>b.classList.toggle('on',b.dataset.app===a));
  const d=a==='decide';main.ov=null;$('#dockB').hidden=d;$('#drawer').hidden=true;$('#stepsBtn').classList.remove('on');$('#stepsBtn').textContent='Show steps';
- if(d){rate=$('#slow').checked?0.2:1;buildQList();showQuestion(qi)}
- else{rate=+document.querySelector('#speed .on').dataset.r;$('#qh').hidden=true;$('#dockD').hidden=true;$('#sum').hidden=true;$('#places').hidden=true;buildList();showGroup(grp)}
+ clearTimeout(loopT);
+ if(d){rate=+document.querySelector('#speedD .on').dataset.r;buildQList();showQuestion(qi)}
+ else{rate=+document.querySelector('#speed .on').dataset.r;$('#qh').hidden=true;$('#dockD').hidden=true;$('#sum').hidden=true;$('#places').hidden=true;buildList();showOne(cur)}
 }
 $('#appSeg').onclick=e=>{const b=e.target.closest('button');if(b&&b.dataset.app!==app)setApp(b.dataset.app)};
 
 /* ---------- All animations: groups fold; a group has "All together" and its animations ---------- */
 const ICO='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function buildList(){
- $('#list').innerHTML=GROUPS.map((g,gi)=>{const items=ANIMS.filter(a=>a.g===gi);
+ $('#list').innerHTML=GROUPS.map((g,gi)=>{if(gi>6)return '';const items=ANIMS.filter(a=>a.g===gi);
   return `<div class="gp" data-g="${gi}"><button class="gh" aria-expanded="false">${ICO}<span>${esc(g)}</span><i>${items.length}</i></button><div class="gb"><div>`+
-   `<button class="li" data-all="${gi}"><span>All together</span></button>`+items.map(a=>`<button class="li" data-i="${ANIMS.indexOf(a)}"><span>${esc(a.n)}</span></button>`).join('')+'</div></div></div>'}).join('');
+   items.map(a=>`<button class="li" data-i="${ANIMS.indexOf(a)}"><span>${esc(a.n)}</span></button>`).join('')+'</div></div></div>'}).join('');
  $('#list').onclick=e=>{
-  const h=e.target.closest('.gh');if(h){showGroup(+h.parentNode.dataset.g);return}
-  const b=e.target.closest('.li');if(!b)return;
-  if(b.dataset.all!==undefined)showGroup(+b.dataset.all);else showOne(+b.dataset.i)};
+  const h=e.target.closest('.gh');if(h){showOne(ANIMS.findIndex(a=>a.g===+h.parentNode.dataset.g));return}   // a group opens on its first animation
+  const b=e.target.closest('.li');if(b)showOne(+b.dataset.i)};
 }
 function paintAll(){
  const one=mode==='one',a=ANIMS[cur];
  document.querySelectorAll('.gp').forEach(p=>{const on=+p.dataset.g===grp;p.classList.toggle('open',on);p.querySelector('.gh').setAttribute('aria-expanded',on)});
- document.querySelectorAll('.li').forEach(b=>b.classList.toggle('on',one?+b.dataset.i===cur:+b.dataset.all===grp));
+ document.querySelectorAll('.li').forEach(b=>b.classList.toggle('on',+b.dataset.i===cur));
  $('#nowT').textContent=one?a.n:GROUPS[grp];
  $('#again').disabled=one&&(a.slow==='none'||!a.play);
  paintDetail();paintKnobs();
@@ -903,52 +975,19 @@ function paintDetail(){
   <details><summary>With Reduce motion switched on</summary><p>${rich(RM_TEXT)}</p></details>`;
 }
 
-/* ---------- token knobs ---------- */
-let again;
-function tokenChanged(){
- $('#copyOut').hidden=true;paintKnobs();paintDetail();
- try{localStorage.setItem('motionTokens',JSON.stringify(val))}catch(e){}
- clearTimeout(again);again=setTimeout(replay,350);   // show the result once the knob rests
-}
-const curveSvg=c=>`<svg width="32" height="32" viewBox="-2 -2 28 28" aria-hidden="true"><path d="M0 24C${c[0]*24} ${24-c[1]*24} ${c[2]*24} ${24-c[3]*24} 24 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+/* ---------- tokens: shown for reference only. Motion is changed in Decide, so there is one place for decisions ---------- */
 let showAll=false;
 function buildKnobs(){
- const others=k=>ANIMS.filter(a=>a.tok.has(k)).length,lab=(t,f)=>`<label${f?` for="${f}"`:''}><b>${t.k}</b><span data-use="${esc(t.use)}" title="${esc(t.use)} · drives ${others(t.k)} animations"></span></label>`;
- $('#tk').innerHTML=TOKENS.map((t,i)=>t.cv
-  ?`<div class="tr cv" data-k="${t.k}">${lab(t)}<div class="cvin">${[0,1,2,3].map(j=>`<input class="num" type="number" step=".01" min="${j%2?-1:0}" max="${j%2?2:1}" data-j="${j}" title="cubic-bezier ${['x1','y1','x2','y2'][j]}" aria-label="${t.k} ${['x1','y1','x2','y2'][j]}">`).join('')}</div><span></span></div>`
-  :`<div class="tr" data-k="${t.k}">${lab(t,'r'+i)}<input id="r${i}" type="range" min="0" max="${t.max}" step="10"><div class="unit"><input class="num" type="number" min="0" max="3000" step="10" aria-label="${t.k} in ms">ms</div></div>`).join('')+'<p id="noTk" hidden>Nothing here uses a motion token: the times are typed as numbers. See the steps.</p>';
+ $('#tk').innerHTML=TOKENS.map(t=>`<div class="tr ro"><label><b>${t.k}</b><span>${esc(t.use)}</span></label><b>${t.cv?t.cv.map(n2).join(', '):t.ms+' ms'}</b></div>`).join('');
  $('#stepsBtn').onclick=()=>{const d=$('#drawer');d.hidden=!d.hidden;$('#stepsBtn').classList.toggle('on',!d.hidden);$('#stepsBtn').textContent=d.hidden?'Show steps':'Hide steps';$('#stepsBtn').setAttribute('aria-expanded',!d.hidden)};
- $('#allBtn').onclick=()=>{showAll=!showAll;$('#allBtn').classList.toggle('on',showAll);$('#allBtn').setAttribute('aria-pressed',showAll);paintKnobs()};
- $('#tk').addEventListener('input',e=>{const row=e.target.closest('.tr[data-k]');if(!row)return;const k=row.dataset.k;
-  if(TK[k].cv){const j=+e.target.dataset.j,v=parseFloat(e.target.value);if(isNaN(v))return;val[k][j]=j%2?Math.max(-1,Math.min(2,v)):Math.max(0,Math.min(1,v))}
-  else{const v=parseFloat(e.target.value);if(isNaN(v))return;val[k]=Math.max(0,Math.min(3000,Math.round(v)))}
-  tokenChanged()});
- /* which animations sit on this token: the list dims the rest while the pointer is on the row */
- $('#tk').addEventListener('mouseover',e=>{const row=e.target.closest('.tr[data-k]');filter(row?row.dataset.k:null)});
- $('#tk').addEventListener('mouseleave',()=>filter(null));
- $('#tk').addEventListener('focusout',paintKnobs);   // an empty or out-of-range field goes back to the value in use
- $('#resetTk').onclick=()=>{TOKENS.forEach(t=>val[t.k]=t.cv?[...t.cv]:t.ms);tokenChanged()};
- $('#copyTk').onclick=copyChanges;
+ $('#allBtn').onclick=()=>{showAll=!showAll;$('#allBtn').classList.toggle('on',showAll);$('#allBtn').setAttribute('aria-pressed',showAll);$('#tk').hidden=!showAll};
 }
-function filter(k){$('#list').classList.toggle('filter',!!k);document.querySelectorAll('.li[data-i]').forEach(b=>b.classList.toggle('hit',!!k&&ANIMS[+b.dataset.i].tok.has(k)))}
-function paintKnobs(){
- const use=new Set(shown().flatMap(a=>[...a.tok]));let n=0;$('#tk').hidden=!showAll;$('#tk').classList.add('all');
- document.querySelectorAll('#tk .tr[data-k]').forEach(row=>{const k=row.dataset.k,t=TK[k],u=row.querySelector('label span');row.hidden=false;n++;row.classList.toggle('ch',changed(k));u.textContent=changed(k)?'was '+(t.cv?t.cv.map(n2).join(' '):t.ms+' ms'):u.dataset.use;
-  if(t.cv){row.querySelectorAll('input').forEach(inp=>{if(document.activeElement!==inp)inp.value=n2(val[k][+inp.dataset.j])});row.lastElementChild.innerHTML=curveSvg(val[k])}
-  else{const [r,nb]=row.querySelectorAll('input');r.value=val[k];if(document.activeElement!==nb)nb.value=val[k]}});
- $('#noTk').hidden=n>0;
- const c=TOKENS.filter(t=>changed(t.k)).length;$('#chN').textContent=c?c+' token'+(c>1?'s':'')+' changed':'';$('#resetTk').disabled=!c;$('#copyTk').disabled=!c;
-}
-function changesText(){
- const rows=TOKENS.filter(t=>changed(t.k)).map(t=>`${t.k}: ${dflt(t.k)} → ${css(t.k)}`);
- return rows.length?'Motion tokens — changes\n'+rows.join('\n'):'Motion tokens — no changes';
-}
+function paintKnobs(){}
 function copyText(text,b,label){
  const o=$('#copyOut'),done=ok=>{b.textContent=ok?'Copied':'Could not copy';if(!ok&&app==='browse'){o.textContent=text;o.hidden=false}setTimeout(()=>{b.textContent=label},1800)};
  const legacy=()=>{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();done(ok)};
  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(()=>done(true),legacy);else legacy();
 }
-function copyChanges(){copyText(changesText(),$('#copyTk'),'Copy changes')}
 
 /* ---------- controls ---------- */
 $('#speed').onclick=e=>{const b=e.target.closest('button');if(!b)return;rate=+b.dataset.r;document.querySelectorAll('#speed button').forEach(x=>x.classList.toggle('on',x===b));replay()};
@@ -960,7 +999,6 @@ addEventListener('keydown',e=>{
  if(e.key==='ArrowDown'){e.preventDefault();showOne(mode==='one'?cur+1:ANIMS.findIndex(a=>a.g===grp))}
  else if(e.key==='ArrowUp'){e.preventDefault();if(mode==='one')showOne(cur-1)}
 });
-try{const s=JSON.parse(localStorage.getItem('motionTokens')||'null');if(s)TOKENS.forEach(t=>{const v=s[t.k];if(t.cv?Array.isArray(v)&&v.length===4&&v.every(n=>typeof n==='number'):typeof v==='number')val[t.k]=v})}catch(e){}
 buildKnobs();
 setApp('decide');   // opens on the first question
 </script>
