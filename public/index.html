@@ -392,9 +392,9 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .feed{padding:12px 16px 16px}
 #phone.hasbar .feed{padding-bottom:120px}
 /* Legal/Top banner (Figma 3930:37834): two white plates, 343 = 230 + 1 + 112 */
-.legal{display:flex;justify-content:space-between;align-items:center;gap:1px;height:26px}
+.legal{display:flex;align-items:center;gap:1px;height:26px} /* B4: the banner fills its block on any width — the warning stretches, "Odds powered by" keeps its 112, 1 px between them */
 .legal>div{height:28px;background:#f9fafa;color:#0c161c;display:flex;align-items:center;justify-content:center;min-width:0}
-.legal .lw{flex:0 0 230px;flex-direction:column;gap:4px;border:1px solid #242d33}
+.legal .lw{flex:1 0 230px;flex-direction:column;gap:4px;border:1px solid #242d33}
 .legal .lw b{font-weight:700;font-size:12px;line-height:9px;letter-spacing:-.02em;white-space:nowrap}
 .legal .lw span{font-size:8px;line-height:6px;letter-spacing:-.02em;white-space:nowrap}
 .legal .lp{flex:0 0 112px;gap:3px;border:1px solid #1f2223}
@@ -756,7 +756,7 @@ div.choice{cursor:default}
 .mkts .choice.res:not(.stk) .lb{color:var(--t1)} /* .Bet/Choice tile State=Result: the label turns text/primary (Stacked looks like Default, as in Figma) */
 .mkts .choice.dis:not(.sel){background:var(--odd-bg)} /* State=Disabled: fill/overlay-1, every text in text/disabled */
 .mkts .choice.dis .cd,.mkts .choice.dis .tt,.mkts .choice.dis .lb,.mkts .choice.dis .ov{color:var(--tdis)}
-.mkts .legal{height:28px;width:342px;gap:0;margin-bottom:-4px} /* fixture: banner frame is 28 high and 342 wide, 12 to the first market */
+.mkts .legal{height:28px;margin-bottom:-4px} /* fixture: banner frame is 28 high, 12 to the first market */
 .fx-more{width:100%;height:48px;border-radius:8px;background:rgba(195,209,219,.10);font-weight:700;font-size:16px;line-height:24px;color:#f8f8f8}
 #phone.infx .bar{bottom:24px}
 #phone.infx.hasbar .mkts{padding-bottom:109px}
