@@ -154,13 +154,13 @@ body{grid-template-columns:320px minmax(600px,1fr);min-width:960px}
 .gb>div::after{content:"";flex:none;height:8px}
 .gb .li{padding-left:36px}
 #frame.off{visibility:hidden}
-.grid{position:absolute;inset:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--ui-line) transparent;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;align-content:start;align-items:start;padding:1px}
+.grid{position:absolute;inset:0;overflow-y:auto;scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:var(--ui-line) transparent;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));grid-auto-rows:max-content;gap:12px;align-content:start;padding:1px} /* rows keep the height of their cards: the grid scrolls, it never squeezes them */
+.grid.tall{grid-template-columns:repeat(auto-fill,var(--cw,240px));justify-content:center}
 .grid[hidden]{display:none}
 .card{min-width:0;border-radius:16px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);overflow:hidden;display:flex;flex-direction:column}
 .cl{flex:none;height:40px;padding:0 16px;text-align:left;font-weight:700;font-size:13px;line-height:18px;color:var(--ui-t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:background .2s}
 .cl:hover{background:var(--ui-on)}
-.vp{flex:none;position:relative;height:220px;overflow:hidden;background:var(--ui-canvas)}
-.vp.tall{height:460px}
+.vp{flex:none;position:relative;height:var(--vh,240px);overflow:hidden;background:var(--ui-canvas)} /* every card of a group has the same size */
 .vp iframe{position:absolute;left:0;top:0;width:560px;height:1030px;border:0;transform-origin:0 0}
 .cmp{padding-bottom:16px;border-bottom:1px solid var(--ui-line)}
 .cmp:last-child{border-bottom:0}
@@ -422,9 +422,11 @@ let rate=1;
 const status=t=>{$('#status').textContent=t};
 /* where to look when the animation is shown small in a group: the element that moves (default: the whole phone) */
 const FOCUS={M01:'#feed .odd[data-m="m1"][data-o="1"]',M02:'#mkts .choice',M03:'#cpScroll .tp',M04:'#cpScroll .cp-row',M05:'#placeBtn',M06:'#bar',M07:'#editBtn',
- M09:'#feed .odd[data-m="m1"][data-o="1"]',M10:'#cpScroll .tp',M11:'#oddsChip',M12:'#liveBadge',M13:'#days',M14:'.cp-chips',M15:'#placeBtn',M16:'[data-card="m4|1x2"]',M19:'.livepill',M20:'[data-card="m1|1x2"]',
+ M08:'#bar',M09:'#feed .odd[data-m="m1"][data-o="1"]',M10:'#cpScroll .tp',M11:'#oddsChip',M12:'#liveBadge',M13:'#days',M14:'.cp-chips',M15:'#placeBtn',M16:'[data-card="m4|1x2"]',M17:'#cards .cardwrap',M18:'#shead',M23:'[data-card="m4|1x2"]',M19:'.livepill',M20:'[data-card="m1|1x2"]',
  M21:'#feed [data-tile="m1"]',M22:'#feed [data-tile="m1"] .orow',M24:'#bar',M27:'#bar',M29:'#sheet .summary',M30:'#sheet .sfoot'};
-function makeProto(F,vp){
+/* groups about one element are shown close up; groups about the whole screen (sheets, pages, layout) show the whole phone */
+const WHOLE=new Set([3,4,5,6,7]);
+function makeProto(F,vp,whole){
  const P={F,vp,W:null,D:null,ready:false,runId:0,pressed:[],dragEl:null,dev:'mini',anim:null,onready:null};
  const q=s=>P.D.querySelector(s),scale=()=>+q('#stage').dataset.scale||1;
  const G={                                  // helpers for the scenarios; live on the prototype's window as G
@@ -469,9 +471,8 @@ function makeProto(F,vp){
  };
  /* a small phone in a group: zoom the frame to the element that moves */
  P.frameOn=a=>{
-  const ph=q('#phone'),el=(FOCUS[a.id]&&q(FOCUS[a.id]))||ph,r=el.getBoundingClientRect(),whole=el===ph;
-  vp.classList.toggle('tall',whole||r.height>240);const vw=vp.clientWidth,vh=vp.clientHeight;
-  const z=whole?Math.min(vw/(r.width+32),vh/(r.height+32)):Math.min(2,vw*.8/r.width,vh*.72/r.height);
+  const ph=q('#phone'),el=(!whole&&FOCUS[a.id]&&q(FOCUS[a.id]))||ph,r=el.getBoundingClientRect(),vw=vp.clientWidth,vh=vp.clientHeight;
+  const z=el===ph?Math.min(vw/(r.width+36),vh/(r.height+36)):Math.min(1.5,vw*.78/r.width,vh*.6/r.height);
   F.style.transform=`translate(${vw/2-(r.left+r.width/2)*z}px,${vh/2-(r.top+r.height/2)*z}px) scale(${z})`;
  };
  P.run=a=>{
@@ -494,7 +495,7 @@ function makeProto(F,vp){
 }
 
 /* ---------- what is on screen: one animation on the big phone, or a whole group side by side ---------- */
-const main=makeProto($('#frame'),null);
+const main=makeProto($('#frame'),null,false);
 let mode='group',grp=0,cur=0,cards=[];
 const inGroup=g=>ANIMS.filter(a=>a.g===g&&a.slow!=='none');
 const shown=()=>mode==='one'?[ANIMS[cur]]:inGroup(grp);
@@ -503,19 +504,29 @@ function replay(){
  status(RMON?'Reduce motion is on in your system: nothing will travel':!one?`${cards.length} animations side by side`:a.slow==='none'?'Not shown in this gallery':a.slow==='part'?'One part is not slowed: see the steps':a.slow==='sim'?'The press is made by this page':a.play?'':'Runs all the time');
  if(one)main.run(a);else if(cards.every(c=>c.ready))cards.forEach(c=>c.run(c.anim));
 }
+/* small phones that leave the screen must not keep playing: stop their pending steps before their frames are removed */
+function dropCards(){cards.forEach(c=>{c.runId++;c.onready=null;c.anim=null;try{c.W.MOTION.clear()}catch(e){}});cards=[]}
 function showOne(i){
  mode='one';cur=Math.max(0,Math.min(ANIMS.length-1,i));grp=ANIMS[cur].g;
- cards=[];$('#grid').innerHTML='';$('#grid').hidden=true;$('#frame').classList.remove('off');
+ dropCards();$('#grid').innerHTML='';$('#grid').hidden=true;$('#frame').classList.remove('off');
  paintAll();replay();
 }
 function showGroup(g){
- mode='group';grp=g;const items=inGroup(g);
+ mode='group';grp=g;const items=inGroup(g);dropCards();
  $('#frame').classList.add('off');if(main.ready)main.reset();
- const grid=$('#grid');grid.hidden=false;grid.scrollTop=0;
+ const grid=$('#grid'),tall=WHOLE.has(g);grid.hidden=false;grid.scrollTop=0;grid.classList.toggle('tall',tall);
  grid.innerHTML=items.map(a=>`<div class="card"><button class="cl" data-i="${ANIMS.indexOf(a)}" title="Open on the big phone">${esc(a.n)}</button><div class="vp"><iframe src="index.html?embed" title="${esc(a.n)}"></iframe></div></div>`).join('');
- cards=[...grid.querySelectorAll('.vp')].map((vp,n)=>{const c=makeProto(vp.firstElementChild,vp);c.anim=items[n];c.onready=()=>{if(cards.every(x=>x.ready))replay()};return c}); // they start together, once the last one has loaded
+ sizeCards();
+ cards=[...grid.querySelectorAll('.vp')].map((vp,n)=>{const c=makeProto(vp.firstElementChild,vp,tall);c.anim=items[n];c.onready=()=>{if(cards.every(x=>x.ready))replay()};return c}); // they start together, once the last one has loaded
  paintAll();replay();
 }
+/* whole phones: one row fills the height of the stage; close-ups: a fixed, smaller card */
+function sizeCards(){   // the whole group fits the stage when it can: phones in one row, close-ups in as many rows as needed
+ const g=$('#grid'),tall=g.classList.contains('tall'),n=g.children.length||1,gw=g.clientWidth-2,gh=g.clientHeight-2;
+ if(tall){const w=Math.floor(Math.max(180,Math.min(340,(gh-44)*411/848,(gw-12*(n-1))/n-1)));g.style.setProperty('--cw',w+'px');g.style.setProperty('--vh',Math.floor(w*848/411)+'px')}
+ else{const cols=Math.max(1,Math.floor((gw+12)/312)),rows=Math.ceil(n/cols);g.style.setProperty('--vh',Math.round(Math.max(150,Math.min(260,(gh-12*(rows-1))/rows-40)))+'px')}
+}
+addEventListener('resize',()=>{if(mode!=='group')return;sizeCards();cards.forEach(c=>{if(c.ready)c.frameOn(c.anim)})});
 $('#grid').onclick=e=>{const b=e.target.closest('.cl');if(b)showOne(+b.dataset.i)};
 
 /* ---------- list: groups fold; a group has "All together" and its animations ---------- */
