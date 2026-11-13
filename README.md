@@ -80,6 +80,9 @@ One system everywhere. The tokens live at the top of the hand-written CSS (`MOTI
 | `--m-layout` | .44 s | heights and pages: odds reveal, sheet resize, fixture push |
 | `--m-sheet` | .5 s | sheets, collapsed bar, toast, DAZN Bet overlay |
 
+- **Inventory:** `notes/MOTION.md` lists every animation (M01…M44): what moves, trigger, phases, tokens, numbers written outside the tokens, and where similar things are done differently.
+- **Gallery:** `public/motion.html` (open it by its own address; nothing links to it) plays each of them on the real prototype (`index.html?embed` in a frame) at 1× / 0.5× / 0.1×, with knobs for the tokens and "Copy changes".
+
 JS helpers: `soft()` (play an element in), `setTxt()` (swap a text), `smoothH()` (ease a height), `rise(dir)` (start position of a new number). With **Reduce motion** switched on in the system nothing travels, springs or pulses; states still change.
 
 - **Odds toggle:** visible cards open one after another, prices fade in and rise, the gambling banner and the footer collapse and expand with the cards (`--o-*` variables, cascade in `setOddsOn()`). If the feed is scrolled, the first visible tile stays where it is (`holdAnchor()`).

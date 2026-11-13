@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>DAZN Bet in Scores — Motion</title>
+<!-- A2 · Motion gallery. Desktop only; nothing in the prototype links here.
+     The phone in the middle is the real prototype (index.html?embed) in a frame: this page only sets a state in it,
+     starts one of its own animations, slows its clock and overrides its motion tokens. No animation is redrawn here.
+     The list below (ANIMS) mirrors notes/MOTION.md: same numbers M01…M44. -->
+<style>
+@font-face{font-family:'DAZN Oscine';font-weight:400;src:url(assets/fonts/DAZN-Oscine-Regular.woff2) format('woff2');ascent-override:104.8%;descent-override:24%;line-gap-override:0%}
+@font-face{font-family:'DAZN Oscine';font-weight:700;src:url(assets/fonts/DAZN-Oscine-Bold.woff2) format('woff2');ascent-override:104.8%;descent-override:24%;line-gap-override:0%}
+/* the same chrome variables as the "Prototype states" panel in index.html (Global foundation, dark); no other colours on this page */
+:root{
+  --ui-canvas:#1b2326;                 /* surface/container-2 */
+  --ui-panel:#0c161c;                  /* surface/container-1 */
+  --ui-well:#080e12;                   /* surface/default-0 */
+  --ui-line:#242d33;                   /* border/full-color/subtle */
+  --ui-hover:rgba(249,250,250,0.04);   /* fill/overlay-1 */
+  --ui-on:rgba(249,250,250,0.08);      /* fill/overlay-2 */
+  --ui-thumb:rgba(249,250,250,0.12);   /* fill/overlay-3 */
+  --ui-t1:#f9fafa;                     /* text/primary */
+  --ui-t2:#c5c7ca;                     /* text/secondary */
+  --ui-t3:#8d9295;                     /* text/tertiary */
+  --ui-edge:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--ui-canvas);font-family:'DAZN Oscine',system-ui,sans-serif;font-size:14px;line-height:20px;color:var(--ui-t2);-webkit-font-smoothing:antialiased;display:grid;grid-template-columns:320px minmax(440px,1fr) 432px;gap:var(--ui-edge);padding:var(--ui-edge);min-width:1240px;overflow:auto hidden}
+button,input{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--ui-t1);outline-offset:-2px}
+.panel{min-height:0;display:flex;flex-direction:column;border-radius:16px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line)}
+.ph{flex:none;padding:20px 20px 12px}
+.ph b{display:block;font-size:16px;line-height:22px;color:var(--ui-t1)}
+.ph span{display:block;margin-top:2px;font-size:13px;line-height:18px;color:var(--ui-t3)}
+.scroll{min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--ui-line) transparent}
+
+/* segmented control, as in the Prototype states panel */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;align-items:center;padding:2px;border-radius:8px;background:var(--ui-well)}
+.seg button{height:28px;padding:0 12px;border-radius:6px;font-weight:700;font-size:12px;line-height:18px;color:var(--ui-t3);white-space:nowrap;transition:background .2s,color .2s}
+.seg button.on{background:var(--ui-thumb);color:var(--ui-t1)}
+.seg button:not(.on):hover{color:var(--ui-t2)}
+
+/* list */
+.flt{flex:none;margin:0 16px 8px}
+.list{padding:0 8px 12px;display:flex;flex-direction:column;gap:2px}
+.lg{flex:none;margin-top:12px;padding:6px 12px;font-weight:700;font-size:12px;line-height:18px;color:var(--ui-t3)}
+.li{flex:none;display:flex;align-items:center;gap:10px;width:100%;min-height:36px;padding:8px 12px;border-radius:8px;text-align:left;color:var(--ui-t2);transition:background .2s,color .2s,opacity .2s}
+.li:hover{background:var(--ui-hover);color:var(--ui-t1)}
+.li.on{background:var(--ui-on);color:var(--ui-t1);font-weight:700}
+.li span{flex:1;min-width:0}
+.li small{flex:none;font-weight:400;font-size:12px;line-height:18px;color:var(--ui-t3)}
+.list.filter .li:not(.hit){opacity:.3}
+.li[hidden],.lg[hidden]{display:none}
+
+/* stage */
+.stage{min-width:0;min-height:0;display:flex;flex-direction:column;gap:12px}
+.bar{flex:none;display:flex;align-items:center;gap:20px;min-height:56px;padding:10px 12px 10px 20px;border-radius:16px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line)}
+.now{flex:1;min-width:0}
+.now b{display:block;font-size:16px;line-height:22px;color:var(--ui-t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.now span{display:block;font-size:12px;line-height:18px;color:var(--ui-t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctl{flex:none;display:flex;align-items:center;gap:8px;font-size:12px;line-height:18px;color:var(--ui-t3)}
+.btn{flex:none;height:32px;padding:0 14px;border-radius:8px;background:var(--ui-t1);font-weight:700;font-size:12px;line-height:18px;color:var(--ui-well);white-space:nowrap;transition:opacity .2s,background .2s}
+.btn:hover{opacity:.85}
+.btn:disabled{opacity:.3;cursor:default}
+.btn.q{background:var(--ui-on);color:var(--ui-t1)}
+.btn.q:hover{opacity:1;background:var(--ui-thumb)}
+#frame{flex:1;min-height:0;width:100%;border:0;border-radius:16px;background:var(--ui-canvas)}
+
+/* side: how the selected animation is built + token knobs */
+.side{min-height:0;display:flex;flex-direction:column;gap:var(--ui-edge)}
+.side .panel:first-child{flex:1}
+.det{padding:0 20px 20px;display:flex;flex-direction:column;gap:20px}
+.det h2{font-size:12px;line-height:18px;font-weight:700;color:var(--ui-t3);margin-bottom:6px}
+.det p{font-size:14px;line-height:20px;color:var(--ui-t2)}
+.det p.lead{color:var(--ui-t1)}
+.note{padding:10px 12px;border-radius:8px;background:var(--ui-on);font-size:13px;line-height:19px;color:var(--ui-t2)}
+.note b{color:var(--ui-t1)}
+.step{display:grid;grid-template-columns:22px 1fr;gap:6px 8px;padding:12px 0;border-top:1px solid var(--ui-line)}
+.step:first-of-type{border-top:0;padding-top:0}
+.step:last-of-type{padding-bottom:0}
+.step>i{width:20px;height:20px;border-radius:50%;background:var(--ui-on);font-style:normal;font-weight:700;font-size:11px;line-height:20px;text-align:center;color:var(--ui-t2)}
+.step>b{color:var(--ui-t1);font-weight:700;line-height:20px}
+.step>div{grid-column:2;display:grid;grid-template-columns:64px 1fr;align-items:start;gap:8px}
+.step>div>em{font-style:normal;font-size:12px;line-height:22px;color:var(--ui-t3)}
+.step>div>span{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:13px;line-height:22px}
+.chip,.off{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:6px;font-size:12px;line-height:22px;color:var(--ui-t1);white-space:nowrap}
+.chip{background:var(--ui-on)}
+.chip small,.off small{font-size:11px;color:var(--ui-t3)}
+.chip.ch{box-shadow:inset 0 0 0 1px var(--ui-t1)}
+.off{box-shadow:inset 0 0 0 1px var(--ui-t3)}
+details summary{cursor:pointer;font-size:12px;line-height:18px;font-weight:700;color:var(--ui-t3);border-radius:4px}
+details p{margin-top:6px}
+
+/* tokens */
+.tk{padding:0 20px 16px;display:flex;flex-direction:column;gap:4px}
+.tr{display:grid;grid-template-columns:132px 1fr 76px;align-items:center;gap:12px;min-height:40px}
+.tr label b{display:block;font-weight:400;font-size:13px;line-height:18px;color:var(--ui-t1)}
+.tr label span{display:block;font-size:11px;line-height:15px;color:var(--ui-t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr.ch label b{font-weight:700}
+.tr.ch label span{color:var(--ui-t1)}
+.tr input[type=range]{width:100%;accent-color:var(--ui-t1);height:16px}
+.unit{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ui-t3)}
+.num{width:100%;min-width:0;height:28px;padding:0 8px;border-radius:6px;border:0;background:var(--ui-well);font-size:13px;color:var(--ui-t1);text-align:right;-moz-appearance:textfield}
+.num::-webkit-inner-spin-button{display:none}
+.tr.cv{grid-template-columns:132px 1fr 32px}
+.cvin{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.cvin .num{text-align:center;padding:0 2px}
+.cvh{min-height:0;margin-top:8px;padding-top:10px;border-top:1px solid var(--ui-line);font-size:11px;line-height:15px;color:var(--ui-t3)}
+.cvh .cvin span{text-align:center}
+.tr svg{display:block;border-radius:6px;background:var(--ui-well);color:var(--ui-t1)}
+.acts{display:flex;align-items:center;gap:8px;margin-top:10px}
+.acts span{flex:1;min-width:0;font-size:12px;line-height:18px;color:var(--ui-t3)}
+.tk pre{font:inherit;font-size:12px;line-height:18px;color:var(--ui-t2);white-space:pre-wrap;margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--ui-well);max-height:96px;overflow:auto}
+.tk pre:empty{display:none}
+</style>
+</head>
+<body>
+<aside class="panel">
+ <div class="ph"><b>Animations</b><span>Pick one: it plays on the phone.</span></div>
+ <div class="seg flt" id="flt" role="tablist" aria-label="Show">
+  <button role="tab" data-f="all" class="on">All</button><button role="tab" data-f="off" title="Animations with a time or a curve typed as a number instead of a motion token">Not on tokens</button><button role="tab" data-f="lim" title="Animations this page cannot fully slow down or start by itself">With limits</button>
+ </div>
+ <div class="scroll list" id="list"></div>
+</aside>
+
+<main class="stage">
+ <div class="bar">
+  <div class="now"><b id="nowT"></b><span id="status"></span></div>
+  <button class="btn" id="again">Play again</button>
+  <div class="ctl">Speed<div class="seg" id="speed" role="tablist" aria-label="Speed">
+   <button role="tab" data-r="1" class="on">1×</button><button role="tab" data-r="0.5">0.5×</button><button role="tab" data-r="0.1">0.1×</button>
+  </div></div>
+  <div class="ctl">Phone<div class="seg" id="size" role="tablist" aria-label="Phone size">
+   <button role="tab" data-dev="mini" class="on">13 mini</button><button role="tab" data-dev="max">17 Pro Max</button>
+  </div></div>
+ </div>
+ <iframe id="frame" src="index.html?embed" title="Prototype"></iframe>
+</main>
+
+<aside class="side">
+ <div class="panel">
+  <div class="ph"><b>How it is built</b><span>Steps of the selected animation, with the token behind each time and curve.</span></div>
+  <div class="scroll det" id="det"></div>
+ </div>
+ <div class="panel">
+  <div class="ph"><b>Motion tokens</b><span id="tkHint">Change a value: every animation that uses it changes on the phone.</span></div>
+  <div class="tk" id="tk"></div>
+ </div>
+</aside>
+
+<script>
+/* ---------- tokens: the five durations and the curves of the prototype (defaults = values in index.html) ---------- */
+const TOKENS=[
+ {k:'--m-press', ms:120, max:400,  js:null,      use:'press feedback'},
+ {k:'--m-quick', ms:200, max:600,  js:'T.quick', use:'colour, opacity'},
+ {k:'--m-std',   ms:320, max:900,  js:'T.std',   use:'an element enters, a text swaps'},
+ {k:'--m-layout',ms:440, max:1200, js:'T.layout',use:'heights and pages'},
+ {k:'--m-sheet', ms:500, max:1400, js:'T.sheet', use:'sheets, bar, toast, overlay'},
+ {k:'--soft', cv:[.32,.72,0,1],  js:'SOFT', use:'anything that travels or resizes'},
+ {k:'--ease', cv:[.2,.8,.2,1],   js:null,   use:'state changes in place'},
+ {k:'--exit', cv:[.4,0,.6,1],    js:null,   use:'not in the token table: limit tongue, removed card'}
+];
+const TK=Object.fromEntries(TOKENS.map(t=>[t.k,t]));
+const MIRROR={'T.quick':'--m-quick','T.std':'--m-std','T.layout':'--m-layout','T.sheet':'--m-sheet','SOFT':'--soft'};
+const FIXED={'--chg-in':'.8s','--chg-fade':'1.5s','--chg-fade-pick':'.6s','--dev':'.55s'}; // variables of the prototype that are not motion tokens
+const n2=n=>String(+(+n).toFixed(3)).replace(/^0\./,'.').replace(/^-0\./,'-.');
+const fmtS=ms=>n2(ms/1000)+'s',fmtC=c=>'cubic-bezier('+c.map(n2).join(',')+')';
+const val={};TOKENS.forEach(t=>val[t.k]=t.cv?[...t.cv]:t.ms);
+const changed=k=>TK[k].cv?fmtC(val[k])!==fmtC(TK[k].cv):val[k]!==TK[k].ms;
+const css=k=>TK[k].cv?fmtC(val[k]):fmtS(val[k]);
+const dflt=k=>TK[k].cv?fmtC(TK[k].cv):fmtS(TK[k].ms);
+
+/* ---------- the list ----------
+ ph: phases as [what, duration, curve]. Token names are written as they are in the code; {…} marks a time or a curve that
+ is written as a number or a keyword instead of a token (off-token).
+ setup / play: code that runs INSIDE the prototype (same names as in index.html). G.* are the helpers of this page:
+ G.after(ms,fn) waits on the prototype's (slowed) clock, G.click(sel) clicks a real element, G.press(sel) applies the
+ element's own :active rule for a moment, G.drag(sel,px,then) drags like a finger, G.show(sel,scroller) scrolls to it.
+ slow: 'part' = one part cannot be slowed (why: slowNote), 'sim' = the press is simulated, 'none' = nothing to play. */
+const P3="S.sel=P3();refresh();",P3S=P3+"openSheet();",ONES="S.sel=ONE();refresh();openSheet();";
+const GROUPS=['Press feedback','State change in place','Price change','Element appears or leaves','Height and layout','Sheets, bar, toast, overlay','Pages and feed','Prototype chrome (not product)'];
+const PRESS_INT='Releasing early reverses from where the scale is.';
+const REV='A CSS transition: tapping back mid-way reverses from the current position.';
+const ANIMS=[
+ // 1 · press feedback
+ {id:'M01',g:0,n:'Odds tile press',what:'The odds tile shrinks to 97 % under the finger and comes back.',trig:'Finger down on an odds tile (:active).',
+  ph:[['Press in and release','--m-press','{not set · browser default}']],int:PRESS_INT,slow:'sim',
+  play:`G.press('#feed .odd[data-m="m5"][data-o="0"]')`},
+ {id:'M02',g:0,n:'Outcome button press (fixture)',what:'The outcome button on the fixture page shrinks to 98 %.',trig:'Finger down on an outcome (:active).',
+  ph:[['Press in and release','--m-press','{not set · browser default}']],int:PRESS_INT,diff:'Scale .98 here, .97 on the odds tile.',slow:'sim',
+  setup:`openFixture('m4');G.show('#mkts .choice','#fxScroll')`,play:`G.press('#mkts .choice')`},
+ {id:'M03',g:0,n:'Top Pick / Goalscorer card press',what:'The whole card shrinks to 98.5 %.',trig:'Finger down on the card (:active).',
+  ph:[['Press in and release','--m-press','{not set · browser default}']],int:PRESS_INT,diff:'Third press scale: .985.',slow:'sim',
+  setup:`openComp('ucl','scorer')`,play:`G.press('#cpScroll .tp')`},
+ {id:'M04',g:0,n:'List row press',what:'A row of the winner table or the scorer list dims to 70 %.',trig:'Finger down on the row (:active).',
+  ph:[['Dim and back (opacity)','--m-press','{not set · browser default}']],int:PRESS_INT,slow:'sim',
+  setup:`openComp('ucl','win')`,play:`G.press('#cpScroll .cp-row')`},
+ {id:'M05',g:0,n:'Main button press',what:'"Place bet on DAZN Bet" shrinks to 98 %.',trig:'Finger down on the button (:active).',
+  ph:[['Press in and release','--m-press','{not set · browser default}']],int:PRESS_INT,slow:'sim',
+  setup:P3S,play:`G.press('#placeBtn')`},
+ {id:'M06',g:0,n:'Collapsed betslip press',what:'The bar shrinks to 98.5 %.',trig:'Finger down on the bar (:active).',
+  ph:[['Press in','--m-press','--soft'],['Release','--m-sheet','--soft']],int:PRESS_INT,diff:'The release takes --m-sheet (the bar’s own entrance transition); every other press releases in --m-press.',slow:'sim',
+  setup:P3,play:`G.press('#bar')`},
+ {id:'M07',g:0,n:'Small controls press',what:'Edit, ×, back, Follow, More bets, the toast button, LIVE, a day, a competition chip: opacity 60 %.',trig:'Finger down (:active).',
+  ph:[['Dim and back','{instant: no transition}','{none}']],int:'Nothing to interrupt.',diff:'List rows dim with --m-press; these switch instantly.',slow:'sim',
+  setup:P3S,play:`G.press('#editBtn',600)`},
+ {id:'M08',g:0,n:'21st pick refused',what:'The tapped odd presses and springs back, an orange tongue slides out from behind the bar, the counter pulses; the tongue hides again.',trig:'Tap on an odd with 20 picks in the betslip (denyLimit()).',
+  ph:[['Odd: press and spring (deny)','{.6 s}','{linear + 4 curves inside the keyframes}'],
+      ['Tongue slides out (30 px)','--m-layout','--soft'],['Tongue fades in','--m-quick','{ease-out}'],
+      ['Counter pulses (nope), starts after {90 ms}','{.6 s}','--soft'],
+      ['Tongue stays','{2600 ms}','—'],
+      ['Tongue slides back','--m-std','--exit'],['Tongue fades out, after {.1 s}','--m-quick','{ease-in}']],
+  int:'Another tap restarts the spring and the pulse and restarts the tongue’s 2.6 s. With the sheet open the toast is used instead of the tongue.',
+  setup:`fill20();refresh()`,play:`G.click('#feed .odd[data-m="m1"][data-o="2"]')`},
+ // 2 · state change in place
+ {id:'M09',g:1,n:'Odd picked / unpicked',what:'Tile fill and text colour: dark ↔ white.',trig:'Tap on an odd (toggleSel() → syncTiles()).',
+  ph:[['Fill','--m-quick','{not set · browser default}'],['Label and price colour','--m-quick','{not set · browser default}']],int:REV,
+  diff:'On the fixture page (.choice) only the fill animates; its text switches instantly.',
+  play:`G.click('#feed .odd[data-m="m5"][data-o="0"]');G.after(1000,()=>G.click('#feed .odd[data-m="m5"][data-o="0"]'))`},
+ {id:'M10',g:1,n:'Top Pick card picked',what:'The whole card turns white, its texts turn dark.',trig:'Tap on the card.',
+  ph:[['Card fill','--m-quick','{not set · browser default}'],['Text colours','--m-quick','{not set · browser default}']],int:REV,
+  setup:`openComp('ucl','scorer')`,play:`G.click('#cpScroll .tp');G.after(1000,()=>G.click('#cpScroll .tp'))`},
+ {id:'M11',g:1,n:'Odds switch',what:'The knob travels, the track changes colour. (The feed reveal is M28.)',trig:'Tap on Odds in the header.',
+  ph:[['Knob travels','--m-quick','--ease'],['Knob and track colour','--m-quick','{not set · browser default}']],int:REV,
+  play:`G.click('#oddsChip');G.after(1200,()=>G.click('#oddsChip'))`},
+ {id:'M12',g:1,n:'LIVE badge',what:'Fill and border: dark ↔ red. (The feed swap is M41.)',trig:'Tap on LIVE.',
+  ph:[['Fill and border','--m-quick','{not set · browser default}']],int:REV,
+  play:`G.click('#liveBadge');G.after(1200,()=>G.click('#liveBadge'))`},
+ {id:'M13',g:1,n:'Day in the calendar',what:'The day’s colour and underline; the strip of days shifts by 54 px. (The feed swap is M40.)',trig:'Tap on a day (setDay()).',
+  ph:[['Colour and underline','--m-quick','{not set · browser default}'],['Strip of days shifts','--m-std','--ease']],int:REV,
+  play:`setDay('yest');G.after(1200,()=>setDay('today'))`},
+ {id:'M14',g:1,n:'Competition chip',what:'Fill, text colour and outline of the sub-tab chip.',trig:'Tap on a chip.',
+  ph:[['Fill, text, outline','--m-quick','{not set · browser default}']],int:'The chips are redrawn with the page, so the transition is usually not visible.',
+  setup:`openComp('ucl','win')`,play:`G.click('[data-cpt="scorer"]');G.after(1100,()=>G.click('[data-cpt="win"]'))`},
+ {id:'M15',g:1,n:'Place bet: enabled / disabled',what:'Fill and text colour of the main button.',trig:'Edit mode, no active pick left, or a locked pick.',
+  ph:[['Fill and text colour','--m-quick','{not set · browser default}']],int:REV,
+  setup:ONES,play:`S.st['m1|1x2']='suspended';refresh();G.after(1300,()=>{delete S.st['m1|1x2'];refresh()})`},
+ {id:'M16',g:1,n:'Pick becomes Suspended / Locked',what:'The card content dims to 30 % (or lights up again); the price swaps for the status with a 5 px rise.',trig:'A pick drops out while the sheet is open (renderSheet()).',
+  ph:[['Content dims / lights up','T.layout','SOFT'],['Price ↔ status rises in, after {60 ms}','T.std','SOFT']],
+  int:'The cards are redrawn; the animation starts again from the beginning.',diff:'The same 30 % dim in Edit mode runs on --m-quick / --m-std.',
+  setup:P3S,play:`S.st['m4|1x2']='suspended';refresh();G.after(1500,()=>{delete S.st['m4|1x2'];refresh()})`},
+ {id:'M17',g:1,n:'Edit mode on / off',what:'A round × grows in every card header, card content dims to 30 %, the summary dims to 40 %, Edit ↔ Confirm, Place bet turns off.',trig:'Edit / Confirm (applyEdit()).',
+  ph:[['× grows (size, margin, scale)','--m-std','--ease'],['× fades in','--m-quick','{not set · browser default}'],
+      ['Card header dims','--m-quick','{not set · browser default}'],['Market and match rows dim','--m-std','--ease'],
+      ['Summary dims','--m-std','{not set · browser default}'],['Cascade: each card on screen starts {45 ms} later (max 6 steps)','—','—'],
+      ['Button label fades in','T.quick','SOFT']],
+  int:'Reverses together with its cascade.',diff:'Three speeds for one dim: header --m-quick, rows --m-std, summary --m-std without a curve. "Goal!" dims instantly.',
+  setup:P3S,play:`G.click('#editBtn');G.after(1400,()=>G.click('#editBtn'))`},
+ {id:'M18',g:1,n:'Scroll hints',what:'A line under the sheet header; cards fade out above the button; the top bar of the fixture page.',trig:'Scrolling the sheet (> 42 px), cards below the edge, scrolling the fixture page (> 150 px).',
+  ph:[['Header line','--m-quick','{not set · browser default}'],['Fade above the button','--m-quick','{ease-out}'],['Fixture top bar','--m-quick','{not set · browser default}']],int:REV,
+  setup:`fill20();refresh();openSheet()`,play:`$('#sbody').scrollTop=120;G.after(1000,()=>{$('#sbody').scrollTop=1e5});G.after(2000,()=>{$('#sbody').scrollTop=0})`},
+ {id:'M19',g:1,n:'Live dot pulse',what:'The red dot next to the minute on a live card.',trig:'Always, while a live card is on screen.',
+  ph:[['Pulse 100 % → 20 % → 100 %, endless','{2.4 s}','{ease-in-out}']],int:'—',setup:ONES,play:``},
+ {id:'M20',g:1,n:'"Goal!" on a live card',what:'The word fades in with a 4 px rise, stays, and leaves.',trig:'The price of a live pick changes (flashEvent()).',
+  ph:[['Fades in','--m-std','{ease-out}'],['Rises 4 px','--m-std','--soft'],['Stays','{1000 ms}','—'],['Leaves (same transitions), then hidden after','T.std','—']],
+  int:'A new event resets the timers and shows it again.',setup:ONES,play:`flashEvent('m1|1x2')`},
+ // 3 · price change
+ {id:'M21',g:2,n:'Price moves on a tile',what:'The new number comes in along the move (up: from below, down: from above, 5 px); a green or red tint and an arrow appear, stay and fade.',trig:'A live price changes (changeOdd() → animateOdd()).',
+  ph:[['New number comes in','T.std','SOFT'],['Tint in','--chg-in {.8 s}','--ease'],['Arrow in','--m-quick','{ease-out}'],['Tint and arrow stay','{2000 ms}','—'],['Tint and arrow fade','--chg-fade {1.5 s}','--ease']],
+  int:'A new change of the same price clears the timers and starts over.',
+  play:`changeOdd(M('m4'),1,0,3.85);changeOdd(M('m5'),0,0,2.45)`},
+ {id:'M22',g:2,n:'Price moves on my pick’s tile',what:'The tile stays white; the number comes in and a dark arrow shows the direction, longer than on other tiles.',trig:'The price of a picked odd changes.',
+  ph:[['New number comes in','T.std','SOFT'],['Arrow in','--m-quick','{ease-out}'],['Arrow stays','{5000 ms}','—'],['Arrow fades','--chg-fade-pick {.6 s}','--ease']],
+  int:'A new change clears the timers and starts over.',setup:P3,play:`changeOdd(M('m4'),2,0,4.10)`},
+ {id:'M23',g:2,n:'Price moves in the betslip',what:'The card price, Total odds and "€10 may return" come in with a rise; the arrow grows in width and the number takes its colour.',trig:'The price of my pick changes while the sheet is open.',
+  ph:[['Numbers come in','T.std','SOFT'],['Arrow grows (width, margin)','--m-quick','--ease'],['Arrow fades in','--m-quick','{ease-out}'],['Number takes the colour','--m-quick','{not set · browser default}'],
+      ['Arrow and colour stay','{5000 ms}','—'],['Arrow and colour fade','--chg-fade-pick {.6 s}','{not set · browser default}'],['Classes are cleared after','{600 ms}','—']],
+  int:'Timers are reset. After the cards are redrawn the arrow comes back for the time that is left (counted in real time).',diff:'The arrow fades on --ease on a tile and without a curve here.',
+  setup:P3S,play:`moved()`},
+ {id:'M24',g:2,n:'Price moves in the collapsed bar',what:'The total in the bar: the number comes in, the arrow widens the pill.',trig:'The price of my pick changes while the sheet is closed.',
+  ph:[['Number comes in','T.std','SOFT'],['Arrow grows (width, margin)','--m-quick','--ease'],['Arrow stays','{5000 ms}','—'],['Arrow fades','--chg-fade-pick {.6 s}','{not set · browser default}']],
+  int:'Timers are reset.',setup:P3,play:`moved()`},
+ // 4 · element appears or leaves
+ {id:'M25',g:3,n:'Card removed in Edit',what:'Phase 1: the card fades and shrinks to 96 % at full height. Phase 2: its place closes and the cards below move up; Total odds, the return and the counter change.',trig:'× on a card (removeSel()).',
+  ph:[['Card fades and shrinks','--m-quick','{ease-out}'],['Its place closes (height, gap, padding); starts --m-press after step 1 begins','--m-std','--exit'],
+      ['Totals and counter change after','T.quick','—'],['Card leaves the page after','T.std','—']],
+  int:'A second tap on the same × is ignored. Several cards can be removed one after another; each runs on its own.',
+  setup:P3S+`S.edit=true;applyEdit()`,play:`G.click('[data-rm="m4|1x2"]')`},
+ {id:'M26',g:3,n:'Card added while the sheet is open',what:'The new card rises 5 px and fades in.',trig:'A pick appears while the sheet is open (hardly reachable by hand today).',
+  ph:[['Card rises in','T.std','SOFT']],int:'Starts again.',
+  setup:P3S,play:`S.sel.unshift({m:'m7',g:'1x2',o:'0'});syncTiles();updateBar(true);renderSheet()`},
+ {id:'M27',g:3,n:'Bar content swaps',what:'The list of picks, the bet type and the total: the new text rises 5 px. The total pill appears from 90 %. The counter jumps to 130 %.',trig:'A pick is added or removed (updateBar()).',
+  ph:[['Texts rise in','T.std','SOFT'],['Total pill appears','T.std','SOFT'],['Counter bump','--m-layout','--ease']],int:'Texts start again; the bump restarts.',
+  setup:`S.sel=ONE();refresh()`,play:`G.click('#feed .odd[data-m="m4"][data-o="2"]');G.after(1100,()=>G.click('#feed .odd[data-m="m5"][data-o="1"]'));G.after(2200,()=>G.click('#feed .odd[data-m="m4"][data-o="2"]'))`},
+ // 5 · height and layout
+ {id:'M28',g:4,n:'Odds toggle: feed reveal',what:'Tiles change height one after another, prices fade in and rise 6 px; the warning on top and the "+18…" line collapse with them.',trig:'Odds in the header (setOddsOn()).',
+  ph:[['Open · row height and tile padding','--m-layout','--soft'],['Open · prices fade in, after {110 ms}','--m-std','{ease-out}'],['Open · prices rise 6 px, after {110 ms}','--m-layout','--soft'],
+      ['Cascade: each tile on screen starts {32 ms} later (max 6 steps)','—','—'],
+      ['Close · prices fade out','{.16 s}','{ease-out}'],['Close · height, after {70 ms}','--m-layout','--soft'],
+      ['Warning: height','--m-layout','--soft'],['Warning: fades in, after {.08 s}','--m-quick','{ease-out}'],
+      ['Scrolled feed: the first tile on screen is held in place for','{800 ms}','—']],
+  int:'Reverses from the current position; open and close use different delays.',
+  slow:'part',slowNote:'If the feed is scrolled, the 800 ms that keep the first tile in place run in real time. With the feed at the top (as played here) everything is slowed.',
+  play:`G.click('#oddsChip');G.after(1500,()=>G.click('#oddsChip'))`},
+ {id:'M29',g:4,n:'Summary changes height',what:'The Total odds block grows or shrinks; the line "Excludes N…" and the return row rise 5 px.',trig:'A pick drops out or comes back; no active pick is left (updateSummary() → smoothH()).',
+  ph:[['Height','T.layout','SOFT'],['Note under Total odds rises in, after {60 ms}','T.std','SOFT'],['Return row rises in, after {80 ms}','T.std','SOFT']],
+  int:'Runs may overlap; the last one wins.',diff:'Height here is eased in JS; the place of a removed card (M25) closes in CSS on --m-std / --exit.',
+  setup:P3S,play:`S.st['m4|1x2']='suspended';refresh();G.after(1500,()=>{delete S.st['m4|1x2'];refresh()})`},
+ {id:'M30',g:4,n:'Limit message above the button',what:'The bottom of the sheet grows and the message rises in.',trig:'The 20th pick arrives while the sheet is open (sheetMeta()).',
+  ph:[['Footer height','T.layout','SOFT'],['Message rises in, after {80 ms}','T.std','SOFT']],int:'Runs may overlap; the last one wins.',
+  setup:`fill20();G.x=S.sel.shift();refresh();openSheet()`,play:`S.sel.unshift(G.x);syncTiles();updateBar(true);renderSheet()`},
+ // 6 · sheets, bar, toast, overlay
+ {id:'M31',g:5,n:'Collapsed betslip appears / leaves',what:'The bar rises 18 px from 97 % and fades in.',trig:'The first pick / the last pick is removed.',
+  ph:[['Rise and scale','--m-sheet','--soft'],['Fade','--m-quick','{ease-out}']],int:REV,
+  play:`G.click('#feed .odd[data-m="m4"][data-o="0"]');G.after(1400,()=>G.click('#feed .odd[data-m="m4"][data-o="0"]'))`},
+ {id:'M32',g:5,n:'Betslip sheet opens / closes',what:'The sheet slides up from the bottom edge, the page dims behind it.',trig:'Tap on the bar; tap outside the sheet.',
+  ph:[['Sheet slides','--m-sheet','--soft'],['Dimming','--m-sheet','--soft'],['After closing the cards are redrawn after T.sheet + {20 ms}','—','—']],int:REV,
+  setup:P3,play:`openSheet();G.after(1400,closeSheet)`},
+ {id:'M33',g:5,n:'Sheet drag and release',what:'The sheet follows the finger and the dimming lightens; pulling up gives a rubber band; on release it closes or springs back.',trig:'Drag by the handle or the header (dragSheet()).',
+  ph:[['Follows the finger','no transition','—'],['Release','{220 ms} … T.sheet, from the finger’s speed','--soft']],
+  int:'Grabbing a moving sheet first snaps it to its open position.',
+  slow:'part',slowNote:'The finger part is scripted here in real time; only the release is slowed. Its length depends on the finger’s speed, which is always measured in real time.',
+  setup:P3S,play:`G.drag('#handle',130,()=>G.after(1000,()=>G.drag('#handle',300)))`},
+ {id:'M34',g:5,n:'Favourite-team popup',what:'Same as the betslip sheet: slides up, the page dims, can be dragged.',trig:'Opens by itself when the favourite team plays today; closes with ×, a tap outside, or after adding.',
+  ph:[['Popup slides','--m-sheet','--soft'],['Dimming','--m-sheet','--soft']],int:REV,play:`openFav();G.after(1600,closeFav)`},
+ {id:'M35',g:5,n:'Toast',what:'Rises 12 px and fades in above the nav; leaves the same way.',trig:'Undo after the last pick is removed, "Betslip cleared", More bets, the limit while the sheet is open.',
+  ph:[['Fade','--m-quick','{ease-out}'],['Rise','--m-sheet','--soft'],['Stays','{5000 / 3000 / 2500 ms}','—']],int:'A new toast swaps the text in place and restarts the timer.',
+  setup:`openFixture('m4');G.show('#fxMore','#fxScroll')`,play:`G.click('#fxMore')`},
+ {id:'M36',g:5,n:'Last pick removed',what:'The card fades → the sheet closes and the bar leaves → the Undo toast appears where the bar was.',trig:'× on the only card.',
+  ph:[['Card fades','T.quick','{ease-out}'],['Sheet closes, bar leaves','--m-sheet','--soft'],['Undo toast appears after','{300 ms}','—']],int:'Undo brings the pick and the bar back.',
+  setup:ONES+`S.edit=true;applyEdit()`,play:`G.click('[data-rm="m1|1x2"]')`},
+ {id:'M37',g:5,n:'DAZN Bet overlay',what:'The DAZN Bet screen slides up over everything; on closing it slides down, the sheet under it closes, then a toast.',trig:'Place bet on DAZN Bet / the × of the overlay.',
+  ph:[['Overlay slides','--m-sheet','--soft'],['Toast appears after','T.sheet','—']],int:REV,
+  setup:P3S,play:`G.click('#placeBtn');G.after(1500,()=>G.click('#ovClose'))`},
+ // 7 · pages and feed
+ {id:'M38',g:6,n:'Fixture page',what:'The page slides in from the right and back.',trig:'Tap on a match tile / back.',
+  ph:[['Page slides','--m-layout','--soft'],['Helper classes are removed after','T.layout','—'],['Collapsed bar moves to 24 px above the bottom','{instant: no transition}','{none}']],int:REV,
+  diff:'Pages use --m-layout, sheets and the overlay use --m-sheet. The bar jumps while the page slides.',
+  setup:`S.sel=ONE();refresh()`,play:`openFixture('m4');G.after(1400,closeFixture)`},
+ {id:'M39',g:6,n:'Competition page',what:'The page slides in from the right and back; the bar and the nav stay.',trig:'Tap on a competition header in the feed / back.',
+  ph:[['Page slides','--m-layout','--soft']],int:REV,play:`openComp('ucl','win');G.after(1400,closeComp)`},
+ {id:'M40',g:6,n:'Day switch',what:'The old list leaves quickly to the side; the new one slides in from the side of that day (20 px).',trig:'A day in the calendar (swapFeed(±1)).',
+  ph:[['Old list leaves (10 px)','{120 ms}','{ease-in}'],['New list comes in (20 px)','T.std','SOFT'],['Fallback if the tab is in the background','{160 ms}','—']],
+  int:'Quick switches redraw the list one after another.',play:`setDay('yest');G.after(1300,()=>setDay('today'))`},
+ {id:'M41',g:6,n:'LIVE filter',what:'The list fades out; the filtered one rises 8 px.',trig:'The LIVE badge (swapFeed(0)).',
+  ph:[['Old list fades out','{120 ms}','{ease-in}'],['New list rises in','T.std','SOFT']],int:'Quick switches redraw the list one after another.',
+  play:`G.click('#liveBadge');G.after(1300,()=>G.click('#liveBadge'))`},
+ {id:'M42',g:6,n:'Competition sub-tab',what:'The new list rises 5 px; the old one has no exit.',trig:'A chip: Competition winner / Top scorer.',
+  ph:[['New list rises in','T.std','SOFT']],int:'Starts again.',
+  setup:`openComp('ucl','win')`,play:`G.click('[data-cpt="scorer"]');G.after(1200,()=>G.click('[data-cpt="win"]'))`},
+ // 8 · prototype chrome
+ {id:'M43',g:7,n:'Phone size switch',what:'Body, scale, status bar, corner radius and the island change together.',trig:'The 13 mini / 17 Pro Max switch.',
+  ph:[['Size, scale, radius, status bar','--dev {.55 s}','{cubic-bezier(.3,.7,.2,1)}'],['Island fades','--m-std','{not set · browser default}'],['Transition class is removed after','{600 ms}','—']],
+  int:'Reverses.',play:`G.flip();G.after(1500,G.flip)`},
+ {id:'M44',g:7,n:'Prototype states panel',what:'Folding the panel, opening topics and descriptions, hover, the round arrow.',trig:'Clicks in the panel of the prototype.',
+  ph:[['Panel folds','{.24 s} / {.44 s}','--soft'],['Topics and descriptions open','{.4 s}','--soft'],['Hover, selection','{.2 s}','{not set · browser default}'],['Round arrow','{.3 s}','--soft']],
+  int:'—',slow:'none',slowNote:'The panel is hidden inside this gallery. Open index.html to see it.'}
+];
+const RM_TEXT='With Reduce motion on, CSS transitions and animations collapse to an instant change and delays are dropped: states still change, nothing travels or pulses. JS entrances only fade for {120 ms}; heights are not eased. Hold times stay.';
+const usesOf=a=>{const s=new Set();a.ph.forEach(p=>(p.join(' ').match(/--[a-z][a-z-]*|T\.[a-z]+|SOFT/g)||[]).forEach(t=>{t=MIRROR[t]||t;if(TK[t])s.add(t)}));return s};
+ANIMS.forEach(a=>{a.tok=usesOf(a);a.nOff=(JSON.stringify(a.ph).match(/\{(?!not set)/g)||[]).length}); // curves that are simply not set are shown in the steps but not counted here
+
+/* ---------- small helpers ---------- */
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* text -> html: token names become chips with their current value, {…} becomes an off-token mark */
+function rich(s){
+ return esc(s).replace(/\{([^}]*)\}/g,'<span class="off">$1<small>not a token</small></span>').replace(/--[a-z][a-z-]*|T\.[a-z]+|SOFT/g,t=>{
+  const k=MIRROR[t]||t,tk=TK[k];
+  if(tk)return `<span class="chip${changed(k)?' ch':''}" data-k="${k}">${t}<small>${tk.cv?fmtC(val[k]):val[k]+' ms'}</small></span>`;
+  return `<span class="chip">${t}${FIXED[t]?`<small>${FIXED[t]}</small>`:''}</span>`});
+}
+
+/* ---------- the prototype in the frame ---------- */
+const F=$('#frame');let W=null,D=null,cur=0,rate=1,runId=0,pressed=[],dragEl=null,ready=false;
+const status=t=>{$('#status').textContent=t};
+const G={                                   // helpers for the scenarios; live on the prototype's window as G
+ after:(ms,fn)=>W.setTimeout(fn,ms),        // the prototype's clock: slowed with everything else, dropped on the next run
+ click(sel){const e=D.querySelector(sel);if(e)e.click()},
+ show(sel,scSel){const e=D.querySelector(sel),sc=D.querySelector(scSel),k=+D.querySelector('#stage').dataset.scale||1;
+  if(e&&sc)sc.scrollTop+=(e.getBoundingClientRect().top-sc.getBoundingClientRect().top)/k-sc.clientHeight*.45},
+ /* a press cannot be started from code, so the element's own :active rules are applied to it for a moment:
+    the values, the duration and the curve all come from the prototype's CSS */
+ press(sel,ms=300){const el=D.querySelector(sel);if(!el)return;const props=[];
+  for(const sh of D.styleSheets){let rules;try{rules=sh.cssRules}catch(e){continue}
+   for(const r of rules){if(!r.selectorText||!r.selectorText.includes(':active'))continue;
+    for(const part of r.selectorText.split(',')){if(!part.includes(':active'))continue;let ok=false;try{ok=el.matches(part.replace(/:active/g,''))}catch(e){}
+     if(ok)for(const k of r.style)props.push([k,r.style.getPropertyValue(k)])}}}
+  props.forEach(([k,v])=>el.style.setProperty(k,v));pressed.push([el,props.map(p=>p[0])]);
+  W.setTimeout(()=>props.forEach(([k])=>el.style.removeProperty(k)),ms)},
+ /* a scripted finger: down on the grip, px down over ~half a second, a short stop, up */
+ drag(sel,px,then){const el=D.querySelector(sel);if(!el)return;const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+10,k=+D.querySelector('#stage').dataset.scale||1,id=runId;
+  const ev=(t,cy)=>el.dispatchEvent(new W.PointerEvent(t,{bubbles:true,clientX:x,clientY:cy,pointerId:1,pointerType:'touch',isPrimary:true}));
+  dragEl=el;ev('pointerdown',y);const t0=performance.now();
+  (function step(){if(id!==runId)return;const p=Math.min(1,(performance.now()-t0)/520),e=1-(1-p)*(1-p);ev('pointermove',y+px*k*e);
+   if(p<1)requestAnimationFrame(step);else setTimeout(()=>{if(id!==runId)return;ev('pointerup',y+px*k);dragEl=null;then&&then()},140)})()},
+ flip(){setSize($('#size .on').dataset.dev==='max'?'mini':'max')},
+ x:null
+};
+function setSize(d){const b=D&&D.querySelector(`.devsw [data-dev="${d}"]`);if(b)b.click();document.querySelectorAll('#size button').forEach(x=>x.classList.toggle('on',x.dataset.dev===d))}
+function boot(){
+ W=F.contentWindow;D=F.contentDocument;ready=false;
+ if(!W||!W.MOTION){status('The prototype did not load with its gallery hooks (index.html?embed).');return}
+ const st=D.createElement('style');st.textContent='html.mg-freeze *,html.mg-freeze *::before,html.mg-freeze *::after{transition:none!important;animation:none!important}';D.head.appendChild(st);
+ W.addEventListener('keydown',e=>{if(e.key.startsWith('Arrow')||e.key==='l'||e.key==='L')e.stopImmediatePropagation()},true); // the prototype's own shortcuts would rebuild the screen behind the gallery's back
+ W.G=G;ready=true;
+ pushTokens();W.MOTION.rate(rate);
+ if($('#size .on').dataset.dev==='max')setSize('max');
+ select(cur);
+}
+/* back to a clean prototype, without any motion */
+function reset(){
+ runId++;
+ if(dragEl){try{dragEl.dispatchEvent(new W.PointerEvent('pointercancel',{bubbles:true,pointerId:1}))}catch(e){}dragEl=null}
+ W.MOTION.clear();
+ pressed.forEach(([el,ks])=>ks.forEach(k=>el.style.removeProperty(k)));pressed=[];
+ ['#sheet','#fav','#backdrop'].forEach(s=>{const e=D.querySelector(s);e.classList.remove('drag');e.style.transform=e.style.opacity=e.style.transitionDuration=''});
+ D.querySelector('#stage').classList.remove('anim');
+ W.eval('cur=-1;init();LIVE=false;HOLD=false');   // live prices are paused here: every run shows the same numbers
+}
+function run(){
+ if(!ready)return;const a=ANIMS[cur],root=D.documentElement;
+ try{
+  root.classList.add('mg-freeze');                 // set the state instantly: no entrance of the bar, the sheet or the page
+  reset();const id=runId;
+  if(a.setup)W.eval(a.setup);
+  D.querySelectorAll('.bump,.nope,.deny').forEach(e=>e.classList.remove('bump','nope','deny')); // one-shot keyframe classes left by the setup would replay when the freeze is lifted
+  void D.body.offsetWidth;D.getAnimations().forEach(x=>x.cancel());
+  status(a.slow==='none'?'Not shown in this gallery':a.play?`Playing at ${rate}× speed`:'Runs all the time');
+  requestAnimationFrame(()=>{if(id!==runId)return;root.classList.remove('mg-freeze');void D.body.offsetWidth;
+   requestAnimationFrame(()=>{if(id!==runId)return;try{if(a.play)W.eval(a.play)}catch(e){status(a.id+' · error: '+e.message);console.error(e)}})});
+ }catch(e){root.classList.remove('mg-freeze');status(a.id+' · error: '+e.message);console.error(e)}
+}
+
+/* ---------- list ---------- */
+let flt='all';
+function buildList(){
+ let h='';GROUPS.forEach((g,gi)=>{const items=ANIMS.filter(a=>a.g===gi);
+  h+=`<div class="lg" data-g="${gi}">${esc(g)}</div>`+items.map(a=>{const i=ANIMS.indexOf(a);
+   return `<button class="li" data-i="${i}" data-g="${gi}"><span>${esc(a.n)}</span>${a.nOff?`<small title="${a.nOff} value${a.nOff>1?'s':''} typed as a number instead of a token">${a.nOff} not on tokens</small>`:''}</button>`}).join('')});
+ $('#list').innerHTML=h;
+ $('#list').onclick=e=>{const b=e.target.closest('.li');if(b)select(+b.dataset.i)};
+ const n={all:ANIMS.length,off:ANIMS.filter(a=>a.nOff).length,lim:ANIMS.filter(a=>a.slow).length};
+ document.querySelectorAll('#flt button').forEach(b=>b.textContent+=' '+n[b.dataset.f]);
+ $('#flt').onclick=e=>{const b=e.target.closest('button');if(!b)return;flt=b.dataset.f;document.querySelectorAll('#flt button').forEach(x=>x.classList.toggle('on',x===b));paintFilter()};
+}
+function paintFilter(){
+ const ok=a=>flt==='all'||(flt==='off'?a.nOff>0:!!a.slow);
+ document.querySelectorAll('.li').forEach(b=>b.hidden=!ok(ANIMS[+b.dataset.i]));
+ document.querySelectorAll('.lg').forEach(g=>g.hidden=!ANIMS.some(a=>a.g===+g.dataset.g&&ok(a)));
+}
+function select(i){
+ cur=Math.max(0,Math.min(ANIMS.length-1,i));const a=ANIMS[cur];
+ document.querySelectorAll('.li').forEach(b=>{const on=+b.dataset.i===cur;b.classList.toggle('on',on);if(on)b.scrollIntoView({block:'nearest'})});
+ $('#again').disabled=a.slow==='none'||!a.play;$('#nowT').textContent=a.n;
+ paintDetail();run();
+}
+function paintDetail(){
+ const a=ANIMS[cur],row=(l,v)=>v&&v!=='—'?`<div><em>${l}</em><span>${rich(v)}</span></div>`:'';
+ const slow=a.slow==='part'?`<div class="note"><b>Not fully slowed.</b> ${esc(a.slowNote)}</div>`
+  :a.slow==='sim'?`<div class="note"><b>The press is made by this page.</b> Code cannot hold a finger down, so the page switches on the element’s own pressed style for a moment. Time and curve are the prototype’s. You can also press it on the phone yourself.</div>`
+  :a.slow==='none'?`<div class="note"><b>Not shown here.</b> ${esc(a.slowNote)}</div>`:'';
+ $('#det').innerHTML=`${slow}
+  <div><h2>What moves</h2><p class="lead">${esc(a.what)}</p></div>
+  <div><h2>Starts when</h2><p>${esc(a.trig)}</p></div>
+  <div><h2>Steps</h2>${a.ph.map((p,n)=>`<div class="step"><i>${n+1}</i><b>${rich(p[0])}</b>${row('Duration',p[1])}${row('Curve',p[2])}</div>`).join('')}</div>
+  ${a.diff?`<div><h2>Similar things are done differently</h2><p>${rich(a.diff)}</p></div>`:''}
+  <div><h2>If interrupted</h2><p>${esc(a.int)}</p></div>
+  <details><summary>With Reduce motion switched on</summary><p>${rich(RM_TEXT)}</p></details>`;
+}
+
+/* ---------- token knobs ---------- */
+let again;
+function pushTokens(){if(!ready)return;const o={};TOKENS.forEach(t=>o[t.k]=changed(t.k)?css(t.k):null);W.MOTION.tokens(o)}
+function tokenChanged(){
+ pushTokens();paintKnobs();paintDetail();
+ try{localStorage.setItem('motionTokens',JSON.stringify(val))}catch(e){}
+ clearTimeout(again);again=setTimeout(run,350);   // show the result once the knob rests
+}
+const curveSvg=c=>`<svg width="32" height="32" viewBox="-2 -2 28 28" aria-hidden="true"><path d="M0 24C${c[0]*24} ${24-c[1]*24} ${c[2]*24} ${24-c[3]*24} 24 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+function buildKnobs(){
+ const n=k=>ANIMS.filter(a=>a.tok.has(k)).length,lab=(t,f)=>`<label${f?` for="${f}"`:''}><b>${t.k}</b><span data-use="${esc(t.use)} · ${n(t.k)} animations"></span></label>`;
+ $('#tk').innerHTML=TOKENS.map((t,i)=>(t.cv&&!TOKENS[i-1].cv?'<div class="tr cv cvh"><span>Curves (cubic-bezier)</span><div class="cvin"><span>x1</span><span>y1</span><span>x2</span><span>y2</span></div><span></span></div>':'')+(t.cv
+  ?`<div class="tr cv" data-k="${t.k}">${lab(t)}<div class="cvin">${[0,1,2,3].map(j=>`<input class="num" type="number" step=".01" min="${j%2?-1:0}" max="${j%2?2:1}" data-j="${j}" aria-label="${t.k} ${['x1','y1','x2','y2'][j]}">`).join('')}</div><span></span></div>`
+  :`<div class="tr" data-k="${t.k}">${lab(t,'r'+i)}<input id="r${i}" type="range" min="0" max="${t.max}" step="10"><div class="unit"><input class="num" type="number" min="0" max="3000" step="10" aria-label="${t.k} in ms">ms</div></div>`)).join('')+
+  `<div class="acts"><span id="chN"></span><button class="btn q" id="resetTk">Reset</button><button class="btn" id="copyTk">Copy changes</button></div><pre id="copyOut"></pre>`;
+ $('#tk').addEventListener('input',e=>{const row=e.target.closest('.tr[data-k]');if(!row)return;const k=row.dataset.k;
+  if(TK[k].cv){const j=+e.target.dataset.j,v=parseFloat(e.target.value);if(isNaN(v))return;val[k][j]=j%2?Math.max(-1,Math.min(2,v)):Math.max(0,Math.min(1,v))}
+  else{const v=parseFloat(e.target.value);if(isNaN(v))return;val[k]=Math.max(0,Math.min(3000,Math.round(v)))}
+  tokenChanged()});
+ /* which animations sit on this token: the list dims the rest while the pointer is on the row */
+ $('#tk').addEventListener('mouseover',e=>{const row=e.target.closest('.tr[data-k]');filter(row?row.dataset.k:null)});
+ $('#tk').addEventListener('mouseleave',()=>filter(null));
+ $('#tk').addEventListener('focusout',paintKnobs);   // an empty or out-of-range field goes back to the value in use
+ $('#resetTk').onclick=()=>{TOKENS.forEach(t=>val[t.k]=t.cv?[...t.cv]:t.ms);$('#copyOut').textContent='';tokenChanged()};
+ $('#copyTk').onclick=copyChanges;
+}
+function filter(k){$('#list').classList.toggle('filter',!!k);document.querySelectorAll('.li').forEach(b=>b.classList.toggle('hit',!!k&&ANIMS[+b.dataset.i].tok.has(k)))}
+function paintKnobs(){
+ document.querySelectorAll('#tk .tr[data-k]').forEach(row=>{const k=row.dataset.k,t=TK[k],u=row.querySelector('label span');row.classList.toggle('ch',changed(k));u.textContent=changed(k)?'was '+(t.cv?fmtC(t.cv):t.ms+' ms'):u.dataset.use;
+  if(t.cv){row.querySelectorAll('input').forEach(inp=>{if(document.activeElement!==inp)inp.value=n2(val[k][+inp.dataset.j])});row.lastElementChild.innerHTML=curveSvg(val[k])}
+  else{const [r,nb]=row.querySelectorAll('input');r.value=val[k];if(document.activeElement!==nb)nb.value=val[k]}});
+ const c=TOKENS.filter(t=>changed(t.k)).length;$('#chN').textContent=c?c+' changed':'Nothing changed yet';$('#resetTk').disabled=!c;$('#copyTk').disabled=!c;
+}
+function changesText(){
+ const rows=TOKENS.filter(t=>changed(t.k)).map(t=>`${t.k}: ${dflt(t.k)} → ${css(t.k)}`);
+ return rows.length?'Motion tokens — changes\n'+rows.join('\n'):'Motion tokens — no changes';
+}
+function copyChanges(){
+ const text=changesText(),b=$('#copyTk'),done=ok=>{b.textContent=ok?'Copied':'Copy the text below';$('#copyOut').textContent=text;setTimeout(()=>{b.textContent='Copy changes'},1600)};
+ const legacy=()=>{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();done(ok)};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(()=>done(true),legacy);else legacy();
+}
+
+/* ---------- controls ---------- */
+$('#speed').onclick=e=>{const b=e.target.closest('button');if(!b)return;rate=+b.dataset.r;document.querySelectorAll('#speed button').forEach(x=>x.classList.toggle('on',x===b));if(ready){W.MOTION.rate(rate);run()}};
+$('#size').onclick=e=>{const b=e.target.closest('button');if(b&&ready&&!b.classList.contains('on')){setSize(b.dataset.dev)}};
+$('#again').onclick=run;
+addEventListener('keydown',e=>{
+ if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
+ if(e.key==='ArrowDown'){e.preventDefault();select(cur+1)}
+ else if(e.key==='ArrowUp'){e.preventDefault();select(cur-1)}
+ else if(e.key===' '||e.key==='r'||e.key==='R'){e.preventDefault();run()}
+});
+try{const s=JSON.parse(localStorage.getItem('motionTokens')||'null');if(s)TOKENS.forEach(t=>{const v=s[t.k];if(t.cv?Array.isArray(v)&&v.length===4&&v.every(n=>typeof n==='number'):typeof v==='number')val[t.k]=v})}catch(e){}
+buildList();buildKnobs();paintKnobs();
+document.querySelector('.li').classList.add('on');$('#nowT').textContent=ANIMS[0].n;paintDetail();
+if(matchMedia('(prefers-reduced-motion:reduce)').matches)$('#tkHint').textContent='Reduce motion is switched on in your system settings: nothing will travel here.';
+F.addEventListener('load',boot);
+if(F.contentDocument&&F.contentDocument.readyState==='complete'&&F.contentWindow.MOTION)boot();
+</script>
+</body>
+</html>
