@@ -116,41 +116,64 @@ details p{margin-top:6px}
 .acts span{flex:1;min-width:0;font-size:12px;line-height:18px;color:var(--ui-t3)}
 .tk pre{font:inherit;font-size:12px;line-height:18px;color:var(--ui-t2);white-space:pre-wrap;margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--ui-well);max-height:96px;overflow:auto}
 .tk pre:empty{display:none}
+
+/* v3 layout: list | phone, one dock under the phone */
+body{grid-template-columns:320px minmax(600px,1fr);min-width:960px}
+.li{min-height:34px;padding:7px 12px}
+.view{flex:1;min-height:0;position:relative}
+#frame{position:absolute;inset:0;height:100%}
+.drawer{position:absolute;top:0;right:0;bottom:0;width:400px;z-index:2}
+.drawer[hidden]{display:none}
+.dock{flex:none;position:relative;width:100%;max-width:820px;align-self:center;padding:12px 16px 12px 20px;gap:10px}
+.dh{display:flex;align-items:center;gap:12px}
+.tk{padding:0;display:grid;grid-template-columns:1fr 1fr;gap:4px 28px;min-height:128px;align-content:start}
+.tk.all{min-height:172px}
+.tk p{grid-column:1/-1;align-self:center;padding:12px 0;font-size:13px;line-height:19px;color:var(--ui-t3)}
+.tr{grid-template-columns:118px 1fr 70px;gap:10px}
+.tr.cv{grid-template-columns:118px 1fr 32px}
+.tr[hidden]{display:none}
+.df{display:flex;align-items:center;gap:8px;padding-top:10px;border-top:1px solid var(--ui-line)}
+.df span{flex:1;min-width:0;text-align:right;font-size:12px;line-height:18px;color:var(--ui-t3);padding-right:4px}
+.lnk{height:32px;padding:0 12px;border-radius:8px;font-weight:700;font-size:12px;line-height:18px;color:var(--ui-t2);transition:background .2s,color .2s}
+.lnk:hover{background:var(--ui-hover);color:var(--ui-t1)}
+.lnk.on{background:var(--ui-on);color:var(--ui-t1)}
+#copyOut{position:absolute;right:16px;bottom:calc(100% + 8px);width:360px;margin:0;font:inherit;font-size:12px;line-height:18px;color:var(--ui-t1);white-space:pre-wrap;padding:12px 14px;border-radius:12px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);z-index:3}
+#copyOut[hidden]{display:none}
 </style>
 </head>
 <body>
 <aside class="panel">
  <div class="ph"><b>Animations</b><span>Pick one: it plays on the phone.</span></div>
- <div class="seg flt" id="flt" role="tablist" aria-label="Show">
-  <button role="tab" data-f="all" class="on">All</button><button role="tab" data-f="off" title="Animations with a time or a curve typed as a number instead of a motion token">Not on tokens</button><button role="tab" data-f="lim" title="Animations this page cannot fully slow down or start by itself">With limits</button>
- </div>
  <div class="scroll list" id="list"></div>
 </aside>
 
 <main class="stage">
- <div class="bar">
-  <div class="now"><b id="nowT"></b><span id="status"></span></div>
-  <button class="btn" id="again">Play again</button>
-  <div class="ctl">Speed<div class="seg" id="speed" role="tablist" aria-label="Speed">
-   <button role="tab" data-r="1" class="on">1×</button><button role="tab" data-r="0.5">0.5×</button><button role="tab" data-r="0.1">0.1×</button>
-  </div></div>
-  <div class="ctl">Phone<div class="seg" id="size" role="tablist" aria-label="Phone size">
-   <button role="tab" data-dev="mini" class="on">13 mini</button><button role="tab" data-dev="max">17 Pro Max</button>
-  </div></div>
+ <div class="view">
+  <iframe id="frame" src="index.html?embed" title="Prototype"></iframe>
+  <div class="panel drawer" id="drawer" hidden>
+   <div class="ph"><b>Steps</b><span>What moves, and the token behind each time and curve.</span></div>
+   <div class="scroll det" id="det"></div>
+  </div>
  </div>
- <iframe id="frame" src="index.html?embed" title="Prototype"></iframe>
-</main>
-
-<aside class="side">
- <div class="panel">
-  <div class="ph"><b>How it is built</b><span>Steps of the selected animation, with the token behind each time and curve.</span></div>
-  <div class="scroll det" id="det"></div>
- </div>
- <div class="panel">
-  <div class="ph"><b>Motion tokens</b><span id="tkHint">Change a value: every animation that uses it changes on the phone.</span></div>
+ <!-- the one place to control everything: replay, speed, and the tokens of the selected animation -->
+ <div class="panel dock">
+  <div class="dh">
+   <div class="now"><b id="nowT"></b><span id="status"></span></div>
+   <div class="seg" id="speed" role="tablist" aria-label="Speed">
+    <button role="tab" data-r="1" class="on">1×</button><button role="tab" data-r="0.5">0.5×</button><button role="tab" data-r="0.1">0.1×</button>
+   </div>
+   <button class="btn" id="again">Play again</button>
+  </div>
   <div class="tk" id="tk"></div>
+  <div class="df">
+   <button class="lnk" id="stepsBtn" aria-expanded="false">Show steps</button>
+   <button class="lnk" id="allBtn" aria-pressed="false">All tokens</button>
+   <span id="chN"></span>
+   <button class="btn q" id="resetTk">Reset</button><button class="btn q" id="copyTk">Copy changes</button>
+  </div>
+  <pre id="copyOut" hidden></pre>
  </div>
-</aside>
+</main>
 
 <script>
 /* ---------- tokens: the five durations and the curves of the prototype (defaults = values in index.html) ---------- */
@@ -365,6 +388,7 @@ function rich(s){
 }
 
 /* ---------- the prototype in the frame ---------- */
+const RMON=matchMedia('(prefers-reduced-motion:reduce)').matches;
 const F=$('#frame');let W=null,D=null,cur=0,rate=1,runId=0,pressed=[],dragEl=null,ready=false;
 const status=t=>{$('#status').textContent=t};
 const G={                                   // helpers for the scenarios; live on the prototype's window as G
@@ -387,10 +411,11 @@ const G={                                   // helpers for the scenarios; live o
   dragEl=el;ev('pointerdown',y);const t0=performance.now();
   (function step(){if(id!==runId)return;const p=Math.min(1,(performance.now()-t0)/520),e=1-(1-p)*(1-p);ev('pointermove',y+px*k*e);
    if(p<1)requestAnimationFrame(step);else setTimeout(()=>{if(id!==runId)return;ev('pointerup',y+px*k);dragEl=null;then&&then()},140)})()},
- flip(){setSize($('#size .on').dataset.dev==='max'?'mini':'max')},
+ flip(){setSize(dev==='max'?'mini':'max')},
  x:null
 };
-function setSize(d){const b=D&&D.querySelector(`.devsw [data-dev="${d}"]`);if(b)b.click();document.querySelectorAll('#size button').forEach(x=>x.classList.toggle('on',x.dataset.dev===d))}
+let dev='mini';
+function setSize(d){const b=D&&D.querySelector(`.devsw [data-dev="${d}"]`);if(b)b.click();dev=d}
 function boot(){
  W=F.contentWindow;D=F.contentDocument;ready=false;
  if(!W||!W.MOTION){status('The prototype did not load with its gallery hooks (index.html?embed).');return}
@@ -398,7 +423,7 @@ function boot(){
  W.addEventListener('keydown',e=>{if(e.key.startsWith('Arrow')||e.key==='l'||e.key==='L')e.stopImmediatePropagation()},true); // the prototype's own shortcuts would rebuild the screen behind the gallery's back
  W.G=G;ready=true;
  pushTokens();W.MOTION.rate(rate);
- if($('#size .on').dataset.dev==='max')setSize('max');
+ dev='mini';
  select(cur);
 }
 /* back to a clean prototype, without any motion */
@@ -419,34 +444,24 @@ function run(){
   if(a.setup)W.eval(a.setup);
   D.querySelectorAll('.bump,.nope,.deny').forEach(e=>e.classList.remove('bump','nope','deny')); // one-shot keyframe classes left by the setup would replay when the freeze is lifted
   void D.body.offsetWidth;D.getAnimations().forEach(x=>x.cancel());
-  status(a.slow==='none'?'Not shown in this gallery':a.play?`Playing at ${rate}× speed`:'Runs all the time');
+  status(RMON?'Reduce motion is on in your system: nothing will travel':a.slow==='none'?'Not shown in this gallery':a.slow==='part'?'One part is not slowed: see the steps':a.slow==='sim'?'The press is made by this page':a.play?'':'Runs all the time');
   requestAnimationFrame(()=>{if(id!==runId)return;root.classList.remove('mg-freeze');void D.body.offsetWidth;
    requestAnimationFrame(()=>{if(id!==runId)return;try{if(a.play)W.eval(a.play)}catch(e){status(a.id+' · error: '+e.message);console.error(e)}})});
  }catch(e){root.classList.remove('mg-freeze');status(a.id+' · error: '+e.message);console.error(e)}
 }
 
 /* ---------- list ---------- */
-let flt='all';
 function buildList(){
  let h='';GROUPS.forEach((g,gi)=>{const items=ANIMS.filter(a=>a.g===gi);
-  h+=`<div class="lg" data-g="${gi}">${esc(g)}</div>`+items.map(a=>{const i=ANIMS.indexOf(a);
-   return `<button class="li" data-i="${i}" data-g="${gi}"><span>${esc(a.n)}</span>${a.nOff?`<small title="${a.nOff} value${a.nOff>1?'s':''} typed as a number instead of a token">${a.nOff} not on tokens</small>`:''}</button>`}).join('')});
+  h+=`<div class="lg">${esc(g)}</div>`+items.map(a=>`<button class="li" data-i="${ANIMS.indexOf(a)}"><span>${esc(a.n)}</span></button>`).join('')});
  $('#list').innerHTML=h;
  $('#list').onclick=e=>{const b=e.target.closest('.li');if(b)select(+b.dataset.i)};
- const n={all:ANIMS.length,off:ANIMS.filter(a=>a.nOff).length,lim:ANIMS.filter(a=>a.slow).length};
- document.querySelectorAll('#flt button').forEach(b=>b.textContent+=' '+n[b.dataset.f]);
- $('#flt').onclick=e=>{const b=e.target.closest('button');if(!b)return;flt=b.dataset.f;document.querySelectorAll('#flt button').forEach(x=>x.classList.toggle('on',x===b));paintFilter()};
-}
-function paintFilter(){
- const ok=a=>flt==='all'||(flt==='off'?a.nOff>0:!!a.slow);
- document.querySelectorAll('.li').forEach(b=>b.hidden=!ok(ANIMS[+b.dataset.i]));
- document.querySelectorAll('.lg').forEach(g=>g.hidden=!ANIMS.some(a=>a.g===+g.dataset.g&&ok(a)));
 }
 function select(i){
  cur=Math.max(0,Math.min(ANIMS.length-1,i));const a=ANIMS[cur];
  document.querySelectorAll('.li').forEach(b=>{const on=+b.dataset.i===cur;b.classList.toggle('on',on);if(on)b.scrollIntoView({block:'nearest'})});
  $('#again').disabled=a.slow==='none'||!a.play;$('#nowT').textContent=a.n;
- paintDetail();run();
+ paintDetail();paintKnobs();run();
 }
 function paintDetail(){
  const a=ANIMS[cur],row=(l,v)=>v&&v!=='—'?`<div><em>${l}</em><span>${rich(v)}</span></div>`:'';
@@ -466,17 +481,19 @@ function paintDetail(){
 let again;
 function pushTokens(){if(!ready)return;const o={};TOKENS.forEach(t=>o[t.k]=changed(t.k)?css(t.k):null);W.MOTION.tokens(o)}
 function tokenChanged(){
- pushTokens();paintKnobs();paintDetail();
+ $('#copyOut').hidden=true;pushTokens();paintKnobs();paintDetail();
  try{localStorage.setItem('motionTokens',JSON.stringify(val))}catch(e){}
  clearTimeout(again);again=setTimeout(run,350);   // show the result once the knob rests
 }
 const curveSvg=c=>`<svg width="32" height="32" viewBox="-2 -2 28 28" aria-hidden="true"><path d="M0 24C${c[0]*24} ${24-c[1]*24} ${c[2]*24} ${24-c[3]*24} 24 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+let showAll=false;
 function buildKnobs(){
- const n=k=>ANIMS.filter(a=>a.tok.has(k)).length,lab=(t,f)=>`<label${f?` for="${f}"`:''}><b>${t.k}</b><span data-use="${esc(t.use)} · ${n(t.k)} animations"></span></label>`;
- $('#tk').innerHTML=TOKENS.map((t,i)=>(t.cv&&!TOKENS[i-1].cv?'<div class="tr cv cvh"><span>Curves (cubic-bezier)</span><div class="cvin"><span>x1</span><span>y1</span><span>x2</span><span>y2</span></div><span></span></div>':'')+(t.cv
-  ?`<div class="tr cv" data-k="${t.k}">${lab(t)}<div class="cvin">${[0,1,2,3].map(j=>`<input class="num" type="number" step=".01" min="${j%2?-1:0}" max="${j%2?2:1}" data-j="${j}" aria-label="${t.k} ${['x1','y1','x2','y2'][j]}">`).join('')}</div><span></span></div>`
-  :`<div class="tr" data-k="${t.k}">${lab(t,'r'+i)}<input id="r${i}" type="range" min="0" max="${t.max}" step="10"><div class="unit"><input class="num" type="number" min="0" max="3000" step="10" aria-label="${t.k} in ms">ms</div></div>`)).join('')+
-  `<div class="acts"><span id="chN"></span><button class="btn q" id="resetTk">Reset</button><button class="btn" id="copyTk">Copy changes</button></div><pre id="copyOut"></pre>`;
+ const others=k=>ANIMS.filter(a=>a.tok.has(k)).length,lab=(t,f)=>`<label${f?` for="${f}"`:''}><b>${t.k}</b><span data-use="${esc(t.use)}" title="${esc(t.use)} · drives ${others(t.k)} animations"></span></label>`;
+ $('#tk').innerHTML=TOKENS.map((t,i)=>t.cv
+  ?`<div class="tr cv" data-k="${t.k}">${lab(t)}<div class="cvin">${[0,1,2,3].map(j=>`<input class="num" type="number" step=".01" min="${j%2?-1:0}" max="${j%2?2:1}" data-j="${j}" title="cubic-bezier ${['x1','y1','x2','y2'][j]}" aria-label="${t.k} ${['x1','y1','x2','y2'][j]}">`).join('')}</div><span></span></div>`
+  :`<div class="tr" data-k="${t.k}">${lab(t,'r'+i)}<input id="r${i}" type="range" min="0" max="${t.max}" step="10"><div class="unit"><input class="num" type="number" min="0" max="3000" step="10" aria-label="${t.k} in ms">ms</div></div>`).join('')+'<p id="noTk" hidden>This animation does not use motion tokens: its times are typed as numbers. See the steps.</p>';
+ $('#stepsBtn').onclick=()=>{const d=$('#drawer');d.hidden=!d.hidden;$('#stepsBtn').classList.toggle('on',!d.hidden);$('#stepsBtn').textContent=d.hidden?'Show steps':'Hide steps';$('#stepsBtn').setAttribute('aria-expanded',!d.hidden)};
+ $('#allBtn').onclick=()=>{showAll=!showAll;$('#allBtn').classList.toggle('on',showAll);$('#allBtn').setAttribute('aria-pressed',showAll);paintKnobs()};
  $('#tk').addEventListener('input',e=>{const row=e.target.closest('.tr[data-k]');if(!row)return;const k=row.dataset.k;
   if(TK[k].cv){const j=+e.target.dataset.j,v=parseFloat(e.target.value);if(isNaN(v))return;val[k][j]=j%2?Math.max(-1,Math.min(2,v)):Math.max(0,Math.min(1,v))}
   else{const v=parseFloat(e.target.value);if(isNaN(v))return;val[k]=Math.max(0,Math.min(3000,Math.round(v)))}
@@ -485,29 +502,30 @@ function buildKnobs(){
  $('#tk').addEventListener('mouseover',e=>{const row=e.target.closest('.tr[data-k]');filter(row?row.dataset.k:null)});
  $('#tk').addEventListener('mouseleave',()=>filter(null));
  $('#tk').addEventListener('focusout',paintKnobs);   // an empty or out-of-range field goes back to the value in use
- $('#resetTk').onclick=()=>{TOKENS.forEach(t=>val[t.k]=t.cv?[...t.cv]:t.ms);$('#copyOut').textContent='';tokenChanged()};
+ $('#resetTk').onclick=()=>{TOKENS.forEach(t=>val[t.k]=t.cv?[...t.cv]:t.ms);tokenChanged()};
  $('#copyTk').onclick=copyChanges;
 }
 function filter(k){$('#list').classList.toggle('filter',!!k);document.querySelectorAll('.li').forEach(b=>b.classList.toggle('hit',!!k&&ANIMS[+b.dataset.i].tok.has(k)))}
 function paintKnobs(){
- document.querySelectorAll('#tk .tr[data-k]').forEach(row=>{const k=row.dataset.k,t=TK[k],u=row.querySelector('label span');row.classList.toggle('ch',changed(k));u.textContent=changed(k)?'was '+(t.cv?fmtC(t.cv):t.ms+' ms'):u.dataset.use;
+ const use=ANIMS[cur].tok;let shown=0;$('#tk').classList.toggle('all',showAll);
+ document.querySelectorAll('#tk .tr[data-k]').forEach(row=>{const k=row.dataset.k,t=TK[k],u=row.querySelector('label span');row.hidden=!(showAll||use.has(k));if(!row.hidden)shown++;row.classList.toggle('ch',changed(k));u.textContent=changed(k)?'was '+(t.cv?t.cv.map(n2).join(' '):t.ms+' ms'):u.dataset.use;
   if(t.cv){row.querySelectorAll('input').forEach(inp=>{if(document.activeElement!==inp)inp.value=n2(val[k][+inp.dataset.j])});row.lastElementChild.innerHTML=curveSvg(val[k])}
   else{const [r,nb]=row.querySelectorAll('input');r.value=val[k];if(document.activeElement!==nb)nb.value=val[k]}});
- const c=TOKENS.filter(t=>changed(t.k)).length;$('#chN').textContent=c?c+' changed':'Nothing changed yet';$('#resetTk').disabled=!c;$('#copyTk').disabled=!c;
+ $('#noTk').hidden=shown>0;
+ const c=TOKENS.filter(t=>changed(t.k)).length;$('#chN').textContent=c?c+' token'+(c>1?'s':'')+' changed':'';$('#resetTk').disabled=!c;$('#copyTk').disabled=!c;
 }
 function changesText(){
  const rows=TOKENS.filter(t=>changed(t.k)).map(t=>`${t.k}: ${dflt(t.k)} → ${css(t.k)}`);
  return rows.length?'Motion tokens — changes\n'+rows.join('\n'):'Motion tokens — no changes';
 }
 function copyChanges(){
- const text=changesText(),b=$('#copyTk'),done=ok=>{b.textContent=ok?'Copied':'Copy the text below';$('#copyOut').textContent=text;setTimeout(()=>{b.textContent='Copy changes'},1600)};
+ const text=changesText(),b=$('#copyTk'),o=$('#copyOut'),done=ok=>{b.textContent=ok?'Copied':'Copy from the note';o.textContent=text;o.hidden=false;setTimeout(()=>{b.textContent='Copy changes';if(ok)o.hidden=true},ok?2400:1600)};
  const legacy=()=>{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();done(ok)};
  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(()=>done(true),legacy);else legacy();
 }
 
 /* ---------- controls ---------- */
 $('#speed').onclick=e=>{const b=e.target.closest('button');if(!b)return;rate=+b.dataset.r;document.querySelectorAll('#speed button').forEach(x=>x.classList.toggle('on',x===b));if(ready){W.MOTION.rate(rate);run()}};
-$('#size').onclick=e=>{const b=e.target.closest('button');if(b&&ready&&!b.classList.contains('on')){setSize(b.dataset.dev)}};
 $('#again').onclick=run;
 addEventListener('keydown',e=>{
  if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
@@ -518,7 +536,7 @@ addEventListener('keydown',e=>{
 try{const s=JSON.parse(localStorage.getItem('motionTokens')||'null');if(s)TOKENS.forEach(t=>{const v=s[t.k];if(t.cv?Array.isArray(v)&&v.length===4&&v.every(n=>typeof n==='number'):typeof v==='number')val[t.k]=v})}catch(e){}
 buildList();buildKnobs();paintKnobs();
 document.querySelector('.li').classList.add('on');$('#nowT').textContent=ANIMS[0].n;paintDetail();
-if(matchMedia('(prefers-reduced-motion:reduce)').matches)$('#tkHint').textContent='Reduce motion is switched on in your system settings: nothing will travel here.';
+
 F.addEventListener('load',boot);
 if(F.contentDocument&&F.contentDocument.readyState==='complete'&&F.contentWindow.MOTION)boot();
 </script>
