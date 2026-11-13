@@ -290,12 +290,28 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
 .gq{flex-direction:column;align-items:flex-start;justify-content:center;gap:0}   /* the applied preset sits under the group's name, so a long one never squeezes it */
 .gq b{flex:none}
 .gq small:empty{display:none}
+
+/* clearer navigation: groups with a chevron, their animations on a guide line, My decisions pinned below */
+.list{padding:0 8px 8px;gap:0}
+.gq{flex-direction:row;align-items:center;gap:8px;min-height:44px;padding:8px}
+.gq svg{flex:none;color:var(--ui-t3);transition:transform .4s cubic-bezier(.32,.72,0,1)}
+.gq.open svg{transform:rotate(90deg);color:var(--ui-t1)}
+.gq>span{flex:1;min-width:0;display:block}
+.gq b{display:block}
+.gq small{display:block}
+.gs>div{margin-left:16px;padding-left:8px;border-left:1px solid var(--ui-line);gap:0}
+.gs.open>div{margin-bottom:8px;padding-bottom:0}
+.pq{min-height:36px;padding:8px 12px}
+#allDec{flex:none;width:auto;margin:0 8px 8px;padding:12px 16px;border-top:0;box-shadow:inset 0 0 0 1px var(--ui-line);border-radius:8px}
+#allDec.on{background:var(--ui-on)}
+.list{flex:1}   /* the list takes the height, so My decisions stays at the bottom of the panel */
 </style>
 </head>
 <body>
 <aside class="panel">
  <div class="ph"><b>Motion</b></div>
  <div class="scroll list" id="list"></div>
+ <button class="ql all" id="allDec"><div><b>My decisions</b></div><small></small></button>
 </aside>
 
 <main class="stage">
@@ -869,7 +885,7 @@ $('#basic').onclick=e=>{const b=e.target.closest('.seg button');if(!b||ps<0)retu
 function paintDecide(){
  const sumOn=qi===QS.length,q=QS[qi],n=QS.filter(x=>dec[x.id]).length;
  document.querySelectorAll('.gq').forEach(b=>{const i=+b.dataset.q,x=QS[i];b.classList.toggle('done',!!dec[x.id]);b.querySelector('small').textContent=dec[x.id]?presetName(x,dec[x.id]):''});
- document.querySelectorAll('.gs').forEach(g=>g.classList.toggle('open',+g.dataset.q===qi));
+ document.querySelectorAll('.gs').forEach(g=>g.classList.toggle('open',+g.dataset.q===qi));document.querySelectorAll('.gq').forEach(b=>{const on=+b.dataset.q===qi;b.classList.toggle('open',on);b.setAttribute('aria-expanded',on)});
  document.querySelectorAll('.pq').forEach(b=>{const x=QS[+b.dataset.q],k=+b.dataset.p,e=exOf(x,k);b.classList.toggle('on',+b.dataset.q===qi&&k===pi);b.querySelector('small').textContent=e?presetName(x,e)+' · own':''});
  const all=$('.ql.all');all.classList.toggle('on',sumOn);all.querySelector('small').textContent=`${n} / ${QS.length}`;
  $('#qh').hidden=sumOn;$('#dockD').hidden=sumOn;if(sumOn)return;
@@ -931,13 +947,14 @@ $('#sum').onclick=e=>{const r=e.target.closest('.sr');if(r){showQuestion(+r.data
  if(e.target.closest('#copyDec'))copyText(decisionsText(),$('#copyDec'),'Copy decisions');
  else if(e.target.closest('#copyLink'))copyText(shareLink(),$('#copyLink'),'Copy link')};
 $('#againD').onclick=replay;
-function buildQList(){   // groups by part of the interface; the open group lists its animations
- let h='',last='';QS.forEach((q,i)=>{const sc=SECT[q.id];if(sc!==last){h+=`<div class="lg">${esc(sc)}</div>`;last=sc}
-  h+=`<button class="gq" data-q="${i}"><b>${esc(q.t)}</b><small></small></button><div class="gs" data-q="${i}"><div>`+q.places.map((x,k)=>`<button class="pq" data-q="${i}" data-p="${k}"><span>${esc(x.n)}</span><small></small></button>`).join('')+'</div></div>'});
- $('#list').innerHTML=h+`<hr><button class="ql all" data-q="${QS.length}"><div><b>My decisions</b></div><small></small></button>`;
- $('#list').onclick=e=>{const b=e.target.closest('.gq,.pq,.ql');if(b)showQuestion(+b.dataset.q,+b.dataset.p||0)};
+function buildQList(){   // two levels only: a group (with a chevron) and, inside the open one, its animations; My decisions is pinned at the bottom
+ const CH='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+ $('#list').innerHTML=QS.map((q,i)=>`<button class="gq" data-q="${i}" aria-expanded="false">${CH}<span><b>${esc(q.t)}</b><small></small></span></button><div class="gs" data-q="${i}"><div>`+
+  q.places.map((x,k)=>`<button class="pq" data-q="${i}" data-p="${k}"><span>${esc(x.n)}</span><small></small></button>`).join('')+'</div></div>').join('');
+ $('#list').onclick=e=>{const b=e.target.closest('.gq,.pq');if(b)showQuestion(+b.dataset.q,+b.dataset.p||0)};
 }
 /* (the page used to have a second mode, "All animations"; its dock stays hidden. The full list of animations is notes/MOTION.md) */
+$('#allDec').onclick=()=>showQuestion(QS.length);
 function setApp(a){app='decide';main.ov=null;$('#dockB').hidden=true;$('#drawer').hidden=true;clearTimeout(loopT);rate=+document.querySelector('#speedD .on').dataset.r;buildQList();showQuestion(qi)}
 
 /* ---------- All animations: groups fold; a group has "All together" and its animations ---------- */
