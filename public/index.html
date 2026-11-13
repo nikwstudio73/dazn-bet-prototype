@@ -338,7 +338,7 @@ html.app .navbar{height:calc(52px + max(env(safe-area-inset-bottom,0px),var(--sp
 html.app .scroll,html.app .cp{bottom:calc(52px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)))}
 html.app .bar{bottom:calc(62px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)))}
 html.app .tongue{bottom:calc(62px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)) + var(--bar-h) - 10px)}
-html.app .sfoot{padding-bottom:max(var(--sheet-foot-pad-b),calc(env(safe-area-inset-bottom,0px) + var(--spacing-8)))} /* S4: the text under the button stays above the home indicator */
+html.app .sfoot{padding-bottom:max(var(--sheet-foot-pad-t),calc(env(safe-area-inset-bottom,0px) + var(--spacing-8)))} /* S4: the text under the button stays above the home indicator. The 40 px of the frame include the home indicator; in a browser with its own toolbar there is none, so the gap is the plain 16 */
 html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} /* only the feed and the sheet content scroll, never the page */
 
 /* status bar */
