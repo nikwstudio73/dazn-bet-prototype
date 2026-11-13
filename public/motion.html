@@ -157,6 +157,7 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
 .pr:empty{display:none}
 .prm{display:grid;grid-template-columns:80px 1fr 52px;align-items:center;gap:0 8px;min-height:32px;font-size:12px;line-height:16px}
 .prm{grid-template-columns:72px 1fr 64px}
+.vr{display:grid;grid-template-columns:72px 1fr;align-items:center;gap:8px;min-height:32px;font-size:12px;line-height:16px}
 /* the slider: a 24 px tall grab area, a 4 px track, a 16 px thumb */
 .prm input[type=range]{appearance:none;-webkit-appearance:none;width:100%;height:24px;background:none;cursor:pointer;touch-action:none}
 .prm input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:var(--ui-thumb)}
@@ -242,7 +243,7 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
   <div class="qh" id="qh"><span id="qN"></span><h1 id="qT"></h1><p id="qS"></p></div>
   <div class="panel places" id="places" hidden></div>
   <div class="panel dock" id="dockD">
-   <!-- basic: a preset, its one or two main values, watch, apply -->
+   <!-- basic: a preset, its ready-made variants (how strong, how long), watch, apply -->
    <span class="lbl">Presets</span>
    <div class="chips" id="presets"></div>
    <p class="pd" id="pDesc"></p>
@@ -250,7 +251,7 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
    <div class="dh"><div class="seg" id="speedD" role="tablist" aria-label="Speed"><button role="tab" data-r="1" class="on">1×</button><button role="tab" data-r="0.5">0.5×</button><button role="tab" data-r="0.1">0.1×</button></div><span class="sp"></span><button class="btn q" id="againD">Play again</button></div>
    <label class="chk"><span>Compare with Current</span><input type="checkbox" id="cmp"></label>
    <button class="btn big" id="applyB">Apply</button>
-   <!-- advanced: the rest of the values, viewing options, what it replaces, a note -->
+   <!-- advanced: the exact values as sliders, viewing options, what it replaces, a note -->
    <details class="adv" id="advD"><summary>Advanced</summary>
     <div class="pr" id="mo"></div>
     <label class="chk"><span>Loop</span><input type="checkbox" id="loop"></label>
@@ -640,6 +641,7 @@ const QS=[
  {id:'press',t:'Press feedback',s:'What an element does under the finger and when it is let go: odds, outcome buttons, the main button, cards, rows, the betslip bar, small buttons.',
   places:[PL('M01','Odds tile'),PL('M02','Outcome button'),PL('M05','Main button'),PL('M06','Betslip bar'),PL('M03','Top Pick card'),PL('M04','List row'),PL('M07','Edit button')],
   none:f=>f.scale>=1&&f.op>=1,noneText:'Scale 100% and Opacity 100% mean nothing happens on press. Move a slider to the left to see an effect.',
+  amt:(p,k)=>{p.fx.scale=Math.max(.88,+(1-(1-p.fx.scale)*k).toFixed(3));p.fx.op=Math.max(.4,+(1-(1-p.fx.op)*k).toFixed(2))},
   self:true,lp:1500,today:['Scale: 97% odds tile, 98% outcome and main button, 98.5% bar and cards.','Rows dim to 70% with a fade; small buttons dim to 60% at once.','Release: 0.12 s everywhere, 0.5 s on the betslip bar.'],
   ml:'Motion · release',fx:[{k:'scale',l:'Scale',min:.88,max:1,step:.005,fmt:pct,ends:['deeper','none']},{k:'op',l:'Opacity',min:.4,max:1,step:.05,fmt:pct,ends:['dimmer','none'],adv:true}],
   presets:[{n:'Subtle',d:'Barely moves. Quiet, for dense screens.',fx:{scale:.985,op:1},m:M('out',120)},
@@ -656,6 +658,7 @@ const QS=[
   apply:(f,k)=>({css:`html:root{--m-quick:${k.t}ms}html .odd,html .choice,html .tp,html .gs-card,html .cta-main,html .odd .l,html .odd .v,html .livebadge,html .oddsTog .sw,html .oddsTog .knob,html .day,html .cp-chip,html .tp-top i,html .tp-in>span,html .tp-in>b,html .tp-club{transition-timing-function:${k.flat}}`})}, // these all sit on --m-quick: the preview moves that token and sets one curve
  {id:'swap',t:'Numbers and texts that change',s:'A price moves, a total is recalculated, a list is replaced: the new value comes in.',
   places:[PL('M21','Price on a tile'),PL('M23','Prices in the betslip'),PL('M24','Total in the bar'),PL('M27','Bar texts'),PL('M42','Competition list')],
+  amt:(p,k)=>{p.fx.off=Math.min(24,Math.round(p.fx.off*k))},
   today:['Rises 5 px in 0.32 s on --soft.','Lists rise 8 px; day switch slides 20 px.'],
   fx:[{k:'off',l:'Offset',min:0,max:24,step:1,fmt:px,ends:['none','far']}],none:f=>f.off<=0,noneText:'Offset 0 px: the new value only fades in, it does not travel.',
   presets:[{n:'Crossfade',d:'The new value just fades in. No movement.',fx:{off:0},m:M('out',200)},{n:'Small rise',d:'A short rise, close to what it is today.',fx:{off:5},m:M('soft',320)},
@@ -665,6 +668,7 @@ const QS=[
     return base(el,from,t,d)}}})},
  {id:'cascade',t:'Reveal and cascade',s:'Several things open one after another: odds under the tiles when Odds is switched on, the × on cards in Edit mode.',
   places:[PL('M28','Odds toggle'),PL('M17','Edit mode')],
+  amt:(p,k)=>{p.m.delay=Math.min(160,Math.round(p.m.delay*k))},
   lp:3600,today:['Tiles: 0.44 s on --soft, 32 ms apart.','Cards in Edit: 0.32 s, 45 ms apart.'],
   fx:[],delay:'Delay per item',
   presets:[{n:'All at once',d:'Everything opens together. Fast and plain.',fx:{},m:M('soft',440,{delay:0})},{n:'Quick ripple',d:'A short, tight ripple.',fx:{},m:M('soft',300,{delay:20})},
@@ -703,6 +707,18 @@ let dec={},notes={};try{dec=JSON.parse(localStorage.getItem('motionPresets3')||'
 /* a link made with "Copy link" carries the decisions and notes in its #d=… part */
 try{const h=location.hash.match(/^#d=(.+)$/);if(h){const o=JSON.parse(decodeURIComponent(escape(atob(h[1]))));if(o&&o.dec){dec=o.dec;notes=o.notes||{}}}}catch(e){}
 let pi=0,ps=-1,pp=null;
+/* ready-made variants of a preset, the same two questions for every preset: how strong (Amount) and how long (Duration).
+   Amount scales what the group's effect is made of (press depth and dimming, travel, the gap of a cascade) and the bounce of a spring;
+   Duration scales the time. Medium / Medium is the preset itself. va / vs = the chosen steps, -1 once a slider in Advanced was moved. */
+const AMT=[.5,1,1.6],DUR=[.7,1,1.4],AN=['Light','Medium','Strong'],DN=['Short','Medium','Long'];
+let va=1,vs=1;
+function variant(q,i,a,d){
+ const b=q.presets[i],p=clone({fx:b.fx,m:b.m});
+ p.m.dur=Math.round(p.m.dur*DUR[d]/10)*10;
+ if(isSpring(p.m.ease)){p.m.bounce=Math.min(.8,+(p.m.bounce*AMT[a]).toFixed(2));if(a!==1||d!==1)p.m.ease='spring'}
+ if(q.amt)q.amt(p,AMT[a]);
+ return p}
+const hasAmt=(q,i)=>!!q.amt||isSpring(q.presets[i].m.ease);
 const saveDec=()=>{try{localStorage.setItem('motionPresets3',JSON.stringify(dec));localStorage.setItem('motionNotes',JSON.stringify(notes))}catch(e){}};
 const clone=x=>JSON.parse(JSON.stringify(x)),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const edited=(q,i,p)=>i>=0&&!same({fx:q.presets[i].fx,m:q.presets[i].m},p);
@@ -711,7 +727,7 @@ function moText(q,m){const k=mo(m);
  return (isSpring(m.ease)?`spring ${ezName(m.ease)} (duration ${m.dur} ms, bounce ${Math.round(m.bounce*100)}%, settles in ${k.t} ms)`:`${ezName(m.ease)} cubic-bezier(${bezOf(m).map(n2).join(', ')}), ${m.dur} ms`)+(q.delay?`, ${m.delay} ms per item`:'')}
 function decText(q){const d=dec[q.id];if(!d)return '';if(d.i<0)return 'Current (no change)';
  const fx=q.fx.map(f=>f.l.toLowerCase()+' '+f.fmt(d.p.fx[f.k])).join(', ');
- return q.presets[d.i].n+(edited(q,d.i,d.p)?' (edited)':'')+' — '+(fx?fx+'; ':'')+moText(q,d.p.m)}
+ return presetName(q,d)+' — '+(fx?fx+'; ':'')+moText(q,d.p.m)}
 /* what is put on top of the prototype: every group that already has an applied preset, plus what is being tried in this group */
 function ovNow(){
  const q=QS[qi],parts=[];
@@ -735,16 +751,16 @@ function playDecide(rebuild=true){
  else{main.ov=ov;main.run(q.places[pi])}
  if(loopOn)loopT=setTimeout(()=>playDecide(false),(q.lp||2800)/rate);
 }
-function pick(i){const q=QS[qi];ps=i;pp=i<0?null:clone({fx:q.presets[i].fx,m:q.presets[i].m})}
+function pick(i){const q=QS[qi];ps=i;va=vs=1;pp=i<0?null:variant(q,i,1,1)}
 function showQuestion(n){
  qi=Math.max(0,Math.min(QS.length,n));
  if(qi===QS.length){showSummary();return}
  const q=QS[qi],d=dec[q.id];pi=0;
- if(d&&d.i>=0){ps=d.i;pp=clone(d.p)}else pick(-1);   // a decided group opens on its preset
+ if(d&&d.i>=0){ps=d.i;pp=clone(d.p);[va,vs]=d.v||[-1,-1]}else pick(-1);   // a decided group opens on its preset
  $('#sum').hidden=true;
  paintDecide();playDecide();
 }
-const presetName=(q,d)=>d.i<0?'Current':q.presets[d.i].n+(edited(q,d.i,d.p)?' (edited)':'');
+const presetName=(q,d)=>d.i<0?'Current':q.presets[d.i].n+(d.v&&d.v[0]>=0?(d.v[0]===1&&d.v[1]===1?'':' · '+[hasAmt(q,d.i)&&d.v[0]!==1?AN[d.v[0]]:'',d.v[1]!==1?DN[d.v[1]]:''].filter(Boolean).join(', ')):edited(q,d.i,d.p)?' (edited)':'');
 /* a small picture of the easing: a bezier curve, or the sampled spring */
 function easeSvg(m){let d;if(isSpring(m.ease)){const sp=springSamples(m.dur,m.bounce,32).pts,mx=Math.max(1.05,...sp);d='M'+sp.map((y,i)=>`${(i/32*24).toFixed(1)} ${(24-y/mx*22).toFixed(1)}`).join('L')}
  else{const b=bezOf(m);d=`M0 24C${b[0]*24} ${24-b[1]*24} ${b[2]*24} ${24-b[3]*24} 24 0`}
@@ -756,14 +772,18 @@ const sl=(grp,k,l,min,max,step,v,t,ends)=>`<div class="prm"><span>${esc(l)}</spa
 function paintParams(){
  const q=QS[qi],on=ps>=0;if(!on){$('#basic').innerHTML='';$('#mo').innerHTML='';return}
  const m=pp.m,spring=isSpring(m.ease),fx=f=>sl('fx',f.k,f.l,f.min,f.max,f.step,pp.fx[f.k],f.fmt(pp.fx[f.k]),f.ends);
- /* basic: the main value of the effect (if the group has one) and Duration */
- $('#basic').innerHTML=q.fx.filter(f=>!f.adv).map(fx).join('')+sl('m','dur','Duration',0,1000,10,m.dur,m.dur+' ms');
- /* advanced: secondary effect values, Easing, Bounce (springs), Delay (cascade) */
- $('#mo').innerHTML=q.fx.filter(f=>f.adv).map(fx).join('')+
+ const seg=(id,l,names,v)=>`<div class="vr"><span>${l}</span><div class="seg" id="${id}">${names.map((n,i)=>`<button data-v="${i}"${v===i?' class="on"':''}>${n}</button>`).join('')}</div></div>`;
+ /* basic: ready-made variants */
+ $('#basic').innerHTML=(hasAmt(q,ps)?seg('vAmt','Amount',AN,va):'')+seg('vDur','Duration',DN,vs);
+ /* advanced: the exact values */
+ $('#mo').innerHTML=q.fx.map(fx).join('')+sl('m','dur','Duration',0,1000,10,m.dur,m.dur+' ms')+
   `<div class="prm sel"><span>Easing</span><select id="ezSel" aria-label="Easing"><optgroup label="Curve">${EZ.map(x=>`<option value="${x[0]}"${m.ease===x[0]?' selected':''}>${esc(x[1])}</option>`).join('')}</optgroup><optgroup label="Spring">${SP.map(x=>`<option value="${x[0]}"${m.ease===x[0]?' selected':''}>${esc(x[1])}</option>`).join('')}</optgroup></select>${easeSvg(m)}</div>`+
   (spring?sl('m','bounce','Bounce',0,.8,.05,m.bounce,Math.round(m.bounce*100)+'%'):'')+
   (q.delay?sl('m','delay',q.delay,0,160,2,m.delay,m.delay+' ms'):'');
 }
+/* a variant step was chosen: the preset is rebuilt from its own values at that strength and length */
+$('#basic').onclick=e=>{const b=e.target.closest('.seg button');if(!b||ps<0)return;const id=b.parentNode.id,v=+b.dataset.v;
+ if(va<0||vs<0)va=vs=1;if(id==='vAmt')va=v;else vs=v;pp=variant(QS[qi],ps,va,vs);paintParams();paintStatus();playDecide(false)};
 function paintDecide(){
  const sumOn=qi===QS.length,q=QS[qi],n=QS.filter(x=>dec[x.id]).length;
  document.querySelectorAll('.ql').forEach(b=>{const i=+b.dataset.q,x=QS[i];b.classList.toggle('on',i===qi);
@@ -795,14 +815,15 @@ $('#dockD').addEventListener('input',e=>{const r=e.target,q=QS[qi],k=r.dataset.k
  if(r.dataset.g==='fx')pp.fx[k]=v;
  else{pp.m[k]=v;if(isSpring(pp.m.ease)&&k!=='delay'&&pp.m.ease!=='spring'){pp.m.ease='spring';const z=$('#ezSel');if(z)z.value='spring'}   // Duration or Bounce of a named spring: it becomes a custom spring
   const sv=$('#mo svg');if(sv)sv.outerHTML=easeSvg(pp.m)}
+ va=vs=-1;document.querySelectorAll('#basic .seg button.on').forEach(b=>b.classList.remove('on'));
  paintStatus();later()});
 /* leaving a number field: show the value that is really in use (clamped, rounded) */
 $('#dockD').addEventListener('focusout',e=>{const r=e.target;if(r.type!=='number'||!r.dataset.g||ps<0)return;const k=r.dataset.k;r.value=toShow(k,r.dataset.g==='fx'?pp.fx[k]:pp.m[k])});
 $('#dockD').addEventListener('change',e=>{if(e.target.id!=='ezSel'||ps<0)return;const v=e.target.value,m=pp.m,sp=SP.find(x=>x[0]===v);
  if(v==='custom'&&m.ease!=='custom'&&!isSpring(m.ease))m.bez=bezOf(m).slice();   // start the custom curve from the one that was selected
  m.ease=v;if(sp&&sp[2]){m.dur=sp[2].dur;m.bounce=sp[2].bounce}
- paintParams();paintStatus();playDecide(false)});
-$('#applyB').onclick=()=>{const q=QS[qi];dec[q.id]={i:ps,p:pp?clone(pp):null};saveDec();showQuestion(qi+1)};   // apply, then on to the next group
+ va=vs=-1;paintParams();paintStatus();playDecide(false)});
+$('#applyB').onclick=()=>{const q=QS[qi];dec[q.id]={i:ps,p:pp?clone(pp):null,v:[va,vs]};saveDec();showQuestion(qi+1)};   // apply, then on to the next group
 $('#why').oninput=e=>{const q=QS[qi],v=e.target.value.trim();if(v)notes[q.id]=v;else delete notes[q.id];saveDec()};
 $('#loop').onchange=e=>{loopOn=e.target.checked;playDecide(false)};
 $('#cmp').onchange=e=>{cmp=e.target.checked;playDecide(true)};
