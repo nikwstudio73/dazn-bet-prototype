@@ -265,13 +265,36 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
 .ql.done>i{visibility:visible}
 .ql.done>i::before{display:block}
 .ql.all{padding-left:12px}
+
+/* one panel: groups, and inside the open group its animations */
+.gq{flex:none;display:flex;align-items:center;gap:8px;width:100%;min-height:40px;padding:8px 12px;border-radius:8px;text-align:left;color:var(--ui-t1);transition:background .2s}
+.gq:hover{background:var(--ui-hover)}
+.gq b{flex:1;min-width:0;font-weight:700}
+.gq small,.pq small{flex:none;font-size:12px;line-height:16px;color:var(--ui-t3)}
+.gq.done small{color:var(--ui-t2)}
+.gq.done small::after{content:" ✓"}
+.gs{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.32,.72,0,1)}
+.gs.open{grid-template-rows:1fr}
+.gs>div{min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:4px}
+.gs.open>div{padding-bottom:8px}
+.pq{flex:none;display:flex;align-items:center;gap:8px;width:100%;min-height:32px;padding:4px 12px 4px 24px;border-radius:8px;text-align:left;color:var(--ui-t2);transition:background .2s,color .2s}
+.pq:hover{background:var(--ui-hover);color:var(--ui-t1)}
+.pq.on{background:var(--ui-on);color:var(--ui-t1);font-weight:700}
+.pq span{flex:1;min-width:0}
+.pq small{font-weight:400}
+.ap{display:flex;flex-direction:column;gap:8px}
+.ap .lnk{align-self:center}
+.sr.sub{padding:8px 0 8px 16px;border-top:0}
+.sr.sub b{font-weight:400;color:var(--ui-t2)}
+#qN{display:block}   /* the group's name above the animation's */
+.gq{flex-direction:column;align-items:flex-start;justify-content:center;gap:0}   /* the applied preset sits under the group's name, so a long one never squeezes it */
+.gq b{flex:none}
+.gq small:empty{display:none}
 </style>
 </head>
 <body>
 <aside class="panel">
- <div class="ph"><b>Motion</b>
-  <div class="seg" id="appSeg" role="tablist" aria-label="Mode"><button role="tab" data-app="decide" class="on">Decide</button><button role="tab" data-app="browse">All animations</button></div>
- </div>
+ <div class="ph"><b>Motion</b></div>
  <div class="scroll list" id="list"></div>
 </aside>
 
@@ -289,7 +312,6 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
  <aside class="rc scroll">
   <!-- Decide: a group, where to watch it, its presets -->
   <div class="qh" id="qh"><span id="qN"></span><h1 id="qT"></h1><p id="qS"></p></div>
-  <div class="panel places" id="places" hidden></div>
   <div class="panel dock" id="dockD">
    <!-- basic: a preset, its ready-made variants (how strong, how long), watch, apply -->
    <span class="lbl">Presets</span>
@@ -302,14 +324,13 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
     <label class="chk"><span>Zoom</span><input type="checkbox" id="zoom"></label>
     <label class="chk"><span>Loop</span><input type="checkbox" id="loop"></label>
    </div>
-   <button class="btn big" id="applyB">Apply</button>
+   <div class="ap"><button class="btn big" id="applyB">Apply to the group</button><button class="btn q big" id="onlyB">Only this one</button><button class="lnk" id="backB" hidden>Use the group’s preset here</button></div>
    <!-- advanced: the exact values as sliders, viewing options, what it replaces, a note -->
    <details class="adv" id="advD"><summary>Advanced</summary>
     <div class="pr" id="mo"></div>
     <details class="today"><summary>Today</summary><ul id="todayL"></ul></details>
     <label class="lbl" for="why">Note</label><textarea id="why" rows="2"></textarea>
    </details>
-   <div class="df"><button class="btn q" id="prevQ">Back</button><span id="dHint"></span><button class="btn q" id="nextQ">Skip</button></div>
   </div>
   <!-- All animations: speed, replay, steps, tokens -->
   <div class="panel dock" id="dockB" hidden>
@@ -760,9 +781,10 @@ const WHERE={M01:'1X2 button under a match',M02:'on the match page',M03:'Top sco
  M21:'in the feed',M23:'card, total, return',M24:'collapsed betslip',M27:'collapsed betslip',M42:'competition page',M28:'the whole feed',M17:'cards in the betslip',M32:'from the bar',M34:'favourite team',M37:'after Place bet',M31:'first pick',M35:'above the nav',M38:'from a match tile',M39:'from a competition header'};
 const glyph=id=>`<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${GL[GLY[id]]||GL.small}</svg>`;
 /* per group: what is on the phone (pi = place), which preset is being tried (ps: -1 = Current) and its values (pp = {fx, m}) */
-let dec={},notes={};try{dec=JSON.parse(localStorage.getItem('motionPresets4')||'{}')||{};notes=JSON.parse(localStorage.getItem('motionNotes')||'{}')||{}}catch(e){}
+/* dec[group] = the preset applied to the whole group; ex[group][n] = an exception for its n-th animation */
+let dec={},notes={},ex={};try{dec=JSON.parse(localStorage.getItem('motionPresets5')||'{}')||{};ex=JSON.parse(localStorage.getItem('motionExceptions')||'{}')||{};notes=JSON.parse(localStorage.getItem('motionNotes')||'{}')||{}}catch(e){}
 /* a link made with "Copy link" carries the decisions and notes in its #d=… part */
-try{const h=location.hash.match(/^#d=(.+)$/);if(h){const o=JSON.parse(decodeURIComponent(escape(atob(h[1]))));if(o&&o.dec){dec=o.dec;notes=o.notes||{}}}}catch(e){}
+try{const h=location.hash.match(/^#d=(.+)$/);if(h){const o=JSON.parse(decodeURIComponent(escape(atob(h[1]))));if(o&&o.dec){dec=o.dec;notes=o.notes||{};ex=o.ex||{}}}}catch(e){}
 let pi=0,ps=-1,pp=null;
 /* ready-made variants of a preset, the same two questions for every preset: how strong (Amount) and how long (Duration).
    Amount scales what the group's effect is made of (press depth and dimming, travel, the gap of a cascade) and the bounce of a spring;
@@ -776,13 +798,14 @@ function variant(q,i,a,d){
  if(q.amt)q.amt(p,AMT[a]);
  return p}
 const hasAmt=(q,i)=>!!q.amt||isSpring(q.presets[i].m.ease);
-const saveDec=()=>{try{localStorage.setItem('motionPresets4',JSON.stringify(dec));localStorage.setItem('motionNotes',JSON.stringify(notes))}catch(e){}};
+const saveDec=()=>{try{localStorage.setItem('motionPresets5',JSON.stringify(dec));localStorage.setItem('motionExceptions',JSON.stringify(ex));localStorage.setItem('motionNotes',JSON.stringify(notes))}catch(e){}};
+const exOf=(q,n)=>ex[q.id]&&ex[q.id][n];
 const clone=x=>JSON.parse(JSON.stringify(x)),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const edited=(q,i,p)=>i>=0&&!same(clone({fx:q.presets[i].fx,m:q.presets[i].m}),p);
 /* a Motion setting in words, the way a developer needs it */
 function moText(q,m){const k=mo(m);
  return (isSpring(m.ease)?`spring ${ezName(m.ease)} (duration ${m.dur} ms, bounce ${Math.round(m.bounce*100)}%, settles in ${k.t} ms)`:`${ezName(m.ease)} cubic-bezier(${bezOf(m).map(n2).join(', ')}), ${m.dur} ms`)+(q.delay?`, ${m.delay} ms per item`:'')}
-function decText(q){const d=dec[q.id];if(!d)return '';if(d.i<0)return 'Current (no change)';
+function decText(q,d=dec[q.id]){if(!d)return '';if(d.i<0)return 'Current (no change)';
  const fx=q.fx.map(f=>f.l.toLowerCase()+' '+f.fmt(d.p.fx[f.k])).join(', ');
  return presetName(q,d)+' — '+(fx?fx+'; ':'')+moText(q,d.p.m)}
 /* what is put on top of the prototype: every group that already has an applied preset, plus what is being tried in this group */
@@ -809,11 +832,13 @@ function playDecide(rebuild=true){
  if(loopOn)loopT=setTimeout(()=>playDecide(false),(q.lp||2800)/rate);
 }
 function pick(i){const q=QS[qi];ps=i;va=vs=MID;pp=i<0?null:variant(q,i,MID,MID)}
-function showQuestion(n){
+/* what the controls show for this animation: its own exception if it has one, else the group's preset, else Current */
+function loadTarget(){const q=QS[qi],d=exOf(q,pi)||dec[q.id];
+ if(d&&d.i>=0){ps=d.i;pp=clone(d.p);[va,vs]=d.v||[-1,-1]}else pick(-1)}
+function showQuestion(n,place=0){
  qi=Math.max(0,Math.min(QS.length,n));
  if(qi===QS.length){showSummary();return}
- const q=QS[qi],d=dec[q.id];pi=0;
- if(d&&d.i>=0){ps=d.i;pp=clone(d.p);[va,vs]=d.v||[-1,-1]}else pick(-1);   // a decided group opens on its preset
+ pi=Math.max(0,Math.min(QS[qi].places.length-1,place));loadTarget();
  $('#sum').hidden=true;
  paintDecide();playDecide();
 }
@@ -843,25 +868,24 @@ $('#basic').onclick=e=>{const b=e.target.closest('.seg button');if(!b||ps<0)retu
  if(va<0||vs<0)va=vs=MID;if(id==='vAmt')va=v;else vs=v;pp=variant(QS[qi],ps,va,vs);paintParams();paintStatus();playDecide(false)};
 function paintDecide(){
  const sumOn=qi===QS.length,q=QS[qi],n=QS.filter(x=>dec[x.id]).length;
- document.querySelectorAll('.ql').forEach(b=>{const i=+b.dataset.q,x=QS[i];b.classList.toggle('on',i===qi);
-  if(x){b.classList.toggle('done',!!dec[x.id]);b.querySelector('small').textContent=dec[x.id]?presetName(x,dec[x.id]):''}else b.querySelector('small').textContent=`${n} / ${QS.length}`});
- $('#qh').hidden=sumOn;$('#dockD').hidden=sumOn;$('#places').hidden=sumOn;if(sumOn)return;
+ document.querySelectorAll('.gq').forEach(b=>{const i=+b.dataset.q,x=QS[i];b.classList.toggle('done',!!dec[x.id]);b.querySelector('small').textContent=dec[x.id]?presetName(x,dec[x.id]):''});
+ document.querySelectorAll('.gs').forEach(g=>g.classList.toggle('open',+g.dataset.q===qi));
+ document.querySelectorAll('.pq').forEach(b=>{const x=QS[+b.dataset.q],k=+b.dataset.p,e=exOf(x,k);b.classList.toggle('on',+b.dataset.q===qi&&k===pi);b.querySelector('small').textContent=e?presetName(x,e)+' · own':''});
+ const all=$('.ql.all');all.classList.toggle('on',sumOn);all.querySelector('small').textContent=`${n} / ${QS.length}`;
+ $('#qh').hidden=sumOn;$('#dockD').hidden=sumOn;if(sumOn)return;
  const d=dec[q.id];
- $('#qT').textContent=q.t;$('#qS').textContent=q.s;
- $('#places').innerHTML='<b>Watch it on</b>'+q.places.map((x,i)=>`<button class="pl${i===pi?' on':''}" data-p="${i}">${glyph(x.id)}<div><b>${esc(x.n)}</b></div></button>`).join('');
- $('#todayL').innerHTML=q.today.map(t=>`<li>${esc(t)}</li>`).join('');if(document.activeElement!==$('#why'))$('#why').value=notes[q.id]||'';
+ $('#qT').textContent=q.places[pi].n;$('#qN').textContent=q.t;
  $('#presets').innerHTML=`<button class="chip2${ps<0?' on':''}${d&&d.i<0?' ap':''}" data-ps="-1">Current</button>`+q.presets.map((x,i)=>`<button class="chip2${ps===i?' on':''}${d&&d.i===i?' ap':''}" data-ps="${i}">${esc(x.n)}</button>`).join('');
+ $('#todayL').innerHTML=q.today.map(t=>`<li>${esc(t)}</li>`).join('');if(document.activeElement!==$('#why'))$('#why').value=notes[q.id]||'';
  paintParams();paintStatus();
- $('#prevQ').disabled=qi===0;
 }
+/* the two ways to keep what is playing: for the whole group, or only for this animation */
 function paintStatus(){
- const q=QS[qi],d=dec[q.id],ok=d&&d.i===ps&&(ps<0||same(d.p,pp)),ab=$('#applyB');
- const off=ps>=0&&q.none&&q.none(pp.fx);
- $('#pDesc').textContent=ps<0?'The prototype as it is today. Pick a preset to feel the difference, then fine-tune it.':off?q.noneText:q.presets[ps].d+(edited(q,ps,pp)?' (edited)':'');
- ab.textContent=ok?'Applied ✓':ps<0?'Keep current':'Apply';
- $('#dHint').textContent=d?'Applied: '+presetName(q,d):'Nothing applied yet';
+ const q=QS[qi],d=dec[q.id],e=exOf(q,pi),now={i:ps,p:pp},eq=x=>x&&x.i===ps&&(ps<0||same(x.p,pp));
+ $('#applyB').textContent=eq(d)&&!e?'Applied to the group ✓':'Apply to the group';
+ $('#onlyB').textContent=eq(e)?'Only this one ✓':'Only this one';
+ $('#backB').hidden=!e;
 }
-$('#places').onclick=e=>{const b=e.target.closest('.pl');if(!b)return;pi=+b.dataset.p;paintDecide();playDecide()};
 $('#presets').onclick=e=>{const b=e.target.closest('.chip2');if(!b)return;pick(+b.dataset.ps);paintDecide();playDecide(false)};
 let prT;const later=()=>{clearTimeout(prT);prT=setTimeout(()=>playDecide(false),140)};   // plays as soon as the hand rests
 /* sliders: Effect values, and Duration / Bounce / Delay of the Motion. Touching Duration or Bounce of a named spring makes it a custom spring */
@@ -880,42 +904,41 @@ $('#dockD').addEventListener('change',e=>{if(e.target.id!=='ezSel'||ps<0)return;
  if(v==='custom'&&m.ease!=='custom'&&!isSpring(m.ease))m.bez=bezOf(m).slice();   // start the custom curve from the one that was selected
  m.ease=v;if(sp&&sp[2]){m.dur=sp[2].dur;m.bounce=sp[2].bounce}
  va=vs=-1;paintParams();paintStatus();playDecide(false)});
-$('#applyB').onclick=()=>{const q=QS[qi];dec[q.id]={i:ps,p:pp?clone(pp):null,v:[va,vs]};saveDec();showQuestion(qi+1)};   // apply, then on to the next group
+const nowDec=()=>({i:ps,p:pp?clone(pp):null,v:[va,vs]});
+const dropEx=()=>{const q=QS[qi];if(ex[q.id]){delete ex[q.id][pi];if(!Object.keys(ex[q.id]).length)delete ex[q.id]}};
+$('#applyB').onclick=()=>{const q=QS[qi];dec[q.id]=nowDec();dropEx();saveDec();paintDecide()};          // the group, this animation included
+$('#onlyB').onclick=()=>{const q=QS[qi];(ex[q.id]=ex[q.id]||{})[pi]=nowDec();saveDec();paintDecide()};  // an exception for this animation
+$('#backB').onclick=()=>{dropEx();saveDec();loadTarget();paintDecide();playDecide(false)};
 $('#why').oninput=e=>{const q=QS[qi],v=e.target.value.trim();if(v)notes[q.id]=v;else delete notes[q.id];saveDec()};
 $('#loop').onchange=e=>{loopOn=e.target.checked;playDecide(false)};
 $('#cmp').onchange=e=>{cmp=e.target.checked;playDecide(true)};
 $('#zoom').onchange=e=>{zoom=e.target.checked;playDecide(true)};
 $('#speedD').onclick=e=>{const b=e.target.closest('button');if(!b)return;rate=+b.dataset.r;document.querySelectorAll('#speedD button').forEach(x=>x.classList.toggle('on',x===b));playDecide(false)};
+const exList=q=>Object.keys(ex[q.id]||{}).map(k=>[q.places[+k],ex[q.id][k]]).filter(x=>x[0]);
 function decisionsText(){
- return 'Motion presets — DAZN Bet in Scores\n'+QS.map((q,i)=>`${i+1}. ${q.t}: ${decText(q)||'not decided'}`+(notes[q.id]?`\n   Why: ${notes[q.id]}`:'')).join('\n')+'\n\nFor development:\n'+DEVNOTES.map(t=>'- '+t).join('\n');
+ return 'Motion presets — DAZN Bet in Scores\n'+QS.map((q,i)=>`${i+1}. ${q.t}: ${decText(q)||'not decided'}`+exList(q).map(([pl,d])=>`\n   Except ${pl.n}: ${decText(q,d)}`).join('')+(notes[q.id]?`\n   Why: ${notes[q.id]}`:'')).join('\n')+'\n\nFor development:\n'+DEVNOTES.map(t=>'- '+t).join('\n');
 }
-const shareLink=()=>location.href.split('#')[0]+'#d='+btoa(unescape(encodeURIComponent(JSON.stringify({dec,notes}))));
+const shareLink=()=>location.href.split('#')[0]+'#d='+btoa(unescape(encodeURIComponent(JSON.stringify({dec,notes,ex}))));
 function showSummary(){
  clearTimeout(loopT);dropCards();$('#grid').innerHTML='';$('#grid').hidden=true;$('#frame').classList.add('off');if(main.ready)main.reset();
  const s=$('#sum');s.hidden=false;main.ov=null;
- s.innerHTML=`<h1>My decisions</h1>`+QS.map((q,i)=>`<div class="sr" data-q="${i}" role="button" tabindex="0"><b>${esc(q.t)}</b><span${dec[q.id]?'':' class="no"'}>${esc(decText(q)||'Not decided')}</span>${notes[q.id]?`<small>Why: ${esc(notes[q.id])}</small>`:''}</div>`).join('')+
+ s.innerHTML=`<h1>My decisions</h1>`+QS.map((q,i)=>`<div class="sr" data-q="${i}" role="button" tabindex="0"><b>${esc(q.t)}</b><span${dec[q.id]?'':' class="no"'}>${esc(decText(q)||'Not decided')}</span>${notes[q.id]?`<small>Why: ${esc(notes[q.id])}</small>`:''}</div>`+
+   exList(q).map(([pl,d])=>`<div class="sr sub" data-q="${i}" data-p="${q.places.indexOf(pl)}" role="button" tabindex="0"><b>Except ${esc(pl.n)}</b><span>${esc(decText(q,d))}</span></div>`).join('')).join('')+
   `<div class="acts"><button class="btn" id="copyDec">Copy decisions</button><button class="btn q" id="copyLink" title="A link that opens this page with the same decisions">Copy link</button></div><h2>For development</h2><ul>${DEVNOTES.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
  paintDecide();
 }
-$('#sum').onclick=e=>{const r=e.target.closest('.sr');if(r){showQuestion(+r.dataset.q);return}
+$('#sum').onclick=e=>{const r=e.target.closest('.sr');if(r){showQuestion(+r.dataset.q,+r.dataset.p||0);return}
  if(e.target.closest('#copyDec'))copyText(decisionsText(),$('#copyDec'),'Copy decisions');
  else if(e.target.closest('#copyLink'))copyText(shareLink(),$('#copyLink'),'Copy link')};
-$('#prevQ').onclick=()=>showQuestion(qi-1);$('#nextQ').onclick=()=>showQuestion(qi+1);
 $('#againD').onclick=replay;
-function buildQList(){   // no numbers: a group shows only whether it is decided (a tick) and which preset was applied
+function buildQList(){   // groups by part of the interface; the open group lists its animations
  let h='',last='';QS.forEach((q,i)=>{const sc=SECT[q.id];if(sc!==last){h+=`<div class="lg">${esc(sc)}</div>`;last=sc}
-  h+=`<button class="ql" data-q="${i}"><i></i><div><b>${esc(q.t)}</b><small></small></div></button>`});
+  h+=`<button class="gq" data-q="${i}"><b>${esc(q.t)}</b><small></small></button><div class="gs" data-q="${i}"><div>`+q.places.map((x,k)=>`<button class="pq" data-q="${i}" data-p="${k}"><span>${esc(x.n)}</span><small></small></button>`).join('')+'</div></div>'});
  $('#list').innerHTML=h+`<hr><button class="ql all" data-q="${QS.length}"><div><b>My decisions</b></div><small></small></button>`;
- $('#list').onclick=e=>{const b=e.target.closest('.ql');if(b)showQuestion(+b.dataset.q)};
+ $('#list').onclick=e=>{const b=e.target.closest('.gq,.pq,.ql');if(b)showQuestion(+b.dataset.q,+b.dataset.p||0)};
 }
-function setApp(a){
- app=a;document.querySelectorAll('#appSeg button').forEach(b=>b.classList.toggle('on',b.dataset.app===a));
- const d=a==='decide';main.ov=null;$('#dockB').hidden=d;$('#drawer').hidden=true;$('#stepsBtn').classList.remove('on');$('#stepsBtn').textContent='Show steps';
- clearTimeout(loopT);
- if(d){rate=+document.querySelector('#speedD .on').dataset.r;buildQList();showQuestion(qi)}
- else{rate=+document.querySelector('#speed .on').dataset.r;$('#qh').hidden=true;$('#dockD').hidden=true;$('#sum').hidden=true;$('#places').hidden=true;buildList();showOne(cur)}
-}
-$('#appSeg').onclick=e=>{const b=e.target.closest('button');if(b&&b.dataset.app!==app)setApp(b.dataset.app)};
+/* (the page used to have a second mode, "All animations"; its dock stays hidden. The full list of animations is notes/MOTION.md) */
+function setApp(a){app='decide';main.ov=null;$('#dockB').hidden=true;$('#drawer').hidden=true;clearTimeout(loopT);rate=+document.querySelector('#speedD .on').dataset.r;buildQList();showQuestion(qi)}
 
 /* ---------- All animations: groups fold; a group has "All together" and its animations ---------- */
 const ICO='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -973,7 +996,7 @@ $('#again').onclick=replay;
 addEventListener('keydown',e=>{
  if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
  if(e.key===' '||e.key==='r'||e.key==='R'){e.preventDefault();replay();return}
- if(app==='decide'){if(e.key==='ArrowRight'){e.preventDefault();showQuestion(qi+1)}else if(e.key==='ArrowLeft'){e.preventDefault();showQuestion(qi-1)}return}
+ if(app==='decide'){if(qi>=QS.length)return;const q=QS[qi];if(e.key==='ArrowDown'){e.preventDefault();pi<q.places.length-1?showQuestion(qi,pi+1):showQuestion(qi+1)}else if(e.key==='ArrowUp'){e.preventDefault();pi>0?showQuestion(qi,pi-1):qi>0&&showQuestion(qi-1,QS[qi-1].places.length-1)}return}
  if(e.key==='ArrowDown'){e.preventDefault();showOne(mode==='one'?cur+1:ANIMS.findIndex(a=>a.g===grp))}
  else if(e.key==='ArrowUp'){e.preventDefault();if(mode==='one')showOne(cur-1)}
 });
