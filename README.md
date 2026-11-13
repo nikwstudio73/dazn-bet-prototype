@@ -81,7 +81,7 @@ One system everywhere. The tokens live at the top of the hand-written CSS (`MOTI
 | `--m-sheet` | .5 s | sheets, collapsed bar, toast, DAZN Bet overlay |
 
 - **Inventory:** `notes/MOTION.md` lists every animation (M01…M44): what moves, trigger, phases, tokens, numbers written outside the tokens, and where similar things are done differently.
-- **Gallery:** `public/motion.html` (open it by its own address; nothing links to it) plays each of them on the real prototype (`index.html?embed` in a frame) at 1× / 0.5× / 0.1×, with knobs for the tokens and "Copy changes".
+- **Presets:** `public/motion.html` (open it by its own address; nothing links to it) shows the real prototype (`index.html?embed` in a frame) and lets you try motion presets per group of animations — variants, exact values, compare with the current motion, slow motion — and copy the decisions. It previews on top of the prototype; `index.html` is not changed by it.
 
 JS helpers: `soft()` (play an element in), `setTxt()` (swap a text), `smoothH()` (ease a height), `rise(dir)` (start position of a new number). With **Reduce motion** switched on in the system nothing travels, springs or pulses; states still change.
 
