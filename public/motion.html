@@ -139,17 +139,45 @@ body{grid-template-columns:320px minmax(600px,1fr);min-width:960px}
 .lnk.on{background:var(--ui-on);color:var(--ui-t1)}
 #copyOut{position:absolute;right:16px;bottom:calc(100% + 8px);width:360px;margin:0;font:inherit;font-size:12px;line-height:18px;color:var(--ui-t1);white-space:pre-wrap;padding:12px 14px;border-radius:12px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);z-index:3}
 #copyOut[hidden]{display:none}
+
+/* v4: groups fold like the topics of the Prototype states panel; a group plays all its animations side by side */
+.list{gap:2px;padding-top:0}
+.gh{display:flex;align-items:center;gap:8px;width:100%;height:40px;padding:0 12px;border-radius:8px;text-align:left;font-weight:700;color:var(--ui-t1);transition:background .2s}
+.gh:hover{background:var(--ui-hover)}
+.gh svg{flex:none;color:var(--ui-t3);transition:transform .4s cubic-bezier(.32,.72,0,1)}
+.gp.open .gh svg{transform:rotate(90deg)}
+.gh span{flex:1;min-width:0}
+.gh i{flex:none;font-style:normal;font-weight:400;font-size:12px;color:var(--ui-t3)}
+.gb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.32,.72,0,1)}
+.gp.open .gb{grid-template-rows:1fr}
+.gb>div{min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:2px}
+.gb>div::after{content:"";flex:none;height:8px}
+.gb .li{padding-left:36px}
+#frame.off{visibility:hidden}
+.grid{position:absolute;inset:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--ui-line) transparent;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;align-content:start;align-items:start;padding:1px}
+.grid[hidden]{display:none}
+.card{min-width:0;border-radius:16px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);overflow:hidden;display:flex;flex-direction:column}
+.cl{flex:none;height:40px;padding:0 16px;text-align:left;font-weight:700;font-size:13px;line-height:18px;color:var(--ui-t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:background .2s}
+.cl:hover{background:var(--ui-on)}
+.vp{flex:none;position:relative;height:220px;overflow:hidden;background:var(--ui-canvas)}
+.vp.tall{height:460px}
+.vp iframe{position:absolute;left:0;top:0;width:560px;height:1030px;border:0;transform-origin:0 0}
+.cmp{padding-bottom:16px;border-bottom:1px solid var(--ui-line)}
+.cmp:last-child{border-bottom:0}
+.cmp h3{font-size:14px;line-height:20px;color:var(--ui-t1);margin-bottom:10px}
+.cmp p{margin-top:10px;font-size:13px;line-height:19px}
 </style>
 </head>
 <body>
 <aside class="panel">
- <div class="ph"><b>Animations</b><span>Pick one: it plays on the phone.</span></div>
+ <div class="ph"><b>Animations</b><span>Open a group to watch its animations side by side, or pick one.</span></div>
  <div class="scroll list" id="list"></div>
 </aside>
 
 <main class="stage">
  <div class="view">
   <iframe id="frame" src="index.html?embed" title="Prototype"></iframe>
+  <div class="grid" id="grid" hidden></div>
   <div class="panel drawer" id="drawer" hidden>
    <div class="ph"><b>Steps</b><span>What moves, and the token behind each time and curve.</span></div>
    <div class="scroll det" id="det"></div>
@@ -212,7 +240,7 @@ const ANIMS=[
  // 1 · press feedback
  {id:'M01',g:0,n:'Odds tile press',what:'The odds tile shrinks to 97 % under the finger and comes back.',trig:'Finger down on an odds tile (:active).',
   ph:[['Press in and release','--m-press','{not set · browser default}']],int:PRESS_INT,slow:'sim',
-  play:`G.press('#feed .odd[data-m="m5"][data-o="0"]')`},
+  play:`G.press('#feed .odd[data-m="m1"][data-o="1"]')`},
  {id:'M02',g:0,n:'Outcome button press (fixture)',what:'The outcome button on the fixture page shrinks to 98 %.',trig:'Finger down on an outcome (:active).',
   ph:[['Press in and release','--m-press','{not set · browser default}']],int:PRESS_INT,diff:'Scale .98 here, .97 on the odds tile.',slow:'sim',
   setup:`openFixture('m4');G.show('#mkts .choice','#fxScroll')`,play:`G.press('#mkts .choice')`},
@@ -243,7 +271,7 @@ const ANIMS=[
  {id:'M09',g:1,n:'Odd picked / unpicked',what:'Tile fill and text colour: dark ↔ white.',trig:'Tap on an odd (toggleSel() → syncTiles()).',
   ph:[['Fill','--m-quick','{not set · browser default}'],['Label and price colour','--m-quick','{not set · browser default}']],int:REV,
   diff:'On the fixture page (.choice) only the fill animates; its text switches instantly.',
-  play:`G.click('#feed .odd[data-m="m5"][data-o="0"]');G.after(1000,()=>G.click('#feed .odd[data-m="m5"][data-o="0"]'))`},
+  play:`G.click('#feed .odd[data-m="m1"][data-o="1"]');G.after(1000,()=>G.click('#feed .odd[data-m="m1"][data-o="1"]'))`},
  {id:'M10',g:1,n:'Top Pick card picked',what:'The whole card turns white, its texts turn dark.',trig:'Tap on the card.',
   ph:[['Card fill','--m-quick','{not set · browser default}'],['Text colours','--m-quick','{not set · browser default}']],int:REV,
   setup:`openComp('ucl','scorer')`,play:`G.click('#cpScroll .tp');G.after(1000,()=>G.click('#cpScroll .tp'))`},
@@ -285,10 +313,10 @@ const ANIMS=[
  {id:'M21',g:2,n:'Price moves on a tile',what:'The new number comes in along the move (up: from below, down: from above, 5 px); a green or red tint and an arrow appear, stay and fade.',trig:'A live price changes (changeOdd() → animateOdd()).',
   ph:[['New number comes in','T.std','SOFT'],['Tint in','--chg-in {.8 s}','--ease'],['Arrow in','--m-quick','{ease-out}'],['Tint and arrow stay','{2000 ms}','—'],['Tint and arrow fade','--chg-fade {1.5 s}','--ease']],
   int:'A new change of the same price clears the timers and starts over.',
-  play:`changeOdd(M('m4'),1,0,3.85);changeOdd(M('m5'),0,0,2.45)`},
+  play:`changeOdd(M('m2'),1,0,2.45);changeOdd(M('m1'),2,0,9.10)`},
  {id:'M22',g:2,n:'Price moves on my pick’s tile',what:'The tile stays white; the number comes in and a dark arrow shows the direction, longer than on other tiles.',trig:'The price of a picked odd changes.',
   ph:[['New number comes in','T.std','SOFT'],['Arrow in','--m-quick','{ease-out}'],['Arrow stays','{5000 ms}','—'],['Arrow fades','--chg-fade-pick {.6 s}','--ease']],
-  int:'A new change clears the timers and starts over.',setup:P3,play:`changeOdd(M('m4'),2,0,4.10)`},
+  int:'A new change clears the timers and starts over.',setup:P3,play:`changeOdd(M('m1'),0,0,1.30)`},
  {id:'M23',g:2,n:'Price moves in the betslip',what:'The card price, Total odds and "€10 may return" come in with a rise; the arrow grows in width and the number takes its colour.',trig:'The price of my pick changes while the sheet is open.',
   ph:[['Numbers come in','T.std','SOFT'],['Arrow grows (width, margin)','--m-quick','--ease'],['Arrow fades in','--m-quick','{ease-out}'],['Number takes the colour','--m-quick','{not set · browser default}'],
       ['Arrow and colour stay','{5000 ms}','—'],['Arrow and colour fade','--chg-fade-pick {.6 s}','{not set · browser default}'],['Classes are cleared after','{600 ms}','—']],
@@ -308,7 +336,7 @@ const ANIMS=[
   setup:P3S,play:`S.sel.unshift({m:'m7',g:'1x2',o:'0'});syncTiles();updateBar(true);renderSheet()`},
  {id:'M27',g:3,n:'Bar content swaps',what:'The list of picks, the bet type and the total: the new text rises 5 px. The total pill appears from 90 %. The counter jumps to 130 %.',trig:'A pick is added or removed (updateBar()).',
   ph:[['Texts rise in','T.std','SOFT'],['Total pill appears','T.std','SOFT'],['Counter bump','--m-layout','--ease']],int:'Texts start again; the bump restarts.',
-  setup:`S.sel=ONE();refresh()`,play:`G.click('#feed .odd[data-m="m4"][data-o="2"]');G.after(1100,()=>G.click('#feed .odd[data-m="m5"][data-o="1"]'));G.after(2200,()=>G.click('#feed .odd[data-m="m4"][data-o="2"]'))`},
+  setup:`S.sel=ONE();refresh()`,play:`G.click('#feed .odd[data-m="m2"][data-o="0"]');G.after(1100,()=>G.click('#feed .odd[data-m="m3"][data-o="0"]'));G.after(2200,()=>G.click('#feed .odd[data-m="m2"][data-o="0"]'))`},
  // 5 · height and layout
  {id:'M28',g:4,n:'Odds toggle: feed reveal',what:'Tiles change height one after another, prices fade in and rise 6 px; the warning on top and the "+18…" line collapse with them.',trig:'Odds in the header (setOddsOn()).',
   ph:[['Open · row height and tile padding','--m-layout','--soft'],['Open · prices fade in, after {110 ms}','--m-std','{ease-out}'],['Open · prices rise 6 px, after {110 ms}','--m-layout','--soft'],
@@ -329,7 +357,7 @@ const ANIMS=[
  // 6 · sheets, bar, toast, overlay
  {id:'M31',g:5,n:'Collapsed betslip appears / leaves',what:'The bar rises 18 px from 97 % and fades in.',trig:'The first pick / the last pick is removed.',
   ph:[['Rise and scale','--m-sheet','--soft'],['Fade','--m-quick','{ease-out}']],int:REV,
-  play:`G.click('#feed .odd[data-m="m4"][data-o="0"]');G.after(1400,()=>G.click('#feed .odd[data-m="m4"][data-o="0"]'))`},
+  play:`G.click('#feed .odd[data-m="m1"][data-o="0"]');G.after(1400,()=>G.click('#feed .odd[data-m="m1"][data-o="0"]'))`},
  {id:'M32',g:5,n:'Betslip sheet opens / closes',what:'The sheet slides up from the bottom edge, the page dims behind it.',trig:'Tap on the bar; tap outside the sheet.',
   ph:[['Sheet slides','--m-sheet','--soft'],['Dimming','--m-sheet','--soft'],['After closing the cards are redrawn after T.sheet + {20 ms}','—','—']],int:REV,
   setup:P3,play:`openSheet();G.after(1400,closeSheet)`},
@@ -387,91 +415,141 @@ function rich(s){
   return `<span class="chip">${t}${FIXED[t]?`<small>${FIXED[t]}</small>`:''}</span>`});
 }
 
-/* ---------- the prototype in the frame ---------- */
+/* ---------- a prototype in a frame ----------
+ The big phone and every small one in a group are the same thing: index.html?embed in a frame, driven by makeProto(). */
 const RMON=matchMedia('(prefers-reduced-motion:reduce)').matches;
-const F=$('#frame');let W=null,D=null,cur=0,rate=1,runId=0,pressed=[],dragEl=null,ready=false;
+let rate=1;
 const status=t=>{$('#status').textContent=t};
-const G={                                   // helpers for the scenarios; live on the prototype's window as G
- after:(ms,fn)=>W.setTimeout(fn,ms),        // the prototype's clock: slowed with everything else, dropped on the next run
- click(sel){const e=D.querySelector(sel);if(e)e.click()},
- show(sel,scSel){const e=D.querySelector(sel),sc=D.querySelector(scSel),k=+D.querySelector('#stage').dataset.scale||1;
-  if(e&&sc)sc.scrollTop+=(e.getBoundingClientRect().top-sc.getBoundingClientRect().top)/k-sc.clientHeight*.45},
- /* a press cannot be started from code, so the element's own :active rules are applied to it for a moment:
-    the values, the duration and the curve all come from the prototype's CSS */
- press(sel,ms=300){const el=D.querySelector(sel);if(!el)return;const props=[];
-  for(const sh of D.styleSheets){let rules;try{rules=sh.cssRules}catch(e){continue}
-   for(const r of rules){if(!r.selectorText||!r.selectorText.includes(':active'))continue;
-    for(const part of r.selectorText.split(',')){if(!part.includes(':active'))continue;let ok=false;try{ok=el.matches(part.replace(/:active/g,''))}catch(e){}
-     if(ok)for(const k of r.style)props.push([k,r.style.getPropertyValue(k)])}}}
-  props.forEach(([k,v])=>el.style.setProperty(k,v));pressed.push([el,props.map(p=>p[0])]);
-  W.setTimeout(()=>props.forEach(([k])=>el.style.removeProperty(k)),ms)},
- /* a scripted finger: down on the grip, px down over ~half a second, a short stop, up */
- drag(sel,px,then){const el=D.querySelector(sel);if(!el)return;const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+10,k=+D.querySelector('#stage').dataset.scale||1,id=runId;
-  const ev=(t,cy)=>el.dispatchEvent(new W.PointerEvent(t,{bubbles:true,clientX:x,clientY:cy,pointerId:1,pointerType:'touch',isPrimary:true}));
-  dragEl=el;ev('pointerdown',y);const t0=performance.now();
-  (function step(){if(id!==runId)return;const p=Math.min(1,(performance.now()-t0)/520),e=1-(1-p)*(1-p);ev('pointermove',y+px*k*e);
-   if(p<1)requestAnimationFrame(step);else setTimeout(()=>{if(id!==runId)return;ev('pointerup',y+px*k);dragEl=null;then&&then()},140)})()},
- flip(){setSize(dev==='max'?'mini':'max')},
- x:null
-};
-let dev='mini';
-function setSize(d){const b=D&&D.querySelector(`.devsw [data-dev="${d}"]`);if(b)b.click();dev=d}
-function boot(){
- W=F.contentWindow;D=F.contentDocument;ready=false;
- if(!W||!W.MOTION){status('The prototype did not load with its gallery hooks (index.html?embed).');return}
- const st=D.createElement('style');st.textContent='html.mg-freeze *,html.mg-freeze *::before,html.mg-freeze *::after{transition:none!important;animation:none!important}';D.head.appendChild(st);
- W.addEventListener('keydown',e=>{if(e.key.startsWith('Arrow')||e.key==='l'||e.key==='L')e.stopImmediatePropagation()},true); // the prototype's own shortcuts would rebuild the screen behind the gallery's back
- W.G=G;ready=true;
- pushTokens();W.MOTION.rate(rate);
- dev='mini';
- select(cur);
-}
-/* back to a clean prototype, without any motion */
-function reset(){
- runId++;
- if(dragEl){try{dragEl.dispatchEvent(new W.PointerEvent('pointercancel',{bubbles:true,pointerId:1}))}catch(e){}dragEl=null}
- W.MOTION.clear();
- pressed.forEach(([el,ks])=>ks.forEach(k=>el.style.removeProperty(k)));pressed=[];
- ['#sheet','#fav','#backdrop'].forEach(s=>{const e=D.querySelector(s);e.classList.remove('drag');e.style.transform=e.style.opacity=e.style.transitionDuration=''});
- D.querySelector('#stage').classList.remove('anim');
- W.eval('cur=-1;init();LIVE=false;HOLD=false');   // live prices are paused here: every run shows the same numbers
-}
-function run(){
- if(!ready)return;const a=ANIMS[cur],root=D.documentElement;
- try{
-  root.classList.add('mg-freeze');                 // set the state instantly: no entrance of the bar, the sheet or the page
-  reset();const id=runId;
-  if(a.setup)W.eval(a.setup);
-  D.querySelectorAll('.bump,.nope,.deny').forEach(e=>e.classList.remove('bump','nope','deny')); // one-shot keyframe classes left by the setup would replay when the freeze is lifted
-  void D.body.offsetWidth;D.getAnimations().forEach(x=>x.cancel());
-  status(RMON?'Reduce motion is on in your system: nothing will travel':a.slow==='none'?'Not shown in this gallery':a.slow==='part'?'One part is not slowed: see the steps':a.slow==='sim'?'The press is made by this page':a.play?'':'Runs all the time');
-  requestAnimationFrame(()=>{if(id!==runId)return;root.classList.remove('mg-freeze');void D.body.offsetWidth;
-   requestAnimationFrame(()=>{if(id!==runId)return;try{if(a.play)W.eval(a.play)}catch(e){status(a.id+' · error: '+e.message);console.error(e)}})});
- }catch(e){root.classList.remove('mg-freeze');status(a.id+' · error: '+e.message);console.error(e)}
+/* where to look when the animation is shown small in a group: the element that moves (default: the whole phone) */
+const FOCUS={M01:'#feed .odd[data-m="m1"][data-o="1"]',M02:'#mkts .choice',M03:'#cpScroll .tp',M04:'#cpScroll .cp-row',M05:'#placeBtn',M06:'#bar',M07:'#editBtn',
+ M09:'#feed .odd[data-m="m1"][data-o="1"]',M10:'#cpScroll .tp',M11:'#oddsChip',M12:'#liveBadge',M13:'#days',M14:'.cp-chips',M15:'#placeBtn',M16:'[data-card="m4|1x2"]',M19:'.livepill',M20:'[data-card="m1|1x2"]',
+ M21:'#feed [data-tile="m1"]',M22:'#feed [data-tile="m1"] .orow',M24:'#bar',M27:'#bar',M29:'#sheet .summary',M30:'#sheet .sfoot'};
+function makeProto(F,vp){
+ const P={F,vp,W:null,D:null,ready:false,runId:0,pressed:[],dragEl:null,dev:'mini',anim:null,onready:null};
+ const q=s=>P.D.querySelector(s),scale=()=>+q('#stage').dataset.scale||1;
+ const G={                                  // helpers for the scenarios; live on the prototype's window as G
+  after:(ms,fn)=>P.W.setTimeout(fn,ms),     // the prototype's clock: slowed with everything else, dropped on the next run
+  click(sel){const e=q(sel);if(e)e.click()},
+  show(sel,scSel){const e=q(sel),sc=q(scSel);if(e&&sc)sc.scrollTop+=(e.getBoundingClientRect().top-sc.getBoundingClientRect().top)/scale()-sc.clientHeight*.45},
+  /* a press cannot be started from code, so the element's own :active rules are applied to it for a moment:
+     the values, the duration and the curve all come from the prototype's CSS */
+  press(sel,ms=300){const el=q(sel);if(!el)return;const props=[];
+   for(const sh of P.D.styleSheets){let rules;try{rules=sh.cssRules}catch(e){continue}
+    for(const r of rules){if(!r.selectorText||!r.selectorText.includes(':active'))continue;
+     for(const part of r.selectorText.split(',')){if(!part.includes(':active'))continue;let ok=false;try{ok=el.matches(part.replace(/:active/g,''))}catch(e){}
+      if(ok)for(const k of r.style)props.push([k,r.style.getPropertyValue(k)])}}}
+   props.forEach(([k,v])=>el.style.setProperty(k,v));P.pressed.push([el,props.map(p=>p[0])]);
+   P.W.setTimeout(()=>props.forEach(([k])=>el.style.removeProperty(k)),ms)},
+  /* a scripted finger: down on the grip, px down over ~half a second, a short stop, up */
+  drag(sel,px,then){const el=q(sel);if(!el)return;const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+10,k=scale(),id=P.runId;
+   const ev=(t,cy)=>el.dispatchEvent(new P.W.PointerEvent(t,{bubbles:true,clientX:x,clientY:cy,pointerId:1,pointerType:'touch',isPrimary:true}));
+   P.dragEl=el;ev('pointerdown',y);const t0=performance.now();
+   (function step(){if(id!==P.runId)return;const p=Math.min(1,(performance.now()-t0)/520),e=1-(1-p)*(1-p);ev('pointermove',y+px*k*e);
+    if(p<1)requestAnimationFrame(step);else setTimeout(()=>{if(id!==P.runId)return;ev('pointerup',y+px*k);P.dragEl=null;then&&then()},140)})()},
+  flip(){P.dev=P.dev==='max'?'mini':'max';const b=q(`.devsw [data-dev="${P.dev}"]`);if(b)b.click()},
+  x:null
+ };
+ P.boot=()=>{
+  P.W=F.contentWindow;P.D=F.contentDocument;P.ready=false;P.dev='mini';
+  if(!P.W||!P.W.MOTION){status('The prototype did not load with its gallery hooks (index.html?embed).');return}
+  const st=P.D.createElement('style');st.textContent='html.mg-freeze *,html.mg-freeze *::before,html.mg-freeze *::after{transition:none!important;animation:none!important}';P.D.head.appendChild(st);
+  P.W.addEventListener('keydown',e=>{if(e.key.startsWith('Arrow')||e.key==='l'||e.key==='L')e.stopImmediatePropagation()},true); // the prototype's own shortcuts would rebuild the screen behind the gallery's back
+  P.W.G=G;P.ready=true;
+  if(P.onready)P.onready();else if(P.anim)P.run(P.anim);
+ };
+ /* back to a clean prototype, without any motion */
+ P.reset=()=>{
+  P.runId++;
+  if(P.dragEl){try{P.dragEl.dispatchEvent(new P.W.PointerEvent('pointercancel',{bubbles:true,pointerId:1}))}catch(e){}P.dragEl=null}
+  P.W.MOTION.clear();
+  P.pressed.forEach(([el,ks])=>ks.forEach(k=>el.style.removeProperty(k)));P.pressed=[];
+  ['#sheet','#fav','#backdrop'].forEach(s=>{const e=q(s);e.classList.remove('drag');e.style.transform=e.style.opacity=e.style.transitionDuration=''});
+  q('#stage').classList.remove('anim');
+  P.W.eval('cur=-1;init();LIVE=false;HOLD=false');   // live prices are paused here: every run shows the same numbers
+ };
+ /* a small phone in a group: zoom the frame to the element that moves */
+ P.frameOn=a=>{
+  const ph=q('#phone'),el=(FOCUS[a.id]&&q(FOCUS[a.id]))||ph,r=el.getBoundingClientRect(),whole=el===ph;
+  vp.classList.toggle('tall',whole||r.height>240);const vw=vp.clientWidth,vh=vp.clientHeight;
+  const z=whole?Math.min(vw/(r.width+32),vh/(r.height+32)):Math.min(2,vw*.8/r.width,vh*.72/r.height);
+  F.style.transform=`translate(${vw/2-(r.left+r.width/2)*z}px,${vh/2-(r.top+r.height/2)*z}px) scale(${z})`;
+ };
+ P.run=a=>{
+  P.anim=a;if(!P.ready)return;const root=P.D.documentElement;
+  try{
+   P.W.MOTION.rate(rate);const o={};TOKENS.forEach(t=>o[t.k]=changed(t.k)?css(t.k):null);P.W.MOTION.tokens(o);
+   root.classList.add('mg-freeze');                 // set the state instantly: no entrance of the bar, the sheet or the page
+   P.reset();const id=P.runId;
+   if(a.setup)P.W.eval(a.setup);
+   P.D.querySelectorAll('.bump,.nope,.deny').forEach(e=>e.classList.remove('bump','nope','deny')); // one-shot keyframe classes left by the setup would replay when the freeze is lifted
+   void P.D.body.offsetWidth;P.D.getAnimations().forEach(x=>x.cancel());
+   if(vp)P.frameOn(a);
+   requestAnimationFrame(()=>{if(id!==P.runId)return;root.classList.remove('mg-freeze');void P.D.body.offsetWidth;
+    requestAnimationFrame(()=>{if(id!==P.runId)return;try{if(a.play)P.W.eval(a.play)}catch(e){status(a.id+' · error: '+e.message);console.error(e)}})});
+  }catch(e){root.classList.remove('mg-freeze');status(a.id+' · error: '+e.message);console.error(e)}
+ };
+ F.addEventListener('load',P.boot);
+ if(F.contentDocument&&F.contentDocument.readyState==='complete'&&F.contentWindow.MOTION)P.boot();
+ return P;
 }
 
-/* ---------- list ---------- */
+/* ---------- what is on screen: one animation on the big phone, or a whole group side by side ---------- */
+const main=makeProto($('#frame'),null);
+let mode='group',grp=0,cur=0,cards=[];
+const inGroup=g=>ANIMS.filter(a=>a.g===g&&a.slow!=='none');
+const shown=()=>mode==='one'?[ANIMS[cur]]:inGroup(grp);
+function replay(){
+ const one=mode==='one',a=ANIMS[cur];
+ status(RMON?'Reduce motion is on in your system: nothing will travel':!one?`${cards.length} animations side by side`:a.slow==='none'?'Not shown in this gallery':a.slow==='part'?'One part is not slowed: see the steps':a.slow==='sim'?'The press is made by this page':a.play?'':'Runs all the time');
+ if(one)main.run(a);else if(cards.every(c=>c.ready))cards.forEach(c=>c.run(c.anim));
+}
+function showOne(i){
+ mode='one';cur=Math.max(0,Math.min(ANIMS.length-1,i));grp=ANIMS[cur].g;
+ cards=[];$('#grid').innerHTML='';$('#grid').hidden=true;$('#frame').classList.remove('off');
+ paintAll();replay();
+}
+function showGroup(g){
+ mode='group';grp=g;const items=inGroup(g);
+ $('#frame').classList.add('off');if(main.ready)main.reset();
+ const grid=$('#grid');grid.hidden=false;grid.scrollTop=0;
+ grid.innerHTML=items.map(a=>`<div class="card"><button class="cl" data-i="${ANIMS.indexOf(a)}" title="Open on the big phone">${esc(a.n)}</button><div class="vp"><iframe src="index.html?embed" title="${esc(a.n)}"></iframe></div></div>`).join('');
+ cards=[...grid.querySelectorAll('.vp')].map((vp,n)=>{const c=makeProto(vp.firstElementChild,vp);c.anim=items[n];c.onready=()=>{if(cards.every(x=>x.ready))replay()};return c}); // they start together, once the last one has loaded
+ paintAll();replay();
+}
+$('#grid').onclick=e=>{const b=e.target.closest('.cl');if(b)showOne(+b.dataset.i)};
+
+/* ---------- list: groups fold; a group has "All together" and its animations ---------- */
+const ICO='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function buildList(){
- let h='';GROUPS.forEach((g,gi)=>{const items=ANIMS.filter(a=>a.g===gi);
-  h+=`<div class="lg">${esc(g)}</div>`+items.map(a=>`<button class="li" data-i="${ANIMS.indexOf(a)}"><span>${esc(a.n)}</span></button>`).join('')});
- $('#list').innerHTML=h;
- $('#list').onclick=e=>{const b=e.target.closest('.li');if(b)select(+b.dataset.i)};
+ $('#list').innerHTML=GROUPS.map((g,gi)=>{const items=ANIMS.filter(a=>a.g===gi);
+  return `<div class="gp" data-g="${gi}"><button class="gh" aria-expanded="false">${ICO}<span>${esc(g)}</span><i>${items.length}</i></button><div class="gb"><div>`+
+   `<button class="li" data-all="${gi}"><span>All together</span></button>`+items.map(a=>`<button class="li" data-i="${ANIMS.indexOf(a)}"><span>${esc(a.n)}</span></button>`).join('')+'</div></div></div>'}).join('');
+ $('#list').onclick=e=>{
+  const h=e.target.closest('.gh');if(h){showGroup(+h.parentNode.dataset.g);return}
+  const b=e.target.closest('.li');if(!b)return;
+  if(b.dataset.all!==undefined)showGroup(+b.dataset.all);else showOne(+b.dataset.i)};
 }
-function select(i){
- cur=Math.max(0,Math.min(ANIMS.length-1,i));const a=ANIMS[cur];
- document.querySelectorAll('.li').forEach(b=>{const on=+b.dataset.i===cur;b.classList.toggle('on',on);if(on)b.scrollIntoView({block:'nearest'})});
- $('#again').disabled=a.slow==='none'||!a.play;$('#nowT').textContent=a.n;
- paintDetail();paintKnobs();run();
+function paintAll(){
+ const one=mode==='one',a=ANIMS[cur];
+ document.querySelectorAll('.gp').forEach(p=>{const on=+p.dataset.g===grp;p.classList.toggle('open',on);p.querySelector('.gh').setAttribute('aria-expanded',on)});
+ document.querySelectorAll('.li').forEach(b=>b.classList.toggle('on',one?+b.dataset.i===cur:+b.dataset.all===grp));
+ $('#nowT').textContent=one?a.n:GROUPS[grp];
+ $('#again').disabled=one&&(a.slow==='none'||!a.play);
+ paintDetail();paintKnobs();
 }
+const stepsHTML=a=>{const row=(l,v)=>v&&v!=='—'?`<div><em>${l}</em><span>${rich(v)}</span></div>`:'';
+ return a.ph.map((p,n)=>`<div class="step"><i>${n+1}</i><b>${rich(p[0])}</b>${row('Duration',p[1])}${row('Curve',p[2])}</div>`).join('')};
 function paintDetail(){
- const a=ANIMS[cur],row=(l,v)=>v&&v!=='—'?`<div><em>${l}</em><span>${rich(v)}</span></div>`:'';
+ if(mode==='group'){   // side by side: the steps of each, one under another, so the differences are easy to see
+  $('#det').innerHTML=inGroup(grp).map(a=>`<div class="cmp"><h3>${esc(a.n)}</h3>${stepsHTML(a)}${a.diff?`<p>${rich(a.diff)}</p>`:''}</div>`).join('');return}
+ const a=ANIMS[cur];
  const slow=a.slow==='part'?`<div class="note"><b>Not fully slowed.</b> ${esc(a.slowNote)}</div>`
   :a.slow==='sim'?`<div class="note"><b>The press is made by this page.</b> Code cannot hold a finger down, so the page switches on the element’s own pressed style for a moment. Time and curve are the prototype’s. You can also press it on the phone yourself.</div>`
   :a.slow==='none'?`<div class="note"><b>Not shown here.</b> ${esc(a.slowNote)}</div>`:'';
  $('#det').innerHTML=`${slow}
   <div><h2>What moves</h2><p class="lead">${esc(a.what)}</p></div>
   <div><h2>Starts when</h2><p>${esc(a.trig)}</p></div>
-  <div><h2>Steps</h2>${a.ph.map((p,n)=>`<div class="step"><i>${n+1}</i><b>${rich(p[0])}</b>${row('Duration',p[1])}${row('Curve',p[2])}</div>`).join('')}</div>
+  <div><h2>Steps</h2>${stepsHTML(a)}</div>
   ${a.diff?`<div><h2>Similar things are done differently</h2><p>${rich(a.diff)}</p></div>`:''}
   <div><h2>If interrupted</h2><p>${esc(a.int)}</p></div>
   <details><summary>With Reduce motion switched on</summary><p>${rich(RM_TEXT)}</p></details>`;
@@ -479,11 +557,10 @@ function paintDetail(){
 
 /* ---------- token knobs ---------- */
 let again;
-function pushTokens(){if(!ready)return;const o={};TOKENS.forEach(t=>o[t.k]=changed(t.k)?css(t.k):null);W.MOTION.tokens(o)}
 function tokenChanged(){
- $('#copyOut').hidden=true;pushTokens();paintKnobs();paintDetail();
+ $('#copyOut').hidden=true;paintKnobs();paintDetail();
  try{localStorage.setItem('motionTokens',JSON.stringify(val))}catch(e){}
- clearTimeout(again);again=setTimeout(run,350);   // show the result once the knob rests
+ clearTimeout(again);again=setTimeout(replay,350);   // show the result once the knob rests
 }
 const curveSvg=c=>`<svg width="32" height="32" viewBox="-2 -2 28 28" aria-hidden="true"><path d="M0 24C${c[0]*24} ${24-c[1]*24} ${c[2]*24} ${24-c[3]*24} 24 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
 let showAll=false;
@@ -491,7 +568,7 @@ function buildKnobs(){
  const others=k=>ANIMS.filter(a=>a.tok.has(k)).length,lab=(t,f)=>`<label${f?` for="${f}"`:''}><b>${t.k}</b><span data-use="${esc(t.use)}" title="${esc(t.use)} · drives ${others(t.k)} animations"></span></label>`;
  $('#tk').innerHTML=TOKENS.map((t,i)=>t.cv
   ?`<div class="tr cv" data-k="${t.k}">${lab(t)}<div class="cvin">${[0,1,2,3].map(j=>`<input class="num" type="number" step=".01" min="${j%2?-1:0}" max="${j%2?2:1}" data-j="${j}" title="cubic-bezier ${['x1','y1','x2','y2'][j]}" aria-label="${t.k} ${['x1','y1','x2','y2'][j]}">`).join('')}</div><span></span></div>`
-  :`<div class="tr" data-k="${t.k}">${lab(t,'r'+i)}<input id="r${i}" type="range" min="0" max="${t.max}" step="10"><div class="unit"><input class="num" type="number" min="0" max="3000" step="10" aria-label="${t.k} in ms">ms</div></div>`).join('')+'<p id="noTk" hidden>This animation does not use motion tokens: its times are typed as numbers. See the steps.</p>';
+  :`<div class="tr" data-k="${t.k}">${lab(t,'r'+i)}<input id="r${i}" type="range" min="0" max="${t.max}" step="10"><div class="unit"><input class="num" type="number" min="0" max="3000" step="10" aria-label="${t.k} in ms">ms</div></div>`).join('')+'<p id="noTk" hidden>Nothing here uses a motion token: the times are typed as numbers. See the steps.</p>';
  $('#stepsBtn').onclick=()=>{const d=$('#drawer');d.hidden=!d.hidden;$('#stepsBtn').classList.toggle('on',!d.hidden);$('#stepsBtn').textContent=d.hidden?'Show steps':'Hide steps';$('#stepsBtn').setAttribute('aria-expanded',!d.hidden)};
  $('#allBtn').onclick=()=>{showAll=!showAll;$('#allBtn').classList.toggle('on',showAll);$('#allBtn').setAttribute('aria-pressed',showAll);paintKnobs()};
  $('#tk').addEventListener('input',e=>{const row=e.target.closest('.tr[data-k]');if(!row)return;const k=row.dataset.k;
@@ -505,13 +582,13 @@ function buildKnobs(){
  $('#resetTk').onclick=()=>{TOKENS.forEach(t=>val[t.k]=t.cv?[...t.cv]:t.ms);tokenChanged()};
  $('#copyTk').onclick=copyChanges;
 }
-function filter(k){$('#list').classList.toggle('filter',!!k);document.querySelectorAll('.li').forEach(b=>b.classList.toggle('hit',!!k&&ANIMS[+b.dataset.i].tok.has(k)))}
+function filter(k){$('#list').classList.toggle('filter',!!k);document.querySelectorAll('.li[data-i]').forEach(b=>b.classList.toggle('hit',!!k&&ANIMS[+b.dataset.i].tok.has(k)))}
 function paintKnobs(){
- const use=ANIMS[cur].tok;let shown=0;$('#tk').classList.toggle('all',showAll);
- document.querySelectorAll('#tk .tr[data-k]').forEach(row=>{const k=row.dataset.k,t=TK[k],u=row.querySelector('label span');row.hidden=!(showAll||use.has(k));if(!row.hidden)shown++;row.classList.toggle('ch',changed(k));u.textContent=changed(k)?'was '+(t.cv?t.cv.map(n2).join(' '):t.ms+' ms'):u.dataset.use;
+ const use=new Set(shown().flatMap(a=>[...a.tok]));let n=0;$('#tk').classList.toggle('all',showAll);
+ document.querySelectorAll('#tk .tr[data-k]').forEach(row=>{const k=row.dataset.k,t=TK[k],u=row.querySelector('label span');row.hidden=!(showAll||use.has(k));if(!row.hidden)n++;row.classList.toggle('ch',changed(k));u.textContent=changed(k)?'was '+(t.cv?t.cv.map(n2).join(' '):t.ms+' ms'):u.dataset.use;
   if(t.cv){row.querySelectorAll('input').forEach(inp=>{if(document.activeElement!==inp)inp.value=n2(val[k][+inp.dataset.j])});row.lastElementChild.innerHTML=curveSvg(val[k])}
   else{const [r,nb]=row.querySelectorAll('input');r.value=val[k];if(document.activeElement!==nb)nb.value=val[k]}});
- $('#noTk').hidden=shown>0;
+ $('#noTk').hidden=n>0;
  const c=TOKENS.filter(t=>changed(t.k)).length;$('#chN').textContent=c?c+' token'+(c>1?'s':'')+' changed':'';$('#resetTk').disabled=!c;$('#copyTk').disabled=!c;
 }
 function changesText(){
@@ -525,20 +602,17 @@ function copyChanges(){
 }
 
 /* ---------- controls ---------- */
-$('#speed').onclick=e=>{const b=e.target.closest('button');if(!b)return;rate=+b.dataset.r;document.querySelectorAll('#speed button').forEach(x=>x.classList.toggle('on',x===b));if(ready){W.MOTION.rate(rate);run()}};
-$('#again').onclick=run;
+$('#speed').onclick=e=>{const b=e.target.closest('button');if(!b)return;rate=+b.dataset.r;document.querySelectorAll('#speed button').forEach(x=>x.classList.toggle('on',x===b));replay()};
+$('#again').onclick=replay;
 addEventListener('keydown',e=>{
  if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
- if(e.key==='ArrowDown'){e.preventDefault();select(cur+1)}
- else if(e.key==='ArrowUp'){e.preventDefault();select(cur-1)}
- else if(e.key===' '||e.key==='r'||e.key==='R'){e.preventDefault();run()}
+ if(e.key==='ArrowDown'){e.preventDefault();showOne(mode==='one'?cur+1:ANIMS.findIndex(a=>a.g===grp))}
+ else if(e.key==='ArrowUp'){e.preventDefault();if(mode==='one')showOne(cur-1)}
+ else if(e.key===' '||e.key==='r'||e.key==='R'){e.preventDefault();replay()}
 });
 try{const s=JSON.parse(localStorage.getItem('motionTokens')||'null');if(s)TOKENS.forEach(t=>{const v=s[t.k];if(t.cv?Array.isArray(v)&&v.length===4&&v.every(n=>typeof n==='number'):typeof v==='number')val[t.k]=v})}catch(e){}
-buildList();buildKnobs();paintKnobs();
-document.querySelector('.li').classList.add('on');$('#nowT').textContent=ANIMS[0].n;paintDetail();
-
-F.addEventListener('load',boot);
-if(F.contentDocument&&F.contentDocument.readyState==='complete'&&F.contentWindow.MOTION)boot();
+buildList();buildKnobs();
+showGroup(0);   // opens on the press feedback of every button, side by side
 </script>
 </body>
 </html>
