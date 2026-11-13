@@ -711,6 +711,7 @@ const SECT={press:'Touch',state:'Touch',swap:'Content',cascade:'Content',sheets:
 const QS=[
  {id:'press',t:'Press feedback',s:'What an element does under the finger and when it is let go: odds, outcome buttons, the main button, cards, rows, the betslip bar, small buttons.',
   places:[PL('M01','Odds tile'),PL('M02','Outcome button'),PL('M05','Main button'),PL('M06','Betslip bar'),PL('M03','Top Pick card'),PL('M04','List row'),PL('M07','Edit button')],
+  none:f=>f.scale>=1&&f.op>=1,noneText:'Scale 100% and Opacity 100% mean nothing happens on press. Move a slider to the left to see an effect.',
   ml:'Motion · release',fx:[{k:'scale',l:'Scale',min:.88,max:1,step:.005,fmt:pct},{k:'op',l:'Opacity',min:.4,max:1,step:.05,fmt:pct}],
   presets:[{n:'Subtle',d:'Barely moves. Quiet, for dense screens.',fx:{scale:.985,op:1},m:M('out',120)},
    {n:'iOS-like',d:'A clear press and a soft, slower return.',fx:{scale:.96,op:1},m:M('soft',320)},
@@ -725,7 +726,7 @@ const QS=[
   apply:(f,k)=>({css:`html:root{--m-quick:${k.t}ms}html .odd,html .choice,html .tp,html .gs-card,html .cta-main,html .odd .l,html .odd .v,html .livebadge,html .oddsTog .sw,html .oddsTog .knob,html .day,html .cp-chip,html .tp-top i,html .tp-in>span,html .tp-in>b,html .tp-club{transition-timing-function:${k.flat}}`})}, // these all sit on --m-quick: the preview moves that token and sets one curve
  {id:'swap',t:'Numbers and texts that change',s:'A price moves, a total is recalculated, a list is replaced: the new value comes in.',
   places:[PL('M21','Price on a tile'),PL('M23','Prices in the betslip'),PL('M24','Total in the bar'),PL('M27','Bar texts'),PL('M42','Competition list')],
-  fx:[{k:'off',l:'Offset',min:0,max:24,step:1,fmt:px}],
+  fx:[{k:'off',l:'Offset',min:0,max:24,step:1,fmt:px}],none:f=>f.off<=0,noneText:'Offset 0 px: the new value only fades in, it does not travel.',
   presets:[{n:'Crossfade',d:'The new value just fades in. No movement.',fx:{off:0},m:M('out',200)},{n:'Small rise',d:'A short rise, close to what it is today.',fx:{off:5},m:M('soft',320)},
    {n:'Big rise',d:'The value clearly rolls in. Draws the eye.',fx:{off:14},m:M('soft',380)},{n:'Springy',d:'Arrives with a small overshoot and settles.',fx:{off:10},m:M('bouncy')}],
   apply:(f,k)=>({js:(W,o)=>{const base=W.soft;W.soft=(el,from,t,d)=>{if(!el||!el.animate)return;
@@ -814,7 +815,8 @@ function paintDecide(){
 }
 function paintStatus(){
  const q=QS[qi],d=dec[q.id],ok=d&&d.i===ps&&(ps<0||same(d.p,pp)),ab=$('#applyB');
- $('#pDesc').textContent=ps<0?'The prototype as it is today. Pick a preset to feel the difference, then fine-tune it.':q.presets[ps].d+(edited(q,ps,pp)?' (edited)':'');
+ const off=ps>=0&&q.none&&q.none(pp.fx);
+ $('#pDesc').textContent=ps<0?'The prototype as it is today. Pick a preset to feel the difference, then fine-tune it.':off?q.noneText:q.presets[ps].d+(edited(q,ps,pp)?' (edited)':'');
  ab.textContent=ok?'Applied to the whole group ✓':ps<0?'Keep the group as it is':'Apply to the whole group';ab.classList.toggle('q',!!ok);
  $('#dHint').textContent=d?'Applied: '+presetName(q,d):'Nothing applied yet';
 }
