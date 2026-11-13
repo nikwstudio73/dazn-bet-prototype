@@ -317,6 +317,13 @@ body{grid-template-columns:248px minmax(520px,1fr);gap:12px;padding:12px;min-wid
 .qh p,#pDesc,#dHint,#status:empty{display:none}
 .ql small:empty{display:none}
 .df span{flex:1}
+
+/* v12: basic settings on top, the rest under Advanced */
+.adv{padding-top:10px;border-top:1px solid var(--ui-line)}
+.adv>summary{cursor:pointer;font-size:12px;line-height:18px;font-weight:700;color:var(--ui-t3);border-radius:4px}
+.adv[open]>summary{color:var(--ui-t1);margin-bottom:8px}
+.adv[open]{display:flex;flex-direction:column;gap:8px}
+#basic:empty{display:none}
 </style>
 </head>
 <body>
@@ -343,20 +350,22 @@ body{grid-template-columns:248px minmax(520px,1fr);gap:12px;padding:12px;min-wid
   <div class="qh" id="qh"><span id="qN"></span><h1 id="qT"></h1><p id="qS"></p></div>
   <div class="panel places" id="places" hidden></div>
   <div class="panel dock" id="dockD">
+   <!-- basic: a preset, its one or two main values, watch, apply -->
    <span class="lbl">Presets</span>
    <div class="chips" id="presets"></div>
    <p class="pd" id="pDesc"></p>
-   <details class="today"><summary>Today</summary><ul id="todayL"></ul></details>
-   <div class="blk" id="fxBlk"><span class="lbl">Effect</span><div class="pr" id="fx"></div></div>
-   <div class="blk" id="moBlk"><span class="lbl" id="moLbl">Motion</span><div class="pr" id="mo"></div></div>
-   <div class="blk"><span class="lbl">Preview</span>
-    <div class="dh"><div class="seg" id="speedD" role="tablist" aria-label="Speed"><button role="tab" data-r="1" class="on">1×</button><button role="tab" data-r="0.5">0.5×</button><button role="tab" data-r="0.1">0.1×</button></div><span class="sp"></span><button class="btn q" id="againD">Play again</button></div>
-    <label class="chk"><input type="checkbox" id="loop">Loop</label>
-    <label class="chk"><input type="checkbox" id="cmp">Compare with Current</label>
-    <label class="chk"><input type="checkbox" id="zoom">Zoom</label>
-       </div>
-   <div class="blk"><label class="lbl" for="why">Note</label><textarea id="why" rows="2"></textarea></div>
+   <div class="pr" id="basic"></div>
+   <div class="dh"><div class="seg" id="speedD" role="tablist" aria-label="Speed"><button role="tab" data-r="1" class="on">1×</button><button role="tab" data-r="0.5">0.5×</button><button role="tab" data-r="0.1">0.1×</button></div><span class="sp"></span><button class="btn q" id="againD">Play again</button></div>
+   <label class="chk"><input type="checkbox" id="cmp">Compare with Current</label>
    <button class="btn big" id="applyB">Apply</button>
+   <!-- advanced: the rest of the values, viewing options, what it replaces, a note -->
+   <details class="adv" id="advD"><summary>Advanced</summary>
+    <div class="pr" id="mo"></div>
+    <label class="chk"><input type="checkbox" id="loop">Loop</label>
+    <label class="chk"><input type="checkbox" id="zoom">Zoom</label>
+    <details class="today"><summary>Today</summary><ul id="todayL"></ul></details>
+    <label class="lbl" for="why">Note</label><textarea id="why" rows="2"></textarea>
+   </details>
    <div class="df"><button class="btn q" id="prevQ">Back</button><span id="dHint"></span><button class="btn q" id="nextQ">Skip</button></div>
   </div>
   <!-- All animations: speed, replay, steps, tokens -->
@@ -740,7 +749,7 @@ const QS=[
   places:[PL('M01','Odds tile'),PL('M02','Outcome button'),PL('M05','Main button'),PL('M06','Betslip bar'),PL('M03','Top Pick card'),PL('M04','List row'),PL('M07','Edit button')],
   none:f=>f.scale>=1&&f.op>=1,noneText:'Scale 100% and Opacity 100% mean nothing happens on press. Move a slider to the left to see an effect.',
   self:true,lp:1500,today:['Scale: 97% odds tile, 98% outcome and main button, 98.5% bar and cards.','Rows dim to 70% with a fade; small buttons dim to 60% at once.','Release: 0.12 s everywhere, 0.5 s on the betslip bar.'],
-  ml:'Motion · release',fx:[{k:'scale',l:'Scale',min:.88,max:1,step:.005,fmt:pct,ends:['deeper','none']},{k:'op',l:'Opacity',min:.4,max:1,step:.05,fmt:pct,ends:['dimmer','none']}],
+  ml:'Motion · release',fx:[{k:'scale',l:'Scale',min:.88,max:1,step:.005,fmt:pct,ends:['deeper','none']},{k:'op',l:'Opacity',min:.4,max:1,step:.05,fmt:pct,ends:['dimmer','none'],adv:true}],
   presets:[{n:'Subtle',d:'Barely moves. Quiet, for dense screens.',fx:{scale:.985,op:1},m:M('out',120)},
    {n:'iOS-like',d:'A clear press and a soft, slower return.',fx:{scale:.96,op:1},m:M('soft',320)},
    {n:'Bouncy',d:'Presses deep and springs back past its size.',fx:{scale:.93,op:1},m:M('bouncy')},
@@ -850,13 +859,13 @@ function easeSvg(m){let d;if(isSpring(m.ease)){const sp=springSamples(m.dur,m.bo
  return `<svg viewBox="-2 -6 28 34" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
 const sl=(grp,k,l,min,max,step,v,t,ends)=>`<div class="prm"><span>${esc(l)}</span><input type="range" data-g="${grp}" data-k="${k}" min="${min}" max="${max}" step="${step}" value="${v}" aria-label="${esc(l)}"><b>${esc(t)}</b>${ends?`<small class="ends"><span>${ends[0]}</span><span>${ends[1]}</span></small>`:''}</div>`;
 function paintParams(){
- const q=QS[qi],on=ps>=0;$('#fxBlk').hidden=!on||!q.fx.length;$('#moBlk').hidden=!on;if(!on)return;
- const m=pp.m,spring=isSpring(m.ease);
- $('#fx').innerHTML=q.fx.map(f=>sl('fx',f.k,f.l,f.min,f.max,f.step,pp.fx[f.k],f.fmt(pp.fx[f.k]),f.ends)).join('');
- $('#moLbl').textContent=q.ml||'Motion';
- $('#mo').innerHTML=`<div class="prm sel"><span>Easing</span><select id="ezSel" aria-label="Easing"><optgroup label="Curve">${EZ.map(x=>`<option value="${x[0]}"${m.ease===x[0]?' selected':''}>${esc(x[1])}</option>`).join('')}</optgroup><optgroup label="Spring">${SP.map(x=>`<option value="${x[0]}"${m.ease===x[0]?' selected':''}>${esc(x[1])}</option>`).join('')}</optgroup></select>${easeSvg(m)}</div>`+
-  (m.ease==='custom'?`<div class="prm bz"><span>Bezier</span><div class="cvin">${[0,1,2,3].map(j=>`<input class="num" type="number" step=".01" min="${j%2?-1:0}" max="${j%2?2:1}" data-bz="${j}" value="${n2(m.bez[j])}" title="${['x1','y1','x2','y2'][j]}" aria-label="${['x1','y1','x2','y2'][j]}">`).join('')}</div></div>`:'')+
-  sl('m','dur','Duration',0,1000,10,m.dur,m.dur+' ms')+
+ const q=QS[qi],on=ps>=0;if(!on){$('#basic').innerHTML='';$('#mo').innerHTML='';return}
+ const m=pp.m,spring=isSpring(m.ease),fx=f=>sl('fx',f.k,f.l,f.min,f.max,f.step,pp.fx[f.k],f.fmt(pp.fx[f.k]),f.ends);
+ /* basic: the main value of the effect (if the group has one) and Duration */
+ $('#basic').innerHTML=q.fx.filter(f=>!f.adv).map(fx).join('')+sl('m','dur','Duration',0,1000,10,m.dur,m.dur+' ms');
+ /* advanced: secondary effect values, Easing, Bounce (springs), Delay (cascade) */
+ $('#mo').innerHTML=q.fx.filter(f=>f.adv).map(fx).join('')+
+  `<div class="prm sel"><span>Easing</span><select id="ezSel" aria-label="Easing"><optgroup label="Curve">${EZ.map(x=>`<option value="${x[0]}"${m.ease===x[0]?' selected':''}>${esc(x[1])}</option>`).join('')}</optgroup><optgroup label="Spring">${SP.map(x=>`<option value="${x[0]}"${m.ease===x[0]?' selected':''}>${esc(x[1])}</option>`).join('')}</optgroup></select>${easeSvg(m)}</div>`+
   (spring?sl('m','bounce','Bounce',0,.8,.05,m.bounce,Math.round(m.bounce*100)+'%'):'')+
   (q.delay?sl('m','delay',q.delay,0,160,2,m.delay,m.delay+' ms'):'');
 }
@@ -889,7 +898,7 @@ $('#dockD').addEventListener('input',e=>{const r=e.target,q=QS[qi];if(ps<0)retur
   if(!r.dataset.g)return;
   if(r.dataset.g==='fx'){pp.fx[r.dataset.k]=v;r.nextElementSibling.textContent=q.fx.find(f=>f.k===r.dataset.k).fmt(v)}
   else{pp.m[r.dataset.k]=v;r.nextElementSibling.textContent=r.dataset.k==='bounce'?Math.round(v*100)+'%':v+' ms';
-   if(isSpring(pp.m.ease)&&r.dataset.k!=='delay'&&pp.m.ease!=='spring'){pp.m.ease='spring';$('#ezSel').value='spring'}
+   if(isSpring(pp.m.ease)&&r.dataset.k!=='delay'&&pp.m.ease!=='spring'){pp.m.ease='spring';const e=$('#ezSel');if(e)e.value='spring'}
    const sv=$('#mo svg');if(sv)sv.outerHTML=easeSvg(pp.m)}
   paintStatus();later()}
  else if(r.dataset.bz!==undefined){const j=+r.dataset.bz,v=parseFloat(r.value);if(isNaN(v))return;pp.m.bez[j]=j%2?Math.max(-1,Math.min(2,v)):Math.max(0,Math.min(1,v));const sv=$('#mo svg');if(sv)sv.outerHTML=easeSvg(pp.m);paintStatus();later()}});
