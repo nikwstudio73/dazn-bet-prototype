@@ -210,6 +210,23 @@ body{grid-template-columns:320px minmax(600px,1fr);min-width:960px}
 .sum h2{margin:24px 0 8px;font-size:12px;line-height:18px;color:var(--ui-t3)}
 .sum li{margin:0 0 6px 18px;font-size:13px;line-height:19px;color:var(--ui-t2)}
 .sum .btn{margin-top:20px}
+
+/* v6: Decide = one big phone, a short list of places, one switch "Play it as" */
+.places{position:absolute;left:0;top:0;width:260px;padding:16px 8px 8px;z-index:2;gap:2px}
+.places[hidden]{display:none}
+.places>b{padding:0 12px 8px;font-size:12px;line-height:18px;color:var(--ui-t3)}
+.pl{display:flex;align-items:center;gap:10px;width:100%;padding:8px 12px;border-radius:8px;text-align:left;color:var(--ui-t2);transition:background .2s,color .2s}
+.pl:hover{background:var(--ui-hover);color:var(--ui-t1)}
+.pl.on{background:var(--ui-on);color:var(--ui-t1)}
+.pl i{flex:none;width:14px;height:14px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--ui-t3)}
+.pl.on i{box-shadow:inset 0 0 0 4px var(--ui-t1)}
+.pl b{display:block;font-weight:700;line-height:20px}
+.pl small{display:block;font-size:12px;line-height:17px;color:var(--ui-t3)}
+#dockD{max-width:980px}
+#dockD .lbl{flex:none;font-size:13px;color:var(--ui-t3)}
+#dockD .sp{flex:1;min-width:0;font-size:12px;line-height:18px;color:var(--ui-t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pvSeg button{height:36px;padding:0 16px;font-size:13px}
+#dockD .df span{flex:1;min-width:0;text-align:left;padding-left:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
 <body>
@@ -226,6 +243,7 @@ body{grid-template-columns:320px minmax(600px,1fr);min-width:960px}
  <div class="view">
   <iframe id="frame" src="index.html?embed" title="Prototype"></iframe>
   <div class="grid" id="grid" hidden></div>
+  <div class="panel places" id="places" hidden></div>
   <div class="panel sum scroll" id="sum" hidden></div>
   <div class="panel drawer" id="drawer" hidden>
    <div class="ph"><b>Steps</b><span>What moves, and the token behind each time and curve.</span></div>
@@ -233,14 +251,10 @@ body{grid-template-columns:320px minmax(600px,1fr);min-width:960px}
   </div>
  </div>
  <div class="panel dock" id="dockD">
-  <div class="dh">
-   <div class="now"><b>What do we do everywhere?</b><span id="dHint"></span></div>
-   <label class="chk"><input type="checkbox" id="slow">Slow motion</label>
-   <button class="btn" id="againD">Play again</button>
-  </div>
-  <div class="opts" id="opts"></div>
+  <div class="dh"><span class="lbl">Play it as</span><div class="seg" id="pvSeg" role="tablist" aria-label="Play it as"></div><span class="sp" id="pvNote"></span>
+   <label class="chk"><input type="checkbox" id="slow">Slow motion</label><button class="btn q" id="againD">Play again</button></div>
   <div class="own" id="own" hidden><span id="ownL"></span><input type="range" id="ownR" aria-labelledby="ownL"><b id="ownV"></b></div>
-  <div class="df"><button class="btn q" id="prevQ">Back</button><span></span><button class="btn" id="nextQ">Next</button></div>
+  <div class="df"><button class="btn q" id="prevQ">Back</button><span id="dHint"></span><button class="btn q" id="keepB">Keep them different</button><button class="btn" id="chooseB"></button><button class="btn q" id="nextQ">Next</button></div>
  </div>
  <!-- All animations: list, phone, speed -->
  <div class="panel dock" id="dockB" hidden>
@@ -563,7 +577,7 @@ let app='decide',mode='group',grp=0,cur=0,cards=[],qi=0;
 const inGroup=g=>ANIMS.filter(a=>a.g===g&&a.slow!=='none');
 const shown=()=>mode==='one'?[ANIMS[cur]]:inGroup(grp);
 function replay(){
- if(app==='decide'){if(cards.length&&cards.every(c=>c.ready))cards.forEach(c=>c.run(c.anim));return}
+ if(app==='decide'){if(qi<QS.length)playDecide();return}
  const one=mode==='one',a=ANIMS[cur];
  status(RMON?'Reduce motion is on in your system: nothing will travel':!one?`${cards.length} animations side by side`:a.slow==='none'?'Not shown in this gallery':a.slow==='part'?'One part is not slowed: see the steps':a.slow==='sim'?'The press is made by this page':a.play?'':'Runs all the time');
  if(one)main.run(a);else if(cards.every(c=>c.ready))cards.forEach(c=>c.run(c.anim));
@@ -595,7 +609,7 @@ function sizeCards(){   // the whole set fits the stage when it can: phones in o
 }
 addEventListener('resize',()=>{if($('#grid').hidden)return;sizeCards();cards.forEach(c=>{if(c.ready)c.frameOn(c.anim)})});
 $('#grid').onclick=e=>{const b=e.target.closest('.cl');if(!b)return;const a=cards[+b.dataset.n].anim;
- if(app==='browse')showOne(ANIMS.indexOf(a));else if(a.v.length===1)answer({t:'var',i:a.v[0]})};
+ if(app==='browse')showOne(ANIMS.indexOf(a))};
 
 /* ---------- Decide: the questions ----------
  Each is one place where similar things are done differently today (notes/MOTION.md, "Где похожее сделано по-разному").
@@ -653,60 +667,62 @@ const DEVNOTES=['Heights are eased in three ways: summary and sheet footer in JS
  'Hold and fade times of a price change are written twice: CSS variables and numbers in JS.','Rows that appear use three small delays: 60, 80 and 110 ms.',
  'The price arrow fades on --ease on a tile and without a curve in the betslip.','README still describes a sheet that eases its height on Confirm; the code no longer does that.'];
 const LET='ABCDEFG';
+const SHORT={press:['97%','98%','98.5%'],small:['At once','Fades'],release:['0.5 s','0.12 s'],curve:['Default','Ease-out','--ease'],text:['Fades','At once'],dim:['0.2 s','0.32 s','0.44 s'],cascade:['32 ms','45 ms'],screens:['0.44 s','0.5 s'],barjump:['Jumps','Slides'],travel:['12 px','18 px','30 px']};
 let dec={};try{dec=JSON.parse(localStorage.getItem('motionDecisions')||'{}')||{}}catch(e){}
 const fmtOf=q=>q.out||(q.own&&q.own.fmt)||String;
 const where=(q,i)=>q.vars[i].w||('now: '+q.places.filter(p=>p.v.includes(i)).map(p=>p.n.toLowerCase()).join(', '));
 function decText(q){const d=dec[q.id];if(!d)return '';
  return d.t==='keep'?'Keep them different':d.t==='own'?`My own: ${q.own.fmt(d.v)}`:`${q.vars[d.i].l}`+(q.places.length>1?` (like ${LET[d.i]})`:'')}
-const valueOf=(q,d)=>!d||d.t==='keep'?null:d.t==='own'?d.v:q.vars[d.i].v;
-function answer(d){   // choose, or click the same answer again to take it back
- const q=QS[qi],old=dec[q.id];
- if(old&&old.t===d.t&&old.i===d.i&&d.t!=='own')delete dec[q.id];else dec[q.id]=d;
- try{localStorage.setItem('motionDecisions',JSON.stringify(dec))}catch(e){}
- applyDecision();paintDecide();replay();
-}
-function applyDecision(){const q=QS[qi],v=valueOf(q,dec[q.id]);cards.forEach(c=>c.ov=v==null?null:q.apply(v))}
+/* per question: which place is on the phone (pi) and what it plays (pv: 'now', a variant index, or 'own') */
+let pi=0,pv='now';const ownVal={};
+const saveDec=()=>{try{localStorage.setItem('motionDecisions',JSON.stringify(dec))}catch(e){}};
+const ownOf=q=>ownVal[q.id]!==undefined?ownVal[q.id]:(ownVal[q.id]=dec[q.id]&&dec[q.id].t==='own'?dec[q.id].v:q.vars[0].v);
+function playDecide(){const q=QS[qi];main.ov=pv==='now'?null:q.apply(pv==='own'?ownOf(q):q.vars[pv].v);main.run(q.places[pi])}
 function showQuestion(n){
  qi=Math.max(0,Math.min(QS.length,n));
  if(qi===QS.length){showSummary();return}
- const q=QS[qi];
- showCards(q.places,!!q.whole,a=>`${a.v.map(i=>`<i class="vb">${LET[i]}</i>`).join('')}<span>${esc(a.n)}</span><small>${esc(a.v.map(i=>q.vars[i].l).join(' + '))}</small>`);
- applyDecision();paintDecide();replay();
+ const q=QS[qi],d=dec[q.id];pi=0;pv=!d||d.t==='keep'?'now':d.t==='own'?'own':d.i;   // a decided question opens on its answer
+ dropCards();$('#grid').innerHTML='';$('#grid').hidden=true;$('#sum').hidden=true;$('#frame').classList.remove('off');
+ paintDecide();playDecide();
 }
 function paintDecide(){
  const sumOn=qi===QS.length,q=QS[qi],n=QS.filter(x=>dec[x.id]).length;
  document.querySelectorAll('.ql').forEach(b=>{const i=+b.dataset.q,x=QS[i];b.classList.toggle('on',i===qi);
   if(x){b.classList.toggle('done',!!dec[x.id]);b.querySelector('small').textContent=decText(x)||'Not decided'}else b.querySelector('small').textContent=`${n} of ${QS.length} decided`});
- $('#qh').hidden=sumOn;$('#dockD').hidden=sumOn;if(sumOn)return;
- const d=dec[q.id];
+ $('#qh').hidden=sumOn;$('#dockD').hidden=sumOn;$('#places').hidden=sumOn;if(sumOn)return;
+ const d=dec[q.id],place=q.places[pi],now=place.v.map(i=>LET[i]).join(' + '),sh=SHORT[q.id];
  $('#qN').textContent=`Question ${qi+1} of ${QS.length}`;$('#qT').textContent=q.t;$('#qS').textContent=q.s;
- $('#dHint').textContent=!d?'Shown as it is today. Pick an answer: every place switches to it, so you can check.':d.t==='keep'?'Shown as it is today.':'Every place now plays your answer. Click it again to go back.';
- $('#opts').innerHTML=q.vars.map((v,i)=>`<button class="opt${d&&d.t==='var'&&d.i===i?' on':''}" data-o="${i}"><i class="vb">${LET[i]}</i><div><b>${esc(v.l)}</b><span>${esc(where(q,i))}</span></div></button>`).join('')+
-  (q.own?`<button class="opt${d&&d.t==='own'?' on':''}" data-o="own"><div><b>My own</b><span>${d&&d.t==='own'?esc(q.own.fmt(d.v)):'set it with a slider'}</span></div></button>`:'')+
-  (q.places.length>1?`<button class="opt${d&&d.t==='keep'?' on':''}" data-o="keep"><div><b>Keep them different</b><span>no change</span></div></button>`:'');
- const own=d&&d.t==='own';$('#own').hidden=!own;
- if(own){const r=$('#ownR');r.min=q.own.min;r.max=q.own.max;r.step=q.own.step;r.value=d.v;$('#ownL').textContent=q.own.l;$('#ownV').textContent=q.own.fmt(d.v)}
+ $('#places').innerHTML='<b>Where it happens</b>'+q.places.map((x,i)=>`<button class="pl${i===pi?' on':''}" data-p="${i}"><i></i><div><b>${esc(x.n)}</b><small>today: ${esc(x.v.map(k=>LET[k]+' · '+sh[k]).join(', '))}</small></div></button>`).join('');
+ $('#pvSeg').innerHTML=`<button role="tab" data-pv="now"${pv==='now'?' class="on"':''}>As it is today</button>`+q.vars.map((v,i)=>`<button role="tab" data-pv="${i}"${pv===i?' class="on"':''} title="${esc(v.l+' · '+where(q,i))}">${LET[i]} · ${esc(sh[i])}</button>`).join('')+(q.own?`<button role="tab" data-pv="own"${pv==='own'?' class="on"':''}>My own</button>`:'');
+ $('#pvNote').textContent=pv==='now'?`This place uses ${now} today.`:pv==='own'?'':esc(q.vars[pv].l)+' · '+where(q,pv);
+ const own=pv==='own';$('#own').hidden=!own;
+ if(own){const r=$('#ownR'),v=ownOf(q);r.min=q.own.min;r.max=q.own.max;r.step=q.own.step;r.value=v;$('#ownL').textContent=q.own.l;$('#ownV').textContent=q.own.fmt(v)}
+ /* the decision: what is playing now becomes the answer for every place */
+ const same=d&&(pv==='own'?d.t==='own'&&d.v===ownOf(q):d.t==='var'&&d.i===pv),cb=$('#chooseB'),kb=$('#keepB');
+ cb.disabled=pv==='now';cb.textContent=pv==='now'?'Pick A, B… to choose':same?'Chosen for everywhere ✓':pv==='own'?`Use ${q.own.fmt(ownOf(q))} everywhere`:`Use ${LET[pv]} everywhere`;
+ kb.hidden=q.places.length<2&&q.vars.length<2;kb.textContent=d&&d.t==='keep'?'Kept different ✓':q.places.length>1?'Keep them different':'Keep as it is';
+ $('#dHint').textContent=d?'Decided: '+decText(q):'Not decided yet';
+ const done=!!d;cb.classList.toggle('q',done&&same);$('#nextQ').classList.toggle('q',!done);
  $('#prevQ').disabled=qi===0;$('#nextQ').textContent=qi===QS.length-1?'See my decisions':'Next';
 }
+$('#places').onclick=e=>{const b=e.target.closest('.pl');if(!b)return;pi=+b.dataset.p;paintDecide();playDecide()};
+$('#pvSeg').onclick=e=>{const b=e.target.closest('button');if(!b)return;const v=b.dataset.pv;pv=v==='now'||v==='own'?v:+v;paintDecide();playDecide()};
+$('#chooseB').onclick=()=>{const q=QS[qi];if(pv==='now')return;dec[q.id]=pv==='own'?{t:'own',v:ownOf(q)}:{t:'var',i:pv};saveDec();paintDecide()};
+$('#keepB').onclick=()=>{const q=QS[qi],d=dec[q.id];if(d&&d.t==='keep')delete dec[q.id];else dec[q.id]={t:'keep'};saveDec();paintDecide()};
+let ownT;
+$('#ownR').oninput=e=>{const q=QS[qi];ownVal[q.id]=+e.target.value;paintDecide();clearTimeout(ownT);ownT=setTimeout(playDecide,300)};
 function decisionsText(){
  return 'Motion decisions — DAZN Bet in Scores\n'+QS.map((q,i)=>`${i+1}. ${q.t}: ${decText(q)||'not decided'}`).join('\n')+'\n\nFor development, no visual choice:\n'+DEVNOTES.map(t=>'- '+t).join('\n');
 }
 function showSummary(){
  dropCards();$('#grid').innerHTML='';$('#grid').hidden=true;$('#frame').classList.add('off');if(main.ready)main.reset();
- const s=$('#sum');s.hidden=false;
+ const s=$('#sum');s.hidden=false;main.ov=null;
  s.innerHTML=`<h1>My decisions</h1><p>Click a row to go back to that question.</p>`+QS.map((q,i)=>`<div class="sr" data-q="${i}" role="button" tabindex="0"><i>${i+1}</i><b>${esc(q.t)}</b><span${dec[q.id]?'':' class="no"'}>${esc(decText(q)||'Not decided')}</span></div>`).join('')+
   `<button class="btn" id="copyDec">Copy decisions</button><h2>Goes to development as it is (no visual choice)</h2><ul>${DEVNOTES.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
  paintDecide();
 }
 $('#sum').onclick=e=>{const r=e.target.closest('.sr');if(r){showQuestion(+r.dataset.q);return}
  const b=e.target.closest('#copyDec');if(b)copyText(decisionsText(),b,'Copy decisions')};
-$('#opts').onclick=e=>{const b=e.target.closest('.opt');if(!b)return;const o=b.dataset.o,q=QS[qi];
- if(o==='keep')answer({t:'keep'});else if(o==='own'){const d=dec[q.id];if(d&&d.t==='own'){delete dec[q.id];try{localStorage.setItem('motionDecisions',JSON.stringify(dec))}catch(x){}applyDecision();paintDecide();replay()}else answer({t:'own',v:d&&d.t==='var'?q.vars[d.i].v:q.vars[0].v})}
- else answer({t:'var',i:+o})};
-let ownT;
-$('#ownR').oninput=e=>{const q=QS[qi],v=+e.target.value;dec[q.id]={t:'own',v};$('#ownV').textContent=q.own.fmt(v);
- try{localStorage.setItem('motionDecisions',JSON.stringify(dec))}catch(x){}
- clearTimeout(ownT);ownT=setTimeout(()=>{applyDecision();paintDecide();replay()},300)};
 $('#prevQ').onclick=()=>showQuestion(qi-1);$('#nextQ').onclick=()=>showQuestion(qi+1);
 $('#againD').onclick=replay;
 $('#slow').onchange=e=>{rate=e.target.checked?0.2:1;replay()};
@@ -717,9 +733,9 @@ function buildQList(){
 }
 function setApp(a){
  app=a;document.querySelectorAll('#appSeg button').forEach(b=>b.classList.toggle('on',b.dataset.app===a));
- const d=a==='decide';$('#dockB').hidden=d;$('#drawer').hidden=true;$('#stepsBtn').classList.remove('on');$('#stepsBtn').textContent='Show steps';
+ const d=a==='decide';main.ov=null;$('#dockB').hidden=d;$('#drawer').hidden=true;$('#stepsBtn').classList.remove('on');$('#stepsBtn').textContent='Show steps';
  if(d){rate=$('#slow').checked?0.2:1;buildQList();showQuestion(qi)}
- else{rate=+document.querySelector('#speed .on').dataset.r;$('#qh').hidden=true;$('#dockD').hidden=true;$('#sum').hidden=true;buildList();showGroup(grp)}
+ else{rate=+document.querySelector('#speed .on').dataset.r;$('#qh').hidden=true;$('#dockD').hidden=true;$('#sum').hidden=true;$('#places').hidden=true;buildList();showGroup(grp)}
 }
 $('#appSeg').onclick=e=>{const b=e.target.closest('button');if(b&&b.dataset.app!==app)setApp(b.dataset.app)};
 
