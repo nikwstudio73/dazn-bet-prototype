@@ -166,25 +166,84 @@ body{grid-template-columns:320px minmax(600px,1fr);min-width:960px}
 .cmp:last-child{border-bottom:0}
 .cmp h3{font-size:14px;line-height:20px;color:var(--ui-t1);margin-bottom:10px}
 .cmp p{margin-top:10px;font-size:13px;line-height:19px}
+
+/* v5: Decide mode — one question, the places it concerns, one row of answers */
+.ph .seg{margin-top:12px}
+.qh{flex:none;padding:4px 4px 0}
+.qh[hidden],.dock[hidden],.tk[hidden],.own[hidden],.sum[hidden]{display:none}
+.qh span{font-size:12px;line-height:18px;font-weight:700;color:var(--ui-t3)}
+.qh h1{font-size:24px;line-height:32px;font-weight:700;color:var(--ui-t1)}
+.qh p{max-width:820px;font-size:14px;line-height:20px;color:var(--ui-t2)}
+.ql{flex:none;display:flex;align-items:flex-start;gap:10px;width:100%;padding:10px 12px;border-radius:8px;text-align:left;color:var(--ui-t2);transition:background .2s,color .2s}
+.ql:hover{background:var(--ui-hover);color:var(--ui-t1)}
+.ql.on{background:var(--ui-on);color:var(--ui-t1)}
+.ql>i{flex:none;width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--ui-t3);font-style:normal;font-weight:700;font-size:11px;line-height:20px;text-align:center;color:var(--ui-t3)}
+.ql.done>i{background:var(--ui-t1);box-shadow:none;color:var(--ui-well)}
+.ql b{display:block;font-weight:700;line-height:20px}
+.ql small{display:block;font-size:12px;line-height:18px;color:var(--ui-t3)}
+.ql.done small{color:var(--ui-t2)}
+.list hr{flex:none;border:0;height:1px;background:var(--ui-line);margin:8px 12px}
+.cl{display:flex;align-items:center;gap:8px;height:44px}
+.cl span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.cl small{flex:none;font-weight:400;font-size:12px;color:var(--ui-t3)}
+.vb{flex:none;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--ui-thumb);font-style:normal;font-weight:700;font-size:11px;line-height:20px;text-align:center;color:var(--ui-t1)}
+.chk{flex:none;display:flex;align-items:center;gap:8px;font-size:13px;line-height:18px;color:var(--ui-t2);cursor:pointer}
+.chk input{width:16px;height:16px;accent-color:var(--ui-t1)}
+.opts{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px}
+.opt{display:flex;align-items:flex-start;gap:10px;min-height:64px;padding:12px;border-radius:12px;background:var(--ui-hover);box-shadow:inset 0 0 0 1px var(--ui-line);text-align:left;transition:background .2s,box-shadow .2s}
+.opt:hover{background:var(--ui-on)}
+.opt.on{background:var(--ui-thumb);box-shadow:inset 0 0 0 2px var(--ui-t1)}
+.opt b{display:block;font-size:14px;line-height:20px;color:var(--ui-t1)}
+.opt span{display:block;font-size:12px;line-height:17px;color:var(--ui-t3)}
+.own{display:grid;grid-template-columns:auto 1fr 72px;align-items:center;gap:12px;padding:4px 2px 0;font-size:13px;color:var(--ui-t2)}
+.own input{width:100%;accent-color:var(--ui-t1)}
+.own b{text-align:right;color:var(--ui-t1)}
+#dockD .df span{flex:1}
+.sum{position:absolute;inset:0;padding:24px 28px;display:block}
+.sum h1{font-size:24px;line-height:32px;color:var(--ui-t1)}
+.sum>p{margin:4px 0 20px;color:var(--ui-t3)}
+.sr{display:grid;grid-template-columns:28px 1fr 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--ui-line);align-items:baseline}
+.sr i{font-style:normal;font-size:12px;color:var(--ui-t3)}
+.sr b{color:var(--ui-t1)}
+.sr span{color:var(--ui-t2)}
+.sr span.no{color:var(--ui-t3)}
+.sum h2{margin:24px 0 8px;font-size:12px;line-height:18px;color:var(--ui-t3)}
+.sum li{margin:0 0 6px 18px;font-size:13px;line-height:19px;color:var(--ui-t2)}
+.sum .btn{margin-top:20px}
 </style>
 </head>
 <body>
 <aside class="panel">
- <div class="ph"><b>Animations</b><span>Open a group to watch its animations side by side, or pick one.</span></div>
+ <div class="ph"><b>Motion</b>
+  <div class="seg" id="appSeg" role="tablist" aria-label="Mode"><button role="tab" data-app="decide" class="on">Decide</button><button role="tab" data-app="browse">All animations</button></div>
+ </div>
  <div class="scroll list" id="list"></div>
 </aside>
 
 <main class="stage">
+ <!-- Decide: one question at a time -->
+ <div class="qh" id="qh"><span id="qN"></span><h1 id="qT"></h1><p id="qS"></p></div>
  <div class="view">
   <iframe id="frame" src="index.html?embed" title="Prototype"></iframe>
   <div class="grid" id="grid" hidden></div>
+  <div class="panel sum scroll" id="sum" hidden></div>
   <div class="panel drawer" id="drawer" hidden>
    <div class="ph"><b>Steps</b><span>What moves, and the token behind each time and curve.</span></div>
    <div class="scroll det" id="det"></div>
   </div>
  </div>
- <!-- the one place to control everything: replay, speed, and the tokens of the selected animation -->
- <div class="panel dock">
+ <div class="panel dock" id="dockD">
+  <div class="dh">
+   <div class="now"><b>What do we do everywhere?</b><span id="dHint"></span></div>
+   <label class="chk"><input type="checkbox" id="slow">Slow motion</label>
+   <button class="btn" id="againD">Play again</button>
+  </div>
+  <div class="opts" id="opts"></div>
+  <div class="own" id="own" hidden><span id="ownL"></span><input type="range" id="ownR" aria-labelledby="ownL"><b id="ownV"></b></div>
+  <div class="df"><button class="btn q" id="prevQ">Back</button><span></span><button class="btn" id="nextQ">Next</button></div>
+ </div>
+ <!-- All animations: list, phone, speed -->
+ <div class="panel dock" id="dockB" hidden>
   <div class="dh">
    <div class="now"><b id="nowT"></b><span id="status"></span></div>
    <div class="seg" id="speed" role="tablist" aria-label="Speed">
@@ -192,10 +251,10 @@ body{grid-template-columns:320px minmax(600px,1fr);min-width:960px}
    </div>
    <button class="btn" id="again">Play again</button>
   </div>
-  <div class="tk" id="tk"></div>
+  <div class="tk" id="tk" hidden></div>
   <div class="df">
    <button class="lnk" id="stepsBtn" aria-expanded="false">Show steps</button>
-   <button class="lnk" id="allBtn" aria-pressed="false">All tokens</button>
+   <button class="lnk" id="allBtn" aria-pressed="false">Tune tokens</button>
    <span id="chN"></span>
    <button class="btn q" id="resetTk">Reset</button><button class="btn q" id="copyTk">Copy changes</button>
   </div>
@@ -427,7 +486,7 @@ const FOCUS={M01:'#feed .odd[data-m="m1"][data-o="1"]',M02:'#mkts .choice',M03:'
 /* groups about one element are shown close up; groups about the whole screen (sheets, pages, layout) show the whole phone */
 const WHOLE=new Set([3,4,5,6,7]);
 function makeProto(F,vp,whole){
- const P={F,vp,W:null,D:null,ready:false,runId:0,pressed:[],dragEl:null,dev:'mini',anim:null,onready:null};
+ const P={F,vp,W:null,D:null,ready:false,runId:0,pressed:[],dragEl:null,dev:'mini',anim:null,onready:null,ov:null};
  const q=s=>P.D.querySelector(s),scale=()=>+q('#stage').dataset.scale||1;
  const G={                                  // helpers for the scenarios; live on the prototype's window as G
   after:(ms,fn)=>P.W.setTimeout(fn,ms),     // the prototype's clock: slowed with everything else, dropped on the next run
@@ -471,7 +530,7 @@ function makeProto(F,vp,whole){
  };
  /* a small phone in a group: zoom the frame to the element that moves */
  P.frameOn=a=>{
-  const ph=q('#phone'),el=(!whole&&FOCUS[a.id]&&q(FOCUS[a.id]))||ph,r=el.getBoundingClientRect(),vw=vp.clientWidth,vh=vp.clientHeight;
+  const ph=q('#phone'),sel=a.f||FOCUS[a.id],el=(!whole&&sel&&q(sel))||ph,r=el.getBoundingClientRect(),vw=vp.clientWidth,vh=vp.clientHeight;
   const z=el===ph?Math.min(vw/(r.width+36),vh/(r.height+36)):Math.min(1.5,vw*.78/r.width,vh*.6/r.height);
   F.style.transform=`translate(${vw/2-(r.left+r.width/2)*z}px,${vh/2-(r.top+r.height/2)*z}px) scale(${z})`;
  };
@@ -479,6 +538,9 @@ function makeProto(F,vp,whole){
   P.anim=a;if(!P.ready)return;const root=P.D.documentElement;
   try{
    P.W.MOTION.rate(rate);const o={};TOKENS.forEach(t=>o[t.k]=changed(t.k)?css(t.k):null);P.W.MOTION.tokens(o);
+   /* Decide mode: "what if every place did this" — extra CSS on top of the prototype's, and where the value lives in JS, a wrapped function */
+   let ov=P.D.getElementById('mg-ov');if(!ov){ov=P.D.createElement('style');ov.id='mg-ov';P.D.head.appendChild(ov)}ov.textContent=(P.ov&&P.ov.css)||'';
+   if(!P.W.__o)P.W.__o={soft:P.W.soft,setOddsOn:P.W.setOddsOn};Object.assign(P.W,P.W.__o);if(P.ov&&P.ov.js)P.ov.js(P.W,P.W.__o);
    root.classList.add('mg-freeze');                 // set the state instantly: no entrance of the bar, the sheet or the page
    P.reset();const id=P.runId;
    if(a.setup)P.W.eval(a.setup);
@@ -494,42 +556,174 @@ function makeProto(F,vp,whole){
  return P;
 }
 
-/* ---------- what is on screen: one animation on the big phone, or a whole group side by side ---------- */
+/* ---------- what is on screen ----------
+ app 'decide': a question with the places it concerns. app 'browse': one animation on the big phone, or a group side by side. */
 const main=makeProto($('#frame'),null,false);
-let mode='group',grp=0,cur=0,cards=[];
+let app='decide',mode='group',grp=0,cur=0,cards=[],qi=0;
 const inGroup=g=>ANIMS.filter(a=>a.g===g&&a.slow!=='none');
 const shown=()=>mode==='one'?[ANIMS[cur]]:inGroup(grp);
 function replay(){
+ if(app==='decide'){if(cards.length&&cards.every(c=>c.ready))cards.forEach(c=>c.run(c.anim));return}
  const one=mode==='one',a=ANIMS[cur];
  status(RMON?'Reduce motion is on in your system: nothing will travel':!one?`${cards.length} animations side by side`:a.slow==='none'?'Not shown in this gallery':a.slow==='part'?'One part is not slowed: see the steps':a.slow==='sim'?'The press is made by this page':a.play?'':'Runs all the time');
  if(one)main.run(a);else if(cards.every(c=>c.ready))cards.forEach(c=>c.run(c.anim));
 }
 /* small phones that leave the screen must not keep playing: stop their pending steps before their frames are removed */
 function dropCards(){cards.forEach(c=>{c.runId++;c.onready=null;c.anim=null;try{c.W.MOTION.clear()}catch(e){}});cards=[]}
+/* a row of small prototypes, one per item; label(item) is the html of its title */
+function showCards(items,whole,label){
+ dropCards();$('#frame').classList.add('off');if(main.ready)main.reset();$('#sum').hidden=true;
+ const grid=$('#grid');grid.hidden=false;grid.scrollTop=0;grid.classList.toggle('tall',whole);
+ grid.innerHTML=items.map((a,n)=>`<div class="card"><button class="cl" data-n="${n}">${label(a)}</button><div class="vp"><iframe src="index.html?embed" title="${esc(a.n)}"></iframe></div></div>`).join('');
+ sizeCards();
+ cards=[...grid.querySelectorAll('.vp')].map((vp,n)=>{const c=makeProto(vp.firstElementChild,vp,whole);c.anim=items[n];c.onready=()=>{if(cards.every(x=>x.ready))replay()};return c}); // they start together, once the last one has loaded
+}
 function showOne(i){
  mode='one';cur=Math.max(0,Math.min(ANIMS.length-1,i));grp=ANIMS[cur].g;
- dropCards();$('#grid').innerHTML='';$('#grid').hidden=true;$('#frame').classList.remove('off');
+ dropCards();$('#grid').innerHTML='';$('#grid').hidden=true;$('#sum').hidden=true;$('#frame').classList.remove('off');
  paintAll();replay();
 }
 function showGroup(g){
- mode='group';grp=g;const items=inGroup(g);dropCards();
- $('#frame').classList.add('off');if(main.ready)main.reset();
- const grid=$('#grid'),tall=WHOLE.has(g);grid.hidden=false;grid.scrollTop=0;grid.classList.toggle('tall',tall);
- grid.innerHTML=items.map(a=>`<div class="card"><button class="cl" data-i="${ANIMS.indexOf(a)}" title="Open on the big phone">${esc(a.n)}</button><div class="vp"><iframe src="index.html?embed" title="${esc(a.n)}"></iframe></div></div>`).join('');
- sizeCards();
- cards=[...grid.querySelectorAll('.vp')].map((vp,n)=>{const c=makeProto(vp.firstElementChild,vp,tall);c.anim=items[n];c.onready=()=>{if(cards.every(x=>x.ready))replay()};return c}); // they start together, once the last one has loaded
+ mode='group';grp=g;
+ showCards(inGroup(g),WHOLE.has(g),a=>`<span title="Open on the big phone">${esc(a.n)}</span>`);
  paintAll();replay();
 }
-/* whole phones: one row fills the height of the stage; close-ups: a fixed, smaller card */
-function sizeCards(){   // the whole group fits the stage when it can: phones in one row, close-ups in as many rows as needed
+function sizeCards(){   // the whole set fits the stage when it can: phones in one row, close-ups in as many rows as needed
  const g=$('#grid'),tall=g.classList.contains('tall'),n=g.children.length||1,gw=g.clientWidth-2,gh=g.clientHeight-2;
- if(tall){const w=Math.floor(Math.max(180,Math.min(340,(gh-44)*411/848,(gw-12*(n-1))/n-1)));g.style.setProperty('--cw',w+'px');g.style.setProperty('--vh',Math.floor(w*848/411)+'px')}
- else{const cols=Math.max(1,Math.floor((gw+12)/312)),rows=Math.ceil(n/cols);g.style.setProperty('--vh',Math.round(Math.max(150,Math.min(260,(gh-12*(rows-1))/rows-40)))+'px')}
+ if(tall){const w=Math.floor(Math.max(180,Math.min(340,(gh-48)*411/848,(gw-12*(n-1))/n-1)));g.style.setProperty('--cw',w+'px');g.style.setProperty('--vh',Math.floor(w*848/411)+'px')}
+ else{const cols=Math.max(1,Math.floor((gw+12)/312)),rows=Math.ceil(n/cols);g.style.setProperty('--vh',Math.round(Math.max(150,Math.min(420,(gh-12*(rows-1))/rows-44)))+'px')}
 }
-addEventListener('resize',()=>{if(mode!=='group')return;sizeCards();cards.forEach(c=>{if(c.ready)c.frameOn(c.anim)})});
-$('#grid').onclick=e=>{const b=e.target.closest('.cl');if(b)showOne(+b.dataset.i)};
+addEventListener('resize',()=>{if($('#grid').hidden)return;sizeCards();cards.forEach(c=>{if(c.ready)c.frameOn(c.anim)})});
+$('#grid').onclick=e=>{const b=e.target.closest('.cl');if(!b)return;const a=cards[+b.dataset.n].anim;
+ if(app==='browse')showOne(ANIMS.indexOf(a));else if(a.v.length===1)answer({t:'var',i:a.v[0]})};
 
-/* ---------- list: groups fold; a group has "All together" and its animations ---------- */
+/* ---------- Decide: the questions ----------
+ Each is one place where similar things are done differently today (notes/MOTION.md, "Где похожее сделано по-разному").
+ places: where it lives in the product (an animation of the list, shown as it is today), v = which variant(s) that place uses now.
+ vars: the variants that exist today. own: one slider for a value of your own. apply(value): what to put on top of the prototype
+ so that EVERY place plays that value; it is only a preview, the prototype itself is not changed. */
+const pct=v=>Math.round(v*1000)/10+'%',ms=v=>v+' ms',px=v=>v+' px';
+const PL=(id,n,v,more)=>Object.assign({},ANIMS.find(a=>a.id===id),{n,v:[].concat(v)},more||{});
+const QS=[
+ {id:'press',t:'Press on a button',s:'A pressed element shrinks a little. Today there are three different amounts. Which one do we use everywhere?',
+  places:[PL('M01','Odds tile',0),PL('M02','Outcome button',1),PL('M05','Main button',1),PL('M06','Betslip bar',2),PL('M03','Top Pick card',2)],
+  vars:[{l:'Shrinks to 97%',v:.97},{l:'Shrinks to 98%',v:.98},{l:'Shrinks to 98.5%',v:.985}],own:{l:'Shrinks to',min:.9,max:1,step:.005,fmt:pct},
+  apply:v=>({css:`html .odd:active,html .choice:active,html .cta-main:active,html .bar.show:active,html .tp:active,html .gs-card:active{transform:scale(${v})}`})},
+ {id:'small',t:'Press on a small control',s:'Edit, back, × and similar dim the moment you touch them. List rows fade instead. Which one everywhere?',
+  places:[PL('M07','Edit button',0),PL('M04','List row',1)],
+  vars:[{l:'Dims at once',v:0},{l:'Fades in 0.12 s',v:120}],own:{l:'Fade time',min:0,max:400,step:10,fmt:ms},
+  apply:v=>({css:`html .tbtn,html .fav-x,html .fx-back,html .fx-follow,html .fx-more,html .toast button,html .day[data-day],html .cp-back,html .sc-row,html .cp-row{transition:opacity ${v}ms}`})},
+ {id:'release',t:'Letting go of a button',s:'After a press the betslip bar returns slowly and softly; every other button snaps back fast. Which one everywhere?',
+  places:[PL('M06','Betslip bar',0),PL('M05','Main button',1),PL('M01','Odds tile',1)],
+  vars:[{l:'Slow, soft return: 0.5 s',v:500},{l:'Quick return: 0.12 s',v:120}],own:{l:'Return time',min:60,max:800,step:20,fmt:ms},
+  apply:v=>({css:`html .bar{transition:transform ${v}ms var(--soft),opacity var(--m-quick) ease-out}html .cta-main{transition:transform ${v}ms var(--soft),background var(--m-quick),color var(--m-quick)}html .odd{transition:background var(--m-quick),transform ${v}ms var(--soft)}html .cta-main:active,html .odd:active{transition-duration:var(--m-press)}`})},
+ {id:'curve',t:'How a colour changes',s:'Colour and opacity changes use three different curves. They last 0.2 s, so switch on Slow motion to see the difference.',
+  places:[PL('M09','Odds tile picked',0),PL('M12','LIVE badge',0),PL('M31','Betslip bar fades in',1,{f:'#bar'}),PL('M11','Odds switch',2)],
+  vars:[{l:'Browser default',v:'ease'},{l:'Ease-out',v:'ease-out'},{l:'Token --ease',v:'var(--ease)'}],own:null,out:v=>v,
+  apply:v=>({css:`html .odd,html .odd .l,html .odd .v,html .livebadge,html .oddsTog .sw,html .oddsTog .knob{transition-timing-function:${v}}html .bar{transition-timing-function:var(--soft),${v}}`})},
+ {id:'text',t:'Text colour when an odd is picked',s:'In the feed the text changes colour together with the fill. On the match page the fill fades but the text switches at once.',
+  places:[PL('M09','Odds tile in the feed',0),PL('M09','Outcome on the match page',1,{setup:`openFixture('m4');G.show('#mkts .choice','#fxScroll')`,play:`G.click('#mkts .choice');G.after(1000,()=>G.click('#mkts .choice'))`,f:'#mkts .choice'})],
+  vars:[{l:'Text fades with the fill',v:200},{l:'Text switches at once',v:0}],own:{l:'Text fade time',min:0,max:500,step:10,fmt:ms},
+  apply:v=>({css:`html .odd .l,html .odd .v,html .choice .cd,html .choice .lb,html .choice .ov{transition:color ${v}ms,background ${v}ms}`})},
+ {id:'dim',t:'Dimming a card',whole:true,s:'A card dims to 30% in Edit mode and when a pick is suspended. Today that takes three different times.',
+  places:[PL('M17','Edit mode',[0,1]),PL('M16','Pick becomes Suspended',2)],
+  vars:[{l:'Fast: 0.2 s',v:200,w:'card header in Edit'},{l:'Standard: 0.32 s',v:320,w:'rows and summary in Edit'},{l:'Slow: 0.44 s',v:440,w:'Suspended / Locked'}],own:{l:'Dim time',min:80,max:700,step:20,fmt:ms},
+  apply:v=>({css:`html .ctop>.sp,html .ctop>.selc,html .ctop>.od{transition-duration:var(--m-std),var(--m-std),var(--m-std),${v}ms,var(--m-std),var(--m-std)}html .cinfo .mk,html .cinfo .tm,html .cinfo .ko,html .summary{transition-duration:${v}ms}`,
+   js:(W,o)=>{W.soft=(el,from,t,d)=>o.soft(el,from,from&&from.transform==='none'&&from.opacity!==undefined?v:t,d)}})},
+ {id:'cascade',t:'One after another',whole:true,s:'Tiles in the feed and cards in Edit mode start one after another. The gap between them is different.',
+  places:[PL('M28','Odds toggle: tiles',0),PL('M17','Edit mode: cards',1)],
+  vars:[{l:'32 ms apart',v:32},{l:'45 ms apart',v:45}],own:{l:'Gap',min:0,max:120,step:1,fmt:ms},
+  apply:v=>({css:`html .rm,html .ctop>.sp,html .ctop>.selc,html .ctop>.od,html .cinfo .mk,html .cinfo .tm,html .cinfo .ko{transition-delay:calc(var(--i,0) * ${v}ms)}`,
+   js:(W,o)=>{W.setOddsOn=on=>{o.setOddsOn(on);W.document.querySelectorAll('.tile').forEach(t=>{const k=+t.style.getPropertyValue('--ti')||0;t.style.setProperty('--ti',k/32*v)})}}})},
+ {id:'screens',t:'Pages and sheets',whole:true,s:'A page slides in from the side a little faster than a sheet slides up from the bottom. Same speed for both, or keep them different?',
+  places:[PL('M38','Match page',0),PL('M39','Competition page',0),PL('M32','Betslip sheet',1),PL('M37','DAZN Bet overlay',1)],
+  vars:[{l:'0.44 s',v:440},{l:'0.5 s',v:500}],own:{l:'Time',min:200,max:900,step:20,fmt:ms},
+  apply:v=>({css:`html .fx,html .cp,html .sheet,html .overlay,html .fvp,html .backdrop{transition-duration:${v}ms}`})},
+ {id:'barjump',t:'Betslip bar when a match page opens',whole:true,s:'The page slides in, but the bar jumps to its lower position without any motion.',
+  places:[PL('M38','Match page with a betslip',0)],
+  vars:[{l:'Bar jumps (as now)',v:0},{l:'Bar slides with the page',v:1,w:'new'}],own:null,out:()=>'',
+  apply:v=>v?{css:`html .bar{transition:transform var(--m-sheet) var(--soft),opacity var(--m-quick) ease-out,bottom var(--m-layout) var(--soft)}`}:null},
+ {id:'travel',t:'How far things travel when they appear',s:'The toast, the bar and the limit message rise from below, each from a different distance. (Texts that swap rise 5 px; that is set in code and not changed by this preview.)',
+  places:[PL('M35','Toast',0,{f:'#toast'}),PL('M31','Betslip bar',1,{f:'#bar'}),PL('M08','Limit message',2)],
+  vars:[{l:'12 px',v:12},{l:'18 px',v:18},{l:'30 px',v:30}],own:{l:'Distance',min:0,max:48,step:1,fmt:px},
+  apply:v=>({css:`html .bar:not(.show){transform:translateY(${v}px) scale(.97)}html .toast:not(.show){transform:translateY(${v}px)}html .tongue:not(.show){transform:translateY(${v}px)}`})}
+];
+/* differences that are not a visual choice: they go to development as they are */
+const DEVNOTES=['Heights are eased in three ways: summary and sheet footer in JS, a removed card’s place in CSS on --exit, odds rows in CSS on --soft.',
+ 'Hold and fade times of a price change are written twice: CSS variables and numbers in JS.','Rows that appear use three small delays: 60, 80 and 110 ms.',
+ 'The price arrow fades on --ease on a tile and without a curve in the betslip.','README still describes a sheet that eases its height on Confirm; the code no longer does that.'];
+const LET='ABCDEFG';
+let dec={};try{dec=JSON.parse(localStorage.getItem('motionDecisions')||'{}')||{}}catch(e){}
+const fmtOf=q=>q.out||(q.own&&q.own.fmt)||String;
+const where=(q,i)=>q.vars[i].w||('now: '+q.places.filter(p=>p.v.includes(i)).map(p=>p.n.toLowerCase()).join(', '));
+function decText(q){const d=dec[q.id];if(!d)return '';
+ return d.t==='keep'?'Keep them different':d.t==='own'?`My own: ${q.own.fmt(d.v)}`:`${q.vars[d.i].l}`+(q.places.length>1?` (like ${LET[d.i]})`:'')}
+const valueOf=(q,d)=>!d||d.t==='keep'?null:d.t==='own'?d.v:q.vars[d.i].v;
+function answer(d){   // choose, or click the same answer again to take it back
+ const q=QS[qi],old=dec[q.id];
+ if(old&&old.t===d.t&&old.i===d.i&&d.t!=='own')delete dec[q.id];else dec[q.id]=d;
+ try{localStorage.setItem('motionDecisions',JSON.stringify(dec))}catch(e){}
+ applyDecision();paintDecide();replay();
+}
+function applyDecision(){const q=QS[qi],v=valueOf(q,dec[q.id]);cards.forEach(c=>c.ov=v==null?null:q.apply(v))}
+function showQuestion(n){
+ qi=Math.max(0,Math.min(QS.length,n));
+ if(qi===QS.length){showSummary();return}
+ const q=QS[qi];
+ showCards(q.places,!!q.whole,a=>`${a.v.map(i=>`<i class="vb">${LET[i]}</i>`).join('')}<span>${esc(a.n)}</span><small>${esc(a.v.map(i=>q.vars[i].l).join(' + '))}</small>`);
+ applyDecision();paintDecide();replay();
+}
+function paintDecide(){
+ const sumOn=qi===QS.length,q=QS[qi],n=QS.filter(x=>dec[x.id]).length;
+ document.querySelectorAll('.ql').forEach(b=>{const i=+b.dataset.q,x=QS[i];b.classList.toggle('on',i===qi);
+  if(x){b.classList.toggle('done',!!dec[x.id]);b.querySelector('small').textContent=decText(x)||'Not decided'}else b.querySelector('small').textContent=`${n} of ${QS.length} decided`});
+ $('#qh').hidden=sumOn;$('#dockD').hidden=sumOn;if(sumOn)return;
+ const d=dec[q.id];
+ $('#qN').textContent=`Question ${qi+1} of ${QS.length}`;$('#qT').textContent=q.t;$('#qS').textContent=q.s;
+ $('#dHint').textContent=!d?'Shown as it is today. Pick an answer: every place switches to it, so you can check.':d.t==='keep'?'Shown as it is today.':'Every place now plays your answer. Click it again to go back.';
+ $('#opts').innerHTML=q.vars.map((v,i)=>`<button class="opt${d&&d.t==='var'&&d.i===i?' on':''}" data-o="${i}"><i class="vb">${LET[i]}</i><div><b>${esc(v.l)}</b><span>${esc(where(q,i))}</span></div></button>`).join('')+
+  (q.own?`<button class="opt${d&&d.t==='own'?' on':''}" data-o="own"><div><b>My own</b><span>${d&&d.t==='own'?esc(q.own.fmt(d.v)):'set it with a slider'}</span></div></button>`:'')+
+  (q.places.length>1?`<button class="opt${d&&d.t==='keep'?' on':''}" data-o="keep"><div><b>Keep them different</b><span>no change</span></div></button>`:'');
+ const own=d&&d.t==='own';$('#own').hidden=!own;
+ if(own){const r=$('#ownR');r.min=q.own.min;r.max=q.own.max;r.step=q.own.step;r.value=d.v;$('#ownL').textContent=q.own.l;$('#ownV').textContent=q.own.fmt(d.v)}
+ $('#prevQ').disabled=qi===0;$('#nextQ').textContent=qi===QS.length-1?'See my decisions':'Next';
+}
+function decisionsText(){
+ return 'Motion decisions — DAZN Bet in Scores\n'+QS.map((q,i)=>`${i+1}. ${q.t}: ${decText(q)||'not decided'}`).join('\n')+'\n\nFor development, no visual choice:\n'+DEVNOTES.map(t=>'- '+t).join('\n');
+}
+function showSummary(){
+ dropCards();$('#grid').innerHTML='';$('#grid').hidden=true;$('#frame').classList.add('off');if(main.ready)main.reset();
+ const s=$('#sum');s.hidden=false;
+ s.innerHTML=`<h1>My decisions</h1><p>Click a row to go back to that question.</p>`+QS.map((q,i)=>`<div class="sr" data-q="${i}" role="button" tabindex="0"><i>${i+1}</i><b>${esc(q.t)}</b><span${dec[q.id]?'':' class="no"'}>${esc(decText(q)||'Not decided')}</span></div>`).join('')+
+  `<button class="btn" id="copyDec">Copy decisions</button><h2>Goes to development as it is (no visual choice)</h2><ul>${DEVNOTES.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
+ paintDecide();
+}
+$('#sum').onclick=e=>{const r=e.target.closest('.sr');if(r){showQuestion(+r.dataset.q);return}
+ const b=e.target.closest('#copyDec');if(b)copyText(decisionsText(),b,'Copy decisions')};
+$('#opts').onclick=e=>{const b=e.target.closest('.opt');if(!b)return;const o=b.dataset.o,q=QS[qi];
+ if(o==='keep')answer({t:'keep'});else if(o==='own'){const d=dec[q.id];if(d&&d.t==='own'){delete dec[q.id];try{localStorage.setItem('motionDecisions',JSON.stringify(dec))}catch(x){}applyDecision();paintDecide();replay()}else answer({t:'own',v:d&&d.t==='var'?q.vars[d.i].v:q.vars[0].v})}
+ else answer({t:'var',i:+o})};
+let ownT;
+$('#ownR').oninput=e=>{const q=QS[qi],v=+e.target.value;dec[q.id]={t:'own',v};$('#ownV').textContent=q.own.fmt(v);
+ try{localStorage.setItem('motionDecisions',JSON.stringify(dec))}catch(x){}
+ clearTimeout(ownT);ownT=setTimeout(()=>{applyDecision();paintDecide();replay()},300)};
+$('#prevQ').onclick=()=>showQuestion(qi-1);$('#nextQ').onclick=()=>showQuestion(qi+1);
+$('#againD').onclick=replay;
+$('#slow').onchange=e=>{rate=e.target.checked?0.2:1;replay()};
+function buildQList(){
+ $('#list').innerHTML=QS.map((q,i)=>`<button class="ql" data-q="${i}"><i>${i+1}</i><div><b>${esc(q.t)}</b><small></small></div></button>`).join('')+
+  `<hr><button class="ql" data-q="${QS.length}"><i>✓</i><div><b>My decisions</b><small></small></div></button>`;
+ $('#list').onclick=e=>{const b=e.target.closest('.ql');if(b)showQuestion(+b.dataset.q)};
+}
+function setApp(a){
+ app=a;document.querySelectorAll('#appSeg button').forEach(b=>b.classList.toggle('on',b.dataset.app===a));
+ const d=a==='decide';$('#dockB').hidden=d;$('#drawer').hidden=true;$('#stepsBtn').classList.remove('on');$('#stepsBtn').textContent='Show steps';
+ if(d){rate=$('#slow').checked?0.2:1;buildQList();showQuestion(qi)}
+ else{rate=+document.querySelector('#speed .on').dataset.r;$('#qh').hidden=true;$('#dockD').hidden=true;$('#sum').hidden=true;buildList();showGroup(grp)}
+}
+$('#appSeg').onclick=e=>{const b=e.target.closest('button');if(b&&b.dataset.app!==app)setApp(b.dataset.app)};
+
+/* ---------- All animations: groups fold; a group has "All together" and its animations ---------- */
 const ICO='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function buildList(){
  $('#list').innerHTML=GROUPS.map((g,gi)=>{const items=ANIMS.filter(a=>a.g===gi);
@@ -595,8 +789,8 @@ function buildKnobs(){
 }
 function filter(k){$('#list').classList.toggle('filter',!!k);document.querySelectorAll('.li[data-i]').forEach(b=>b.classList.toggle('hit',!!k&&ANIMS[+b.dataset.i].tok.has(k)))}
 function paintKnobs(){
- const use=new Set(shown().flatMap(a=>[...a.tok]));let n=0;$('#tk').classList.toggle('all',showAll);
- document.querySelectorAll('#tk .tr[data-k]').forEach(row=>{const k=row.dataset.k,t=TK[k],u=row.querySelector('label span');row.hidden=!(showAll||use.has(k));if(!row.hidden)n++;row.classList.toggle('ch',changed(k));u.textContent=changed(k)?'was '+(t.cv?t.cv.map(n2).join(' '):t.ms+' ms'):u.dataset.use;
+ const use=new Set(shown().flatMap(a=>[...a.tok]));let n=0;$('#tk').hidden=!showAll;$('#tk').classList.add('all');
+ document.querySelectorAll('#tk .tr[data-k]').forEach(row=>{const k=row.dataset.k,t=TK[k],u=row.querySelector('label span');row.hidden=false;n++;row.classList.toggle('ch',changed(k));u.textContent=changed(k)?'was '+(t.cv?t.cv.map(n2).join(' '):t.ms+' ms'):u.dataset.use;
   if(t.cv){row.querySelectorAll('input').forEach(inp=>{if(document.activeElement!==inp)inp.value=n2(val[k][+inp.dataset.j])});row.lastElementChild.innerHTML=curveSvg(val[k])}
   else{const [r,nb]=row.querySelectorAll('input');r.value=val[k];if(document.activeElement!==nb)nb.value=val[k]}});
  $('#noTk').hidden=n>0;
@@ -606,24 +800,26 @@ function changesText(){
  const rows=TOKENS.filter(t=>changed(t.k)).map(t=>`${t.k}: ${dflt(t.k)} → ${css(t.k)}`);
  return rows.length?'Motion tokens — changes\n'+rows.join('\n'):'Motion tokens — no changes';
 }
-function copyChanges(){
- const text=changesText(),b=$('#copyTk'),o=$('#copyOut'),done=ok=>{b.textContent=ok?'Copied':'Copy from the note';o.textContent=text;o.hidden=false;setTimeout(()=>{b.textContent='Copy changes';if(ok)o.hidden=true},ok?2400:1600)};
+function copyText(text,b,label){
+ const o=$('#copyOut'),done=ok=>{b.textContent=ok?'Copied':'Could not copy';if(!ok&&app==='browse'){o.textContent=text;o.hidden=false}setTimeout(()=>{b.textContent=label},1800)};
  const legacy=()=>{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();done(ok)};
  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(()=>done(true),legacy);else legacy();
 }
+function copyChanges(){copyText(changesText(),$('#copyTk'),'Copy changes')}
 
 /* ---------- controls ---------- */
 $('#speed').onclick=e=>{const b=e.target.closest('button');if(!b)return;rate=+b.dataset.r;document.querySelectorAll('#speed button').forEach(x=>x.classList.toggle('on',x===b));replay()};
 $('#again').onclick=replay;
 addEventListener('keydown',e=>{
  if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
+ if(e.key===' '||e.key==='r'||e.key==='R'){e.preventDefault();replay();return}
+ if(app==='decide'){if(e.key==='ArrowRight'){e.preventDefault();showQuestion(qi+1)}else if(e.key==='ArrowLeft'){e.preventDefault();showQuestion(qi-1)}return}
  if(e.key==='ArrowDown'){e.preventDefault();showOne(mode==='one'?cur+1:ANIMS.findIndex(a=>a.g===grp))}
  else if(e.key==='ArrowUp'){e.preventDefault();if(mode==='one')showOne(cur-1)}
- else if(e.key===' '||e.key==='r'||e.key==='R'){e.preventDefault();replay()}
 });
 try{const s=JSON.parse(localStorage.getItem('motionTokens')||'null');if(s)TOKENS.forEach(t=>{const v=s[t.k];if(t.cv?Array.isArray(v)&&v.length===4&&v.every(n=>typeof n==='number'):typeof v==='number')val[t.k]=v})}catch(e){}
-buildList();buildKnobs();
-showGroup(0);   // opens on the press feedback of every button, side by side
+buildKnobs();
+setApp('decide');   // opens on the first question
 </script>
 </body>
 </html>
