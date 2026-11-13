@@ -599,7 +599,7 @@ const FOCUS={M01:'#feed .odd[data-m="m1"][data-o="1"]',M02:'#mkts .choice',M03:'
 /* groups about one element are shown close up; groups about the whole screen (sheets, pages, layout) show the whole phone */
 const WHOLE=new Set([3,4,5,6,7]);
 function makeProto(F,vp,whole){
- const P={F,vp,W:null,D:null,ready:false,runId:0,pressed:[],dragEl:null,dev:'mini',anim:null,onready:null,ov:null,ring:false};
+ const P={F,vp,W:null,D:null,ready:false,runId:0,pressed:[],dragEl:null,dev:'mini',anim:null,onready:null,ov:null};
  const q=s=>P.D.querySelector(s),scale=()=>+q('#stage').dataset.scale||1;
  const G={                                  // helpers for the scenarios; live on the prototype's window as G
   after:(ms,fn)=>P.W.setTimeout(fn,ms),     // the prototype's clock: slowed with everything else, dropped on the next run
@@ -647,10 +647,6 @@ function makeProto(F,vp,whole){
   const z=el===ph?Math.min(vw/(r.width+36),vh/(r.height+36)):Math.min(vp.closest('.solo')?3:1.5,vw*.78/r.width,vh*.6/r.height);
   F.style.transform=`translate(${vw/2-(r.left+r.width/2)*z}px,${vh/2-(r.top+r.height/2)*z}px) scale(${z})`;
  };
- /* a ring around the element of this place, so it is clear what to look at or press; it sits above the page and fades */
- P.showRing=a=>{const el=q(a.f||FOCUS[a.id]);if(!el)return;const r=el.getBoundingClientRect(),d=P.D.createElement('div');d.className='mg-ring';
-  d.style.cssText=`position:fixed;left:${r.left-5}px;top:${r.top-5}px;width:${r.width+10}px;height:${r.height+10}px;border-radius:14px;box-shadow:0 0 0 2px #f9fafa;pointer-events:none;z-index:999`;
-  P.D.body.appendChild(d);const an=d.animate([{opacity:0},{opacity:1,offset:.15},{opacity:1,offset:.6},{opacity:0}],{duration:1800,fill:'forwards'});an.onfinish=()=>d.remove()};
  P.run=a=>{
   P.anim=a;if(!P.ready)return;const root=P.D.documentElement;
   try{
@@ -658,7 +654,6 @@ function makeProto(F,vp,whole){
    /* Decide mode: "what if every place did this" — extra CSS on top of the prototype's, and where the value lives in JS, a wrapped function */
    let ov=P.D.getElementById('mg-ov');if(!ov){ov=P.D.createElement('style');ov.id='mg-ov';P.D.head.appendChild(ov)}ov.textContent=(P.ov&&P.ov.css)||'';
    if(!P.W.__o)P.W.__o={soft:P.W.soft,setOddsOn:P.W.setOddsOn};Object.assign(P.W,P.W.__o);if(P.ov&&P.ov.js)P.ov.js(P.W,P.W.__o);
-   P.D.querySelectorAll('.mg-ring').forEach(e=>e.remove());
    root.classList.add('mg-freeze');                 // set the state instantly: no entrance of the bar, the sheet or the page
    P.reset();const id=P.runId;
    if(a.setup)P.W.eval(a.setup);
@@ -666,7 +661,7 @@ function makeProto(F,vp,whole){
    void P.D.body.offsetWidth;P.D.getAnimations().forEach(x=>x.cancel());
    if(vp)P.frameOn(a);
    requestAnimationFrame(()=>{if(id!==P.runId)return;root.classList.remove('mg-freeze');void P.D.body.offsetWidth;
-    requestAnimationFrame(()=>{if(id!==P.runId)return;if(P.ring)P.showRing(a);try{if(a.play)P.W.eval(a.play)}catch(e){status(a.id+' · error: '+e.message);console.error(e)}})});
+    requestAnimationFrame(()=>{if(id!==P.runId)return;try{if(a.play)P.W.eval(a.play)}catch(e){status(a.id+' · error: '+e.message);console.error(e)}})});
   }catch(e){root.classList.remove('mg-freeze');status(a.id+' · error: '+e.message);console.error(e)}
  };
  F.addEventListener('load',P.boot);
@@ -835,8 +830,8 @@ function playDecide(rebuild=true){
  clearTimeout(loopT);if(qi>=QS.length)return;
  const q=QS[qi],ov=ovNow(),framed=cmp||zoom;
  if(rebuild||framed!==!$('#grid').hidden)decideView();
- if(framed){cards.forEach((c,n)=>{c.ov=n===cards.length-1?ov:null;c.ring=!!q.self});if(cards.every(c=>c.ready))cards.forEach(c=>c.run(c.anim))}   // not loaded yet: they start by themselves when ready
- else{main.ov=ov;main.ring=!!q.self;main.run(q.places[pi])}
+ if(framed){cards.forEach((c,n)=>{c.ov=n===cards.length-1?ov:null});if(cards.every(c=>c.ready))cards.forEach(c=>c.run(c.anim))}   // not loaded yet: they start by themselves when ready
+ else{main.ov=ov;main.run(q.places[pi])}
  if(loopOn)loopT=setTimeout(()=>playDecide(false),(q.lp||2800)/rate);
 }
 function pick(i){const q=QS[qi];ps=i;pp=i<0?null:clone({fx:q.presets[i].fx,m:q.presets[i].m})}
