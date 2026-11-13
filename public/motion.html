@@ -257,6 +257,14 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
 .ql.all>small{flex:none;color:var(--ui-t3)}
 .sr{grid-template-columns:1fr 1fr}
 .sr small{grid-column:1/-1}
+
+/* no dots either: a group is just its name; once decided, a tick appears at the right edge */
+.ql{padding:8px 12px}
+.ql>i{order:2;flex:none;visibility:hidden}
+.ql>i::before{display:none}
+.ql.done>i{visibility:visible}
+.ql.done>i::before{display:block}
+.ql.all{padding-left:12px}
 </style>
 </head>
 <body>
