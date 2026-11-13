@@ -243,6 +243,20 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
 .tgl{display:flex;flex-direction:column}
 .tgl .chk{min-height:40px}
 .tgl .chk+.chk{border-top:1px solid var(--ui-line)}
+
+/* left list without numbers: a quiet dot for "not decided", a tick for "decided" */
+#qN{display:none}
+.ql{align-items:center;min-height:40px;padding:8px 12px 8px 8px}
+.ql>i{position:relative;width:16px;height:16px;border-radius:50%;box-shadow:none;background:none}
+.ql>i::before{content:"";position:absolute;left:4px;top:4px;width:8px;height:8px;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--ui-t3);transition:background .2s,box-shadow .2s}
+.ql.done>i{background:none}
+.ql.done>i::before{left:0;top:0;width:16px;height:16px;background:var(--ui-t1);box-shadow:none}
+.ql.done>i::after{content:"";position:absolute;left:4px;top:4px;width:8px;height:4px;border-left:1.5px solid var(--ui-well);border-bottom:1.5px solid var(--ui-well);transform:rotate(-45deg)}
+.ql>div{flex:1;min-width:0}
+.ql.all{padding-left:32px}
+.ql.all>small{flex:none;color:var(--ui-t3)}
+.sr{grid-template-columns:1fr 1fr}
+.sr small{grid-column:1/-1}
 </style>
 </head>
 <body>
@@ -687,7 +701,7 @@ const QS=[
    {n:'Standard',d:'The usual 0.2 s fade.',fx:{},m:M('inout',200)},{n:'Smooth',d:'A visible, calm fade.',fx:{},m:M('soft',380)},
    {n:'Snappy',d:'',fx:{},m:M('out',80)},{n:'Slow',d:'',fx:{},m:M('inout',600)}],
   apply:(f,k)=>({css:`html:root{--m-quick:${k.t}ms}html .odd,html .choice,html .tp,html .gs-card,html .cta-main,html .odd .l,html .odd .v,html .livebadge,html .oddsTog .sw,html .oddsTog .knob,html .day,html .cp-chip,html .tp-top i,html .tp-in>span,html .tp-in>b,html .tp-club{transition-timing-function:${k.flat}}`})}, // these all sit on --m-quick: the preview moves that token and sets one curve
- {id:'swap',t:'Numbers and texts that change',s:'A price moves, a total is recalculated, a list is replaced: the new value comes in.',
+ {id:'swap',t:'Numbers and texts',s:'A price moves, a total is recalculated, a list is replaced: the new value comes in.',
   places:[PL('M21','Price on a tile'),PL('M23','Prices in the betslip'),PL('M24','Total in the bar'),PL('M27','Bar texts'),PL('M42','Competition list')],
   amt:(p,k)=>{p.fx.off=Math.min(48,Math.round(p.fx.off*k))},
   today:['Rises 5 px in 0.32 s on --soft.','Lists rise 8 px; day switch slides 20 px.'],
@@ -708,7 +722,7 @@ const QS=[
    {n:'Domino',d:'',fx:{},m:M('out',260,{delay:90})},{n:'Spring ripple',d:'',fx:{},m:M('gentle',0,{delay:40})}],
   apply:(f,k,m)=>({css:`html:root{--o-dur:${k.t}ms}html .tile,html .feed .legal,html .sgfoot{--soft:${k.e}}html .rm,html .ctop>.sp,html .ctop>.selc,html .ctop>.od,html .cinfo .mk,html .cinfo .tm,html .cinfo .ko{transition-delay:calc(var(--i,0) * ${m.delay}ms)}`,
    js:(W,o)=>{W.setOddsOn=on=>{o.setOddsOn(on);W.document.querySelectorAll('.tile').forEach(t=>{const n=+t.style.getPropertyValue('--ti')||0;t.style.setProperty('--ti',n/32*m.delay)})}}})},
- {id:'sheets',t:'Sheets, bar, toast, overlay',s:'Things that slide in over the screen from the bottom: the betslip sheet, the popup, the DAZN Bet overlay, the collapsed bar, the toast.',
+ {id:'sheets',t:'Sheets and overlays',s:'Things that slide in over the screen from the bottom: the betslip sheet, the popup, the DAZN Bet overlay, the collapsed bar, the toast.',
   places:[PL('M32','Betslip sheet'),PL('M34','Favourite-team popup'),PL('M37','DAZN Bet overlay'),PL('M31','Collapsed bar'),PL('M35','Toast')],
   lp:3400,today:['0.5 s (--m-sheet) on --soft for all of them.'],
   fx:[],presets:[{n:'iOS sheet',d:'Quick start, long soft landing. What it is today.',fx:{},m:M('soft',500)},{n:'Material',d:'Shorter, with a firm start and a firm stop.',fx:{},m:M('emph',300)},
@@ -825,7 +839,7 @@ function paintDecide(){
   if(x){b.classList.toggle('done',!!dec[x.id]);b.querySelector('small').textContent=dec[x.id]?presetName(x,dec[x.id]):''}else b.querySelector('small').textContent=`${n} / ${QS.length}`});
  $('#qh').hidden=sumOn;$('#dockD').hidden=sumOn;$('#places').hidden=sumOn;if(sumOn)return;
  const d=dec[q.id];
- $('#qN').textContent=`${qi+1} / ${QS.length}`;$('#qT').textContent=q.t;$('#qS').textContent=q.s;
+ $('#qT').textContent=q.t;$('#qS').textContent=q.s;
  $('#places').innerHTML='<b>Watch it on</b>'+q.places.map((x,i)=>`<button class="pl${i===pi?' on':''}" data-p="${i}">${glyph(x.id)}<div><b>${esc(x.n)}</b></div></button>`).join('');
  $('#todayL').innerHTML=q.today.map(t=>`<li>${esc(t)}</li>`).join('');if(document.activeElement!==$('#why'))$('#why').value=notes[q.id]||'';
  $('#presets').innerHTML=`<button class="chip2${ps<0?' on':''}${d&&d.i<0?' ap':''}" data-ps="-1">Current</button>`+q.presets.map((x,i)=>`<button class="chip2${ps===i?' on':''}${d&&d.i===i?' ap':''}" data-ps="${i}">${esc(x.n)}</button>`).join('');
@@ -871,7 +885,7 @@ const shareLink=()=>location.href.split('#')[0]+'#d='+btoa(unescape(encodeURICom
 function showSummary(){
  clearTimeout(loopT);dropCards();$('#grid').innerHTML='';$('#grid').hidden=true;$('#frame').classList.add('off');if(main.ready)main.reset();
  const s=$('#sum');s.hidden=false;main.ov=null;
- s.innerHTML=`<h1>My decisions</h1>`+QS.map((q,i)=>`<div class="sr" data-q="${i}" role="button" tabindex="0"><i>${i+1}</i><b>${esc(q.t)}</b><span${dec[q.id]?'':' class="no"'}>${esc(decText(q)||'Not decided')}</span>${notes[q.id]?`<small>Why: ${esc(notes[q.id])}</small>`:''}</div>`).join('')+
+ s.innerHTML=`<h1>My decisions</h1>`+QS.map((q,i)=>`<div class="sr" data-q="${i}" role="button" tabindex="0"><b>${esc(q.t)}</b><span${dec[q.id]?'':' class="no"'}>${esc(decText(q)||'Not decided')}</span>${notes[q.id]?`<small>Why: ${esc(notes[q.id])}</small>`:''}</div>`).join('')+
   `<div class="acts"><button class="btn" id="copyDec">Copy decisions</button><button class="btn q" id="copyLink" title="A link that opens this page with the same decisions">Copy link</button></div><h2>For development</h2><ul>${DEVNOTES.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
  paintDecide();
 }
@@ -880,10 +894,10 @@ $('#sum').onclick=e=>{const r=e.target.closest('.sr');if(r){showQuestion(+r.data
  else if(e.target.closest('#copyLink'))copyText(shareLink(),$('#copyLink'),'Copy link')};
 $('#prevQ').onclick=()=>showQuestion(qi-1);$('#nextQ').onclick=()=>showQuestion(qi+1);
 $('#againD').onclick=replay;
-function buildQList(){
+function buildQList(){   // no numbers: a group shows only whether it is decided (a tick) and which preset was applied
  let h='',last='';QS.forEach((q,i)=>{const sc=SECT[q.id];if(sc!==last){h+=`<div class="lg">${esc(sc)}</div>`;last=sc}
-  h+=`<button class="ql" data-q="${i}"><i>${i+1}</i><div><b>${esc(q.t)}</b><small></small></div></button>`});
- $('#list').innerHTML=h+`<hr><button class="ql" data-q="${QS.length}"><i>✓</i><div><b>My decisions</b><small></small></div></button>`;
+  h+=`<button class="ql" data-q="${i}"><i></i><div><b>${esc(q.t)}</b><small></small></div></button>`});
+ $('#list').innerHTML=h+`<hr><button class="ql all" data-q="${QS.length}"><div><b>My decisions</b></div><small></small></button>`;
  $('#list').onclick=e=>{const b=e.target.closest('.ql');if(b)showQuestion(+b.dataset.q)};
 }
 function setApp(a){
