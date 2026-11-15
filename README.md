@@ -47,8 +47,9 @@ The **Prototype states** panel on the left is the only navigation (see the next 
    - Removing the last pick closes the sheet and shows an Undo toast.
 6. **Place bet on DAZN Bet.** Opens a mock DAZN Bet overlay. Closing it clears the betslip, as in the real flow, because nothing comes back from DAZN Bet.
 7. **Fixture page.** Every match of today opens its own page: tap its tile. Real Madrid v Atlético Madrid is the one drawn in Figma; the other seven use the same template with generated demo data (see "Demo data" below). A live match shows the score and the running minute in the header and only the markets that still make sense for the score. The drawn page has the pre-match markets: Match Results, Total Goals, BTTS, Double Chance, 1st-half goals, Result & Both teams to score, Draw no bet. Picks stay in sync with the feed. Under "More bets on DAZN Bet" there is a **Goalscorer** carousel ("In this match", round photo): every player is his own pick, so several can be in the betslip.
-8. **Finished matches.** Tap **Sat 3 Jan** in the calendar (or the state *Other screens → Finished matches*). FT tiles keep their last odds, nothing is tappable, the outcome that happened is white and the rest are grey. Tap a tile: its page shows the final score with "FT" and the same rule on every market. **Today** goes back.
-9. **Competition page · Odds tab.** Tap a competition header in the feed: **UEFA Champions League** (drawn in Figma), **LaLiga** or **Premier League** (same template, demo data). The page has the tabs Matches / Table / Odds / Playoff / Team stats (only Odds is built) and sub-tabs as chips:
+8. **Days.** Every day of the calendar opens its own feed, and the calendar scrolls sideways (finger, mouse drag or wheel): days before today hold finished matches, days after today hold matches that have not started (`DAY_ADD` in the code).
+   **Finished matches.** Tap **Sat 3 Jan** in the calendar (or the state *Other screens → Finished matches*). FT tiles keep their last odds, nothing is tappable, the outcome that happened is white and the rest are grey. Tap a tile: its page shows the final score with "FT" and the same rule on every market. **Today** goes back.
+9. **Competition page · Odds tab.** Tap a competition header in the feed or a league in the row under the header (the row scrolls sideways): **UEFA Champions League** (drawn in Figma); **LaLiga**, **Premier League**, **Serie A**, **Bundesliga**, **Ligue 1**, **Europa League** and **MLS** use the same template with demo data. The library has no crests of MLS clubs, so their rows show the MLS shield. The page has the tabs Matches / Table / Odds / Playoff / Team stats (only Odds is built) and sub-tabs as chips:
    - **Competition winner:** a table of teams with the price to win the season.
    - **Top scorer** (Figma "Top scorer v3.2"): two **Top Picks** cards, then the list of players. A picked Top Pick turns white as a whole, with the price on a dark tile.
    - **Relegation:** the chip is in the design, its content is not designed, so it does nothing.
@@ -97,6 +98,8 @@ JS helpers: `soft()` (play an element in), `setTxt()` (swap a text), `smoothH()`
 ### Club crests
 
 `public/assets/img/{ars,ath,atm,bar,bay,che,liv,mci,new,psg,psv,rm,val,vil}.png` are exported from the Graphic Assets library (`Football-club-logo`) in the proportions of the 28 px slot of the match tile.
+
+The 46 clubs added later (`TEAMS` in the code) come from the same library: `k.png` is a 112 px square for the tile slot, `t_k.png` the same crest without padding. League logos (`seriea`, `bundes`, `ligue1`, `uel` and their `chip_*` versions for the row of leagues) come from the Quick-link logos of that library. Write image paths out in full in `index.html`: `build.py` inlines only literal paths.
 
 ## Where things live in `public/index.html`
 
