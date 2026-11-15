@@ -1072,6 +1072,31 @@ const IMG={rm:'assets/img/rm.png',psg:'assets/img/psg.png',che:'assets/img/che.p
 const SPORT='<svg class="sp" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M11.0723 7.59863C11.2629 7.62399 11.4335 7.73611 11.5312 7.90527L12.5449 9.66113C12.6566 9.85452 12.6566 10.0928 12.5449 10.2861L11.5312 12.042C11.4196 12.2351 11.2133 12.3543 10.9902 12.3545H8.96191C8.73871 12.3545 8.5316 12.2352 8.41992 12.042L7.40625 10.2861C7.29459 10.0928 7.29463 9.85451 7.40625 9.66113L8.41992 7.90527C8.5316 7.71202 8.73871 7.59277 8.96191 7.59277H10.9902L11.0723 7.59863Z" fill="#F9FAFA"/><path fill-rule="evenodd" clip-rule="evenodd" d="M10 1.66699C14.6021 1.66716 18.3338 5.39788 18.334 10L18.3232 10.4287C18.1001 14.8317 14.4584 18.3338 10 18.334L9.57129 18.3232C5.16841 18.1 1.66718 14.4583 1.66699 10C1.66717 5.39789 5.39789 1.66717 10 1.66699ZM10 3.2666C9.31508 3.26663 8.65398 3.36942 8.03125 3.55957L7.20117 5.35645H7.19238C7.05412 5.65024 6.76894 5.858 6.44922 5.89258L4.50195 6.11328C3.7521 7.17204 3.30193 8.45625 3.27051 9.84473L4.72949 11.1729L4.73828 11.1816C4.9801 11.3976 5.08378 11.7351 5.02344 12.0547L4.61816 14.0459C5.3976 15.0808 6.46847 15.8831 7.70898 16.332L9.51758 15.3125C9.80259 15.1486 10.1486 15.1485 10.4336 15.3125L12.2578 16.3428C13.5016 15.9 14.5758 15.1026 15.3604 14.0713L14.9541 12.0459H14.9453C14.885 11.7263 14.9886 11.3975 15.2305 11.1729L16.7275 9.80176C16.688 8.43621 16.2427 7.17387 15.5068 6.12891L13.459 5.89258C13.1306 5.858 12.8531 5.65025 12.7148 5.35645L11.8672 3.53027C11.2742 3.35938 10.648 3.26663 10 3.2666Z" fill="#F9FAFA"/></svg>';
 const ARROW='<svg width="9" height="8" viewBox="0 0 9 8"><path d="M3.66137 1.29115C4.05567 0.684093 4.94433 0.684092 5.33863 1.29115L7.3938 4.45529C7.8259 5.12057 7.34846 6 6.55517 6H2.44483C1.65154 6 1.17409 5.12057 1.6062 4.4553L3.66137 1.29115Z" fill="currentColor"/></svg>';
 
+/* D1 · more competitions and 8–10 clubs in each. Real clubs and leagues; prices, times and scores are demo values.
+   TEAMS: crest key -> [name on the tile, 3-letter code on the odds tiles].
+   An added match is one row: [competition, home, away, kick-off 'HH:MM' or final score 'h-a', 1, X, 2]; a score makes it a finished match. */
+const TEAMS={rm:['Real Madrid','RMA'],psg:['PSG','PSG'],che:['Chelsea','CHE'],new:['Newcastle United','NEW'],bay:['Bayern Munich','BAY'],psv:['PSV','PSV'],
+ bar:['Barcelona','BAR'],atm:['Atlético Madrid','ATM'],val:['Valencia','VAL'],vil:['Villarreal','VIL'],bet:['Real Betis','BET'],ath:['Athletic Club','ATH'],
+ ars:['Arsenal','ARS'],liv:['Liverpool','LIV'],mci:['Manchester City','MCI'],inter:['Inter','INT'],scp:['Sporting CP','SCP'],gal:['Galatasaray','GAL'],
+ brg:['Club Brugge','BRU'],mun:['Manchester United','MUN'],tot:['Tottenham','TOT'],avl:['Aston Villa','AVL'],bha:['Brighton','BHA'],eve:['Everton','EVE'],
+ nfo:['Nottingham Forest','NFO'],cry:['Crystal Palace','CRY'],ful:['Fulham','FUL'],bre:['Brentford','BRE'],bou:['Bournemouth','BOU'],rom:['Roma','ROM'],
+ ata:['Atalanta','ATA'],mil:['AC Milan','MIL'],laz:['Lazio','LAZ'],nap:['Napoli','NAP'],fio:['Fiorentina','FIO'],bol:['Bologna','BOL'],
+ tor:['Torino','TOR'],udi:['Udinese','UDI'],lec:['Lecce','LEC'],par:['Parma','PAR'],com:['Como','COM'],bvb:['Borussia Dortmund','BVB'],
+ rbl:['RB Leipzig','RBL'],b04:['Bayer Leverkusen','LEV'],stu:['VfB Stuttgart','VFB'],sge:['Eintracht Frankfurt','SGE'],svw:['Werder Bremen','SVW'],scf:['SC Freiburg','SCF'],
+ fcu:['Union Berlin','FCU'],tsg:['Hoffenheim','TSG'],bmg:['Mönchengladbach','BMG'],m05:['Mainz 05','M05'],om:['Marseille','MAR'],ol:['Lyon','LYO'],
+ asm:['Monaco','MON'],los:['Lille','LIL'],rcl:['Lens','LEN'],por:['Porto','POR'],fen:['Fenerbahçe','FEN'],fey:['Feyenoord','FEY'],
+ aja:['Ajax','AJA']};
+const mkM=(id,[comp,hk,ak,t,...o],x)=>{const H=TEAMS[hk],A=TEAMS[ak],sc=t.includes('-')?t.split('-').map(Number):null;
+ return Object.assign({id,comp,live:false,h:H[0],a:A[0],hs:H[1],as:A[1],hi:hk,ai:ak,o},sc?{ft:true,sh:sc[0],sa:sc[1],res:sc[0]>sc[1]?0:sc[0]<sc[1]?2:1}:{ko:t},x)};
+const TODAY_ADD=[['ucl','inter','scp','21:00',1.60,4.00,5.50],['ucl','gal','brg','21:00',1.95,3.60,3.80],
+ ['pl','mun','tot','15:00',2.10,3.60,3.30],['pl','avl','bha','15:00',1.95,3.70,3.75],['pl','eve','nfo','15:00',2.45,3.20,3.00],
+ ['seriea','rom','ata','20:45',1.45,4.20,8.00],['seriea','mil','laz','18:00',1.80,3.60,4.50],['seriea','nap','fio','20:45',1.65,3.80,5.25],['seriea','bol','tor','15:00',1.85,3.40,4.60],['seriea','udi','lec','15:00',2.05,3.20,3.90],
+ ['bundes','bvb','rbl','18:30',2.10,3.70,3.20],['bundes','b04','stu','15:30',1.95,3.80,3.60],['bundes','sge','svw','15:30',1.75,3.90,4.40],['bundes','scf','fcu','15:30',2.00,3.40,3.90]];
+const TODAY_LIVE={m14:{live:true,min:34,sh:1,sa:0}};   // Roma v Atalanta is being played
+const YEST_ADD=[['ucl','bar','inter','2-2',2.05,3.70,3.40],['ucl','brg','gal','1-0',2.30,3.40,3.00],
+ ['laliga','ath','atm','1-1',2.90,3.10,2.60],
+ ['pl','mun','eve','2-0',1.70,3.80,5.00],['pl','tot','avl','1-2',2.40,3.50,2.85],['pl','bha','nfo','1-1',2.05,3.50,3.60],
+ ['seriea','nap','rom','2-1',2.00,3.30,4.00],['seriea','mil','bol','1-0',1.75,3.60,4.75],['seriea','ata','fio','3-2',1.80,3.75,4.30],['seriea','laz','tor','0-0',1.90,3.40,4.20]];
 /* matches outside the feed: only for the "Fill betslip to 20" scenario (cards and bar need names and prices, no crests) */
 const EXTRA=[['Leverkusen','Stuttgart','Tomorrow, 15:30',1.28],['Real Sociedad','Girona','Tomorrow, 14:00',1.42],['Sporting CP','Braga','Tomorrow, 21:15',1.33],['Celtic','Rangers','Tomorrow, 13:30',1.57],
  ['Monaco','Lille','Tomorrow, 17:00',1.38],['Lyon','Marseille','Tomorrow, 20:45',1.44],['Ajax','Feyenoord','Tomorrow, 14:30',1.52],['Benfica','Porto','Today, 21:15',1.65],
@@ -1086,6 +1111,7 @@ const INIT=()=>[
  {id:'m6',comp:'laliga',live:false,h:'Real Betis',a:'Athletic Club',hs:'BET',as:'ATH',hi:'bet',ai:'ath',ko:'16:15',o:[2.30,3.25,3.20]},
  {id:'m7',comp:'pl',live:false,h:'Arsenal',a:'Liverpool',hs:'ARS',as:'LIV',hi:'ars',ai:'liv',ko:'17:30',o:[2.25,3.50,3.10]},
  {id:'m8',comp:'pl',live:false,h:'Manchester City',a:'Chelsea',hs:'MCI',as:'CHE',hi:'mci',ai:'che',ko:'20:00',o:[1.62,4.20,5.00]},
+ ...TODAY_ADD.map((r,i)=>mkM('m'+(i+9),r,TODAY_LIVE['m'+(i+9)])),
  ...EXTRA.map(([h,a,when,v],i)=>({id:'x'+i,hid:true,comp:'x',live:false,h,a,when,ko:'',o:[v,3.40,5.50]}))
 ];
 /* yesterday: finished matches keep their last prices, all disabled; res = the outcome that happened (white) */
@@ -1095,9 +1121,17 @@ const FT=()=>[
  {id:'f3',comp:'ucl',ft:true,h:'Bayern Munich',a:'PSV',hs:'BAY',as:'PSV',hi:'bay',ai:'psv',sh:0,sa:2,o:[1.06,11.00,34.00],res:2},
  {id:'f4',comp:'laliga',ft:true,h:'Valencia',a:'Villarreal',hs:'VAL',as:'VIL',hi:'val',ai:'vil',sh:0,sa:1,o:[2.60,3.20,2.75],res:2},
  {id:'f5',comp:'pl',ft:true,h:'Arsenal',a:'Liverpool',hs:'ARS',as:'LIV',hi:'ars',ai:'liv',sh:2,sa:2,o:[2.25,3.50,3.10],res:1},
- {id:'f6',comp:'pl',ft:true,h:'Manchester City',a:'Chelsea',hs:'MCI',as:'CHE',hi:'mci',ai:'che',sh:1,sa:0,o:[1.62,4.20,5.00],res:0}
+ {id:'f6',comp:'pl',ft:true,h:'Manchester City',a:'Chelsea',hs:'MCI',as:'CHE',hi:'mci',ai:'che',sh:1,sa:0,o:[1.62,4.20,5.00],res:0},
+ ...YEST_ADD.map((r,i)=>mkM('f'+(i+7),r))
 ];
-const COMPS={ucl:{t:'UEFA Champions League',m:'League phase · Matchday 7',img:'ucl'},laliga:{t:'Spain · Laliga',m:'Matchweek 18',img:'laliga'},pl:{t:'England · Premier League',m:'Matchday 20',img:'pl'}};
+/* competitions of the feed, in the order of the feed. fx: the two competition lines of a match page (header, row under the header) */
+const COMPS={ucl:{t:'UEFA Champions League',m:'League phase · Matchday 7',img:'ucl',fx:['UEFA ・Champions League','UEFA Champions League']},
+ uel:{t:'UEFA Europa League',m:'League phase · Matchday 7',img:'uel',fx:['UEFA ・Europa League','UEFA Europa League']},
+ laliga:{t:'Spain · Laliga',m:'Matchweek 18',img:'laliga',fx:['Spain ・LA Liga','LA Liga EA Sports']},
+ pl:{t:'England · Premier League',m:'Matchday 20',img:'pl',fx:['England ・Premier League','Premier League']},
+ seriea:{t:'Italy · Serie A',m:'Matchday 18',img:'seriea',fx:['Italy ・Serie A','Serie A']},
+ bundes:{t:'Germany · Bundesliga',m:'Matchday 16',img:'bundes',fx:['Germany ・Bundesliga','Bundesliga']},
+ ligue1:{t:'France · Ligue 1',m:'Matchday 17',img:'ligue1',fx:['France ・Ligue 1','Ligue 1']}};
 /* Odds tab content (pre-match, mirrors Figma "Odds tab" examples). 1X2 prices live in match.o so feed and Odds tab stay in sync. */
 const FX={m4:{league:'Spain ・LA Liga',comp:'LA Liga EA Sports',hiImg:'rmfx',aiImg:'atmfx',time:'18:00',date:'Today',markets:[
  {id:'1x2',t:'Match Results',type:'1x2',glow:true},
@@ -1115,9 +1149,25 @@ FX.m4.scorers=[{k:'mbappe',n:'Kylian Mbappe',team:'Real Madrid',img:'gs_mbappe',
    win: [crest, team, price] in the order of the Figma table; Figma shows a 3.30 placeholder in every row, the prices here are demo values
    from favourite to outsider (PRD: the list is sorted by odds). picks / scorers: Top scorer v3.2, names, clubs and prices as in Figma.
    One pick per market: tapping another team or player replaces it (same rule as the outcomes of one match market). */
-['bay','mci','bar','psg','ars','che','psv','new','rm','atm','val','vil','bet','ath','liv'].forEach(k=>IMG['t_'+k]='assets/img/t_'+k+'.png'); // t_*: the feed crests without their inner padding
-['mun','tot','bha','nfo','cry','eve'].forEach(k=>IMG[k]='assets/img/'+k+'.png');
-Object.assign(IMG,{bvb:'assets/img/bvb.png',fen:'assets/img/fen.png',nap:'assets/img/nap.png',juv:'assets/img/juv.svg',stu:'assets/img/stu.png',avl:'assets/img/avl.png',brg:'assets/img/brg.png',
+Object.assign(IMG,{t_bay:'assets/img/t_bay.png',t_mci:'assets/img/t_mci.png',t_bar:'assets/img/t_bar.png',t_psg:'assets/img/t_psg.png',t_ars:'assets/img/t_ars.png',
+ t_che:'assets/img/t_che.png',t_psv:'assets/img/t_psv.png',t_new:'assets/img/t_new.png',t_rm:'assets/img/t_rm.png',t_atm:'assets/img/t_atm.png',
+ t_val:'assets/img/t_val.png',t_vil:'assets/img/t_vil.png',t_bet:'assets/img/t_bet.png',t_ath:'assets/img/t_ath.png',t_liv:'assets/img/t_liv.png'}); // t_*: the feed crests without their inner padding (full paths, so build.py inlines them)
+/* D1 · crests of the added clubs, from the Graphic Assets library (.Football-club-logo): k = 112 px square for the 28 px slot of the tile, t_k = the same crest without padding.
+   Paths are written out in full so that build.py can inline them. */
+Object.assign(IMG,{inter:'assets/img/inter.png',t_inter:'assets/img/t_inter.png',scp:'assets/img/scp.png',t_scp:'assets/img/t_scp.png',gal:'assets/img/gal.png',t_gal:'assets/img/t_gal.png',brg:'assets/img/brg.png',t_brg:'assets/img/t_brg.png',
+ mun:'assets/img/mun.png',t_mun:'assets/img/t_mun.png',tot:'assets/img/tot.png',t_tot:'assets/img/t_tot.png',avl:'assets/img/avl.png',t_avl:'assets/img/t_avl.png',bha:'assets/img/bha.png',t_bha:'assets/img/t_bha.png',
+ eve:'assets/img/eve.png',t_eve:'assets/img/t_eve.png',nfo:'assets/img/nfo.png',t_nfo:'assets/img/t_nfo.png',cry:'assets/img/cry.png',t_cry:'assets/img/t_cry.png',ful:'assets/img/ful.png',t_ful:'assets/img/t_ful.png',
+ bre:'assets/img/bre.png',t_bre:'assets/img/t_bre.png',bou:'assets/img/bou.png',t_bou:'assets/img/t_bou.png',rom:'assets/img/rom.png',t_rom:'assets/img/t_rom.png',ata:'assets/img/ata.png',t_ata:'assets/img/t_ata.png',
+ mil:'assets/img/mil.png',t_mil:'assets/img/t_mil.png',laz:'assets/img/laz.png',t_laz:'assets/img/t_laz.png',nap:'assets/img/nap.png',t_nap:'assets/img/t_nap.png',fio:'assets/img/fio.png',t_fio:'assets/img/t_fio.png',
+ bol:'assets/img/bol.png',t_bol:'assets/img/t_bol.png',tor:'assets/img/tor.png',t_tor:'assets/img/t_tor.png',udi:'assets/img/udi.png',t_udi:'assets/img/t_udi.png',lec:'assets/img/lec.png',t_lec:'assets/img/t_lec.png',
+ par:'assets/img/par.png',t_par:'assets/img/t_par.png',com:'assets/img/com.png',t_com:'assets/img/t_com.png',bvb:'assets/img/bvb.png',t_bvb:'assets/img/t_bvb.png',rbl:'assets/img/rbl.png',t_rbl:'assets/img/t_rbl.png',
+ b04:'assets/img/b04.png',t_b04:'assets/img/t_b04.png',stu:'assets/img/stu.png',t_stu:'assets/img/t_stu.png',sge:'assets/img/sge.png',t_sge:'assets/img/t_sge.png',svw:'assets/img/svw.png',t_svw:'assets/img/t_svw.png',
+ scf:'assets/img/scf.png',t_scf:'assets/img/t_scf.png',fcu:'assets/img/fcu.png',t_fcu:'assets/img/t_fcu.png',tsg:'assets/img/tsg.png',t_tsg:'assets/img/t_tsg.png',bmg:'assets/img/bmg.png',t_bmg:'assets/img/t_bmg.png',
+ m05:'assets/img/m05.png',t_m05:'assets/img/t_m05.png',om:'assets/img/om.png',t_om:'assets/img/t_om.png',ol:'assets/img/ol.png',t_ol:'assets/img/t_ol.png',asm:'assets/img/asm.png',t_asm:'assets/img/t_asm.png',
+ los:'assets/img/los.png',t_los:'assets/img/t_los.png',rcl:'assets/img/rcl.png',t_rcl:'assets/img/t_rcl.png',por:'assets/img/por.png',t_por:'assets/img/t_por.png',fen:'assets/img/fen.png',t_fen:'assets/img/t_fen.png',
+ fey:'assets/img/fey.png',t_fey:'assets/img/t_fey.png',aja:'assets/img/aja.png',t_aja:'assets/img/t_aja.png',
+ seriea:'assets/img/seriea.png',bundes:'assets/img/bundes.png',ligue1:'assets/img/ligue1.png',uel:'assets/img/uel.png'});
+Object.assign(IMG,{juv:'assets/img/juv.svg',
  gs_mbappe:'assets/img/gs_mbappe.png',gs_alvarez:'assets/img/gs_alvarez.png',
  pl_haaland:'assets/img/pl_haaland.png',pl_kane:'assets/img/pl_kane.png',pl_mbappe:'assets/img/pl_mbappe.png',pl_dembele:'assets/img/pl_dembele.png',pl_raphinha:'assets/img/pl_raphinha.png',
  pl_torres:'assets/img/pl_torres.png',pl_demirovic:'assets/img/pl_demirovic.png',pl_jackson:'assets/img/pl_jackson.png',pl_tresoldi:'assets/img/pl_tresoldi.png',pl_yamal:'assets/img/pl_yamal.png'});
@@ -1163,13 +1213,32 @@ const SCORERS={
  m6:[{k:'cucho',n:'Cucho Hernández',team:'Real Betis',img:null,cr:'bet',v:2.60},{k:'williams',n:'Iñaki Williams',team:'Athletic Club',img:null,cr:'ath',v:2.80},{k:'antony',n:'Antony',team:'Real Betis',img:null,cr:'bet',v:3.20}],
  m7:[{k:'gyokeres',n:'Viktor Gyökeres',team:'Arsenal',img:null,cr:'ars',v:2.20},{k:'salah',n:'Mohamed Salah',team:'Liverpool',img:null,cr:'liv',v:2.30},{k:'saka',n:'Bukayo Saka',team:'Arsenal',img:null,cr:'ars',v:2.75}],
  m8:[{k:'haaland',n:'Erling Haaland',team:'Man City',img:'pl_haaland',cr:'mci',v:1.65},{k:'palmer',n:'Cole Palmer',team:'Chelsea',img:null,cr:'che',v:3.20},{k:'foden',n:'Phil Foden',team:'Man City',img:null,cr:'mci',v:3.00}]};
+/* D1 · matches without their own list in SCORERS: the Goalscorer carousel gets the best-known forward of each club (STARS: club -> [key, name, photo]).
+   The price follows the chance of his team to win. Finished matches have no carousel, as before. */
+const STARS={rm:['mbappe','Kylian Mbappe','gs_mbappe'],psg:['dembele','Ousmane Dembélé','pl_dembele'],che:['palmer','Cole Palmer'],new:['woltemade','Nick Woltemade'],bay:['kane','Harry Kane','pl_kane'],
+ psv:['pepi','Ricardo Pepi'],bar:['yamal','Lamine Yamal','pl_yamal'],atm:['alvarez','Julian Alvarez','gs_alvarez'],val:['duro','Hugo Duro'],vil:['moreno','Gerard Moreno'],
+ bet:['cucho','Cucho Hernández'],ath:['williams','Iñaki Williams'],ars:['gyokeres','Viktor Gyökeres'],liv:['salah','Mohamed Salah'],mci:['haaland','Erling Haaland','pl_haaland'],
+ inter:['lautaro','Lautaro Martínez'],scp:['pote','Pedro Gonçalves'],gal:['osimhen','Victor Osimhen'],brg:['vanaken','Hans Vanaken'],mun:['bruno','Bruno Fernandes'],
+ tot:['solanke','Dominic Solanke'],avl:['watkins','Ollie Watkins'],bha:['welbeck','Danny Welbeck'],eve:['ndiaye','Iliman Ndiaye'],nfo:['wood','Chris Wood'],
+ cry:['mateta','Jean-Philippe Mateta'],ful:['jimenez','Raúl Jiménez'],bre:['thiago','Igor Thiago'],bou:['evanilson','Evanilson'],rom:['dybala','Paulo Dybala'],
+ ata:['scamacca','Gianluca Scamacca'],mil:['leao','Rafael Leão'],laz:['zaccagni','Mattia Zaccagni'],nap:['mctominay','Scott McTominay'],fio:['kean','Moise Kean'],
+ bol:['orsolini','Riccardo Orsolini'],tor:['zapata','Duván Zapata'],udi:['davis','Keinan Davis'],lec:['banda','Lameck Banda'],par:['pellegrino','Mateo Pellegrino'],
+ com:['paz','Nico Paz'],bvb:['guirassy','Serhou Guirassy'],rbl:['baumgartner','Christoph Baumgartner'],b04:['schick','Patrik Schick'],stu:['undav','Deniz Undav'],
+ sge:['burkardt','Jonathan Burkardt'],svw:['schmid','Romano Schmid'],scf:['grifo','Vincenzo Grifo'],fcu:['ilic','Andrej Ilić'],tsg:['kramaric','Andrej Kramarić'],
+ bmg:['kleindienst','Tim Kleindienst'],m05:['amiri','Nadiem Amiri'],om:['greenwood','Mason Greenwood'],ol:['fofana','Malick Fofana'],asm:['balogun','Folarin Balogun'],
+ los:['giroud','Olivier Giroud'],rcl:['thauvin','Florian Thauvin'],por:['samu','Samu Aghehowa'],fen:['ennesyri','Youssef En-Nesyri'],fey:['ueda','Ayase Ueda'],
+ aja:['weghorst','Wout Weghorst']};
+function starScorers(m,p1,p2){
+ const a=STARS[m.hi],b=STARS[m.ai];if(m.ft||!a||!b)return null;
+ return [[a,m.hi,p1],[b,m.ai,p2]].map(([[k,n,img],cr,p])=>({k,n,team:TEAMS[cr][0],img:img||null,cr,v:priceOf(.22+.38*p)}));
+}
 const poisCum=(l,k)=>{if(k<0)return 0;let p=Math.exp(-l),t=p;for(let i=1;i<=k;i++){p*=l/i;t+=p}return t};       // chance of k goals or fewer when l are expected
 const priceOf=p=>{const v=1/(Math.min(.985,Math.max(.012,p))*1.06),st=v<3?.05:v<6?.25:v<15?.5:1;return Math.min(51,Math.max(1.01,+(Math.round(v/st)*st).toFixed(2)))}; // chance -> price with margin, rounded like a bookmaker does
 function fxOf(m){
  const inv=m.o.map(x=>1/x),sum=inv[0]+inv[1]+inv[2],[p1,px,p2]=inv.map(x=>x/sum),gap=Math.abs(p1-p2);
  const goals=2.45+1.1*gap,scored=m.live?m.sh+m.sa:0,left=m.live?goals*(90-m.min)/90:goals;                    // goals expected in the match / still to come
  const lines=(from,n,exp,done)=>Array.from({length:n},(_,i)=>{const ln=from+i,po=1-poisCum(exp,Math.floor(ln)-done);return [ln.toFixed(1),priceOf(po),priceOf(1-po)]});
- const L={ucl:['UEFA ・Champions League','UEFA Champions League'],laliga:['Spain ・LA Liga','LA Liga EA Sports'],pl:['England ・Premier League','Premier League']}[m.comp];
+ const L=COMPS[m.comp].fx;
  const mk=[{id:'1x2',t:'Match Results',type:'1x2',glow:true},{id:'ou',t:'Total Goals',type:'lines',lines:m.live?lines(scored+.5,2,left,scored):lines(1.5,5,goals,0)}];
  if(!(m.live&&m.sh>0&&m.sa>0)){
   let py=Math.min(.68,Math.max(.36,.6-.35*gap));
@@ -1182,7 +1251,7 @@ function fxOf(m){
   mk.push({id:'rbtts',t:'Result & Both teams to score',glow:true,sub:'Both parts must happen for the bet to win.',type:'stack',opts:[{k:'1',c:'1 & BTTS',l:`${m.hs} to win and both teams to score`,v:priceOf(p1*.42)},{k:'X',c:'X & BTTS',l:'Draw and both teams to score',v:priceOf(px*.72)},{k:'2',c:'2 & BTTS',l:`${m.as} to win and both teams to score`,v:priceOf(p2*.42)}]});
  }
  mk.push({id:'dnb',t:'Draw no bet',glow:true,type:'dnb',opts:[{k:'1',v:priceOf(p1/(p1+p2))},{k:'2',v:priceOf(p2/(p1+p2))}]});
- return {league:L[0],comp:L[1],compImg:COMPS[m.comp].img,hiImg:'t_'+m.hi,aiImg:'t_'+m.ai,time:m.ko,date:'Today',markets:mk,scorers:SCORERS[m.id]||null};
+ return {league:L[0],comp:L[1],compImg:COMPS[m.comp].img,hiImg:'t_'+m.hi,aiImg:'t_'+m.ai,time:m.ko,date:m.day||'Today',markets:mk,scorers:SCORERS[m.id]||starScorers(m,p1,p2)};
 }
 INIT().forEach(m=>{if(!m.hid&&!FX[m.id])FX[m.id]=fxOf(m)});
 FT().forEach(m=>{FX[m.id]=fxOf(m)});
@@ -1230,7 +1299,7 @@ function tileHTML(m){
   <div class="orow">${odds}</div></div>`;
 }
 function renderFeed(){
- const groups=['ucl','laliga','pl'],list=S.day==='yest'?S.ft:S.matches.filter(m=>!m.hid);
+ const groups=Object.keys(COMPS),list=S.day==='yest'?S.ft:S.matches.filter(m=>!m.hid);
  let h=LEGAL+'<div class="following"><i></i><span><img src="'+IMG.star+'" alt="">Following</span><i></i></div>';
  for(const g of groups){
   const ms=list.filter(m=>m.comp===g&&(!S.liveOnly||m.live));
@@ -1631,7 +1700,7 @@ function refresh(){const y=$('#scroll').scrollTop;renderFeed();$('#scroll').scro
 let LIVE=true,HOLD=false,cur=-1;
 const P3=()=>[{m:'m5',g:'1x2',o:'1'},{m:'m4',g:'1x2',o:'2'},{m:'m1',g:'1x2',o:'0'}]; // Draw (Valencia), Atlético Madrid, Real Madrid (live)
 const ONE=()=>[{m:'m1',g:'1x2',o:'0'}];
-function fill20(){for(const m of [...S.matches.filter(x=>!x.hid&&x.id!=='m2'&&x.id!=='m3'),...S.matches.filter(x=>x.hid)]){if(S.sel.length>=MAX)break;if(!S.sel.some(s=>s.m===m.id&&s.g==='1x2'))S.sel.unshift({m:m.id,g:'1x2',o:String(m.pick||0)})}}
+function fill20(){for(const m of [...['m1','m4','m5','m6','m7','m8'].map(M),...S.matches.filter(x=>x.hid)]){if(S.sel.length>=MAX)break;if(!S.sel.some(s=>s.m===m.id&&s.g==='1x2'))S.sel.unshift({m:m.id,g:'1x2',o:String(m.pick||0)})}}
 const showTile=id=>{const t=document.querySelector(`#scroll [data-tile="${id}"]`),sc=$('#scroll'),k=+$('#stage').dataset.scale||1;if(t)sc.scrollTop+=(t.getBoundingClientRect().bottom-$('#phone').getBoundingClientRect().top)/k-$('#bar').offsetTop+12}; // scroll until this tile ends 12 px above the bar (offsetTop: the bar may still be sliding in)
 const toEnd=()=>setTimeout(()=>{const b=$('#sbody');b.scrollTop=b.scrollHeight},80); // show the summary, which is below the fold with 20 cards
 const moved=()=>{changeOdd(M('m1'),0,0,1.30);changeOdd(M('m4'),2,0,4.10)};   // Real Madrid 1.36 -> 1.30, Atlético 3.90 -> 4.10: total 16.97 -> 17.06
