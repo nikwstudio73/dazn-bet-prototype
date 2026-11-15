@@ -4,7 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script>/* M1 · phone: a touch screen whose short side is at most 600 px opens the prototype as an app (html.app): full screen, no frame, no States panel, no size switch */
-if(matchMedia('(pointer:coarse) and (hover:none)').matches&&Math.min(screen.width,screen.height)<=600){document.documentElement.classList.add('app');document.querySelector('meta[name=viewport]').content+=',viewport-fit=cover,maximum-scale=1,user-scalable=no'}</script>
+if(matchMedia('(pointer:coarse) and (hover:none)').matches&&Math.min(screen.width,screen.height)<=600){document.documentElement.classList.add('app');document.querySelector('meta[name=viewport]').content+=',viewport-fit=cover,maximum-scale=1,user-scalable=no'}
+/* A2 · ?embed in the address: the prototype is shown inside the motion gallery (motion.html): no States panel, no size switch. Without it nothing changes */
+if(/[?&]embed(=|&|$)/.test(location.search))document.documentElement.classList.add('embed')</script>
 <title>DAZN Bet in Scores — prototype</title>
 <style>
 @font-face{font-family:'DAZN Oscine';font-weight:400;src:url(assets/fonts/DAZN-Oscine-Regular.woff2) format('woff2');ascent-override:104.8%;descent-override:24%;line-gap-override:0%}
@@ -324,6 +326,7 @@ img{display:block}
 .seg button:not(.on):hover{color:var(--ui-t2)}
 .devsw{position:fixed;right:var(--ui-edge);bottom:var(--ui-edge);z-index:100;padding:var(--spacing-4);border-radius:12px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line)}
 .devsw button{border-radius:8px}
+html.embed .nav,html.embed .nav-open,html.embed .devsw{display:none} /* A2: inside the motion gallery the gallery has its own controls */
 
 /* ---------- M1 · on a phone (html.app, set in <head>) ----------
    The prototype is the whole screen: no frame, no States panel, no size switch, no drawn status bar or home indicator (the phone has its own).
@@ -1328,7 +1331,7 @@ function totalOdds(){const a=act();return a.length?a.reduce((p,s)=>p*oddsOf(s),1
 /* ---------- collapsed bar ---------- */
 let lastCount=0;
 /* ---------- soft motion helpers ---------- */
-const SOFT=getComputedStyle(document.documentElement).getPropertyValue('--soft').trim()||'cubic-bezier(.32,.72,0,1)'; // the one travel curve, defined in CSS
+let SOFT=getComputedStyle(document.documentElement).getPropertyValue('--soft').trim()||'cubic-bezier(.32,.72,0,1)'; // the one travel curve, defined in CSS
 const T={quick:200,std:320,layout:440,sheet:500};   // ms, mirror --m-quick / --m-std / --m-layout / --m-sheet
 const RM=matchMedia('(prefers-reduced-motion:reduce)'); // reduced motion: helpers fade only, nothing travels
 // play an element in from `from` to wherever it rests now
@@ -1801,6 +1804,31 @@ function init(){
 buildNav();fit();init();paintNav();
 if(innerWidth<1000)$('#nav').classList.add('off');      // narrow window: the panel would cover the phone, so it starts folded
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{snapW($('#cards'));document.querySelectorAll('.fx-tabs span').forEach(e=>{e.style.width='';const w=parseFloat(getComputedStyle(e).width);if(w>0)e.style.width=Math.ceil(w-.01)+'px'})});
+/* ---------- A2 · hooks for the motion gallery (public/motion.html) ----------
+ Run only with ?embed in the address (html.embed, set in <head>); without it this block does nothing.
+ The gallery drives the prototype from outside: it sets a state and starts an animation with the prototype's own functions,
+ and uses MOTION for the two things that cannot be done from outside:
+ - rate(r): one clock for everything. Timers (setTimeout) wait 1/r as long, and every CSS transition, CSS animation and
+   Web Animation plays at speed r, so the phases of a sequence stay together at 0.5x and 0.1x.
+ - tokens({'--m-layout':'.6s', '--soft':null}): overrides motion tokens on :root (null = back to the value in the CSS)
+   and refreshes their JS mirrors T and SOFT.
+ - clear(): drops every pending timer, so a sequence that was interrupted does not fire into the next state. */
+if(document.documentElement.classList.contains('embed')){
+ let rate=1;const st=window.setTimeout,ids=new Set(),seen=new WeakSet();
+ window.setTimeout=(f,ms,...a)=>{const id=st(()=>{ids.delete(id);f(...a)},(ms||0)/rate);ids.add(id);return id};
+ (function tick(){
+  document.getAnimations().forEach(a=>{
+   if(!seen.has(a)){seen.add(a);if(rate!==1&&a.currentTime)try{a.currentTime*=rate}catch(e){}} // it started a frame ago at full speed: put it where it would be at this rate
+   if(a.playbackRate!==rate)a.playbackRate=rate});
+  requestAnimationFrame(tick)})();
+ window.MOTION={
+  rate(r){rate=r},
+  clear(){ids.forEach(clearTimeout);ids.clear()},
+  tokens(o){const r=document.documentElement;for(const k in o)o[k]==null?r.style.removeProperty(k):r.style.setProperty(k,o[k]);
+   const cs=getComputedStyle(r),ms=k=>Math.round(parseFloat(cs.getPropertyValue(k))*1000);
+   SOFT=cs.getPropertyValue('--soft').trim();T.quick=ms('--m-quick');T.std=ms('--m-std');T.layout=ms('--m-layout');T.sheet=ms('--m-sheet')}
+ };
+}
 </script>
 </body>
 </html>

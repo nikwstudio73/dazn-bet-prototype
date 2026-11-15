@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>DAZN Bet in Scores — Motion</title>
+<!-- A2 · Motion presets. Desktop only; nothing in the prototype links here.
+     The phone is the real prototype (index.html?embed) in a frame. This page sets a state in it, starts one of its own
+     animations, slows its clock, and — to try a preset — puts extra CSS on top of it. The prototype itself is never changed.
+     Groups and presets: QS below. The inventory of every animation of the prototype: notes/MOTION.md. -->
+<style>
+@font-face{font-family:'DAZN Oscine';font-weight:400;src:url(assets/fonts/DAZN-Oscine-Regular.woff2) format('woff2');ascent-override:104.8%;descent-override:24%;line-gap-override:0%}
+@font-face{font-family:'DAZN Oscine';font-weight:700;src:url(assets/fonts/DAZN-Oscine-Bold.woff2) format('woff2');ascent-override:104.8%;descent-override:24%;line-gap-override:0%}
+/* the same chrome variables as the "Prototype states" panel in index.html (Global foundation, dark); no other colours on this page */
+:root{
+  --ui-canvas:#1b2326;                 /* surface/container-2 */
+  --ui-panel:#0c161c;                  /* surface/container-1 */
+  --ui-well:#080e12;                   /* surface/default-0 */
+  --ui-line:#242d33;                   /* border/full-color/subtle */
+  --ui-hover:rgba(249,250,250,0.04);   /* fill/overlay-1 */
+  --ui-on:rgba(249,250,250,0.08);      /* fill/overlay-2 */
+  --ui-thumb:rgba(249,250,250,0.12);   /* fill/overlay-3 */
+  --ui-t1:#f9fafa;                     /* text/primary */
+  --ui-t2:#c5c7ca;                     /* text/secondary */
+  --ui-t3:#8d9295;                     /* text/tertiary */
+}
+/* One spacing scale for the whole page: 4 / 8 / 12 / 16 / 24. Control heights 24 / 32 / 40. Type 12/16, 14/20, 16/24, 20/24, 24/32. Radii 4 / 8 / 16. */
+/* One spacing scale for the whole page: 4 / 8 / 12 / 16 / 24. Control heights 24 / 32 / 40. Type 12/16, 14/20, 16/24, 20/24, 24/32. Radii 4 / 8 / 16. */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--ui-canvas);font-family:'DAZN Oscine',system-ui,sans-serif;font-size:14px;line-height:20px;color:var(--ui-t2);-webkit-font-smoothing:antialiased;display:grid;grid-template-columns:248px minmax(520px,1fr);gap:12px;padding:12px;min-width:1100px;overflow:auto hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline-offset:-2px}
+[hidden]{display:none!important}
+.panel{min-height:0;display:flex;flex-direction:column;border-radius:16px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line)}
+.scroll{min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--ui-line) transparent}
+
+/* segmented control and buttons */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;align-items:center;padding:4px;border-radius:8px;background:var(--ui-well)}
+.seg button{height:24px;padding:0 8px;border-radius:4px;font-weight:700;font-size:12px;line-height:16px;color:var(--ui-t3);white-space:nowrap;transition:background .2s,color .2s}
+.seg button.on{background:var(--ui-thumb);color:var(--ui-t1)}
+.seg button:not(.on):hover{color:var(--ui-t2)}
+.btn{flex:none;height:32px;padding:0 12px;border-radius:8px;background:var(--ui-t1);font-weight:700;font-size:12px;line-height:16px;color:var(--ui-well);white-space:nowrap;transition:opacity .2s,background .2s}
+.btn:hover{opacity:.85}
+.btn.q{background:var(--ui-on);color:var(--ui-t1)}
+.btn.q:hover{opacity:1;background:var(--ui-thumb)}
+.btn.big{width:100%;height:40px;font-size:14px;line-height:20px}
+.lnk{height:32px;padding:0 12px;border-radius:8px;font-weight:700;font-size:12px;line-height:16px;color:var(--ui-t2);transition:background .2s,color .2s}
+.lnk:hover{background:var(--ui-hover);color:var(--ui-t1)}
+
+/* left panel: groups with a chevron; the open group lists its animations on a guide line; My decisions is pinned below */
+.ph{flex:none;padding:16px 16px 12px;font-weight:700;font-size:16px;line-height:24px;color:var(--ui-t1)}
+.list{flex:1;padding:0 8px 8px;display:flex;flex-direction:column}
+.gq{flex:none;display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:8px;border-radius:8px;text-align:left;color:var(--ui-t1);transition:background .2s}
+.gq:hover{background:var(--ui-hover)}
+.gq svg{flex:none;color:var(--ui-t3);transition:transform .4s cubic-bezier(.32,.72,0,1)}
+.gq.open svg{transform:rotate(90deg);color:var(--ui-t1)}
+.gq>span{flex:1;min-width:0}
+.gq b,.gq small{display:block}
+.gq small,.pq small{font-size:12px;line-height:16px;font-weight:400;color:var(--ui-t3)}
+.gq small:empty{display:none}
+.gq.done small{color:var(--ui-t2)}
+.gq.done small::after{content:" ✓"}
+.gs{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.32,.72,0,1)}
+.gs.open{grid-template-rows:1fr}
+.gs>div{min-height:0;overflow:hidden;display:flex;flex-direction:column;margin-left:16px;padding-left:8px;border-left:1px solid var(--ui-line)}
+.gs.open>div{margin-bottom:8px}
+.pq{flex:none;display:flex;align-items:center;gap:8px;width:100%;min-height:36px;padding:8px 12px;border-radius:8px;text-align:left;color:var(--ui-t2);transition:background .2s,color .2s}
+.pq:hover{background:var(--ui-hover);color:var(--ui-t1)}
+.pq.on{background:var(--ui-on);color:var(--ui-t1);font-weight:700}
+.pq span{flex:1;min-width:0}
+.pq small{flex:none}
+.alld{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 8px 8px;padding:12px 16px;border-radius:8px;box-shadow:inset 0 0 0 1px var(--ui-line);text-align:left;transition:background .2s}
+.alld:hover{background:var(--ui-hover)}
+.alld.on{background:var(--ui-on)}
+.alld b{color:var(--ui-t1)}
+.alld small{font-size:12px;line-height:16px;color:var(--ui-t3)}
+
+/* stage: the phone, or (Compare / Zoom) one or two framed prototypes; then the control column */
+.stage{min-width:0;min-height:0;display:flex;gap:12px}
+.view{flex:1;min-width:0;min-height:0;position:relative}
+#frame{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:16px;background:var(--ui-canvas)}
+#frame.off{visibility:hidden}
+.grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(var(--n,1),1fr);gap:12px;align-content:start}
+.grid.tall{grid-template-columns:repeat(var(--n,1),var(--cw,240px));justify-content:center}
+.card{min-width:0;border-radius:16px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);overflow:hidden;display:flex;flex-direction:column}
+.cl{flex:none;display:flex;align-items:center;height:40px;padding:0 16px;font-weight:700;color:var(--ui-t1)}
+.vp{flex:none;position:relative;height:var(--vh,240px);overflow:hidden;background:var(--ui-canvas)}
+.vp iframe{position:absolute;left:0;top:0;width:560px;height:1032px;border:0;transform-origin:0 0}
+
+/* My decisions */
+.sum{position:absolute;inset:0;padding:24px;display:block}
+.sum h1{font-size:24px;line-height:32px;color:var(--ui-t1);margin-bottom:16px}
+.sr{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;padding:12px 0;border-top:1px solid var(--ui-line);align-items:baseline;cursor:pointer}
+.sr b{color:var(--ui-t1)}
+.sr span.no,.sr small{color:var(--ui-t3)}
+.sr small{grid-column:1/-1;font-size:12px;line-height:16px}
+.sr.sub{padding:8px 0 8px 16px;border-top:0}
+.sr.sub b{font-weight:400;color:var(--ui-t2)}
+.acts{display:flex;gap:8px;margin-top:24px}
+.sum h2{margin:24px 0 8px;font-size:12px;line-height:16px;color:var(--ui-t3)}
+.sum ul{padding-left:16px}
+.sum li{margin-bottom:4px;font-size:12px;line-height:16px}
+
+/* control column */
+.rc{flex:none;width:328px;min-height:0;display:flex;flex-direction:column;gap:16px;scrollbar-width:none}
+.qh{flex:none;padding:4px 4px 0}
+.qh span{display:block;font-size:12px;line-height:16px;font-weight:700;color:var(--ui-t3)}
+.qh h1{font-size:20px;line-height:24px;font-weight:700;color:var(--ui-t1)}
+.err{flex:none;padding:8px 12px;border-radius:8px;background:var(--ui-on);font-size:12px;line-height:16px;color:var(--ui-t1)}
+.dock{flex:none;padding:16px;gap:16px}
+.lbl{font-size:12px;line-height:16px;font-weight:700;color:var(--ui-t3)}
+.dock>.lbl{margin-bottom:-8px}          /* a label sits 8 px above what it names, 16 px below what came before */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip2{height:32px;padding:0 12px;border-radius:16px;background:var(--ui-hover);box-shadow:inset 0 0 0 1px var(--ui-line);font-weight:700;font-size:12px;line-height:16px;color:var(--ui-t2);white-space:nowrap;transition:background .2s,color .2s,box-shadow .2s}
+.chip2:hover{background:var(--ui-on);color:var(--ui-t1)}
+.chip2.on{background:var(--ui-t1);box-shadow:none;color:var(--ui-well)}
+.chip2.ap::after{content:" ✓"}
+.pr{display:flex;flex-direction:column;gap:8px}
+.pr:empty{display:none}
+/* a variant row: name, five steps */
+.vr{display:grid;grid-template-columns:72px 1fr;align-items:center;gap:12px;min-height:32px;font-size:12px;line-height:16px}
+.vr .seg button{padding:0 4px}
+/* a value row: name, slider, the same value as a number */
+.prm{display:grid;grid-template-columns:72px 1fr 64px;align-items:center;gap:0 8px;min-height:32px;font-size:12px;line-height:16px}
+.prm input[type=range]{appearance:none;-webkit-appearance:none;width:100%;height:24px;background:none;cursor:pointer;touch-action:none}
+.prm input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:var(--ui-thumb)}
+.prm input[type=range]::-moz-range-track{height:4px;border-radius:4px;background:var(--ui-thumb)}
+.prm input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6px;border:0;border-radius:50%;background:var(--ui-t1);box-shadow:0 0 0 4px var(--ui-panel);transition:transform .2s}
+.prm input[type=range]::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:var(--ui-t1);box-shadow:0 0 0 4px var(--ui-panel)}
+.prm input[type=range]:hover::-webkit-slider-thumb,.prm input[type=range]:active::-webkit-slider-thumb{transform:scale(1.25)}
+.prm input[type=range]:focus-visible{outline:0}
+.prm input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px var(--ui-thumb)}
+.nf{display:flex;align-items:center;gap:4px;height:24px;padding-right:4px;border-radius:4px;background:var(--ui-well);cursor:text}
+.nf input{width:100%;min-width:0;height:24px;padding-left:4px;border:0;background:none;font-size:12px;line-height:16px;font-weight:700;color:var(--ui-t1);text-align:right;outline:0;-moz-appearance:textfield}
+.nf input::-webkit-inner-spin-button{display:none}
+.nf i{flex:none;font-style:normal;font-size:12px;color:var(--ui-t3)}
+.nf:focus-within{box-shadow:inset 0 0 0 1px var(--ui-t3)}
+.ends{grid-column:2;display:flex;justify-content:space-between;padding-bottom:4px;font-size:12px;line-height:16px;color:var(--ui-t3);pointer-events:none} /* never in the way of the slider above it */
+.prm.sel{grid-template-columns:72px 1fr 32px}
+.prm select{width:100%;height:32px;padding:0 8px;border-radius:8px;border:0;background:var(--ui-well);font-size:12px;color:var(--ui-t1)}
+.prm svg{display:block;width:32px;height:32px;border-radius:8px;background:var(--ui-well);color:var(--ui-t1)}
+.dh{display:flex;align-items:center;justify-content:space-between;gap:8px}
+/* a switch row: label on the left, switch on the right; the three viewing switches sit together */
+.tgl{display:flex;flex-direction:column}
+.chk{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:40px;font-size:12px;line-height:16px;cursor:pointer;transition:color .2s}
+.chk+.chk{border-top:1px solid var(--ui-line)}
+.chk:hover{color:var(--ui-t1)}
+.chk input{appearance:none;-webkit-appearance:none;flex:none;position:relative;width:32px;height:20px;border-radius:12px;background:var(--ui-thumb);cursor:pointer;transition:background .2s}
+.chk input::after{content:"";position:absolute;left:4px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--ui-t2);transition:transform .2s,background .2s}
+.chk input:checked{background:var(--ui-t1)}
+.chk input:checked::after{transform:translateX(12px);background:var(--ui-well)}
+.chk input:focus-visible{outline:2px solid var(--ui-t1);outline-offset:4px}
+.apply{display:flex;flex-direction:column;gap:8px}
+.apply .lnk{align-self:center}
+/* Advanced, and Today inside it: a row with a chevron that opens its content */
+.adv{border-top:1px solid var(--ui-line);padding-top:8px}
+.adv>summary,.today>summary{display:flex;align-items:center;gap:8px;height:40px;margin:0 -4px;padding:0 4px;border-radius:8px;list-style:none;cursor:pointer;font-size:12px;line-height:16px;font-weight:700;color:var(--ui-t3);outline:0;transition:background .2s,color .2s}
+.adv>summary::-webkit-details-marker,.today>summary::-webkit-details-marker{display:none}
+.adv>summary::before,.today>summary::before{content:"";flex:none;width:8px;height:8px;margin:0 4px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg) scale(.75);transition:transform .2s}
+.adv[open]>summary::before,.today[open]>summary::before{transform:rotate(45deg) scale(.75)}
+.adv>summary:hover,.today>summary:hover,.adv>summary:focus-visible,.today>summary:focus-visible{background:var(--ui-hover);color:var(--ui-t1)}
+.adv[open]>summary{color:var(--ui-t1);margin-bottom:8px}
+.adv>.pr{gap:12px;padding-bottom:16px}
+.today,.adv>.lbl{border-top:1px solid var(--ui-line)}
+.today{padding-top:8px}
+.today ul{margin-bottom:12px;padding:12px 12px 12px 28px;border-radius:8px;background:var(--ui-well)}
+.today li{margin-bottom:8px;font-size:12px;line-height:16px}
+.today li:last-child{margin:0}
+.adv>.lbl{display:block;padding-top:16px}
+#why{display:block;width:100%;margin-top:8px;resize:none;min-height:56px;padding:12px;border-radius:8px;border:0;background:var(--ui-well);box-shadow:inset 0 0 0 1px var(--ui-line);font-size:12px;line-height:16px;color:var(--ui-t1);outline:0;transition:box-shadow .2s}
+#why:focus{box-shadow:inset 0 0 0 1px var(--ui-t3)}
+</style>
+</head>
+<body>
+<aside class="panel">
+ <div class="ph">Motion</div>
+ <div class="scroll list" id="list"></div>
+ <button class="alld" id="allDec"><b>My decisions</b><small></small></button>
+</aside>
+
+<main class="stage">
+ <div class="view">
+  <iframe id="frame" src="index.html?embed" title="Prototype"></iframe>
+  <div class="grid" id="grid" hidden></div>
+  <div class="panel sum scroll" id="sum" hidden></div>
+ </div>
+ <!-- everything you control sits in this one column; the phone gets the full height -->
+ <aside class="rc scroll">
+  <div class="qh" id="qh"><span id="qN"></span><h1 id="qT"></h1></div>
+  <p class="err" id="err" hidden></p>
+  <div class="panel dock" id="dock">
+   <!-- basic: a preset, its ready-made variants (how strong, how long), watch, apply -->
+   <span class="lbl">Presets</span>
+   <div class="chips" id="presets"></div>
+   <div class="pr" id="basic"></div>
+   <div class="dh"><div class="seg" id="speed" role="tablist" aria-label="Speed"><button role="tab" data-r="1" class="on">1×</button><button role="tab" data-r="0.5">0.5×</button><button role="tab" data-r="0.1">0.1×</button></div><button class="btn q" id="again">Play again</button></div>
+   <div class="tgl">
+    <label class="chk"><span>Compare with Current</span><input type="checkbox" id="cmp"></label>
+    <label class="chk"><span>Zoom</span><input type="checkbox" id="zoom"></label>
+    <label class="chk"><span>Loop</span><input type="checkbox" id="loop"></label>
+   </div>
+   <div class="apply"><button class="btn big" id="applyB">Apply to the group</button><button class="btn q big" id="onlyB">Only this one</button><button class="lnk" id="backB" hidden>Use the group’s preset here</button></div>
+   <!-- advanced: the exact values as sliders, what the preset replaces, a note -->
+   <details class="adv"><summary>Advanced</summary>
+    <div class="pr" id="mo"></div>
+    <details class="today"><summary>Today</summary><ul id="todayL"></ul></details>
+    <label class="lbl" for="why">Note</label><textarea id="why" rows="2"></textarea>
+   </details>
+  </div>
+ </aside>
+</main>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const n2=n=>String(+(+n).toFixed(3)).replace(/^0\./,'.').replace(/^-0\./,'-.');
+const clone=x=>JSON.parse(JSON.stringify(x)),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+const fail=t=>{const e=$('#err');e.textContent=t;e.hidden=!t};
+
+/* ---------- scenarios ----------
+ How each animation of the prototype is shown: setup puts the prototype in a state (instantly), play starts the animation.
+ Both run INSIDE the prototype, with its own names (S, P3, openSheet…). G.* are helpers of this page (see makeProto). */
+const SCN={
+ M01:{setup:"",play:"G.press('#feed .odd[data-m=\"m1\"][data-o=\"1\"]')"},
+ M02:{setup:"openFixture('m4');G.show('#mkts .choice','#fxScroll')",play:"G.press('#mkts .choice')"},
+ M03:{setup:"openComp('ucl','scorer')",play:"G.press('#cpScroll .tp')"},
+ M04:{setup:"openComp('ucl','win')",play:"G.press('#cpScroll .cp-row')"},
+ M05:{setup:"S.sel=P3();refresh();openSheet();",play:"G.press('#placeBtn')"},
+ M06:{setup:"S.sel=P3();refresh();",play:"G.press('#bar')"},
+ M07:{setup:"S.sel=P3();refresh();openSheet();",play:"G.press('#editBtn',600)"},
+ M09:{setup:"",play:"G.click('#feed .odd[data-m=\"m1\"][data-o=\"1\"]');G.after(1000,()=>G.click('#feed .odd[data-m=\"m1\"][data-o=\"1\"]'))"},
+ M10:{setup:"openComp('ucl','scorer')",play:"G.click('#cpScroll .tp');G.after(1000,()=>G.click('#cpScroll .tp'))"},
+ M11:{setup:"",play:"G.click('#oddsChip');G.after(1200,()=>G.click('#oddsChip'))"},
+ M12:{setup:"",play:"G.click('#liveBadge');G.after(1200,()=>G.click('#liveBadge'))"},
+ M15:{setup:"S.sel=ONE();refresh();openSheet();",play:"S.st['m1|1x2']='suspended';refresh();G.after(1300,()=>{delete S.st['m1|1x2'];refresh()})"},
+ M17:{setup:"S.sel=P3();refresh();openSheet();",play:"G.click('#editBtn');G.after(1400,()=>G.click('#editBtn'))"},
+ M21:{setup:"",play:"changeOdd(M('m2'),1,0,2.45);changeOdd(M('m1'),2,0,9.10)"},
+ M23:{setup:"S.sel=P3();refresh();openSheet();",play:"moved()"},
+ M24:{setup:"S.sel=P3();refresh();",play:"moved()"},
+ M27:{setup:"S.sel=ONE();refresh()",play:"G.click('#feed .odd[data-m=\"m2\"][data-o=\"0\"]');G.after(1100,()=>G.click('#feed .odd[data-m=\"m3\"][data-o=\"0\"]'));G.after(2200,()=>G.click('#feed .odd[data-m=\"m2\"][data-o=\"0\"]'))"},
+ M28:{setup:"",play:"G.click('#oddsChip');G.after(1500,()=>G.click('#oddsChip'))"},
+ M31:{setup:"",play:"G.click('#feed .odd[data-m=\"m1\"][data-o=\"0\"]');G.after(1400,()=>G.click('#feed .odd[data-m=\"m1\"][data-o=\"0\"]'))"},
+ M32:{setup:"S.sel=P3();refresh();",play:"openSheet();G.after(1400,closeSheet)"},
+ M34:{setup:"",play:"openFav();G.after(1600,closeFav)"},
+ M35:{setup:"openFixture('m4');G.show('#fxMore','#fxScroll')",play:"G.click('#fxMore')"},
+ M37:{setup:"S.sel=P3();refresh();openSheet();",play:"G.click('#placeBtn');G.after(1500,()=>G.click('#ovClose'))"},
+ M38:{setup:"S.sel=ONE();refresh()",play:"openFixture('m4');G.after(1400,closeFixture)"},
+ M39:{setup:"",play:"openComp('ucl','win');G.after(1400,closeComp)"},
+ M42:{setup:"openComp('ucl','win')",play:"G.click('[data-cpt=\"scorer\"]');G.after(1200,()=>G.click('[data-cpt=\"win\"]'))"}
+};
+/* the element to zoom to; an animation without one is shown as the whole phone */
+const FOCUS={M01:'#feed .odd[data-m="m1"][data-o="1"]',M02:'#mkts .choice',M03:'#cpScroll .tp',M04:'#cpScroll .cp-row',M05:'#placeBtn',M06:'#bar',M07:'#editBtn',
+ M09:'#feed .odd[data-m="m1"][data-o="1"]',M10:'#cpScroll .tp',M11:'#oddsChip',M12:'#liveBadge',M15:'#placeBtn',M17:'#cards .cardwrap',M21:'#feed [data-tile="m1"]',M23:'[data-card="m4|1x2"]',M24:'#bar',M27:'#bar'};
+
+/* ---------- a prototype in a frame ----------
+ The big phone and the framed ones are the same thing: index.html?embed in a frame, driven by makeProto().
+ vp = the box a framed prototype is cropped to (null for the big phone); whole = show the whole phone in it, not a close-up. */
+let rate=1;
+function makeProto(F,vp,whole){
+ const P={F,W:null,D:null,ready:false,runId:0,pressed:[],anim:null,onready:null,ov:null};
+ const q=s=>P.D.querySelector(s),scale=()=>+q('#stage').dataset.scale||1;
+ const G={                                  // helpers for the scenarios; live on the prototype's window as G
+  after:(ms,fn)=>P.W.setTimeout(fn,ms),     // the prototype's clock: slowed with everything else, dropped on the next run
+  click(sel){const e=q(sel);if(e)e.click()},
+  show(sel,scSel){const e=q(sel),sc=q(scSel);if(e&&sc)sc.scrollTop+=(e.getBoundingClientRect().top-sc.getBoundingClientRect().top)/scale()-sc.clientHeight*.45},
+  /* a press cannot be started from code, so the element's own :active rules are applied to it for a moment:
+     the values, the duration and the curve all come from the CSS (the prototype's, plus the preset on top) */
+  press(sel,ms=300){const el=q(sel);if(!el)return;const props=[];
+   for(const sh of P.D.styleSheets){let rules;try{rules=sh.cssRules}catch(e){continue}
+    for(const r of rules){if(!r.selectorText||!r.selectorText.includes(':active'))continue;
+     for(const part of r.selectorText.split(',')){if(!part.includes(':active'))continue;let ok=false;try{ok=el.matches(part.replace(/:active/g,''))}catch(e){}
+      if(ok)for(const k of r.style)props.push([k,r.style.getPropertyValue(k)])}}}
+   props.forEach(([k,v])=>el.style.setProperty(k,v));P.pressed.push([el,props.map(p=>p[0])]);
+   P.W.setTimeout(()=>props.forEach(([k])=>el.style.removeProperty(k)),ms)}
+ };
+ P.boot=()=>{
+  P.W=F.contentWindow;P.D=F.contentDocument;P.ready=false;
+  if(!P.W||!P.W.MOTION){fail('The prototype did not load with its hooks (index.html?embed).');return}
+  const st=P.D.createElement('style');st.textContent='html.mg-freeze *,html.mg-freeze *::before,html.mg-freeze *::after{transition:none!important;animation:none!important}';P.D.head.appendChild(st);
+  P.W.addEventListener('keydown',e=>{if(e.key.startsWith('Arrow')||e.key==='l'||e.key==='L')e.stopImmediatePropagation()},true); // the prototype's own shortcuts would rebuild the screen behind this page's back
+  P.W.G=G;P.ready=true;
+  if(P.onready)P.onready();else if(P.anim)P.run(P.anim);
+ };
+ /* back to a clean prototype, without any motion */
+ P.reset=()=>{
+  P.runId++;P.W.MOTION.clear();
+  P.pressed.forEach(([el,ks])=>ks.forEach(k=>el.style.removeProperty(k)));P.pressed=[];
+  P.W.eval('cur=-1;init();LIVE=false;HOLD=false');   // live prices are paused here: every run shows the same numbers
+ };
+ /* a framed prototype: move and scale the frame so that the whole phone, or the element of this animation, fills the box */
+ P.frameOn=a=>{
+  const ph=q('#phone'),sel=FOCUS[a.id],el=(!whole&&sel&&q(sel))||ph,r=el.getBoundingClientRect(),vw=vp.clientWidth,vh=vp.clientHeight;
+  const z=el===ph?Math.min(vw/(r.width+36),vh/(r.height+36)):Math.min(3,vw*.78/r.width,vh*.6/r.height);
+  F.style.transform=`translate(${vw/2-(r.left+r.width/2)*z}px,${vh/2-(r.top+r.height/2)*z}px) scale(${z})`;
+ };
+ P.run=a=>{
+  P.anim=a;if(!P.ready)return;const root=P.D.documentElement;
+  try{
+   P.W.MOTION.rate(rate);
+   /* the preset being tried (P.ov): extra CSS on top of the prototype's, and where a value lives in JS, a wrapped function */
+   let ov=P.D.getElementById('mg-ov');if(!ov){ov=P.D.createElement('style');ov.id='mg-ov';P.D.head.appendChild(ov)}ov.textContent=(P.ov&&P.ov.css)||'';
+   if(!P.W.__o)P.W.__o={soft:P.W.soft,setOddsOn:P.W.setOddsOn};Object.assign(P.W,P.W.__o);if(P.ov&&P.ov.js)P.ov.js(P.W,P.W.__o);
+   root.classList.add('mg-freeze');                 // set the state instantly: no entrance of the bar, the sheet or the page
+   P.reset();const id=P.runId;
+   if(a.setup)P.W.eval(a.setup);
+   P.D.querySelectorAll('.bump,.nope,.deny').forEach(e=>e.classList.remove('bump','nope','deny')); // one-shot keyframe classes left by the setup would replay when the freeze is lifted
+   void P.D.body.offsetWidth;P.D.getAnimations().forEach(x=>x.cancel());
+   if(vp)P.frameOn(a);
+   requestAnimationFrame(()=>{if(id!==P.runId)return;root.classList.remove('mg-freeze');void P.D.body.offsetWidth;
+    requestAnimationFrame(()=>{if(id!==P.runId)return;try{if(a.play)P.W.eval(a.play);fail('')}catch(e){fail(a.n+': '+e.message);console.error(e)}})});
+  }catch(e){root.classList.remove('mg-freeze');fail(a.n+': '+e.message);console.error(e)}
+ };
+ F.addEventListener('load',P.boot);
+ if(F.contentDocument&&F.contentDocument.readyState==='complete'&&F.contentWindow.MOTION)P.boot();
+ return P;
+}
+
+/* ---------- the stage ----------
+ Normally the big phone. With Compare or Zoom on: one or two framed prototypes in #grid (cards), built by showCards(). */
+const main=makeProto($('#frame'),null,false);
+let cards=[];
+/* framed prototypes that leave the screen must not keep playing: stop their pending steps before their frames are removed */
+function dropCards(){cards.forEach(c=>{c.runId++;c.onready=null;c.anim=null;try{c.W.MOTION.clear()}catch(e){}});cards=[];const g=$('#grid');g.innerHTML='';g.hidden=true}
+function showCards(items,whole){
+ dropCards();$('#frame').classList.add('off');if(main.ready)main.reset();
+ const grid=$('#grid');grid.hidden=false;grid.classList.toggle('tall',whole);
+ grid.innerHTML=items.map(a=>`<div class="card"><div class="cl">${esc(a.tag)}</div><div class="vp"><iframe src="index.html?embed" title="${esc(a.tag)}"></iframe></div></div>`).join('');
+ sizeCards();
+ cards=[...grid.querySelectorAll('.vp')].map((vp,n)=>{const c=makeProto(vp.firstElementChild,vp,whole);c.anim=items[n];c.onready=()=>{if(cards.every(x=>x.ready))play(false)};return c}); // they start together, once the last one has loaded
+}
+/* whole phones keep the phone's proportions and share one row; close-ups take the full height */
+function sizeCards(){
+ const g=$('#grid'),n=g.children.length||1,gw=g.clientWidth,gh=g.clientHeight;g.style.setProperty('--n',n);
+ if(g.classList.contains('tall')){const w=Math.floor(Math.max(180,Math.min(411,(gh-40)*411/848,(gw-12*(n-1))/n)));g.style.setProperty('--cw',w+'px');g.style.setProperty('--vh',Math.floor(w*848/411)+'px')}
+ else g.style.setProperty('--vh',Math.max(200,gh-40)+'px');
+}
+addEventListener('resize',()=>{if($('#grid').hidden)return;sizeCards();cards.forEach(c=>{if(c.ready)c.frameOn(c.anim)})});
+
+/* ---------- motion: easing, as in Figma ----------
+ Curves (cubic-bezier) and springs. A spring is given by duration and bounce (as in SwiftUI and Motion) and is played
+ as a real damped spring: its curve is sampled into a CSS linear() easing. */
+const EZ=[['linear','Linear',[0,0,1,1]],['in','Ease in',[.42,0,1,1]],['out','Ease out',[0,0,.58,1]],['inout','Ease in and out',[.42,0,.58,1]],['outback','Ease out back',[.34,1.56,.64,1]],
+ ['soft','Soft landing (today, --soft)',[.32,.72,0,1]],['emph','Emphasised (Material)',[.2,0,0,1]]];
+const SP=[['gentle','Gentle',{dur:500,bounce:.15}],['quick','Quick',{dur:300,bounce:.1}],['bouncy','Bouncy',{dur:450,bounce:.4}],['slow','Slow',{dur:800,bounce:0}],['spring','Custom spring',null]];
+const isSpring=e=>SP.some(x=>x[0]===e),ezName=e=>(EZ.find(x=>x[0]===e)||SP.find(x=>x[0]===e))[1],bezOf=m=>EZ.find(x=>x[0]===m.ease)[2];
+function springSamples(dur,b,N=48){const z=Math.max(.15,1-b),w=2*Math.PI/(Math.max(60,dur)/1000),T=Math.min(3,Math.log(1000)/(z*w)),pts=[];
+ for(let i=0;i<=N;i++){const t=T*i/N;let x;if(z>=1)x=1-Math.exp(-w*t)*(1+w*t);else{const wd=w*Math.sqrt(1-z*z);x=1-Math.exp(-z*w*t)*(Math.cos(wd*t)+z*w/wd*Math.sin(wd*t))}pts.push(+x.toFixed(4))}
+ pts[N]=1;return {T:Math.round(T*1000),pts}}
+/* a Motion setting -> what CSS needs: total time, easing, and an easing that never overshoots (for opacity and dimming) */
+function mo(m){
+ if(isSpring(m.ease)){const sp=springSamples(m.dur,m.bounce);return {t:sp.T,e:`linear(${sp.pts.join(',')})`,flat:'ease-out'}}
+ const b=bezOf(m),e=`cubic-bezier(${b.map(n2).join(',')})`;return {t:m.dur,e,flat:b[1]>1||b[3]>1||b[1]<0||b[3]<0?'ease-out':e}}
+/* a Motion setting: M('out',120), M('bouncy'), M('soft',300,{delay:20}), M('spring',520,{bounce:.65}) */
+const M=(ease,dur,x)=>{const sp=SP.find(k=>k[0]===ease);return Object.assign({ease,dur:sp&&sp[2]?sp[2].dur:dur,bounce:sp&&sp[2]?sp[2].bounce:0,delay:0},x||{})};
+
+/* ---------- groups and presets ----------
+ A group = animations of one kind. places = the animations it is shown on. fx = the properties that change (their sliders).
+ presets = {n: name, fx: values, m: Motion}; "Current" (the prototype as it is) is added in front of them.
+ amt(p,k) = what Amount scales in this group. today = what a preset replaces. lp = pause before a Loop replays.
+ apply(fx, k, m), k = mo(m): what is put ON TOP of the prototype to preview the preset — extra CSS, and where a value lives
+ in the prototype's JS, a wrapped function. The prototype itself is not changed. */
+const pct=v=>Math.round(v*1000)/10+'%',px=v=>v+' px';
+const PL=(id,n)=>Object.assign({id,n},SCN[id]);
+const act=l=>l.split(',').map(x=>x+':active:not(:disabled):not(.locked)').join(',');   // disabled buttons and locked odds do not react
+const PRESS='html .odd,html .choice,html .cta-main,html .tp,html .gs-card,html .sc-row,html .cp-row,html .tbtn,html .fx-back,html .fx-follow,html .fx-more';
+const QS=[
+ {id:'press',t:'Press feedback',
+  places:[PL('M01','Odds tile'),PL('M02','Outcome button'),PL('M05','Main button'),PL('M06','Betslip bar'),PL('M03','Top Pick card'),PL('M04','List row'),PL('M07','Edit button')],
+  amt:(p,k)=>{p.fx.scale=Math.max(.8,+(1-(1-p.fx.scale)*k).toFixed(3));p.fx.op=Math.max(.2,+(1-(1-p.fx.op)*k).toFixed(2))},
+  lp:1500,today:['Scale: 97% odds tile, 98% outcome and main button, 98.5% bar and cards.','Rows dim to 70% with a fade; small buttons dim to 60% at once.','Release: 0.12 s everywhere, 0.5 s on the betslip bar.'],
+  fx:[{k:'scale',l:'Scale',min:.8,max:1,step:.005,fmt:pct,ends:['deeper','none']},{k:'op',l:'Opacity',min:.2,max:1,step:.05,fmt:pct,ends:['dimmer','none']}],
+  presets:[{n:'Subtle',fx:{scale:.985,op:1},m:M('out',120)},
+   {n:'iOS-like',fx:{scale:.96,op:1},m:M('soft',320)},
+   {n:'Bouncy',fx:{scale:.93,op:1},m:M('bouncy')},
+   {n:'Dim only',fx:{scale:1,op:.55},m:M('out',180)},
+   {n:'Deep press',fx:{scale:.92,op:.85},m:M('quick')},
+   {n:'Snappy',fx:{scale:.97,op:1},m:M('out',90)},{n:'Soft',fx:{scale:.975,op:1},m:M('soft',480)},
+   {n:'Extra bouncy',fx:{scale:.9,op:1},m:M('spring',520,{bounce:.65})},{n:'Slow and heavy',fx:{scale:.94,op:.9},m:M('slow')}],
+  apply:(f,k)=>({css:`${PRESS}{transition:transform ${k.t}ms ${k.e},opacity ${k.t}ms ${k.flat},background var(--m-quick),color var(--m-quick)}${act(PRESS)},html .bar.show:active{transform:scale(${f.scale});opacity:${f.op};transition-duration:var(--m-press);transition-timing-function:ease-out}`})},
+ {id:'state',t:'State change',
+  places:[PL('M09','Odd picked'),PL('M10','Top Pick card picked'),PL('M11','Odds switch'),PL('M12','LIVE badge'),PL('M15','Place bet on / off')],
+  today:['0.2 s (--m-quick) everywhere.','Three curves: browser default, ease-out, --ease.','On the match page the text of an outcome switches at once.'],
+  fx:[],presets:[{n:'Instant',fx:{},m:M('linear',0)},{n:'Quick',fx:{},m:M('out',120)},
+   {n:'Standard',fx:{},m:M('inout',200)},{n:'Smooth',fx:{},m:M('soft',380)},
+   {n:'Snappy',fx:{},m:M('out',80)},{n:'Slow',fx:{},m:M('inout',600)}],
+  apply:(f,k)=>({css:`html:root{--m-quick:${k.t}ms}html .odd,html .choice,html .tp,html .gs-card,html .cta-main,html .odd .l,html .odd .v,html .livebadge,html .oddsTog .sw,html .oddsTog .knob,html .day,html .cp-chip,html .tp-top i,html .tp-in>span,html .tp-in>b,html .tp-club{transition-timing-function:${k.flat}}`})}, // these all sit on --m-quick: the preview moves that token and sets one curve
+ {id:'swap',t:'Numbers and texts',
+  places:[PL('M21','Price on a tile'),PL('M23','Prices in the betslip'),PL('M24','Total in the bar'),PL('M27','Bar texts'),PL('M42','Competition list')],
+  amt:(p,k)=>{p.fx.off=Math.min(48,Math.round(p.fx.off*k))},
+  today:['Rises 5 px in 0.32 s on --soft.','Lists rise 8 px; day switch slides 20 px.'],
+  fx:[{k:'off',l:'Offset',min:0,max:48,step:1,fmt:px,ends:['none','far']}],  presets:[{n:'Crossfade',fx:{off:0},m:M('out',200)},{n:'Small rise',fx:{off:5},m:M('soft',320)},
+   {n:'Big rise',fx:{off:14},m:M('soft',380)},{n:'Springy',fx:{off:10},m:M('bouncy')},
+   {n:'Quick tick',fx:{off:3},m:M('out',140)},{n:'Slide far',fx:{off:22},m:M('soft',460)},{n:'Bouncy drop',fx:{off:16},m:M('spring',500,{bounce:.55})}],
+  apply:(f,k)=>({js:W=>{const base=W.soft;W.soft=(el,from,t,d)=>{if(!el||!el.animate)return;
+    if(from&&/translateY\(-?\d/.test(from.transform||'')){el.animate([Object.assign({},from,{transform:`translateY(${from.transform.includes('-')?-f.off:f.off}px)`}),{opacity:W.getComputedStyle(el).opacity,transform:'none'}],{duration:k.t,delay:d||0,easing:k.e,fill:'backwards'});return}
+    return base(el,from,t,d)}}})},
+ {id:'cascade',t:'Reveal and cascade',
+  places:[PL('M28','Odds toggle'),PL('M17','Edit mode')],
+  amt:(p,k)=>{p.m.delay=Math.min(280,Math.round(p.m.delay*k))},
+  lp:3600,today:['Tiles: 0.44 s on --soft, 32 ms apart.','Cards in Edit: 0.32 s, 45 ms apart.'],
+  fx:[],delay:'Delay per item',
+  presets:[{n:'All at once',fx:{},m:M('soft',440,{delay:0})},{n:'Quick ripple',fx:{},m:M('soft',300,{delay:20})},
+   {n:'Flowing',fx:{},m:M('soft',560,{delay:60})},{n:'Slow wave',fx:{},m:M('soft',720,{delay:110})},
+   {n:'Domino',fx:{},m:M('out',260,{delay:90})},{n:'Spring ripple',fx:{},m:M('gentle',0,{delay:40})}],
+  apply:(f,k,m)=>({css:`html:root{--o-dur:${k.t}ms}html .tile,html .feed .legal,html .sgfoot{--soft:${k.e}}html .rm,html .ctop>.sp,html .ctop>.selc,html .ctop>.od,html .cinfo .mk,html .cinfo .tm,html .cinfo .ko{transition-delay:calc(var(--i,0) * ${m.delay}ms)}`,
+   js:(W,o)=>{W.setOddsOn=on=>{o.setOddsOn(on);const D=W.document,ts=D.querySelectorAll('.tile'),f=D.querySelector('#feed'),r=D.documentElement;
+     /* the prototype measures the tiles while it switches them, which starts their transitions with its own 32 ms steps.
+        So: go back to where it was without motion, put the new gap in, and switch again */
+     r.classList.add('mg-freeze');ts.forEach(t=>t.classList.toggle('odds',!on));f.classList.toggle('nood',on);void f.offsetWidth;r.classList.remove('mg-freeze');void f.offsetWidth;
+     ts.forEach(t=>t.style.setProperty('--ti',(+t.style.getPropertyValue('--ti')||0)/32*m.delay));
+     ts.forEach(t=>t.classList.toggle('odds',on));f.classList.toggle('nood',!on)}}})},
+ {id:'sheets',t:'Sheets and overlays',
+  places:[PL('M32','Betslip sheet'),PL('M34','Favourite-team popup'),PL('M37','DAZN Bet overlay'),PL('M31','Collapsed bar'),PL('M35','Toast')],
+  lp:3400,today:['0.5 s (--m-sheet) on --soft for all of them.'],
+  fx:[],presets:[{n:'iOS sheet',fx:{},m:M('soft',500)},{n:'Material',fx:{},m:M('emph',300)},
+   {n:'Quick',fx:{},m:M('out',220)},{n:'Springy',fx:{},m:M('gentle')},{n:'Slow',fx:{},m:M('slow')},
+   {n:'Snappy spring',fx:{},m:M('quick')},{n:'Bouncy',fx:{},m:M('bouncy')},{n:'Even',fx:{},m:M('inout',400)}],
+  apply:(f,k)=>({css:`html .sheet,html .fvp,html .overlay{transition:transform ${k.t}ms ${k.e}}html .backdrop{transition:opacity ${k.t}ms ${k.flat}}html .bar{transition:transform ${k.t}ms ${k.e},opacity var(--m-quick) ease-out}html .toast{transition:opacity var(--m-quick) ease-out,transform ${k.t}ms ${k.e}}`})},
+ {id:'pages',t:'Pages',
+  places:[PL('M38','Match page'),PL('M39','Competition page')],
+  lp:3400,today:['0.44 s (--m-layout) on --soft.','The betslip bar jumps to its new place without motion.'],
+  fx:[],presets:[{n:'iOS push',fx:{},m:M('soft',500)},{n:'Material',fx:{},m:M('emph',300)},
+   {n:'Quick',fx:{},m:M('out',220)},{n:'Springy',fx:{},m:M('gentle')},
+   {n:'Snappy spring',fx:{},m:M('quick')},{n:'Even',fx:{},m:M('inout',380)},{n:'Slow',fx:{},m:M('soft',720)}],
+  apply:(f,k)=>({css:`html .fx,html .cp{transition:transform ${k.t}ms ${k.e}}`})}
+];
+/* differences found in the prototype that a preset does not settle: they go to development as they are (notes/MOTION.md has the full list) */
+const DEVNOTES=['Today similar things differ slightly from place to place (press scale .97 / .98 / .985, three dim speeds in Edit, cascade gaps 32 and 45 ms). A preset applied to a group replaces these with one value.',
+ 'Heights are eased in three ways: summary and sheet footer in JS, a removed card’s place in CSS on --exit, odds rows in CSS on --soft.',
+ 'Hold and fade times of a price change are written twice: CSS variables and numbers in JS.','Rows that appear use three small delays: 60, 80 and 110 ms.',
+ 'The betslip bar jumps without motion when a match page opens.','README still describes a sheet that eases its height on Confirm; the code no longer does that.'];
+
+/* ---------- decisions ----------
+ dec[group] = the preset applied to the whole group; ex[group][n] = an exception for its n-th animation; notes[group] = a note.
+ A decision = {i: preset (-1 = Current), p: {fx, m} the values, v: [amount step, duration step] or [-1,-1] if set by hand}. */
+let dec={},notes={},ex={};
+const load=k=>{try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catch(e){return {}}};
+dec=load('motionPresets5');ex=load('motionExceptions');notes=load('motionNotes');
+/* a link made with "Copy link" carries all three in its #d=… part */
+let fromLink=false;
+try{const h=location.hash.match(/^#d=(.+)$/);if(h){const o=JSON.parse(decodeURIComponent(escape(atob(h[1]))));if(o&&o.dec){dec=o.dec;notes=o.notes||{};ex=o.ex||{};fromLink=true}}}catch(e){}
+/* Saved data and links are not trusted: a decision is kept only if it names a preset of its group and every value is a number
+   inside the range of its slider. Anything else is dropped, so nothing foreign reaches the page or the prototype. */
+const inRange=(v,a,b)=>typeof v==='number'&&isFinite(v)&&v>=a&&v<=b;
+function valid(q,d){
+ if(!d||typeof d!=='object'||!Number.isInteger(d.i)||d.i<-1||d.i>=q.presets.length)return false;
+ if(!Array.isArray(d.v)||d.v.length!==2||!d.v.every(x=>Number.isInteger(x)&&x>=-1&&x<STEP.length))d.v=[-1,-1];
+ if(d.i<0){d.p=null;return true}
+ const p=d.p,m=p&&p.m;if(!p||typeof p.fx!=='object'||!p.fx||typeof m!=='object'||!m)return false;
+ if(!q.fx.every(f=>inRange(p.fx[f.k],f.min,f.max))||!EZ.concat(SP).some(x=>x[0]===m.ease)||!inRange(m.dur,0,2000)||!inRange(m.bounce,0,.8)||!inRange(m.delay,0,280))return false;
+ d.p={fx:Object.fromEntries(q.fx.map(f=>[f.k,p.fx[f.k]])),m:{ease:m.ease,dur:m.dur,bounce:m.bounce,delay:m.delay}};return true}
+function sanitize(){const D={},E={},N={},obj=x=>x&&typeof x==='object'?x:{};dec=obj(dec);ex=obj(ex);notes=obj(notes);
+ QS.forEach(q=>{if(valid(q,dec[q.id]))D[q.id]={i:dec[q.id].i,p:dec[q.id].p,v:dec[q.id].v};
+  const e=obj(ex[q.id]);for(const k in e)if(/^\d+$/.test(k)&&+k<q.places.length&&valid(q,e[k]))(E[q.id]=E[q.id]||{})[k]={i:e[k].i,p:e[k].p,v:e[k].v};
+  if(typeof notes[q.id]==='string'&&notes[q.id])N[q.id]=notes[q.id].slice(0,2000)});
+ dec=D;ex=E;notes=N}
+const save=()=>{try{localStorage.setItem('motionPresets5',JSON.stringify(dec));localStorage.setItem('motionExceptions',JSON.stringify(ex));localStorage.setItem('motionNotes',JSON.stringify(notes))}catch(e){}};
+const exOf=(q,n)=>ex[q.id]&&ex[q.id][n];
+const exList=q=>Object.keys(ex[q.id]||{}).map(k=>[q.places[+k],ex[q.id][k]]).filter(x=>x[0]);
+
+/* ---------- what is being tried ----------
+ qi = the open group (QS.length = My decisions), pi = its animation on the stage,
+ ps = the preset being tried (-1 = Current), pp = its values {fx, m}. */
+let qi=0,pi=0,ps=-1,pp=null;
+/* ready-made variants of a preset, the same two questions for every preset: how strong (Amount) and how long (Duration).
+   Amount scales what the group's effect is made of (press depth and dimming, travel, the gap of a cascade) and the bounce of a spring;
+   Duration scales the time. M / M is the preset itself. va / vs = the chosen steps, -1 once a value was set by hand in Advanced. */
+const AMT=[.3,.6,1,1.7,2.6],DUR=[.5,.75,1,1.5,2.2],STEP=['XS','S','M','L','XL'],MID=2;
+let va=MID,vs=MID;
+function variant(q,i,a,d){
+ const b=q.presets[i],p=clone({fx:b.fx,m:b.m});
+ p.m.dur=Math.round(p.m.dur*DUR[d]/10)*10;
+ if(isSpring(p.m.ease)){p.m.bounce=Math.min(.8,+(p.m.bounce*AMT[a]).toFixed(2));if(a!==MID||d!==MID)p.m.ease='spring'}
+ if(q.amt)q.amt(p,AMT[a]);
+ return p}
+const hasAmt=(q,i)=>!!q.amt||isSpring(q.presets[i].m.ease);
+const edited=(q,i,p)=>i>=0&&!same(clone({fx:q.presets[i].fx,m:q.presets[i].m}),p);
+function pick(i){const q=QS[qi];ps=i;va=vs=MID;pp=i<0?null:variant(q,i,MID,MID)}
+/* what the controls show for this animation: its own exception if it has one, else the group's preset, else Current */
+function loadTarget(){const q=QS[qi],d=exOf(q,pi)||dec[q.id];
+ if(d&&d.i>=0){ps=d.i;pp=clone(d.p);[va,vs]=d.v||[-1,-1]}else pick(-1)}
+const nowDec=()=>({i:ps,p:pp?clone(pp):null,v:[va,vs]});
+const dropEx=()=>{const q=QS[qi];if(ex[q.id]){delete ex[q.id][pi];if(!Object.keys(ex[q.id]).length)delete ex[q.id]}};
+
+/* ---------- a decision in words ---------- */
+const presetName=(q,d)=>d.i<0?'Current':q.presets[d.i].n+(d.v&&d.v[0]>=0?(d.v[0]===MID&&d.v[1]===MID?'':' · '+[hasAmt(q,d.i)&&d.v[0]!==MID?'amount '+STEP[d.v[0]]:'',d.v[1]!==MID?'duration '+STEP[d.v[1]]:''].filter(Boolean).join(', ')):edited(q,d.i,d.p)?' (edited)':'');
+/* the Motion of a decision, the way a developer needs it */
+function moText(q,m){const k=mo(m);
+ return (isSpring(m.ease)?`spring ${ezName(m.ease)} (duration ${m.dur} ms, bounce ${Math.round(m.bounce*100)}%, settles in ${k.t} ms)`:`${ezName(m.ease)} cubic-bezier(${bezOf(m).map(n2).join(', ')}), ${m.dur} ms`)+(q.delay?`, ${m.delay} ms per item`:'')}
+function decText(q,d=dec[q.id]){if(!d)return '';if(d.i<0)return 'Current (no change)';
+ const fx=q.fx.map(f=>f.l.toLowerCase()+' '+f.fmt(d.p.fx[f.k])).join(', ');
+ return presetName(q,d)+' — '+(fx?fx+'; ':'')+moText(q,d.p.m)}
+function decisionsText(){
+ return 'Motion presets — DAZN Bet in Scores\n'+QS.map((q,i)=>`${i+1}. ${q.t}: ${decText(q)||'not decided'}`+exList(q).map(([pl,d])=>`\n   Except ${pl.n}: ${decText(q,d)}`).join('')+(notes[q.id]?`\n   Why: ${notes[q.id]}`:'')).join('\n')+'\n\nFor development:\n'+DEVNOTES.map(t=>'- '+t).join('\n');
+}
+const shareLink=()=>location.href.split('#')[0]+'#d='+btoa(unescape(encodeURIComponent(JSON.stringify({dec,notes,ex}))));
+
+/* ---------- playing ---------- */
+/* what is put on top of the prototype: every group that already has an applied preset, plus what is being tried in this group */
+function ovNow(){
+ const q=QS[qi],parts=[];
+ QS.forEach(x=>{const p=x===q?(ps<0?null:pp):dec[x.id]&&dec[x.id].i>=0?dec[x.id].p:null;if(p)parts.push(x.apply(p.fx,mo(p.m),p.m))});
+ return parts.length?{css:parts.slice().reverse().map(o=>o.css||'').join(''),   // reversed: the press rules come last, so on buttons their release curve wins over the state group's
+  js:(W,o)=>parts.forEach(x=>x.js&&x.js(W,o))}:null;
+}
+let cmp=false,zoom=false,loopOn=false,loopT;
+/* one big phone; or, with Compare or Zoom on, framed prototypes (Compare: left = Current, right = the preset) */
+function buildView(){
+ const a=QS[qi].places[pi];
+ if(!cmp&&!zoom){dropCards();$('#frame').classList.remove('off');return}
+ showCards(cmp?[Object.assign({},a,{tag:'Current'}),Object.assign({},a,{tag:'Your preset'})]:[Object.assign({},a,{tag:a.n})],!zoom);
+}
+/* play the animation of this place with what is being tried; rebuild = the place or the way of viewing changed */
+function play(rebuild=true){
+ clearTimeout(loopT);if(qi>=QS.length)return;
+ const q=QS[qi],ov=ovNow(),framed=cmp||zoom;
+ if(rebuild||framed!==!$('#grid').hidden)buildView();
+ if(framed){cards.forEach((c,n)=>{c.ov=n===cards.length-1?ov:null});if(cards.every(c=>c.ready))cards.forEach(c=>c.run(c.anim))}   // not loaded yet: they start by themselves when ready
+ else{main.ov=ov;main.run(q.places[pi])}
+ if(loopOn)loopT=setTimeout(()=>play(false),((q.lp||2800)+(ps<0?0:2*mo(pp.m).t))/rate);   // a long preset gets a longer pause, so a loop never cuts it short
+}
+let prT;const later=()=>{clearTimeout(prT);prT=setTimeout(()=>play(false),140)};   // plays as soon as the hand rests
+
+/* ---------- screens ---------- */
+/* open a group on one of its animations; n = QS.length opens My decisions */
+function go(n,place=0){
+ qi=Math.max(0,Math.min(QS.length,n));
+ if(qi===QS.length){showSummary();return}
+ pi=Math.max(0,Math.min(QS[qi].places.length-1,place));loadTarget();
+ $('#sum').hidden=true;$('#why').value=notes[QS[qi].id]||'';paint();play();   // the note belongs to the group
+}
+function showSummary(){
+ clearTimeout(loopT);dropCards();$('#frame').classList.add('off');if(main.ready)main.reset();main.ov=null;
+ const s=$('#sum');s.hidden=false;
+ s.innerHTML=`<h1>My decisions</h1>`+QS.map((q,i)=>`<div class="sr" data-q="${i}" role="button" tabindex="0"><b>${esc(q.t)}</b><span${dec[q.id]?'':' class="no"'}>${esc(decText(q)||'Not decided')}</span>${notes[q.id]?`<small>Why: ${esc(notes[q.id])}</small>`:''}</div>`+
+   exList(q).map(([pl,d])=>`<div class="sr sub" data-q="${i}" data-p="${q.places.indexOf(pl)}" role="button" tabindex="0"><b>Except ${esc(pl.n)}</b><span>${esc(decText(q,d))}</span></div>`).join('')).join('')+
+  `<div class="acts"><button class="btn" id="copyDec">Copy decisions</button><button class="btn q" id="copyLink" title="A link that opens this page with the same decisions">Copy link</button></div><h2>For development</h2><ul>${DEVNOTES.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
+ paint();
+}
+
+/* ---------- painting ---------- */
+function buildList(){   // two levels: a group (with a chevron) and, inside the open one, its animations
+ const CH='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+ $('#list').innerHTML=QS.map((q,i)=>`<button class="gq" data-q="${i}" aria-expanded="false">${CH}<span><b>${esc(q.t)}</b><small></small></span></button><div class="gs" data-q="${i}"><div>`+
+  q.places.map((x,k)=>`<button class="pq" data-q="${i}" data-p="${k}"><span>${esc(x.n)}</span><small></small></button>`).join('')+'</div></div>').join('');
+}
+/* a small picture of the easing: a bezier curve, or the sampled spring */
+function easeSvg(m){let d;if(isSpring(m.ease)){const sp=springSamples(m.dur,m.bounce,32).pts,mx=Math.max(1.05,...sp);d='M'+sp.map((y,i)=>`${(i/32*24).toFixed(1)} ${(24-y/mx*22).toFixed(1)}`).join('L')}
+ else{const b=bezOf(m);d=`M0 24C${b[0]*24} ${24-b[1]*24} ${b[2]*24} ${24-b[3]*24} 24 0`}
+ return `<svg viewBox="-2 -6 28 34" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+/* a value row: slider, and the same value as a number you can type. UNIT = how a value is shown ('%' values are stored 0..1) */
+const UNIT={scale:'%',op:'%',bounce:'%',off:'px',dur:'ms',delay:'ms'};
+const toShow=(k,v)=>UNIT[k]==='%'?Math.round(v*1000)/10:v,fromShow=(k,v)=>UNIT[k]==='%'?v/100:v;
+const sl=(grp,k,l,min,max,step,v,ends)=>(v=+v||0,`<div class="prm"><span>${esc(l)}</span><input type="range" data-g="${grp}" data-k="${k}" min="${min}" max="${max}" step="${step}" value="${v}" aria-label="${esc(l)}"><label class="nf"><input type="number" data-g="${grp}" data-k="${k}" min="${toShow(k,min)}" max="${toShow(k,max)}" step="${toShow(k,step)}" value="${toShow(k,v)}" aria-label="${esc(l)}"><i>${UNIT[k]}</i></label>${ends?`<small class="ends"><span>${ends[0]}</span><span>${ends[1]}</span></small>`:''}</div>`);
+/* the controls of the preset being tried: variants (basic) and exact values (Advanced) */
+function paintParams(){
+ const q=QS[qi];if(ps<0){$('#basic').innerHTML='';$('#mo').innerHTML='';return}
+ const m=pp.m,seg=(id,l,v)=>`<div class="vr"><span>${l}</span><div class="seg" id="${id}">${STEP.map((n,i)=>`<button data-v="${i}"${v===i?' class="on"':''}>${n}</button>`).join('')}</div></div>`;
+ $('#basic').innerHTML=(hasAmt(q,ps)?seg('vAmt','Amount',va):'')+seg('vDur','Duration',vs);
+ $('#mo').innerHTML=q.fx.map(f=>sl('fx',f.k,f.l,f.min,f.max,f.step,pp.fx[f.k],f.ends)).join('')+sl('m','dur','Duration',0,2000,10,m.dur)+
+  `<div class="prm sel"><span>Easing</span><select id="ezSel" aria-label="Easing"><optgroup label="Curve">${EZ.map(x=>`<option value="${x[0]}"${m.ease===x[0]?' selected':''}>${esc(x[1])}</option>`).join('')}</optgroup><optgroup label="Spring">${SP.map(x=>`<option value="${x[0]}"${m.ease===x[0]?' selected':''}>${esc(x[1])}</option>`).join('')}</optgroup></select>${easeSvg(m)}</div>`+
+  (isSpring(m.ease)?sl('m','bounce','Bounce',0,.8,.05,m.bounce):'')+
+  (q.delay?sl('m','delay',q.delay,0,280,2,m.delay):'');
+}
+/* the two ways to keep what is playing: for the whole group, or only for this animation */
+function paintApply(){
+ const q=QS[qi],d=dec[q.id],e=exOf(q,pi),eq=x=>x&&x.i===ps&&(ps<0||same(x.p,pp));
+ $('#applyB').textContent=eq(d)&&!e?'Applied to the group ✓':'Apply to the group';
+ $('#onlyB').textContent=eq(e)?'Only this one ✓':'Only this one';
+ $('#backB').hidden=!e;
+}
+function paint(){
+ const sumOn=qi===QS.length,q=QS[qi];
+ $$('.gq').forEach(b=>{const i=+b.dataset.q,x=QS[i],on=i===qi;b.classList.toggle('open',on);b.setAttribute('aria-expanded',on);b.classList.toggle('done',!!dec[x.id]);b.querySelector('small').textContent=dec[x.id]?presetName(x,dec[x.id]):''});
+ $$('.gs').forEach(g=>g.classList.toggle('open',+g.dataset.q===qi));
+ $$('.pq').forEach(b=>{const x=QS[+b.dataset.q],k=+b.dataset.p,e=exOf(x,k);b.classList.toggle('on',+b.dataset.q===qi&&k===pi);b.querySelector('small').textContent=e?presetName(x,e)+' · own':''});
+ $('#allDec').classList.toggle('on',sumOn);$('#allDec small').textContent=`${QS.filter(x=>dec[x.id]).length} / ${QS.length}`;
+ $('#qh').hidden=sumOn;$('#dock').hidden=sumOn;if(sumOn)return;
+ const d=dec[q.id];
+ $('#qN').textContent=q.t;$('#qT').textContent=q.places[pi].n;
+ $('#presets').innerHTML=`<button class="chip2${ps<0?' on':''}${d&&d.i<0?' ap':''}" data-ps="-1">Current</button>`+q.presets.map((x,i)=>`<button class="chip2${ps===i?' on':''}${d&&d.i===i?' ap':''}" data-ps="${i}">${esc(x.n)}</button>`).join('');
+ $('#todayL').innerHTML=q.today.map(t=>`<li>${esc(t)}</li>`).join('');
+ paintParams();paintApply();
+}
+
+/* ---------- controls ---------- */
+$('#list').onclick=e=>{const b=e.target.closest('.gq,.pq');if(b)go(+b.dataset.q,+b.dataset.p||0)};
+$('#allDec').onclick=()=>go(QS.length);
+$('#presets').onclick=e=>{const b=e.target.closest('.chip2');if(!b)return;pick(+b.dataset.ps);paint();play(false)};
+/* a variant step: the preset is rebuilt from its own values at that strength and length */
+$('#basic').onclick=e=>{const b=e.target.closest('.seg button');if(!b||ps<0)return;
+ if(va<0||vs<0)va=vs=MID;if(b.parentNode.id==='vAmt')va=+b.dataset.v;else vs=+b.dataset.v;
+ pp=variant(QS[qi],ps,va,vs);paintParams();paintApply();play(false)};
+/* Advanced: a slider or its number field. A value set by hand is no longer one of the variant steps;
+   Duration or Bounce of a named spring makes it a custom spring */
+$('#dock').addEventListener('input',e=>{const r=e.target,k=r.dataset.k;if(ps<0||!r.dataset.g)return;
+ const num=r.type==='number',row=r.closest('.prm'),range=row.querySelector('input[type=range]'),field=row.querySelector('input[type=number]');
+ let v=num?fromShow(k,parseFloat(r.value)):+r.value;if(isNaN(v))return;v=Math.max(+range.min,Math.min(+range.max,v));
+ if(num)range.value=v;else field.value=toShow(k,v);
+ if(r.dataset.g==='fx')pp.fx[k]=v;
+ else{pp.m[k]=v;if(isSpring(pp.m.ease)&&k!=='delay'&&pp.m.ease!=='spring'){pp.m.ease='spring';$('#ezSel').value='spring'}
+  $('#mo svg').outerHTML=easeSvg(pp.m)}
+ va=vs=-1;$$('#basic .seg button.on').forEach(b=>b.classList.remove('on'));
+ paintApply();later()});
+/* leaving a number field: show the value that is really in use (clamped, rounded) */
+$('#dock').addEventListener('focusout',e=>{const r=e.target;if(r.type!=='number'||!r.dataset.g||ps<0)return;const k=r.dataset.k;r.value=toShow(k,r.dataset.g==='fx'?pp.fx[k]:pp.m[k])});
+$('#dock').addEventListener('change',e=>{if(e.target.id!=='ezSel'||ps<0)return;const m=pp.m,sp=SP.find(x=>x[0]===e.target.value);
+ m.ease=e.target.value;if(sp&&sp[2]){m.dur=sp[2].dur;m.bounce=sp[2].bounce}   // a named spring brings its own duration and bounce
+ va=vs=-1;paintParams();paintApply();play(false)});
+$('#applyB').onclick=()=>{dec[QS[qi].id]=nowDec();dropEx();save();paint()};                              // the group, this animation included
+$('#onlyB').onclick=()=>{const q=QS[qi];(ex[q.id]=ex[q.id]||{})[pi]=nowDec();save();paint()};            // an exception for this animation
+$('#backB').onclick=()=>{dropEx();save();loadTarget();paint();play(false)};
+$('#why').oninput=e=>{const q=QS[qi],v=e.target.value.trim();if(v)notes[q.id]=v;else delete notes[q.id];save()};
+$('#again').onclick=()=>play(false);
+$('#speed').onclick=e=>{const b=e.target.closest('button');if(!b)return;rate=+b.dataset.r;$$('#speed button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-selected',x===b)});play(false)};
+$('#loop').onchange=e=>{loopOn=e.target.checked;play(false)};
+$('#cmp').onchange=e=>{cmp=e.target.checked;play(true)};
+$('#zoom').onchange=e=>{zoom=e.target.checked;play(true)};
+function copyText(text,b,label){
+ const done=ok=>{b.textContent=ok?'Copied':'Could not copy';setTimeout(()=>{b.textContent=label},1800)};
+ const legacy=()=>{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();done(ok)};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(()=>done(true),legacy);else legacy();
+}
+$('#sum').onkeydown=e=>{if(e.key==='Enter'&&e.target.matches('.sr'))e.target.click()};
+$('#sum').onclick=e=>{const r=e.target.closest('.sr');if(r){go(+r.dataset.q,+r.dataset.p||0);return}
+ if(e.target.closest('#copyDec'))copyText(decisionsText(),$('#copyDec'),'Copy decisions');
+ else if(e.target.closest('#copyLink'))copyText(shareLink(),$('#copyLink'),'Copy link')};
+/* ↑ ↓ walk through the animations, Space or R plays again */
+addEventListener('keydown',e=>{
+ if(e.target.matches('input,textarea,select,button')||e.metaKey||e.ctrlKey||e.altKey||qi>=QS.length)return;
+ const q=QS[qi];
+ if(e.key===' '||e.key==='r'||e.key==='R'){e.preventDefault();play(false)}
+ else if(e.key==='ArrowDown'){e.preventDefault();if(pi<q.places.length-1)go(qi,pi+1);else if(qi<QS.length-1)go(qi+1)}
+ else if(e.key==='ArrowUp'){e.preventDefault();if(pi>0)go(qi,pi-1);else if(qi>0)go(qi-1,QS[qi-1].places.length-1)}
+});
+
+sanitize();if(fromLink){save();history.replaceState(null,'',location.pathname+location.search)}   // a link is imported once: later edits are not overwritten by it on reload
+buildList();go(0);
+</script>
+</body>
+</html>
