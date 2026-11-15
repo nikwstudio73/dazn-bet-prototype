@@ -1346,7 +1346,8 @@ function denyLimit(mid,g,o){
  document.querySelectorAll(`[data-m="${mid}"][data-g="${g}"][data-o="${o}"]`).forEach(b=>replay(b,'deny'));
  try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}
  const t=$('#tongue');
- if(S.sheet||!$('#bar').classList.contains('show')){showToast(LIMIT_MSG,null,null,HOLD?6e5:2500);return} // no bar on screen (e.g. sheet open): fall back to the toast
+ if(S.sheet)return;                                    // sheet open: no message (owner, 15 Nov) — the number is in the header, the odd only springs back
+ if(!$('#bar').classList.contains('show')){showToast(LIMIT_MSG,null,null,HOLD?6e5:2500);return} // no bar on screen: fall back to the toast
  t.classList.add('show');setTimeout(()=>replay($('#barCount'),'nope'),90);
  clearTimeout(tongueT);tongueT=setTimeout(()=>t.classList.remove('show'),HOLD?6e5:2600);
 }
