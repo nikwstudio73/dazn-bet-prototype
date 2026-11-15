@@ -926,7 +926,7 @@ div.choice{cursor:default}
 .gs-ph{position:relative;flex:none;align-self:stretch;height:122px;overflow:hidden}
 .gs-ph img{display:block;width:100%;height:100%;object-fit:cover;object-position:center top}
 .gs-ph::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:rgba(249,250,250,.2)} /* border/transparent/default */
-.gs-card b{margin-top:8px;font-weight:700;font-size:16px;line-height:21px;color:var(--t1);white-space:nowrap;transition:color var(--m-quick)}
+.gs-card b{margin-top:8px;font-weight:700;font-size:16px;line-height:21px;color:var(--t1);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color var(--m-quick)}
 .gs-card .cl{display:flex;align-items:center;gap:6px;height:20px;margin-top:2px;font-size:14px;line-height:20px;color:var(--t4);white-space:nowrap;transition:color var(--m-quick)}
 .gs-card .cl img{width:20px;height:20px;object-fit:contain}
 .gs-card .odd{flex:none;align-self:stretch;width:auto;height:40px;margin-top:auto;background:rgba(8,14,18,.64)} /* fill/scrim */
@@ -1627,7 +1627,7 @@ function openFixture(mid){
  $('#fx').classList.add('show');$('#fx').setAttribute('aria-hidden','false');S.fx=mid;hideToast();
 }
 /* C1: cut-out photos of the Goalscorer card (Figma has two); every other player gets the silhouette of the component */
-const GSC={mbappe:'gsc_mbappe',alvarez:'gsc_alvarez'};['gsc_mbappe','gsc_alvarez','gsc_none'].forEach(k=>IMG[k]='assets/img/'+k+'.png');
+const GSC={mbappe:'gsc_mbappe',alvarez:'gsc_alvarez'};Object.assign(IMG,{gsc_mbappe:'assets/img/gsc_mbappe.png',gsc_alvarez:'assets/img/gsc_alvarez.png',gsc_none:'assets/img/gsc_none.png'}); // whole paths, so build.py inlines them
 function renderMkts(mid=S.fx){const m=M(mid),f=FX[mid];$('#mkts').innerHTML=LEGAL+f.markets.map(k=>marketHTML(m,k)).join('')+
  (f.scorers?`<section class="gs"><div class="gs-h"><b>Goalscorer</b><span>In this match</span></div><div class="gs-row">${f.scorers.map(p=>`<div class="gs-card"><span class="gs-ph"><img src="${IMG[GSC[p.k]||'gsc_none']}" alt=""></span><b>${p.n}</b><span class="cl"><img src="${crest(p.cr)}" alt="">${p.team}</span>${oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only')}</div>`).join('')}</div></section>`:'')+(m.ft?'':`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`)} // U3: Goalscorer sits above "More bets", which closes the page
 function closeFixture(){$('#fx').classList.remove('show');$('#fx').setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},T.layout)}
