@@ -619,11 +619,6 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .lbg{display:flex;flex-direction:column}
 .sn{font-size:12px;line-height:18px;color:var(--t3)}
 .sn[hidden]{display:none}
-/* .Betslip/Notice: limit of 20 picks, last line of the sheet content */
-/* .Betslip/Notice: limit message pinned above the button — orange icon + text (accent/warning-100), no box */
-.lnote{display:flex;align-items:flex-start;gap:6px;margin:0 0 var(--sheet-content-gap);font-size:12px;line-height:18px;color:#ffae36}
-.lnote svg{flex:none;margin-top:1px}
-.lnote[hidden]{display:none}
 .sbody .legal{margin-top:var(--sheet-pad-t);position:relative;z-index:3}
 #sheet .handle{z-index:4;border-radius:var(--sheet-radius) var(--sheet-radius) 0 0;background:linear-gradient(180deg,var(--sheet-bg) 55%,rgba(12,22,28,0))} /* the banner scrolls away under the handle zone */
 /* limit reached: count badges turn orange (accent/warning-100) */
@@ -1028,7 +1023,6 @@ div.choice{cursor:default}
     </div>
    </div>
    <div class="sfoot">
-    <div class="lnote" id="lnote" hidden><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.3v3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5.1" r=".9" fill="currentColor"/></svg><span>Maximum number of selections allowed is 20</span></div>
     <button class="cta-main" id="placeBtn">Place bet on DAZN Bet</button>
     <p class="compliance">Interactive promotional advertisement. DAZN Bet registration required to place bets. Odds may vary. Gamble responsibly. 18+.</p></div>
   </div>
@@ -1383,11 +1377,10 @@ function renderSheet(){
  renderSheet.st=cur;
  sheetMeta();
 }
-/* everything in the sheet except the cards: counter, limit message, edit mode, summary */
+/* everything in the sheet except the cards: counter, edit mode, summary */
 function sheetMeta(){
  const n=S.sel.length;
  $('#sheetCount').textContent=n;
- smoothH($('#sheet .sfoot'),()=>{const ln=$('#lnote'),was=ln.hidden;ln.hidden=n<MAX;if(was&&!ln.hidden&&S.sheet)soft(ln,RISE,T.std,80)},S.sheet);
  applyEdit();
  updateSummary();
  moreCheck();
@@ -1651,9 +1644,9 @@ const STATES=[
  {g:'Locked',k:'The only bet',v:'bar',n:'One pick and it is locked: the counter stays 1, the total shows a dash.',run(){S.sel=ONE();S.st['m1|1x2']='locked';refresh()}},
  {g:'Locked',k:'The only bet',v:'sheet',n:'A dash instead of the total, "Your selection is locked", the button is disabled.',run(){S.sel=ONE();S.st['m1|1x2']='locked';refresh();openSheet()}},
  {g:'Limit 20',k:'20 picks',v:'bar',n:'PRD · Maximum bets: at 20 selections the counter turns orange.',run(){fill20();refresh()}},
- {g:'Limit 20',k:'20 picks',v:'sheet',n:'The message is pinned above the button, so it is visible as soon as the sheet opens.',run(){fill20();refresh();openSheet()}},
+ {g:'Limit 20',k:'20 picks',v:'sheet',n:'20 selections in the sheet: the number is only in the header, “Betslip 20”. No extra message.',run(){fill20();refresh();openSheet()}},
  {g:'Limit 20',k:'Tap on a 21st odd',n:'Nothing is added and nothing is swapped. The odd presses and springs back slightly, an orange tongue slides out from behind the betslip and the counter pulses.',run(){fill20();refresh();toggleSel('m1','1x2','2')}},
- {g:'Limit 20',k:'Limit + suspended bet',n:'Both at once: the line under Total odds for the dropped bet and the limit message above the button.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet();toEnd()}},
+ {g:'Limit 20',k:'Limit + suspended bet',n:'20 selections and one of them suspended: the line under Total odds explains the dropped bet.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet();toEnd()}},
  {g:'Other screens',k:'Finished matches',n:'Yesterday (Sat 3 Jan in the calendar): last prices stay, everything is disabled, the outcome that happened is white.',run(){setDay('yest')}},
  {g:'Other screens',k:'Favourite team popup',n:'The favourite team plays today: its win is preselected, "Add to my Betslip" puts the pick in the bar.',run(){openFav()}},
  {g:'Other screens',k:'Fixture · Odds tab',n:'Pre-match markets of one match (tap its tile in the feed). Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
