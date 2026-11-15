@@ -621,11 +621,6 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .lbg{display:flex;flex-direction:column}
 .sn{font-size:12px;line-height:18px;color:var(--t3)}
 .sn[hidden]{display:none}
-/* .Betslip/Notice: limit of 20 picks, last line of the sheet content */
-/* .Betslip/Notice: limit message pinned above the button — orange icon + text (accent/warning-100), no box */
-.lnote{display:flex;align-items:flex-start;gap:6px;margin:0 0 var(--sheet-content-gap);font-size:12px;line-height:18px;color:#ffae36}
-.lnote svg{flex:none;margin-top:1px}
-.lnote[hidden]{display:none}
 .sbody .legal{margin-top:var(--sheet-pad-t);position:relative;z-index:3}
 #sheet .handle{z-index:4;border-radius:var(--sheet-radius) var(--sheet-radius) 0 0;background:linear-gradient(180deg,var(--sheet-bg) 55%,rgba(12,22,28,0))} /* the banner scrolls away under the handle zone */
 /* limit reached: count badges turn orange (accent/warning-100) */
@@ -753,6 +748,24 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .choice.stk.locked .tt,.choice.stk.locked .lb{color:#4d5457}
 .choice.stk.sel.locked .tt{color:#080e12}.choice.stk.sel.locked .lb{color:#6d7377}
 /* page of a finished match: the same Result / Disabled states on every market; nothing is tappable */
+/* U3 · Handicap (Figma "Handicap v2"): title and team tabs outside the card; in the card a line stepper and three stacked choices on the Soft surface */
+.hc{display:flex;flex-direction:column;gap:16px}
+.hc-top{display:flex;flex-direction:column;gap:8px}
+.hc-top>b{font-weight:700;font-size:var(--mk-title-size);line-height:var(--mk-title-lh);color:var(--mk-title-color)}
+.hc-tabs{display:flex;gap:8px}
+.hc-tab{flex:1;height:46px;border-radius:20px;background:var(--line-tile-bg);display:flex;align-items:center;justify-content:center;transition:background var(--m-quick),transform var(--m-press)} /* fill/overlay-2 */
+.hc-tab:active{transform:scale(.98)}
+.hc-tab.on{background:var(--t1)} /* surface/inverse */
+.hc-tab img{width:30px;height:30px;object-fit:contain}
+.mkt.hc-card{padding:16px 12px;gap:16px}
+.hc-step{display:flex;align-items:center;gap:8px}
+.hc-step button{flex:none;width:40px;height:40px;border-radius:50%;background:var(--line-tile-bg);border:1px solid var(--border-transparent-subtle);display:flex;align-items:center;justify-content:center;color:var(--t1);transition:opacity var(--m-quick),transform var(--m-press)}
+.hc-step button:active{transform:scale(.97)}
+.hc-step button:disabled{opacity:.3;cursor:default;transform:none}
+.hc-step b+button svg{transform:scaleX(-1)}
+.hc-step b{flex:1;text-align:center;font-weight:700;font-size:var(--mk-title-size);line-height:var(--mk-title-lh);color:#fff}
+.hc-card .choice{border-radius:var(--choice-soft-radius)}
+.hc-card .choice:not(.sel){background:var(--choice-soft-bg)}
 .mkts .odd.res:not(.sel){background:rgba(249,250,250,.12)}
 .mkts .odd.dis:not(.sel){background:var(--odd-bg)} /* State=Disabled keeps fill/overlay-1 on every surface */
 div.odd:active,div.choice:active{transform:none}
@@ -909,13 +922,23 @@ div.choice{cursor:default}
 .gs-h span{display:block;font-size:14px;line-height:18px;letter-spacing:.01em;color:#c5c7ca}
 .gs-row{display:flex;gap:12px;margin:0 -16px;padding:0 16px;overflow-x:auto;scrollbar-width:none}
 .gs-row::-webkit-scrollbar{display:none}
-.gs-card{flex:none;width:210px;border-radius:12px;background:#1b2326;padding:12px 8px;display:flex;flex-direction:column;align-items:center}
-.gs-card .ph{width:96px;height:96px;border-radius:50%;background:rgba(249,250,250,.08);object-fit:cover;object-position:center top}
-.gs-card b{margin-top:8px;font-weight:700;font-size:14px;line-height:21px;color:#fff}
-.gs-card .cl{display:flex;align-items:center;gap:6px;height:20px;margin-top:1px;font-size:14px;line-height:20px;color:#b3b9bb}
+/* C1 · Odds/Goalscorer card (Figma component, 210×250): cut-out photo on a hairline, name, club, price on a dark tile. Selected: the whole card turns white */
+.gs-card{flex:none;width:210px;height:250px;border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;
+ background:radial-gradient(72.8% 84.7% at 50.2% 19%,rgba(8,14,18,0) 0%,rgba(70,74,77,.0375) 25%,rgba(131,134,136,.075) 50%,rgba(193,195,196,.1125) 75%,rgba(255,255,255,.15) 100%),var(--surface-container-1)}
+.gs-ph{position:relative;flex:none;align-self:stretch;height:122px;overflow:hidden}
+.gs-ph img{display:block;width:100%;height:100%;object-fit:cover;object-position:center top}
+.gs-ph::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:rgba(249,250,250,.2)} /* border/transparent/default */
+.gs-card b{margin-top:8px;font-weight:700;font-size:16px;line-height:21px;color:var(--t1);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color var(--m-quick)}
+.gs-card .cl{display:flex;align-items:center;gap:6px;height:20px;margin-top:2px;font-size:14px;line-height:20px;color:var(--t4);white-space:nowrap;transition:color var(--m-quick)}
 .gs-card .cl img{width:20px;height:20px;object-fit:contain}
-.gs-card .odd{flex:none;align-self:stretch;width:auto;height:40px;margin-top:12px;background:rgba(249,250,250,.12)}
-.gs-card .odd.sel{background:var(--odd-sel-bg)}
+.gs-card .odd{flex:none;align-self:stretch;width:auto;height:40px;margin-top:auto;background:rgba(8,14,18,.64)} /* fill/scrim */
+.gs-card:has(.odd.sel){background:radial-gradient(72.8% 84.7% at 50.2% 19%,rgba(8,14,18,0) 0%,rgba(70,74,77,.0375) 25%,rgba(131,134,136,.075) 50%,rgba(193,195,196,.1125) 75%,rgba(255,255,255,.15) 100%),var(--t1)} /* surface/inverse */
+.gs-card:has(.odd.sel) b{color:var(--text-inverse)}
+.gs-card:has(.odd.sel) .cl{color:var(--tdis)}
+.gs-card:has(.odd.sel) .gs-ph::after{background:linear-gradient(90deg,rgba(61,69,73,0),#3d4549 50%,rgba(61,69,73,0))}
+.gs-card .odd.sel{background:var(--text-inverse)} /* surface/default-0 */
+.gs-card .odd.sel .v{color:var(--odd-value-color)}
+.mkts .gs-card .odd.res:not(.sel),.mkts .gs-card .odd.dis:not(.sel){background:rgba(8,14,18,.64)} /* finished match: the tile keeps the scrim, only the text shows Result / Disabled */
 /* the whole card or row is the tap target of its price (Top Picks, players, teams, goalscorers) */
 .tp,.sc-row,.cp-row,.gs-card{cursor:pointer}
 .tp,.gs-card{transition:background var(--m-quick),transform var(--m-press)}
@@ -925,7 +948,6 @@ div.choice{cursor:default}
 /* a player without a photo in the Figma file: initials on the same round plate */
 .ini{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;line-height:1;letter-spacing:.02em;color:#8d9295}
 .tp-top .ini{width:44px;height:44px;border-radius:50%;background:#242d33}
-.gs-card .ini{font-size:28px}
 .sc-row .ph{object-fit:cover;object-position:center top}
 .fx-team img{object-fit:contain}
 .fx-mid{flex:1 1 0;min-width:0;white-space:nowrap} /* takes the space between the crests; a wide score spills evenly to both sides and never squeezes the teams */
@@ -1035,7 +1057,6 @@ div.choice{cursor:default}
     </div>
    </div>
    <div class="sfoot">
-    <div class="lnote" id="lnote" hidden><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.25" stroke="currentColor" stroke-width="1.5"/><path d="M8 7.3v3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="5.1" r=".9" fill="currentColor"/></svg><span>Maximum number of selections allowed is 20</span></div>
     <button class="cta-main" id="placeBtn">Place bet on DAZN Bet</button>
     <p class="compliance">Interactive promotional advertisement. DAZN Bet registration required to place bets. Odds may vary. Gamble responsibly. 18+.</p></div>
   </div>
@@ -1291,6 +1312,16 @@ function starScorers(m,p1,p2){
 }
 const poisCum=(l,k)=>{if(k<0)return 0;let p=Math.exp(-l),t=p;for(let i=1;i<=k;i++){p*=l/i;t+=p}return t};       // chance of k goals or fewer when l are expected
 const priceOf=p=>{const v=1/(Math.min(.985,Math.max(.012,p))*1.06),st=v<3?.05:v<6?.25:v<15?.5:1;return Math.min(51,Math.max(1.01,+(Math.round(v/st)*st).toFixed(2)))}; // chance -> price with margin, rounded like a bookmaker does
+/* Handicap: home lines -3…+2 without 0 (Roey's market list). Prices from the same expected goals as the other markets;
+   a live match starts from the current score. Each line is its own pick group "hc:<home line>", outcomes 1 / X / 2. */
+const HC_LINES=[-3,-2,-1,1,2],sgn=n=>n>0?'+'+n:String(n);
+function hcOf(m,fix){
+ const inv=m.o.map(x=>1/x),sum=inv[0]+inv[1]+inv[2],[p1,,p2]=inv.map(x=>x/sum),goals=2.45+1.1*Math.abs(p1-p2);
+ const left=m.live?goals*(90-m.min)/90:goals,lh=left*(.5+(p1-p2)*.4),la=left-lh,d0=m.live?m.sh-m.sa:0;
+ const pm=l=>{const a=[Math.exp(-l)];for(let i=1;i<=10;i++)a.push(a[i-1]*l/i);return a},H=pm(lh),A=pm(la),lines={};
+ HC_LINES.forEach(L=>{let w=0,x=0,t=0;H.forEach((ph,i)=>A.forEach((pa,j)=>{const d=d0+i-j+L,p=ph*pa;t+=p;if(d>0)w+=p;else if(d===0)x+=p}));lines[L]=[priceOf(w/t),priceOf(x/t),priceOf(1-(w+x)/t)]});
+ return {id:'hc',t:'Handicap',type:'hc',def:p1>=p2?-1:1,lines:Object.assign(lines,fix)};
+}
 function fxOf(m){
  const inv=m.o.map(x=>1/x),sum=inv[0]+inv[1]+inv[2],[p1,px,p2]=inv.map(x=>x/sum),gap=Math.abs(p1-p2);
  const goals=2.45+1.1*gap,scored=m.live?m.sh+m.sa:0,left=m.live?goals*(90-m.min)/90:goals;                    // goals expected in the match / still to come
@@ -1308,8 +1339,10 @@ function fxOf(m){
   mk.push({id:'rbtts',t:'Result & Both teams to score',glow:true,sub:'Both parts must happen for the bet to win.',type:'stack',opts:[{k:'1',c:'1 & BTTS',l:`${m.hs} to win and both teams to score`,v:priceOf(p1*.42)},{k:'X',c:'X & BTTS',l:'Draw and both teams to score',v:priceOf(px*.72)},{k:'2',c:'2 & BTTS',l:`${m.as} to win and both teams to score`,v:priceOf(p2*.42)}]});
  }
  mk.push({id:'dnb',t:'Draw no bet',glow:true,type:'dnb',opts:[{k:'1',v:priceOf(p1/(p1+p2))},{k:'2',v:priceOf(p2/(p1+p2))}]});
+ mk.push(hcOf(m));
  return {league:L[0],comp:L[1],compImg:COMPS[m.comp].img,hiImg:'t_'+m.hi,aiImg:'t_'+m.ai,time:m.ko,date:m.day||'Today',markets:mk,scorers:SCORERS[m.id]||starScorers(m,p1,p2)};
 }
+FX.m4.markets.push(hcOf(INIT().find(m=>m.id==='m4'),{'-1':[3.80,3.95,1.85]})); // the drawn match: line -1 as in Figma, the other lines generated
 INIT().forEach(m=>{if(!m.hid&&!FX[m.id])FX[m.id]=fxOf(m)});
 FT().forEach(m=>{FX[m.id]=fxOf(m)});
 OTHER().forEach(m=>{FX[m.id]=fxOf(m)});
@@ -1323,6 +1356,7 @@ function won(m,g,o){
  if(id==='dc')return {'1X':m.res!==2,'12':m.res!==1,'X2':m.res!==0}[o];
  if(id==='rbtts')return both&&{'1':0,'X':1,'2':2}[o]===m.res;
  if(id==='dnb')return {'1':0,'2':2}[o]===m.res;
+ if(id==='hc'){const d=m.sh-m.sa+ +line;return o==='1'?d>0:o==='X'?d===0:d<0}
  return false;
 }
 let S;
@@ -1352,7 +1386,7 @@ function tileHTML(m){
     <div class="team"><div class="n"><img src="${IMG[m.hi]}" alt="">${m.h}</div><div class="r" data-sh="${m.id}">${r(m.sh)}</div></div>
     <div class="team"><div class="n"><img src="${IMG[m.ai]}" alt="">${m.a}</div><div class="r" data-sa="${m.id}">${r(m.sa)}</div></div>
    </div></div>
-   <div class="cta"><div class="pc"><img src="${IMG.play}" alt=""></div><span>Watch Now</span></div>
+   <div class="cta"><div class="pc"><img src="${IMG.play}" alt=""></div><span>Watch</span></div>
   </div>
   <div class="orow">${odds}</div></div>`;
 }
@@ -1434,6 +1468,7 @@ function oddsOf(s){
  const m=M(s.m);if(m.out){const c=CP[s.m];return s.g==='win'?c.win.find(x=>x[0]===s.o)[2]:cpPlayer(c,s.o).v} // outright: Competition winner / Top scorer
  if(s.g==='1x2')return m.o[+s.o];
  const [id,line]=s.g.split(':');if(id==='gs')return FX[s.m].scorers.find(x=>x.k===line).v;const k=mkt(s.m,id);
+ if(k.type==='hc')return k.lines[line][{'1':0,'X':1,'2':2}[s.o]];
  if(k.type==='lines'){const r=k.lines.find(x=>x[0]===line);return s.o==='o'?r[1]:r[2]}
  return k.opts.find(x=>x.k===s.o).v;
 }
@@ -1447,6 +1482,7 @@ function selInfo(s){
  if(id==='btts')return {m,subj:s.o==='y'?'Both teams':'Not both teams',pred:'to score',mk:'Both teams to score',odds};
  if(id==='rbtts'){const t={'1':[m.h,'to win & BTTS'],'X':['Draw','& BTTS'],'2':[m.a,'to win & BTTS']}[s.o];return {m,subj:t[0],pred:t[1],mk:'Result & both teams to score',odds}}
  if(id==='dnb')return {m,subj:s.o==='1'?m.h:m.a,pred:'to win',mk:'Draw no bet',odds};
+ if(id==='hc')return {m,subj:s.o==='X'?'Draw':s.o==='1'?m.h+' '+sgn(+line):m.a+' '+sgn(-line),pred:s.o==='X'?`(${m.hs} ${sgn(+line)})`:'',mk:'Handicap',odds};
  if(id==='dc'){const t={'1X':[m.h,'or draw'],'12':[m.h+' or '+m.a,''],'X2':[m.a,'or draw']}[s.o];return {m,subj:t[0],pred:t[1],mk:'Double chance',odds}}
 }
 /* 21st pick: nothing is added. Micro-feedback in one beat: the odd presses and springs back slightly, the tongue slides out from behind the bar, the counter pulses */
@@ -1456,7 +1492,8 @@ function denyLimit(mid,g,o){
  document.querySelectorAll(`[data-m="${mid}"][data-g="${g}"][data-o="${o}"]`).forEach(b=>replay(b,'deny'));
  try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}
  const t=$('#tongue');
- if(S.sheet||!$('#bar').classList.contains('show')){showToast(LIMIT_MSG,null,null,HOLD?6e5:2500);return} // no bar on screen (e.g. sheet open): fall back to the toast
+ if(S.sheet)return;                                    // sheet open: no message (owner, 15 Nov) — the number is in the header, the odd only springs back
+ if(!$('#bar').classList.contains('show')){showToast(LIMIT_MSG,null,null,HOLD?6e5:2500);return} // no bar on screen: fall back to the toast
  t.classList.add('show');setTimeout(()=>replay($('#barCount'),'nope'),90);
  clearTimeout(tongueT);tongueT=setTimeout(()=>t.classList.remove('show'),HOLD?6e5:2600);
 }
@@ -1529,11 +1566,10 @@ function renderSheet(){
  renderSheet.st=cur;
  sheetMeta();
 }
-/* everything in the sheet except the cards: counter, limit message, edit mode, summary */
+/* everything in the sheet except the cards: counter, edit mode, summary */
 function sheetMeta(){
  const n=S.sel.length;
  $('#sheetCount').textContent=n;
- smoothH($('#sheet .sfoot'),()=>{const ln=$('#lnote'),was=ln.hidden;ln.hidden=n<MAX;if(was&&!ln.hidden&&S.sheet)soft(ln,RISE,T.std,80)},S.sheet);
  applyEdit();
  updateSummary();
  moreCheck();
@@ -1698,7 +1734,24 @@ function oddBtn(mid,g,o,label,v,cls=''){const fm=M(mid);if(fm.ft)return `<div cl
  const st=oddState(mid,g,o);return `<button class="odd ${cls}${st.sel?' sel':''}${st.locked?' locked':''}" data-m="${mid}" data-g="${g}" data-o="${o}">${label?`<span class="l">${label}</span>`:''}<span class="v">${st.locked?LOCK:`<span class="arr">${ARROW}</span><span class="num">${f2(v)}</span>`}</span></button>`}
 function choiceBtn(mid,g,o,{code,label,icon,v,stack}){const fm=M(mid);if(fm.ft)return `<div class="choice${stack?' stk':''} ${won(fm,g,o)?'res':'dis'}"><span class="ld">${icon?`<img src="${IMG[icon]}" alt="">`:''}${code?`<span class="${stack?'tt':'cd'}">${code}</span>`:''}<span class="lb">${label}</span></span><span class="ov">${f2(v)}</span></div>`;
  const st=oddState(mid,g,o);return `<button class="choice${stack?' stk':''}${st.sel?' sel':''}${st.locked?' locked':''}" data-m="${mid}" data-g="${g}" data-o="${o}"><span class="ld">${icon?`<img src="${IMG[icon]}" alt="">`:''}${code?`<span class="${stack?'tt':'cd'}">${code}</span>`:''}<span class="lb">${label}</span></span><span class="ov">${st.locked?LOCK:f2(v)}</span></button>`}
+/* Handicap: S.hc = which team's side is shown and the line (kept as the home line). The Away tab shows the same market from the other side. */
+const CHEV='<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12.5 4.5 7 10l5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function hcHTML(m,k){
+ const f=FX[m.id];if(!S.hc||S.hc.mid!==m.id)S.hc={mid:m.id,t:'h',l:k.def};
+ const L=S.hc.l,away=S.hc.t==='a',shown=away?-L:L,n=Math.abs(L),giv=L<0?m.hs:m.as,rec=L<0?m.as:m.hs;
+ const list=HC_LINES.map(x=>away?-x:x).sort((a,b)=>a-b),i=list.indexOf(shown);
+ const dG=`${giv} win by ${n+1}+ goals`,dX=`${giv} win by exactly ${n} goal${n>1?'s':''}`,dR=n===1?`${rec} win or draw`:n===2?`${rec} win, draw or lose by 1 goal`:`${rec} win, draw or lose by up to ${n-1} goals`;
+ const row=[['1',`${m.hs} ${sgn(L)}`,L<0?dG:dR],['X','Draw',dX],['2',`${m.as} ${sgn(-L)}`,L<0?dR:dG]];if(away)row.reverse();
+ return `<section class="hc"><div class="hc-top"><b>${k.t}</b><div class="hc-tabs"><button class="hc-tab${away?'':' on'}" data-hct="h" aria-label="${m.h}"><img src="${IMG[f.hiImg]}" alt=""></button><button class="hc-tab${away?' on':''}" data-hct="a" aria-label="${m.a}"><img src="${IMG[f.aiImg]}" alt=""></button></div></div>
+ <div class="mkt soft hc-card"><div class="hc-step"><button data-hcs="-1" aria-label="Previous line"${i<=0?' disabled':''}>${CHEV}</button><b>${sgn(shown)}</b><button data-hcs="1" aria-label="Next line"${i>=list.length-1?' disabled':''}>${CHEV}</button></div>
+ <div class="clist" id="hcList">${row.map(([o,c,l])=>choiceBtn(m.id,'hc:'+L,o,{code:c,label:l,v:k.lines[L][{'1':0,'X':1,'2':2}[o]],stack:true})).join('')}</div></div></section>`;
+}
+function setHc(t,step){const k=mkt(S.fx,'hc');if(!k||!S.hc)return;
+ if(t){if(S.hc.t===t)return;S.hc.t=t}
+ if(step){const away=S.hc.t==='a',list=HC_LINES.map(x=>away?-x:x).sort((a,b)=>a-b),v=list[list.indexOf(away?-S.hc.l:S.hc.l)+step];if(v===undefined)return;S.hc.l=away?-v:v}
+ const y=$('#fxScroll').scrollTop;renderMkts();$('#fxScroll').scrollTop=y;soft($('#hcList'),RISE,T.std)} // the new line rises in, like a sub-tab of the competition page
 function marketHTML(m,k){
+ if(k.type==='hc')return hcHTML(m,k);
  let c='';const f=FX[m.id];
  if(k.type==='1x2')c=`<div class="who"><img src="${IMG[f.hiImg]}" alt=""><b>Who will win?</b><img src="${IMG[f.aiImg]}" alt=""></div><div class="o3">${[m.hs,'X',m.as].map((l,i)=>oddBtn(m.id,'1x2',String(i),l,m.o[i])).join('')}</div>`;
  if(k.type==='lines')c=`<div class="lhd"><span>over</span><span>under</span></div><div class="lrows">`+k.lines.map(([l,ov,un])=>`<div class="lrow"><span class="lv">${l}</span><span class="lo">${oddBtn(m.id,k.id+':'+l,'o','',ov,'only')}${oddBtn(m.id,k.id+':'+l,'u','',un,'only')}</span></div>`).join('')+'</div>';
@@ -1716,12 +1769,14 @@ function openFixture(mid){
  const sc=!!(m.live||m.ft);                             // started or finished: big white score instead of the kick-off time
  ft.textContent=sc?m.sh+' - '+m.sa:f.time;fd.textContent=m.live?m.min+'’':m.ft?'FT':f.date;ft.classList.toggle('sc',sc);fd.classList.toggle('lv',!!m.live);
  if(m.live)fd.dataset.min=m.id;else fd.removeAttribute('data-min');
- renderMkts(mid);
+ S.hc=null;renderMkts(mid);
  $('#fxScroll').scrollTop=0;$('#phone').classList.add('infx');$('#phone').classList.remove('fxs');
  $('#fx').classList.add('show');$('#fx').setAttribute('aria-hidden','false');S.fx=mid;hideToast();
 }
-function renderMkts(mid=S.fx){const m=M(mid),f=FX[mid];$('#mkts').innerHTML=LEGAL+f.markets.map(k=>marketHTML(m,k)).join('')+(m.ft?'':`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`)+
- (f.scorers?`<section class="gs"><div class="gs-h"><b>Goalscorer</b><span>In this match</span></div><div class="gs-row">${f.scorers.map(p=>`<div class="gs-card">${photoOf(p,p.img)}<b>${p.n}</b><span class="cl"><img src="${crest(p.cr)}" alt="">${p.team}</span>${oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only')}</div>`).join('')}</div></section>`:'')}
+/* C1: cut-out photos of the Goalscorer card (Figma has two); every other player gets the silhouette of the component */
+const GSC={mbappe:'gsc_mbappe',alvarez:'gsc_alvarez'};Object.assign(IMG,{gsc_mbappe:'assets/img/gsc_mbappe.png',gsc_alvarez:'assets/img/gsc_alvarez.png',gsc_none:'assets/img/gsc_none.png'}); // whole paths, so build.py inlines them
+function renderMkts(mid=S.fx){const m=M(mid),f=FX[mid];$('#mkts').innerHTML=LEGAL+f.markets.map(k=>marketHTML(m,k)).join('')+
+ (f.scorers?`<section class="gs"><div class="gs-h"><b>Goalscorer</b><span>In this match</span></div><div class="gs-row">${f.scorers.map(p=>`<div class="gs-card"><span class="gs-ph"><img src="${IMG[GSC[p.k]||'gsc_none']}" alt=""></span><b>${p.n}</b><span class="cl"><img src="${crest(p.cr)}" alt="">${p.team}</span>${oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only')}</div>`).join('')}</div></section>`:'')+(m.ft?'':`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`)} // U3: Goalscorer sits above "More bets", which closes the page
 function closeFixture(){$('#fx').classList.remove('show');$('#fx').setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},T.layout)}
 
 /* ---------- competition page · Odds tab (Figma section "Odds in Competition") ----------
@@ -1797,14 +1852,14 @@ const STATES=[
  {g:'Locked',k:'The only bet',v:'bar',n:'One pick and it is locked: the counter stays 1, the total shows a dash.',run(){S.sel=ONE();S.st['m1|1x2']='locked';refresh()}},
  {g:'Locked',k:'The only bet',v:'sheet',n:'A dash instead of the total, "Your selection is locked", the button is disabled.',run(){S.sel=ONE();S.st['m1|1x2']='locked';refresh();openSheet()}},
  {g:'Limit 20',k:'20 picks',v:'bar',n:'PRD · Maximum bets: at 20 selections the counter turns orange.',run(){fill20();refresh()}},
- {g:'Limit 20',k:'20 picks',v:'sheet',n:'The message is pinned above the button, so it is visible as soon as the sheet opens.',run(){fill20();refresh();openSheet()}},
+ {g:'Limit 20',k:'20 picks',v:'sheet',n:'20 selections in the sheet: the number is only in the header, “Betslip 20”. No extra message.',run(){fill20();refresh();openSheet()}},
  {g:'Limit 20',k:'Tap on a 21st odd',n:'Nothing is added and nothing is swapped. The odd presses and springs back slightly, an orange tongue slides out from behind the betslip and the counter pulses.',run(){fill20();refresh();toggleSel('m1','1x2','2')}},
- {g:'Limit 20',k:'Limit + suspended bet',n:'Both at once: the line under Total odds for the dropped bet and the limit message above the button.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet();toEnd()}},
+ {g:'Limit 20',k:'Limit + suspended bet',n:'20 selections and one of them suspended: the line under Total odds explains the dropped bet.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet();toEnd()}},
  {g:'Other screens',k:'Finished matches',n:'Yesterday (Sat 3 Jan in the calendar): last prices stay, everything is disabled, the outcome that happened is white.',run(){setDay('yest')}},
  {g:'Other screens',k:'Favourite team popup',n:'The favourite team plays today: its win is preselected, "Add to my Betslip" puts the pick in the bar.',run(){openFav()}},
  {g:'Other screens',k:'Fixture · Odds tab',n:'Pre-match markets of one match (tap its tile in the feed). Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
  {g:'Other screens',k:'Fixture · Live match',n:'Every match of the feed has its page. A live one shows the score and the minute, and only the markets that still make sense for the score.',run(){openFixture('m1')}},
- {g:'Other screens',k:'Fixture · Goalscorer',n:'Under the markets: a carousel of goalscorers. Every player is his own pick, so several can be in the betslip.',run(){openFixture('m4');setTimeout(()=>{const f=$('#fxScroll');f.scrollTop=f.scrollHeight},80)}},
+ {g:'Other screens',k:'Fixture · Goalscorer',n:'Under the markets, above “More bets”: a carousel of Goalscorer cards. Every player is his own pick, so several can be in the betslip; a picked card turns white.',run(){openFixture('m4');setTimeout(()=>{const f=$('#fxScroll');f.scrollTop=f.scrollHeight},80)}},
  {g:'Other screens',k:'Competition · Winner',n:'Odds tab of a competition (tap its header in the feed): who wins the season. One pick per market; it goes to the same betslip.',run(){openComp('ucl','win')}},
  {g:'Other screens',k:'Competition · Top scorer',n:'Second sub-tab: two Top Picks cards and the list of players. A picked Top Pick turns white as a whole.',run(){openComp('ucl','scorer')}}
 ];
@@ -1867,6 +1922,7 @@ document.addEventListener('click',e=>{
  const odd=e.target.closest('[data-g]');if(odd){if(!odd.classList.contains('locked'))toggleSel(odd.dataset.m,odd.dataset.g,odd.dataset.o);return}
  const rm=e.target.closest('[data-rm]');if(rm){removeSel(rm.dataset.rm);return}
  const card=e.target.closest('.tp,.sc-row,.cp-row,.gs-card');if(card){const o=card.querySelector('.odd');if(o&&!o.classList.contains('locked'))toggleSel(o.dataset.m,o.dataset.g,o.dataset.o);return} // the whole card picks its price
+ const hb=e.target.closest('[data-hct],[data-hcs]');if(hb){if(!hb.disabled)setHc(hb.dataset.hct,+hb.dataset.hcs||0);return}
  if(e.target.closest('#fxMore')){showToast(`Opens ${M(S.fx).h} vs ${M(S.fx).a} in DAZN Bet`,null,null,2500);return}
  const t=e.target.closest('.tile[data-fx]');if(t){openFixture(t.dataset.fx);return}
  const ch=e.target.closest('[data-cpt]');if(ch){setCompTab(ch.dataset.cpt);return}
