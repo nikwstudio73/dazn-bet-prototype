@@ -358,7 +358,7 @@ addEventListener('resize',()=>{if($('#grid').hidden)return;sizeCards();cards.for
  Curves (cubic-bezier) and springs. A spring is given by duration and bounce (as in SwiftUI and Motion) and is played
  as a real damped spring: its curve is sampled into a CSS linear() easing. */
 const EZ=[['linear','Linear',[0,0,1,1]],['in','Ease in',[.42,0,1,1]],['out','Ease out',[0,0,.58,1]],['inout','Ease in and out',[.42,0,.58,1]],['outback','Ease out back',[.34,1.56,.64,1]],
- ['soft','Soft landing (today, --soft)',[.32,.72,0,1]],['emph','Emphasised (Material)',[.2,0,0,1]]];
+ ['soft','Soft landing (today, --soft)',[.32,.72,0,1]],['emph','Emphasised',[.2,0,0,1]]];
 const SP=[['gentle','Gentle',{dur:500,bounce:.15}],['quick','Quick',{dur:300,bounce:.1}],['bouncy','Bouncy',{dur:450,bounce:.4}],['slow','Slow',{dur:800,bounce:0}],['spring','Custom spring',null]];
 const isSpring=e=>SP.some(x=>x[0]===e),ezName=e=>(EZ.find(x=>x[0]===e)||SP.find(x=>x[0]===e))[1],bezOf=m=>EZ.find(x=>x[0]===m.ease)[2];
 function springSamples(dur,b,N=48){const z=Math.max(.15,1-b),w=2*Math.PI/(Math.max(60,dur)/1000),T=Math.min(3,Math.log(1000)/(z*w)),pts=[];
@@ -388,12 +388,10 @@ const QS=[
   lp:1500,today:['Scale: 97% odds tile, 98% outcome and main button, 98.5% bar and cards.','Rows dim to 70% with a fade; small buttons dim to 60% at once.','Release: 0.12 s everywhere, 0.5 s on the betslip bar.'],
   fx:[{k:'scale',l:'Scale',min:.8,max:1,step:.005,fmt:pct,ends:['deeper','none']},{k:'op',l:'Opacity',min:.2,max:1,step:.05,fmt:pct,ends:['dimmer','none']}],
   presets:[{n:'Subtle',fx:{scale:.985,op:1},m:M('out',120)},
-   {n:'iOS-like',fx:{scale:.96,op:1},m:M('soft',320)},
+   {n:'Soft return',fx:{scale:.96,op:1},m:M('soft',320)},
    {n:'Bouncy',fx:{scale:.93,op:1},m:M('bouncy')},
    {n:'Dim only',fx:{scale:1,op:.55},m:M('out',180)},
-   {n:'Deep press',fx:{scale:.92,op:.85},m:M('quick')},
-   {n:'Snappy',fx:{scale:.97,op:1},m:M('out',90)},{n:'Soft',fx:{scale:.975,op:1},m:M('soft',480)},
-   {n:'Extra bouncy',fx:{scale:.9,op:1},m:M('spring',520,{bounce:.65})},{n:'Slow and heavy',fx:{scale:.94,op:.9},m:M('slow')}],
+   {n:'Deep press',fx:{scale:.92,op:.85},m:M('quick')}],
   durL:'Release',amtL:'Depth',amtV:p=>pct(p.fx.scale)+(p.fx.op<1?', dims to '+pct(p.fx.op):''),
   scope:'Duration and easing are the release; the press-in stays 0.12 s.',
   /* background and colour are the state group's: they keep its time (--m-quick) and its curve (--mg-state, set by that group).
@@ -407,8 +405,7 @@ const QS=[
   places:[PL('M09','Odd picked'),PL('M10','Top Pick card picked'),PL('M11','Odds switch: knob and colour'),PL('M12','LIVE badge'),PL('M15','Place bet on / off')],
   today:['0.2 s (--m-quick) everywhere.','Three curves: browser default, ease-out, --ease.','On the match page the text of an outcome switches at once.'],
   fx:[],presets:[{n:'Instant',fx:{},m:M('linear',0)},{n:'Quick',fx:{},m:M('out',120)},
-   {n:'Standard',fx:{},m:M('inout',200)},{n:'Smooth',fx:{},m:M('soft',380)},
-   {n:'Snappy',fx:{},m:M('out',80)},{n:'Slow',fx:{},m:M('inout',600)}],
+   {n:'Standard',fx:{},m:M('inout',200)},{n:'Smooth',fx:{},m:M('soft',380)}],
   springs:false,scope:'Colour and fill. It moves the shared 0.2 s time, so the fade of the bar, the toast and the price arrows follows it.',
   /* these all sit on --m-quick: the preview moves that token (the prototype's JS copy follows) and sets one curve.
      On elements that also have a press release, only background and colour get the curve */
@@ -418,8 +415,7 @@ const QS=[
   amt:(p,k)=>{p.fx.off=Math.min(48,Math.round(p.fx.off*k))},
   today:['Rises 5 px in 0.32 s on --soft.','Lists rise 8 px; day switch slides 20 px.'],
   fx:[{k:'off',l:'Offset',min:0,max:48,step:1,fmt:px,ends:['none','far']}],  presets:[{n:'Crossfade',fx:{off:0},m:M('out',200)},{n:'Small rise',fx:{off:5},m:M('soft',320)},
-   {n:'Big rise',fx:{off:14},m:M('soft',380)},{n:'Springy',fx:{off:10},m:M('bouncy')},
-   {n:'Quick tick',fx:{off:3},m:M('out',140)},{n:'Slide far',fx:{off:22},m:M('soft',460)},{n:'Bouncy',fx:{off:16},m:M('spring',500,{bounce:.55})}],
+   {n:'Big rise',fx:{off:14},m:M('soft',380)},{n:'Springy',fx:{off:10},m:M('bouncy')}],
   amtL:'Travel',amtV:p=>px(p.fx.off),
   scope:'The value that comes in. Its direction follows the price (up or down). The counter bump and the total pill are not changed.',
   /* only the 5 px rise of a new value is replaced (prices, totals, bar texts, a new list); other entrances of the prototype are left alone.
@@ -433,7 +429,7 @@ const QS=[
   lp:3600,today:['Tiles: 0.44 s on --soft, 32 ms apart.','Cards in Edit: 0.32 s, 45 ms apart.'],
   fx:[],delay:'Delay per item',
   presets:[{n:'All at once',fx:{},m:M('soft',440,{delay:0})},{n:'Quick ripple',fx:{},m:M('soft',300,{delay:20})},
-   {n:'Flowing',fx:{},m:M('soft',560,{delay:60})},{n:'Slow wave',fx:{},m:M('soft',720,{delay:110})},
+   {n:'Flowing',fx:{},m:M('soft',560,{delay:60})},
    {n:'Domino',fx:{},m:M('out',260,{delay:90})},{n:'Spring ripple',fx:{},m:M('gentle',0,{delay:40})}],
   amtL:'Gap',amtV:p=>p.m.delay+' ms',scope:'Odds under the tiles, and Edit mode: the × and the dimming of the cards.',
   /* Edit mode: the × (width, height, margin, opacity, transform, colour) and the rows that dim take the time and the curve; opacity never overshoots */
@@ -447,18 +443,16 @@ const QS=[
  {id:'sheets',t:'Sheets and overlays',
   places:[PL('M32','Betslip sheet'),PL('M34','Favourite-team popup'),PL('M37','DAZN Bet overlay'),PL('M31','Collapsed bar'),PL('M35','Toast')],
   lp:3400,today:['0.5 s (--m-sheet) on --soft for all of them.'],
-  fx:[],presets:[{n:'iOS sheet',fx:{},m:M('soft',500)},{n:'Material',fx:{},m:M('emph',300)},
-   {n:'Quick',fx:{},m:M('out',220)},{n:'Springy',fx:{},m:M('gentle')},{n:'Slow',fx:{},m:M('slow')},
-   {n:'Snappy spring',fx:{},m:M('quick')},{n:'Bouncy',fx:{},m:M('bouncy')},{n:'Even',fx:{},m:M('inout',400)}],
+  fx:[],presets:[{n:'Soft landing',fx:{},m:M('soft',500)},{n:'Firm',fx:{},m:M('emph',300)},
+   {n:'Quick',fx:{},m:M('out',220)},{n:'Springy',fx:{},m:M('gentle')},{n:'Even',fx:{},m:M('inout',400)}],
   scope:'How they travel. The fade of the bar and the toast stays on the 0.2 s time.',
   apply:(f,k)=>({css:`html .sheet,html .fvp,html .overlay{transition:transform ${k.t}ms ${k.e}}html .backdrop{transition:opacity ${k.t}ms ${k.flat}}html .bar{transition:transform ${k.t}ms ${k.e},opacity var(--m-quick) ease-out}html .toast{transition:opacity var(--m-quick) ease-out,transform ${k.t}ms ${k.e}}`,
    js:W=>W.eval('T.sheet='+k.t)})},
  {id:'pages',t:'Pages',
   places:[PL('M38','Match page'),PL('M39','Competition page')],
   lp:3400,today:['0.44 s (--m-layout) on --soft.','The betslip bar jumps to its new place without motion.'],
-  fx:[],presets:[{n:'iOS push',fx:{},m:M('soft',500)},{n:'Material',fx:{},m:M('emph',300)},
-   {n:'Quick',fx:{},m:M('out',220)},{n:'Springy',fx:{},m:M('gentle')},
-   {n:'Snappy spring',fx:{},m:M('quick')},{n:'Even',fx:{},m:M('inout',380)},{n:'Slow',fx:{},m:M('soft',720)}],
+  fx:[],presets:[{n:'Soft landing',fx:{},m:M('soft',500)},{n:'Firm',fx:{},m:M('emph',300)},
+   {n:'Quick',fx:{},m:M('out',220)},{n:'Springy',fx:{},m:M('gentle')},{n:'Even',fx:{},m:M('inout',380)}],
   scope:'The slide of the page. The betslip bar still jumps to its new place.',
   apply:(f,k)=>({css:`html .fx,html .cp{transition:transform ${k.t}ms ${k.e}}`,js:W=>W.eval('T.layout='+k.t)})}
 ];
@@ -479,22 +473,26 @@ let fromLink=false;
 try{const h=location.hash.match(/^#d=(.+)$/);if(h){const o=JSON.parse(decodeURIComponent(escape(atob(h[1]))));if(o&&o.dec){dec=o.dec;notes=o.notes||{};ex=o.ex||{};fromLink=true}}}catch(e){}
 /* Saved data and links are not trusted: a decision is kept only if it names a preset of its group and every value is a number
    inside the range of its slider. Anything else is dropped, so nothing foreign reaches the page or the prototype. */
+const LEGACY={press:5,state:4,swap:4,cascade:3,sheets:4,pages:4};   // how many presets from the start of each list kept their place
 const inRange=(v,a,b)=>typeof v==='number'&&isFinite(v)&&v>=a&&v<=b;
 function valid(q,d){
  if(!d||typeof d!=='object'||!Number.isInteger(d.i)||d.i<-1||d.i>=q.presets.length)return false;
+ if(d.i>=0){   // by name when it has one; a decision saved before names were kept is trusted only where the list did not move
+  if(typeof d.n==='string'&&d.n){const j=q.presets.findIndex(x=>x.n===d.n);if(j<0)return false;d.i=j}
+  else if(d.i>=(LEGACY[q.id]||0))return false;else d.n=q.presets[d.i].n}
  if(!Array.isArray(d.v)||d.v.length!==2||!d.v.every(x=>Number.isInteger(x)&&x>=-1&&x<STEP.length))d.v=[-1,-1];
  if(d.i<0){d.p=null;return true}
  const p=d.p,m=p&&p.m;if(!p||typeof p.fx!=='object'||!p.fx||typeof m!=='object'||!m)return false;
  if(!q.fx.every(f=>inRange(p.fx[f.k],f.min,f.max))||!EZ.concat(SP).some(x=>x[0]===m.ease)||!inRange(m.dur,0,2000)||!inRange(m.bounce,0,.8)||!inRange(m.delay,0,280))return false;
  d.p={fx:Object.fromEntries(q.fx.map(f=>[f.k,p.fx[f.k]])),m:{ease:m.ease,dur:m.dur,bounce:m.bounce,delay:m.delay}};return true}
 function sanitize(){const D={},E={},N={},obj=x=>x&&typeof x==='object'?x:{};dec=obj(dec);ex=obj(ex);notes=obj(notes);
- QS.forEach(q=>{if(valid(q,dec[q.id]))D[q.id]={i:dec[q.id].i,p:dec[q.id].p,v:dec[q.id].v};
-  const e=obj(ex[q.id]);for(const k in e)if(/^\d+$/.test(k)&&+k<q.places.length&&valid(q,e[k]))(E[q.id]=E[q.id]||{})[k]={i:e[k].i,p:e[k].p,v:e[k].v};
+ QS.forEach(q=>{if(valid(q,dec[q.id]))D[q.id]={i:dec[q.id].i,n:dec[q.id].n||'',p:dec[q.id].p,v:dec[q.id].v};
+  const e=obj(ex[q.id]);for(const k in e)if(/^\d+$/.test(k)&&+k<q.places.length&&valid(q,e[k]))(E[q.id]=E[q.id]||{})[k]={i:e[k].i,n:e[k].n||'',p:e[k].p,v:e[k].v};
   if(typeof notes[q.id]==='string'&&notes[q.id])N[q.id]=notes[q.id].slice(0,2000)});
  dec=D;ex=E;notes=N}
 let saved=true;   // false when the browser refused to store: the decisions then live only until the page is closed
 const save=()=>{try{localStorage.setItem('motionPresets5',JSON.stringify(dec));localStorage.setItem('motionExceptions',JSON.stringify(ex));localStorage.setItem('motionNotes',JSON.stringify(notes));saved=true}catch(e){saved=false}};
-const exOf=(q,n)=>ex[q.id]&&ex[q.id][n];
+const exOf=(q,n)=>ex[q.id]&&ex[q.id][n],savedFor=(q,n)=>exOf(q,n)||dec[q.id];
 const exList=q=>Object.keys(ex[q.id]||{}).map(k=>[q.places[+k],ex[q.id][k]]).filter(x=>x[0]);
 
 /* ---------- what is being tried ----------
@@ -519,7 +517,7 @@ function pick(i){const q=QS[qi];ps=i;va=vs=MID;pp=i<0?null:variant(q,i,MID,MID)}
 /* what the controls show for this animation: its own exception if it has one, else the group's preset, else Current */
 function loadTarget(){const q=QS[qi],d=exOf(q,pi)||dec[q.id];
  if(d&&d.i>=0){ps=d.i;pp=clone(d.p);[va,vs]=d.v||[-1,-1]}else pick(-1)}
-const nowDec=()=>({i:ps,p:pp?clone(pp):null,v:[va,vs]});
+const nowDec=()=>({i:ps,n:ps<0?'':QS[qi].presets[ps].n,p:pp?clone(pp):null,v:[va,vs]});
 const dropEx=()=>{const q=QS[qi];if(ex[q.id]){delete ex[q.id][pi];if(!Object.keys(ex[q.id]).length)delete ex[q.id]}};
 
 /* ---------- a decision in words ---------- */
@@ -569,9 +567,12 @@ let prT;const later=()=>{clearTimeout(prT);prT=setTimeout(()=>play(false),140)};
 /* ---------- screens ---------- */
 /* open a group on one of its animations; n = QS.length opens My decisions */
 function go(n,place=0){
- qi=Math.max(0,Math.min(QS.length,n));
+ const prev=qi;qi=Math.max(0,Math.min(QS.length,n));
  if(qi===QS.length){showSummary();return}
- pi=Math.max(0,Math.min(QS[qi].places.length-1,place));loadTarget();
+ /* An unsaved trial stays on while you move between the animations of one group, so a preset can be seen on all of them
+    before it is saved. It is dropped when you leave the group. Without a trial, an animation opens on what is saved for it */
+ const was=QS[prev],keep=prev===qi&&!!was&&!(savedFor(was,pi)?eqNow(savedFor(was,pi)):ps<0);
+ pi=Math.max(0,Math.min(QS[qi].places.length-1,place));if(!keep)loadTarget();
  $('#sum').hidden=true;$('#why').value=notes[QS[qi].id]||'';paint();play();   // the note belongs to the group
 }
 function showSummary(){
