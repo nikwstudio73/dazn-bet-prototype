@@ -1000,15 +1000,17 @@ div.choice{cursor:default}
 /* L2 · Live updates rebuilt (Figma "Live Updates with Odds" 4365:194526): the Live bet block on top, a feed without odds, the shot diagram in a goal card.
    L4 (owner 16.11, reverses L3): the Live bet block (header 4365:210691: warning, label, question, prices) stays pinned under the compact header; the feed scrolls under it.
    Its fill is fill/overlay-1 over the page colour, so nothing shows through. The glow stays only on goal cards. */
-.lu-top{position:sticky;top:calc(var(--sb) + 40px);z-index:2;overflow:hidden;margin:calc(-1*var(--spacing-12)) calc(-1*var(--spacing-16)) 0;padding:var(--spacing-16);display:flex;flex-direction:column;gap:20px;border-radius:0 0 var(--radius-12) var(--radius-12);background:linear-gradient(var(--fill-overlay-1),var(--fill-overlay-1)),var(--page);box-shadow:inset 0 -1px 0 var(--border-transparent-subtle)}
-/* the red glow of the frame is a turned ellipse (gradientTransform of 4365:194526 > header, 27 %): centre 109 / 11, half-axes 444.4 and 246.5, turned by 134.87deg on 375; the same transform on 440 gives the second set */
-.lu-top::before{content:"";position:absolute;left:109px;top:11px;width:888.8px;height:493px;margin:-246.5px 0 0 -444.4px;transform:rotate(134.87deg);pointer-events:none;background:radial-gradient(closest-side,rgba(209,36,36,0.270) 0.0%,rgba(198,36,36,0.253) 6.2%,rgba(186,36,36,0.236) 12.5%,rgba(175,36,36,0.219) 18.8%,rgba(164,36,36,0.203) 25.0%,rgba(152,36,37,0.186) 31.2%,rgba(141,36,37,0.169) 37.5%,rgba(129,36,37,0.152) 43.8%,rgba(118,36,37,0.135) 50.0%,rgba(107,35,37,0.118) 56.2%,rgba(95,35,37,0.101) 62.5%,rgba(84,35,37,0.084) 68.8%,rgba(72,35,38,0.068) 75.0%,rgba(61,35,38,0.051) 81.2%,rgba(50,35,38,0.034) 87.5%,rgba(38,35,38,0.017) 93.8%,rgba(27,35,38,0.000) 100.0%)}
-#stage.max .lu-top::before{left:127.9px;width:974px;height:528px;margin:-264px 0 0 -487px;transform:rotate(143.31deg)}
+.lu-top{position:sticky;top:calc(var(--sb) + 40px);z-index:2;overflow:hidden;margin:calc(-1*var(--spacing-12)) calc(-1*var(--spacing-16)) 0;padding:var(--spacing-16) 24px;display:flex;flex-direction:column;gap:20px;background:linear-gradient(var(--fill-overlay-1),var(--fill-overlay-1)),var(--surface-container-1)}
+/* block 4425:251722 (owner, 17.11): surface/container-1 + fill/overlay-1 + a red glow, 24 on the sides, square corners, no line under it, two prices.
+   The glow is a turned ellipse (its gradientTransform, 30 %): centre 97.5 / 45.4, half-axes 445.1 and 215.9, turned by 126.57deg on 375; the same transform on 440 gives the second set */
+.lu-top::before{content:"";position:absolute;left:97.5px;top:45.4px;width:890.2px;height:431.8px;margin:-215.9px 0 0 -445.1px;transform:rotate(126.57deg);pointer-events:none;background:radial-gradient(closest-side,rgba(209,36,36,0.300) 0.0%,rgba(198,36,36,0.281) 6.2%,rgba(186,36,36,0.263) 12.5%,rgba(175,36,36,0.244) 18.8%,rgba(164,36,36,0.225) 25.0%,rgba(152,36,37,0.206) 31.2%,rgba(141,36,37,0.188) 37.5%,rgba(129,36,37,0.169) 43.8%,rgba(118,36,37,0.150) 50.0%,rgba(107,35,37,0.131) 56.2%,rgba(95,35,37,0.112) 62.5%,rgba(84,35,37,0.094) 68.8%,rgba(72,35,38,0.075) 75.0%,rgba(61,35,38,0.056) 81.2%,rgba(50,35,38,0.037) 87.5%,rgba(38,35,38,0.019) 93.8%,rgba(27,35,38,0.000) 100.0%)}
+#stage.max .lu-top::before{left:114.4px;width:951.6px;height:473.8px;margin:-236.9px 0 0 -475.8px;transform:rotate(133.97deg)}
 .lu-top>*{position:relative}
-.lu-top .legal{margin-bottom:0}
+.lu-top .legal{margin:0 calc(-1*var(--spacing-8))} /* the banner keeps its 16 from the edges, wider than the 24 of the block */
 .lu-q{display:flex;flex-direction:column;gap:var(--spacing-4)}
 .lu-q span{height:20px;font-weight:700;font-size:12px;line-height:20px;letter-spacing:.01em;text-transform:uppercase;color:#f45a5a} /* DS Label, red tertiary: components/label/red/tertiary/text */
 .lu-q b{font-weight:700;font-size:18px;line-height:25px;color:var(--t1)}
+.lu-top .o3{gap:var(--spacing-8)}
 .lu-top .o3 .odd:not(.sel){background:var(--odd-bg)}
 .lu-feed{margin-bottom:calc(-1*var(--spacing-8))}
 .lu-card{margin-bottom:var(--spacing-8);border-radius:var(--radius-12);padding:calc(var(--spacing-16) + 1px) calc(var(--spacing-12) + 1px) calc(var(--spacing-12) + 1px);background:var(--fill-overlay-1);box-shadow:inset 0 0 0 1px var(--border-transparent-subtle)} /* Live/Event card */
@@ -2249,7 +2251,7 @@ function hideFixture(){$('#luNew').classList.remove('show');const fx=$('#fx');fx
 function closeFixture(){const t=topPage();t&&t.p==='fx'?pageBack():hideFixture()} // Back on a match page: to the page it was opened from (feed, league page, team page)
 
 /* ---------- fixture · Live updates tab ----------
- L2 · Figma "Live Updates with Odds" 4365:194526. On top the Live bet block: "Who scores the next goal?" with three prices (home, No goal, away);
+ L2 · Figma "Live Updates with Odds" 4365:194526. On top the Live bet block: "Who scores the next goal?" with two prices, home and away (block 4425:251722, owner 17.11);
  it stays pinned under the compact header while the feed scrolls under it (L4, owner 16.11; reverses L3). The feed has no odds: Commentary (minute + text), Event (goal, card, substitution) and Phase
  (half-time, full-time, kick-off). A goal card has the glow of its side and the diagram of the shot. The block exists only while the match is played.
  Motion (owner, 16.11): a new event comes in from the top and pushes the feed down; if the feed is scrolled away nothing moves and a pill
@@ -2323,7 +2325,7 @@ function liveHTML(m){
  const f=FX[m.id];
  if(!m.live&&!m.ft)return `<div class="cp-empty"><b>Live updates start at kick-off</b>${f.date}, ${f.time}</div>`;                     // not started: no events and no odds, so no legal texts either
  const nts=m.live&&mkt(m.id,'nts'),feed=luOf(m).filter(e=>!S.luKey||e.key).map(e=>luCard(m,e)).join('');
- return (nts?`<div class="lu-top">${LEGAL}<div class="lu-q"><span>Live bet</span><b>Who scores the next goal?</b></div><div class="o3">${[[m.hs,'h'],['No goal','n'],[m.as,'a']].map(([l,k],i)=>oddBtn(m.id,'nts',k,l,nts.opts[i].v)).join('')}</div></div>`:'')+
+ return (nts?`<div class="lu-top">${LEGAL}<div class="lu-q"><span>Live bet</span><b>Who scores the next goal?</b></div><div class="o3">${[[m.hs,'h'],[m.as,'a']].map(([l,k])=>oddBtn(m.id,'nts',k,l,nts.opts.find(o=>o.k===k).v)).join('')}</div></div>`:'')+ // two prices, home and away (block 4425:251722); "No goal" stays in the data, it is not offered
   `<div class="lu-seg"><button data-luk="0"${S.luKey?'':' class="on"'}>All</button><button data-luk="1"${S.luKey?' class="on"':''}>Key Events</button></div><div class="lu-feed" id="luFeed">${feed||LU_NONE}</div>`+
   (nts?'<div class="sgfoot">+18. Juega con responsabilidad. Publi.</div>':'');
 }
