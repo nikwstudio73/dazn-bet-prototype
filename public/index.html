@@ -451,7 +451,7 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .teams{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--tile-teams-gap)}
 .team{height:var(--team-h);display:flex;align-items:center;justify-content:space-between;gap:var(--team-gap)}
 .team .n{display:flex;align-items:center;gap:var(--team-name-gap);min-width:0;font-weight:700;font-size:var(--team-name-size);letter-spacing:var(--team-name-ls);line-height:18px;white-space:nowrap;color:var(--team-name-color)}
-.team .n img{width:var(--team-logo);height:var(--team-logo);flex:none}
+.team .n img{width:var(--team-logo);height:var(--team-logo);flex:none;object-fit:contain} /* T1: clubs that have only the crest without padding (not square) keep their proportions */
 .team .r{font-weight:700;font-size:var(--team-score-size);line-height:var(--team-score-lh);color:var(--team-score-color);min-width:7px;text-align:right}
 .tile.live .team .r,.tile.ft .team .r{color:var(--team-score-live-color);line-height:var(--team-score-live-lh);width:15px;text-align:center} /* score-wrap is 15 wide with a centred digit; the dash of a match that has not started hugs the right edge */
 .cta{flex:none;width:var(--tile-watch-w);height:var(--tile-main-h);border-left:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:9.5px var(--tile-watch-pad-r) 0 calc(var(--tile-watch-pad-l) - 1px);gap:12px}
@@ -858,7 +858,7 @@ div.choice{cursor:default}
 .comp[data-cp]{cursor:pointer}
 .cp{position:absolute;left:0;right:0;top:0;bottom:86px;z-index:6;background:#080e12;transform:translateX(100%);transition:transform var(--m-layout) var(--soft);display:flex;flex-direction:column;padding-top:var(--sb)}
 .cp.show{transform:none}
-#phone.incp .status{background:transparent;z-index:9}
+#phone.incp .status,#phone.intm .status{background:transparent;z-index:9}
 .cp-head{flex:none;height:72px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px}
 .cp-id{display:flex;align-items:center;gap:8px;min-width:0}
 .cp-back{flex:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
@@ -930,6 +930,43 @@ div.choice{cursor:default}
 .cp:not(.mt) .cp-cal{display:none}
 .cp-empty{padding:48px 0;text-align:center;font-size:12px;line-height:15px;letter-spacing:.01em;color:#c5c7ca}
 .cp-empty b{display:block;margin-bottom:var(--spacing-4);font-size:14px;line-height:18px;letter-spacing:.01em;color:#f9fafa}
+/* T1 · team page (#tm; not drawn in the new UI — the old frame 4309:169173 gives only what is on it and in which order).
+   It is the competition page's own markup, cloned in JS (buildTeamPage), so header, tabs, scroller and footer are the .cp-* rules above.
+   Only what a team page adds is here: the star, the block that stays under the tabs (legal banner + Matchday), the menus, the line above a tile. */
+.fx.left{transform:translateX(-100%)} /* a team page opened from a match page: the match page leaves to the left while the team page comes in from the right */
+.fx-team[data-team],.cp-row [data-team]{cursor:pointer}
+.fx-team[data-team]{transition:opacity var(--m-press)}
+.fx-team[data-team]:active,.cp-row [data-team]:active{opacity:.6}
+.tm .cp-tabs{margin:0;overflow-x:auto} /* Matches / Overview / Table / Squad / Team stats are wider than 375: the row scrolls, as on the old frame */
+.tm .cp-tabs span[data-tmv]{cursor:pointer}
+.tm-comp{cursor:pointer}
+.tm-comp[disabled]{cursor:default}
+.tm-comp[disabled] svg{display:none}
+.tm-star{flex:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
+.tm-star img{display:none;width:24px;height:24px}
+.tm-star.on img{display:block}
+.tm-star.on svg{display:none}
+.tm-star:active{opacity:.6}
+.tm-fix{flex:none;position:relative;z-index:2;padding:12px 16px 0}
+.tm-fix:empty{display:none}
+.tm-fix .legal{height:28px;margin-bottom:12px}
+.tm-dd{display:flex;align-items:center;justify-content:space-between;width:100%;color:#f9fafa}
+.tm-dd svg{flex:none;transition:transform var(--m-quick) var(--ease)}
+.tm-dd.open svg{transform:rotate(180deg)}
+.tm-menu{position:absolute;left:16px;right:16px;top:100%;z-index:3;margin-top:var(--spacing-4);padding:var(--spacing-4) 0;max-height:280px;overflow-y:auto;scrollbar-width:none;border-radius:var(--surface-size-radius-2xl);background:var(--surface-container-2);box-shadow:inset 0 0 0 1px #3d4549,var(--toast-shadow)}
+.tm-menu::-webkit-scrollbar{display:none}
+.tm-menu[hidden]{display:none}
+.tm-menu button{display:flex;align-items:center;justify-content:space-between;gap:var(--spacing-16);width:100%;height:44px;padding:0 var(--spacing-16);font-size:12px;line-height:15px;letter-spacing:.01em;color:#c5c7ca;white-space:nowrap}
+.tm-menu button b{font-weight:700;font-size:14px;line-height:18px}
+.tm-menu button.on b{color:#f9fafa}
+.tm-menu button:active{opacity:.6}
+.cp-name .tm-menu{left:0;right:auto;min-width:220px;margin-top:var(--spacing-8)}
+.tm-md{margin-bottom:20px}
+.tm-md:last-child{margin-bottom:0}
+.tm-cap{margin-bottom:var(--spacing-8)}
+.tm-cap b{display:block;font-weight:700;font-size:14px;line-height:18px;letter-spacing:.01em;color:#f9fafa}
+.tm-cap span{display:block;font-size:12px;line-height:15px;letter-spacing:.01em;color:#c5c7ca}
+.tm .cp-scroll{position:relative} /* the list measures its matchdays from the scroller */
 /* fixture · Goalscorer carousel under "More bets" (Figma 4199:155577, round photo) */
 .gs{display:flex;flex-direction:column;gap:12px}
 .gs-h b{display:block;font-weight:700;font-size:18px;line-height:25px;color:#fff}
@@ -1159,8 +1196,51 @@ const DAY_ADD={
  d6:[['ucl','psv','ars','18:45',4.50,3.90,1.72],['ucl','bar','bay','21:00',2.30,3.70,2.90],['ucl','liv','atm','21:00',1.70,3.90,4.75],['ucl','bvb','nap','21:00',2.00,3.60,3.60],['ucl','mci','inter','21:00',1.75,3.80,4.50]],
  d7:[['ucl','gal','vil','18:45',2.30,3.40,3.00],['ucl','psg','new','21:00',1.50,4.50,6.00],['ucl','rm','b04','21:00',1.55,4.33,5.50],['ucl','scp','che','21:00',3.10,3.50,2.25]],
  d8:[['uel','fey','bet','18:45',2.25,3.40,3.10],['uel','bol','aja','18:45',1.85,3.60,4.20],['uel','por','avl','21:00',2.60,3.30,2.70],['uel','nfo','rom','21:00',2.30,3.30,3.10],['uel','ol','fen','21:00',1.95,3.60,3.70]]};
-const OTHER=()=>Object.entries(DAY_ADD).flatMap(([dk,rows])=>{const lab=DAYS.find(d=>d[0]===dk)[1];
- return rows.map((r,i)=>mkM(dk+'_'+i,r,{dk,day:lab,when:r[3].includes('-')?'':lab+', '+r[3]}))}); // when: the line on a betslip card
+const OTHER=()=>[...Object.entries(DAY_ADD).flatMap(([dk,rows])=>{const lab=DAYS.find(d=>d[0]===dk)[1];
+ return rows.map((r,i)=>mkM(dk+'_'+i,r,{dk,day:lab,when:r[3].includes('-')?'':lab+', '+r[3]}))}),...tmRows().map(([id,r,x])=>mkM(id,r,x))]; // when: the line on a betslip card
+/* T1 · team page: matches outside the eight days of the calendar, so that every team has a list of four or more.
+   They are in no feed and on no league page (no dk), only on team pages; picks, match pages and the betslip treat them as any other match.
+   CLUBS: the clubs of a competition that have a crest. PWR: strength of a club, 60–92; the 1X2 prices of an added match follow from it
+   (home advantage, 6 % margin, bookmaker rounding), and so does the score of a finished one — the same numbers on every load, nothing is random.
+   TM_ROUNDS: per competition [days of the added finished rounds, days of the added coming rounds, turns of the round-robin]. The turns are picked so that
+   no added match repeats a pairing of the calendar and every club gets four matches or more. Cups have no coming rounds: the league phase ends inside
+   the calendar (Conference League: before it, so its clubs without a domestic league here have no match to come). */
+Object.assign(TEAMS,{juv:['Juventus','JUV'],az:['AZ Alkmaar','AZ'],sha:['Shakhtar Donetsk','SHA'],aek:['AEK Athens','AEK'],twe:['FC Twente','TWE'],slo:['Slovan Bratislava','SLO'],lask:['LASK','LAS'],vik:['Viking','VIK']});
+const CLUBS={laliga:['bar','rm','atm','vil','bet','ath','val'],
+ pl:['new','liv','ars','mci','che','mun','tot','avl','bha','nfo','cry','eve','ful','bre','bou'],
+ seriea:['inter','nap','mil','juv','rom','ata','bol','laz','fio','com','tor','udi','par','lec'],
+ bundes:['bay','bvb','b04','rbl','stu','sge','scf','tsg','svw','bmg','m05','fcu'],
+ ligue1:['psg','om','asm','los','rcl','ol'],
+ ucl:['rm','psg','bay','mci','ars','liv','bar','inter','che','atm','bvb','nap','b04','new','juv','scp','vil','psv','gal','brg'],
+ uel:['laz','ol','avl','rom','por','bet','nfo','fen','bol','fey','aja'],
+ uecl:['cry','fio','m05','az','sha','aek','twe','slo','lask','vik']};
+const PWR={rm:92,bar:91,atm:84,ath:78,vil:78,bet:75,val:70,liv:90,ars:90,mci:89,che:84,new:81,avl:80,mun:79,tot:79,bha:76,nfo:75,cry:75,bou:74,ful:73,bre:73,eve:72,
+ inter:87,nap:85,mil:82,juv:82,rom:80,ata:80,laz:77,bol:76,fio:75,com:73,tor:70,udi:69,par:67,lec:66,bay:92,bvb:83,b04:83,rbl:82,stu:78,sge:78,scf:75,tsg:73,svw:72,m05:72,bmg:71,fcu:70,
+ psg:92,om:80,asm:79,ol:77,los:77,rcl:75,scp:79,psv:78,por:78,gal:77,fen:76,fey:75,brg:74,aja:74,az:72,sha:72,aek:70,twe:69,slo:64,lask:64,vik:63};
+const TM_ROUNDS={laliga:[['Sat 13 Dec','Sat 20 Dec'],['Sat 10 Jan','Sat 17 Jan'],[0,3,4,5]],pl:[['Sat 13 Dec','Sat 20 Dec'],['Sat 10 Jan','Sat 17 Jan'],[3,4,5,7]],
+ seriea:[['Sun 14 Dec','Sun 21 Dec'],['Sun 11 Jan','Sun 18 Jan'],[1,3,5,6]],bundes:[['Sat 13 Dec','Sat 20 Dec'],['Sat 10 Jan','Sat 17 Jan'],[0,6,7,8]],ligue1:[['Sun 14 Dec','Sun 21 Dec'],['Sun 11 Jan'],[0,2,4]],
+ ucl:[['Tue 21 Oct','Tue 4 Nov','Tue 25 Nov','Tue 9 Dec'],[],[3,6,8,10]],uel:[['Thu 6 Nov','Thu 27 Nov','Thu 11 Dec'],[],[3,6,7]],uecl:[['Thu 23 Oct','Thu 6 Nov','Thu 27 Nov','Thu 18 Dec'],[],[0,1,2,3]]};
+const TM_KO=['14:00','16:15','18:30','21:00'],TM_SC=[['1-0','2-0','2-1','3-1','3-0'],['1-1','0-0','2-2'],['0-1','1-2','0-2','1-3']];
+let TM_ROWS;
+/* one round of a round-robin (circle method): the first club stays, the others turn; with an odd number of clubs one of them rests */
+function tmRows(){
+ if(TM_ROWS)return TM_ROWS;TM_ROWS=[];
+ const hash=s=>{let h=0;for(const c of s)h=(h*131+c.charCodeAt(0))%1000003;return h*7919%1000/1000}; // a fixed number 0…1 for a text
+ for(const [comp,[past,next,turns]] of Object.entries(TM_ROUNDS)){
+  const cl=CLUBS[comp],fix=cl.length%2?null:cl[0],turn=fix?cl.slice(1):cl,n=turn.length+1;
+  [...past,...next].forEach((day,r)=>{
+   const row=[fix,...turn.map((_,i)=>turn[(i+turns[r])%turn.length])];
+   for(let i=0;i<n/2;i++){
+    let h=row[i],a=row[n-1-i];if(!h||!a)continue;if((r+i)%2)[h,a]=[a,h];
+    const e=1/(1+Math.pow(10,-(PWR[h]-PWR[a]+3)/28)),px=.25*(1-(2*e-1)**2)+.04,p=[e*(1-px),px,(1-e)*(1-px)],id='t'+comp+r+'_'+i,ft=r<past.length;
+    const u=hash(id+h+a),res=u<p[0]?0:u<p[0]+px?1:2,sc=TM_SC[res],ko=TM_KO[(i+r)%4];
+    TM_ROWS.push([id,[comp,h,a,ft?sc[Math.floor(hash(a+id)*sc.length)]:ko,...p.map(priceOf)],{day,ord:ft?r-10:20+r,when:ft?'':day+', '+ko}]);
+   }
+  });
+ }
+ return TM_ROWS;
+}
+Object.assign(IMG,{t_juv:'assets/img/juv.svg'});
 /* matches outside the feed: only for the "Fill betslip to 20" scenario (cards and bar need names and prices, no crests) */
 const EXTRA=[['Leverkusen','Stuttgart','Tomorrow, 15:30',1.28],['Real Sociedad','Girona','Tomorrow, 14:00',1.42],['Sporting CP','Braga','Tomorrow, 21:15',1.33],['Celtic','Rangers','Tomorrow, 13:30',1.57],
  ['Monaco','Lille','Tomorrow, 17:00',1.38],['Lyon','Marseille','Tomorrow, 20:45',1.44],['Ajax','Feyenoord','Tomorrow, 14:30',1.52],['Benfica','Porto','Today, 21:15',1.65],
@@ -1195,7 +1275,8 @@ const COMPS={ucl:{t:'UEFA Champions League',m:'League phase · Matchday 7',img:'
  pl:{t:'England · Premier League',m:'Matchday 20',img:'pl',fx:['England ・Premier League','Premier League']},
  seriea:{t:'Italy · Serie A',m:'Matchday 18',img:'seriea',fx:['Italy ・Serie A','Serie A']},
  bundes:{t:'Germany · Bundesliga',m:'Matchday 16',img:'bundes',fx:['Germany ・Bundesliga','Bundesliga']},
- ligue1:{t:'France · Ligue 1',m:'Matchday 17',img:'ligue1',fx:['France ・Ligue 1','Ligue 1']}};
+ ligue1:{t:'France · Ligue 1',m:'Matchday 17',img:'ligue1',fx:['France ・Ligue 1','Ligue 1']},
+ uecl:{t:'UEFA Conference League',m:'League phase · Matchday 6',img:'uecl',fx:['UEFA ・Conference League','UEFA Conference League']}}; // T1: no match in the calendar, so no group in the feed; its matches are on team pages only
 /* Odds tab content (pre-match, mirrors Figma "Odds tab" examples). 1X2 prices live in match.o so feed and Odds tab stay in sync. */
 const FX={m4:{league:'Spain ・LA Liga',comp:'LA Liga EA Sports',hiImg:'rmfx',aiImg:'atmfx',time:'18:00',date:'Today',markets:[
  {id:'1x2',t:'Match Results',type:'1x2',glow:true},
@@ -1338,7 +1419,7 @@ const STARS={rm:['mbappe','Kylian Mbappe','gs_mbappe'],psg:['dembele','Ousmane D
  sge:['burkardt','Jonathan Burkardt'],svw:['schmid','Romano Schmid'],scf:['grifo','Vincenzo Grifo'],fcu:['ilic','Andrej Ilić'],tsg:['kramaric','Andrej Kramarić'],
  bmg:['kleindienst','Tim Kleindienst'],m05:['amiri','Nadiem Amiri'],om:['greenwood','Mason Greenwood'],ol:['fofana','Malick Fofana'],asm:['balogun','Folarin Balogun'],
  los:['giroud','Olivier Giroud'],rcl:['thauvin','Florian Thauvin'],por:['samu','Samu Aghehowa'],fen:['ennesyri','Youssef En-Nesyri'],fey:['ueda','Ayase Ueda'],
- aja:['weghorst','Wout Weghorst']};
+ aja:['weghorst','Wout Weghorst'],juv:['vlahovic','Dušan Vlahović']};
 function starScorers(m,p1,p2){
  const a=STARS[m.hi],b=STARS[m.ai];if(m.ft||!a||!b)return null;
  return [[a,m.hi,p1],[b,m.ai,p2]].map(([[k,n,img],cr,p])=>({k,n,team:TEAMS[cr][0],img:img||null,cr,v:priceOf(.22+.38*p)}));
@@ -1394,7 +1475,7 @@ function won(m,g,o){
 }
 let S;
 /* st: dropped-out picks {"match|market":'suspended'|'locked'}; lk: locked odds in the feed ["match|market|outcome"]; day: a key of DAYS; more: the matches of the days other than today and Sat 3 Jan */
-function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fav:false,cp:null,cpTab:'win',cpView:'odds',cpDay:'today',cpLive:false}} // cpView / cpDay / cpLive: tab, day and LIVE filter of the competition page (R2)
+function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fav:false,cp:null,cpTab:'win',cpView:'odds',cpDay:'today',cpLive:false,stack:[],tm:null,tmMenu:null,stars:[]}} // cpView / cpDay / cpLive: tab, day and LIVE filter of the competition page (R2)
 const $=s=>document.querySelector(s);
 const M=id=>S.matches.find(m=>m.id===id)||S.ft.find(m=>m.id===id)||S.more.find(m=>m.id===id)||OUT[id];
 const f2=n=>n.toFixed(2);
@@ -1416,8 +1497,8 @@ function tileHTML(m){
  return `<div class="tile${m.live?' live':''}${m.ft?' ft':''}${S.oddsOn?' odds':''}" data-tile="${m.id}"${FX[m.id]?` data-fx="${m.id}"`:''}>
   <div class="trow"><div class="tmain">${col}
    <div class="teams">
-    <div class="team"><div class="n"><img src="${IMG[m.hi]}" alt="">${m.h}</div><div class="r" data-sh="${m.id}">${r(m.sh)}</div></div>
-    <div class="team"><div class="n"><img src="${IMG[m.ai]}" alt="">${m.a}</div><div class="r" data-sa="${m.id}">${r(m.sa)}</div></div>
+    <div class="team"><div class="n"><img src="${IMG[m.hi]||crest(m.hi)}" alt="">${m.h}</div><div class="r" data-sh="${m.id}">${r(m.sh)}</div></div>
+    <div class="team"><div class="n"><img src="${IMG[m.ai]||crest(m.ai)}" alt="">${m.a}</div><div class="r" data-sa="${m.id}">${r(m.sa)}</div></div>
    </div></div>
    <div class="cta"><div class="pc"><img src="${IMG.play}" alt=""></div><span>Watch</span></div>
   </div>
@@ -1649,8 +1730,9 @@ let toastT;
 function showToast(text,btn,fn,ms=5000){
  $('#toastText').textContent=text;const b=$('#toastBtn');b.style.display=btn?'':'none';b.textContent=btn||'';b.onclick=()=>{hideToast();fn&&fn()};
  // same place as the collapsed bar: 10px above the nav in the feed (96 in the frame; on a phone the nav follows the real bottom inset), 24px on the fixture page
- const base=S.fx?24:$('.navbar').offsetHeight+10,barOn=$('#bar').classList.contains('show');
- $('#toast').style.bottom=S.sheet?'110px':(barOn?base+77:base+(S.fx?0:4))+'px'; // no bar: the toast sits 100 above the bottom, as on the Undo screen
+ const tp=topPage(),onFx=!!tp&&tp.p==='fx';   // T1: a match page lying under a team page does not count, the bar is above the nav there
+ const base=onFx?24:$('.navbar').offsetHeight+10,barOn=$('#bar').classList.contains('show');
+ $('#toast').style.bottom=S.sheet?'110px':(barOn?base+77:base+(onFx?0:4))+'px'; // no bar: the toast sits 100 above the bottom, as on the Undo screen
  $('#toast').classList.add('show');clearTimeout(toastT);toastT=setTimeout(hideToast,ms);
 }
 function hideToast(){$('#toast').classList.remove('show')}
@@ -1797,23 +1879,31 @@ function marketHTML(m,k){
  if(k.type==='dnb')c=`<div class="who"><img src="${IMG[f.hiImg]}" alt=""><b>Who will win?</b><img src="${IMG[f.aiImg]}" alt=""></div><div class="o3">${k.opts.map((x,i)=>oddBtn(m.id,k.id,x.k,i?m.as:m.hs,x.v)).join('')}</div>`;
  return `<section class="mkt ${k.powered||k.glow?'glow':'soft'}"><div class="mkt-h"><div><b>${k.t}</b>${k.sub?`<small>${k.sub}</small>`:''}</div>${k.powered?`<div class="pwr">powered by<img src="${IMG.dznbet}" alt="DAZN Bet"></div>`:''}</div><div class="mkt-c">${c}</div></section>`;
 }
-function openFixture(mid){
- const m=M(mid),f=FX[mid];if(!f)return;
+/* fills the match page (T1: openFixture() puts it on screen and on the stack of pages) */
+function drawFixture(mid){
+ const m=M(mid),f=FX[mid];
  $('#fxLeague').textContent=f.league;$('#fxH').textContent=m.h;$('#fxA').textContent=m.a;$('#fxHi').src=IMG[f.hiImg];$('#fxAi').src=IMG[f.aiImg];$('#fxComp').textContent=f.comp;$('#fxCompImg').src=IMG[f.compImg||'laliga'];
  $('#fxTitle').textContent=m.h+' vs '+m.a;
  const ft=$('#fxTime'),fd=$('#fxDate');                 // kick-off time and day; a live match shows the score and the running minute
  const sc=!!(m.live||m.ft);                             // started or finished: big white score instead of the kick-off time
  ft.textContent=sc?m.sh+' - '+m.sa:f.time;fd.textContent=m.live?m.min+'’':m.ft?'FT':f.date;ft.classList.toggle('sc',sc);fd.classList.toggle('lv',!!m.live);
  if(m.live)fd.dataset.min=m.id;else fd.removeAttribute('data-min');
- S.hc=null;renderMkts(mid);
- $('#fxScroll').scrollTop=0;$('#phone').classList.add('infx');$('#phone').classList.remove('fxs');
- $('#fx').classList.add('show');$('#fx').setAttribute('aria-hidden','false');S.fx=mid;hideToast();
+ [['#fxHi',m.hi],['#fxAi',m.ai]].forEach(([q,k])=>{const b=$(q).parentNode;if(TEAMS[k]){b.dataset.team=k;b.dataset.tc=m.comp}else b.removeAttribute('data-team')}); // T1: crest and name open the team page
+ S.hc=null;renderMkts(mid);$('#fxScroll').scrollTop=0;$('#phone').classList.remove('fxs');S.fx=mid;
+}
+function openFixture(mid){
+ if(!FX[mid])return;const fx=$('#fx'),t=topPage();
+ if(t&&t.p==='fx')S.stack.pop();                                                        // a match page over a match page: it takes its place
+ else if(fx.classList.contains('show'))snap(fx,()=>fx.classList.remove('show','left')); // the element lies left of the screen with an earlier match: it comes in again from the right
+ drawFixture(mid);S.stack.push({p:'fx',id:mid});teamMenu(null);
+ $('#phone').classList.add('infx');fx.classList.add('show');fx.setAttribute('aria-hidden','false');hideToast();
 }
 /* C1: cut-out photos of the Goalscorer card (Figma has two); every other player gets the silhouette of the component */
 const GSC={mbappe:'gsc_mbappe',alvarez:'gsc_alvarez'};Object.assign(IMG,{gsc_mbappe:'assets/img/gsc_mbappe.png',gsc_alvarez:'assets/img/gsc_alvarez.png',gsc_none:'assets/img/gsc_none.png'}); // whole paths, so build.py inlines them
 function renderMkts(mid=S.fx){const m=M(mid),f=FX[mid];$('#mkts').innerHTML=LEGAL+f.markets.map(k=>marketHTML(m,k)).join('')+
  (f.scorers?`<section class="gs"><div class="gs-h"><b>Goalscorer</b><span>In this match</span></div><div class="gs-row">${f.scorers.map(p=>`<div class="gs-card"><span class="gs-ph"><img src="${IMG[GSC[p.k]||'gsc_none']}" alt=""></span><b>${p.n}</b><span class="cl"><img src="${crest(p.cr)}" alt="">${p.team}</span>${oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only')}</div>`).join('')}</div></section>`:'')+(m.ft?'':`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`)} // U3: Goalscorer sits above "More bets", which closes the page
-function closeFixture(){$('#fx').classList.remove('show');$('#fx').setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},T.layout)}
+function hideFixture(){const fx=$('#fx');fx.classList.contains('left')?snap(fx,()=>fx.classList.remove('show','left')):fx.classList.remove('show');fx.setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},T.layout)}
+function closeFixture(){const t=topPage();t&&t.p==='fx'?pageBack():hideFixture()} // Back on a match page: to the page it was opened from (feed, league page, team page)
 
 /* ---------- competition page · Odds tab (Figma section "Odds in Competition") ----------
  Opens from the competition header in the feed (competitions listed in CP). Sub-tabs are chips; Competition winner and Top scorer are designed.
@@ -1822,8 +1912,9 @@ function compHTML(id){
  const c=CP[id],tab=S.cpTab==='rel'&&!c.rel?'win':S.cpTab;   // the Relegation sub-tab was open and this competition has none: Competition winner
  const chips=[['win','Competition winner'],['scorer','Top scorer'],['rel','Relegation']].filter(([k])=>k!=='rel'||c.rel).map(([k,l])=>`<button class="cp-chip${k===tab?' on':''}" data-cpt="${k}">${l}</button>`).join('');
  const club=p=>`<img src="${crest(p.cr)}" alt="">${p.team}`;
+ const tl=k=>TEAMS[k]?` data-team="${k}" data-tc="${id}"`:'';   // T1: crest and name open the team page; the rest of the row still picks the price
  const body=tab!=='scorer'
-  ?`<div class="cp-table">${c[tab].map(([k,n,v],i)=>`<div class="cp-row"><span class="rk">${i+1}</span><span class="cr"><img src="${crest(k)}" alt=""></span><span class="nm">${n}</span>${oddBtn(id,tab,k,'',v,'only')}</div>`).join('')}</div>`
+  ?`<div class="cp-table">${c[tab].map(([k,n,v],i)=>`<div class="cp-row"><span class="rk">${i+1}</span><span class="cr"${tl(k)}><img src="${crest(k)}" alt=""></span><span class="nm"><span${tl(k)}>${n}</span></span>${oddBtn(id,tab,k,'',v,'only')}</div>`).join('')}</div>`
   :`<div class="cp-h">Top Picks</div><div class="tps">${c.picks.map((p,i)=>`<div class="tp"><div class="tp-in"><div class="tp-top"><i>0${i+1}</i>${photoOf(p)}</div><span>${p.f}</span><b>${p.l}</b><div class="tp-club">${club(p)}</div></div>${oddBtn(id,'scorer',p.k,'',p.v,'only')}</div>`).join('')}</div>
    <div class="sc-list">${c.scorers.map(p=>`<div class="sc-row">${photoOf(p)}<div class="tx"><b>${p.n}</b><span>${club(p)}</span></div>${oddBtn(id,'scorer',p.k,'',p.v,'only')}</div>`).join('')}</div>`;
  return LEGAL+`<div class="cp-chips">${chips}</div><div id="cpBody">${body}</div><div class="cp-foot">+18. Juega con responsabilidad. Publi.</div>`;
@@ -1837,7 +1928,7 @@ function compMatchesHTML(id){
 }
 function renderComp(){if(!S.cp)return;$('#cpScroll').innerHTML=S.cpView==='matches'?compMatchesHTML(S.cp):compHTML(S.cp)}
 function openComp(id,tab){
- const c=CP[id];if(!c)return;if(S.fav)closeFav();closeFixture();
+ const c=CP[id];if(!c)return;if(S.fav)closeFav();closePages();
  S.cp=id;if(tab)S.cpTab=tab;S.cpView='odds';S.cpDay=S.day;S.cpLive=false;$('#cp').classList.remove('mt');$('#cpLive').classList.remove('on'); // the page opens on Odds; Matches starts on the day of the feed
  $('#cpLogo').src=IMG[c.img];$('#cpName').textContent=c.t;$('#cpSeason').textContent=c.season;
  const tb=$('#cpTabs');tb.classList.toggle('w5',c.tabs.includes('Playoff'));tb.innerHTML=c.tabs.map(t=>`<span${t==='Odds'?' class="on" data-cpv="odds"':t==='Matches'?' data-cpv="matches"':''}>${t}</span>`).join(''); // R2: Matches and Odds switch, the other tabs are labels
@@ -1857,11 +1948,131 @@ function setCpDay(d,live=false){
 }
 function setCompTab(t){if(S.cpTab===t)return;S.cpTab=t;renderComp();$('#cpScroll').scrollTop=0;soft($('#cpBody'),RISE,T.std)} // the new list rises in, like the LIVE filter in the feed
 
+/* ---------- T1 · team page (#tm) ----------
+ Opens from the crest or the name of a team: in the header of a match page and in the Competition winner / Relegation tables of a league page.
+ The page is the competition page's markup (cloned once, ids cp… -> tm…): back, crest, name, competition + season (a menu when the team plays in
+ more than one), a star, the tabs Matches / Overview / Table / Squad / Team stats (the first two switch).
+ Matches: the team's matches in the chosen competition, oldest first, each under a line with its matchday and day; the tiles are the feed's own
+ tileHTML(), so prices, picks and live changes are the same objects as everywhere else. The Matchday menu brings the list to a matchday; the list
+ starts at the match being played or the next one. The legal banner stays under the tabs with the menu, because the list starts scrolled.
+ Overview: the tab switches; its content is task T2. */
+const DAY_I=Object.fromEntries(DAYS.map((d,i)=>[d[0],i]));
+const ordOf=m=>m.ord!==undefined?m.ord:m.dk?DAY_I[m.dk]:m.ft?DAY_I.yest:DAY_I.today;   // place of a match in time: added finished rounds < the days of the calendar < added coming rounds
+const dayOf=m=>m.day||(m.ft?DAYS[DAY_I.yest][1]:'Today');
+/* matches of a team, oldest first; comp: only this competition. "Sat 3 Jan" repeats six matches of today for the Finished matches screen: a team does not play the same match twice */
+function teamMatches(k,comp){
+ const today=S.matches.filter(m=>!m.hid),rep=m=>today.some(t=>t.comp===m.comp&&t.hi===m.hi&&t.ai===m.ai);
+ return [...S.ft.filter(m=>!rep(m)),...today,...S.more].filter(m=>(m.hi===k||m.ai===k)&&(!comp||m.comp===comp))
+  .sort((a,b)=>ordOf(a)-ordOf(b)||(b.live?1:0)-(a.live?1:0)||(a.ko||'').localeCompare(b.ko||''));
+}
+/* the same list with matchday numbers: today's match carries the matchday of the feed (COMPS), the others count from it one by one */
+function teamList(k,comp){
+ const ms=teamMatches(k,comp),N=+COMPS_MD[comp];let i0=ms.findIndex(m=>ordOf(m)===DAY_I.today),n0=N;
+ if(i0<0){i0=ms.findIndex(m=>!m.ft);n0=N+1}
+ if(i0<0){i0=ms.length-1;n0=N-1}
+ return ms.map((m,i)=>({m,md:n0+i-i0}));
+}
+const COMPS_MD={};Object.entries(COMPS).forEach(([k,c])=>COMPS_MD[k]=+c.m.match(/\d+/)[0]);COMPS_MD.uecl++; // matchday of today per competition. Conference League: the league phase (6 matchdays) is over, its last match is Matchday 6
+const teamComps=k=>Object.keys(CLUBS).filter(c=>CLUBS[c].includes(k)&&teamMatches(k,c).length);   // domestic league first, then the cups
+const CHEV_D='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5 6.5 8 10l3.5-3.5" stroke="#F9FAFA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const FOOT18='<div class="cp-foot">+18. Juega con responsabilidad. Publi.</div>';
+const capHTML=(t,s)=>`<div class="tm-cap"><b>${t}</b><span>${s}</span></div>`;
+function buildTeamPage(){
+ const tm=$('#cp').cloneNode(true);tm.id='tm';tm.classList.add('tm');
+ tm.querySelectorAll('[id]').forEach(e=>e.id=e.id.replace(/^cp/,'tm'));
+ const fix=document.createElement('div');fix.className='tm-fix';fix.id='tmFix';tm.querySelector('.cp-cal').replaceWith(fix);
+ const star=document.createElement('button');star.className='tm-star';star.id='tmStar';star.setAttribute('aria-label','Favourite');
+ star.innerHTML='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3.2 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1-5.4-3-5.4 3 1.1-6.1-4.5-4.3 6.1-.8L12 3.2Z" stroke="#F9FAFA" stroke-width="1.5" stroke-linejoin="round"/></svg><img src="assets/img/star.png" alt="">';
+ tm.querySelector('.fx-follow').replaceWith(star);
+ const sub=tm.querySelector('.cp-name>span');sub.classList.add('tm-comp');sub.dataset.tmm='comp';
+ const menu=document.createElement('div');menu.className='tm-menu';menu.id='tmCompMenu';menu.hidden=true;tm.querySelector('.cp-name').append(menu);
+ $('#cp').after(tm);
+}
+function teamMatchesHTML(e){
+ return `<div id="tmList">${teamList(e.id,e.comp).map(({m,md})=>`<div class="tm-md" data-md="${md}">${capHTML('Matchday '+md,dayOf(m))}${tileHTML(m)}</div>`).join('')}</div>`+(S.oddsOn?FOOT18:'<div class="cp-foot"></div>');
+}
+function renderTeam(){
+ const e=S.tm;if(!e)return;const mt=e.tab==='matches';if(S.tmMenu==='md')teamMenu(null);
+ $('#tmFix').innerHTML=mt?(S.oddsOn?LEGAL:'')+`<button class="cp-chip tm-dd" id="tmMdBtn" data-tmm="md"><span id="tmMdT"></span>${CHEV_D}</button><div class="tm-menu" id="tmMdMenu" hidden></div>`:'';
+ const sc=$('#tmScroll'),y=sc.scrollTop;sc.innerHTML=mt?teamMatchesHTML(e):'';sc.scrollTop=y;   // a re-render (a pick, a price) keeps the place in the list
+ if(mt)syncMd();
+}
+/* the matchday at the top of the list -> the label of the Matchday menu */
+function mdNow(){const sc=$('#tmScroll');let el=null;
+ sc.querySelectorAll('.tm-md').forEach(g=>{if(!el&&g.offsetTop+g.offsetHeight>sc.scrollTop+12)el=g});return el}
+function syncMd(pick){const el=$('#tmMdT'),sc=$('#tmScroll'),g=el&&mdNow();if(!g)return;let md=+g.dataset.md;
+ if(pick!==undefined)S.tm.md=pick;
+ if(sc.scrollHeight-sc.clientHeight-sc.scrollTop<2&&S.tm.md>md)md=S.tm.md;else S.tm.md=md;   // the end of the list: a late matchday cannot reach the top, the label keeps the one that was picked
+ el.textContent='Matchday '+md}
+/* bring the list to a matchday. The scroller jumps and the list travels the same distance back (the way the calendar brings a day into place), over --m-layout with --soft */
+function toMd(md,anim){
+ const sc=$('#tmScroll'),g=sc.querySelector(`.tm-md[data-md="${md}"]`),list=$('#tmList');if(!g)return;
+ const y0=sc.scrollTop;sc.scrollTop=g.offsetTop-12;const dy=sc.scrollTop-y0;syncMd(md);
+ if(anim&&dy&&!HOLD&&!RM.matches&&list.animate)list.animate([{transform:`translateY(${dy}px)`},{transform:'none'}],{duration:T.layout,easing:SOFT});
+}
+function teamMenu(which){ // 'md' | 'comp' | null: open one menu (or close it when it is open), close the other
+ const e=S.tm,md=$('#tmMdMenu'),cm=$('#tmCompMenu'),btn=$('#tmMdBtn'),open=which==='md'?md&&md.hidden:which==='comp'?cm.hidden:false;
+ if(md)md.hidden=true;cm.hidden=true;if(btn)btn.classList.remove('open');S.tmMenu=null;
+ if(!open||!e)return;
+ if(which==='md'){md.innerHTML=teamList(e.id,e.comp).map(({m,md:n})=>`<button data-tmd="${n}"${e.md===n?' class="on"':''}><b>Matchday ${n}</b>${dayOf(m)}</button>`).join('');
+  md.hidden=false;btn.classList.add('open');soft(md,RISE,T.quick);const on=md.querySelector('.on');if(on)md.scrollTop=on.offsetTop-md.clientHeight/2+22}
+ else{const cs=teamComps(e.id);if(cs.length<2)return;cm.innerHTML=cs.map(c=>`<button data-tmc="${c}"${c===e.comp?' class="on"':''}><b>${CP[c].t}</b>${CP[c].season}</button>`).join('');cm.hidden=false;soft(cm,RISE,T.quick)}
+ S.tmMenu=which;
+}
+/* fills the page for one stack entry {p:'tm', id: team, comp, tab, y: scroll position to restore} */
+function drawTeam(e){
+ S.tm=e;const c=CP[e.comp],cs=teamComps(e.id);
+ $('#tmLogo').src=crest(e.id);$('#tmName').textContent=TEAMS[e.id][0];$('#tmSeason').textContent=c.t+' '+c.season;
+ const sub=$('#tm .tm-comp');cs.length>1?sub.removeAttribute('disabled'):sub.setAttribute('disabled','');
+ $('#tmStar').classList.toggle('on',S.stars.includes(e.id));
+ $('#tmTabs').innerHTML=['Matches','Overview','Table','Squad','Team stats'].map((t,i)=>`<span${i<2?` data-tmv="${t.toLowerCase()}"${e.tab===t.toLowerCase()?' class="on"':''}`:''}>${t}</span>`).join(''); // Matches and Overview switch, the other tabs are labels
+ $('#tmTabs').scrollLeft=0;teamMenu(null);renderTeam();
+ if(e.tab!=='matches')$('#tmScroll').scrollTop=0;
+ else if(e.y!==undefined)$('#tmScroll').scrollTop=e.y,syncMd();
+ else{const L=teamList(e.id,e.comp),a=L.find(x=>x.m.live)||L.find(x=>!x.m.ft)||L[L.length-1];if(a)toMd(a.md,false)}
+}
+function setTeamTab(t){const e=S.tm;if(!e||e.tab===t)return;if(e.tab==='matches')e.y=$('#tmScroll').scrollTop;e.tab=t;
+ document.querySelectorAll('#tmTabs [data-tmv]').forEach(x=>x.classList.toggle('on',x.dataset.tmv===t));
+ teamMenu(null);renderTeam();$('#tmScroll').scrollTop=t==='matches'&&e.y!==undefined?e.y:0;if(t==='matches')syncMd();
+ soft($('#tmScroll'),RISE,T.std)} // the new tab rises in, as on a competition page
+function setTeamComp(c){const e=S.tm;teamMenu(null);if(!e||e.comp===c)return;e.comp=c;delete e.y;drawTeam(e);soft($('#tmScroll'),RISE,T.std)}
+/* ---------- pages above the feed or a league page ----------
+ Match pages (#fx) and team pages (#tm) open one from another, so they form a stack: S.stack = [{p:'fx'|'tm', id, …}], the last one is on screen.
+ There is one element of each kind. A match page slides over a team page (as it slides over a league page); a team page comes in from the right
+ while the match page under it leaves to the left (.fx.left), and Back plays the same the other way round. An element that is needed again for a
+ page deeper in the stack is refilled while it is out of sight (snap = a change of place without a transition). */
+const topPage=()=>S.stack[S.stack.length-1];
+function snap(el,fn){el.style.transition='none';fn();void el.offsetWidth;el.style.transition=''}
+function openTeam(k,comp){
+ if(!TEAMS[k])return;const cs=teamComps(k),t=topPage(),tm=$('#tm'),fx=$('#fx');if(!cs.length)return;
+ if(t&&t.p==='tm')return;
+ const under=S.stack[S.stack.length-2];if(t&&under&&under.id===k){pageBack();return}        // the page of this team is right under the match page: go back to it
+ if(S.fav)closeFav();hideToast();
+ if(S.tm){S.tm.y=$('#tmScroll').scrollTop;snap(tm,()=>tm.classList.remove('show'))}          // it lies under the match page with another team: it comes in again from the right
+ const e={p:'tm',id:k,comp:cs.includes(comp)?comp:cs[0],tab:'matches'};S.stack.push(e);drawTeam(e);
+ $('#phone').classList.add('intm');tm.classList.add('show');tm.setAttribute('aria-hidden','false');
+ if(t){fx.classList.add('left');setTimeout(()=>{if(topPage()===e)$('#phone').classList.remove('infx','fxs')},T.layout)}
+}
+function hideTeam(){$('#tm').classList.remove('show');$('#tm').setAttribute('aria-hidden','true');teamMenu(null);S.tm=null;setTimeout(()=>{if(!S.tm)$('#phone').classList.remove('intm')},T.layout)}
+function pageBack(){
+ const t=S.stack.pop(),u=topPage(),fx=$('#fx'),tm=$('#tm');if(!t)return;hideToast();
+ if(t.p==='fx'){
+  if(u&&S.tm!==u)snap(tm,()=>{drawTeam(u);tm.classList.add('show');tm.setAttribute('aria-hidden','false');$('#phone').classList.add('intm')}); // its element showed a later team: put this one back under the match page
+  hideFixture();
+ }else{
+  if(u){if(S.fx!==u.id||!fx.classList.contains('left'))snap(fx,()=>{drawFixture(u.id);fx.classList.add('show','left')});                    // its element showed a later match: put this one back, left of the screen
+   fx.classList.remove('left');fx.setAttribute('aria-hidden','false');$('#phone').classList.add('infx')}
+  hideTeam();
+ }
+}
+/* everything above the feed or the league page goes at once (a ready-made state, a competition opened over it) */
+function closePages(){if(!S.stack.length&&!S.fx)return;S.stack=[];hideTeam();hideFixture()}
+
 /* ---------- favourite-team popup (Figma section "Betting popup") ----------
  1X2 of the favourite team's match over the feed. Tapping an odd selects it, then the popup closes and the pick
  sits in the collapsed bar. The CTA is enabled only while a pick from this match is selected. */
 function openFav(){
- const m=M('m4'),f=FX.m4;closeSheet();closeFixture();closeComp();setDay('today');hideToast();
+ const m=M('m4'),f=FX.m4;closeSheet();closePages();closeComp();setDay('today');hideToast();
  $('#favHi').src=IMG[f.hiImg];$('#favAi').src=IMG[f.aiImg];$('#favWhen').textContent='Today, '+m.ko;
  const cur=S.sel.find(s=>s.m==='m4'&&s.g==='1x2');if(!S.fav)S.favPick=cur?cur.o:'0';
  $('#favOdds').innerHTML=[m.hs,'X',m.as].map((l,i)=>`<button class="odd${S.favPick===String(i)?' sel':''}" data-fo="${i}"><span class="l">${l}</span><span class="v"><span class="num">${f2(m.o[i])}</span></span></button>`).join('');
@@ -1874,7 +2085,7 @@ function favAdd(){const o=S.favPick||'0',i=S.sel.findIndex(s=>s.m==='m4'&&s.g===
  syncTiles();updateBar(true);renderSheet();}
 
 /* ---------- redraw everything after a state change ---------- */
-function refresh(){const y=$('#scroll').scrollTop;renderFeed();$('#scroll').scrollTop=y;if(S.fx)renderMkts();if(S.cp)renderComp();if(S.fav)openFav();renderSheet();updateBar(true)}
+function refresh(){const y=$('#scroll').scrollTop;renderFeed();$('#scroll').scrollTop=y;if(S.fx)renderMkts();if(S.cp)renderComp();if(S.tm)renderTeam();if(S.fav)openFav();renderSheet();updateBar(true)}
 /* ---------- ready-made states (navigation panel) ----------
  Each state sets the whole screen by itself (picks, statuses, prices, sheet open or closed), whatever was on screen before.
  Only states that cannot be reached by tapping the phone are here (prices that move in a pick, suspended and locked bets, the limit of 20)
@@ -1972,7 +2183,14 @@ function buildNav(){
 }
 
 /* ---------- events ---------- */
+buildTeamPage();
 document.addEventListener('click',e=>{
+ if(S.tmMenu&&!e.target.closest('.tm-menu,[data-tmm]')){teamMenu(null);return}             // T1: a tap outside an open menu only closes it
+ const mm=e.target.closest('[data-tmm]');if(mm){if(!mm.hasAttribute('disabled'))teamMenu(mm.dataset.tmm);return}
+ const mdI=e.target.closest('[data-tmd]');if(mdI){teamMenu(null);toMd(+mdI.dataset.tmd,true);return}
+ const cI=e.target.closest('[data-tmc]');if(cI){setTeamComp(cI.dataset.tmc);return}
+ const tl=e.target.closest('[data-team]');if(tl){openTeam(tl.dataset.team,tl.dataset.tc);return}
+ const tv2=e.target.closest('[data-tmv]');if(tv2){setTeamTab(tv2.dataset.tmv);return}
  const odd=e.target.closest('[data-g]');if(odd){if(!odd.classList.contains('locked'))toggleSel(odd.dataset.m,odd.dataset.g,odd.dataset.o);return}
  const rm=e.target.closest('[data-rm]');if(rm){removeSel(rm.dataset.rm);return}
  const card=e.target.closest('.tp,.sc-row,.cp-row,.gs-card');if(card){const o=card.querySelector('.odd');if(o&&!o.classList.contains('locked'))toggleSel(o.dataset.m,o.dataset.g,o.dataset.o);return} // the whole card picks its price
@@ -1983,7 +2201,8 @@ document.addEventListener('click',e=>{
  const tv=e.target.closest('[data-cpv]');if(tv){setCompView(tv.dataset.cpv);return}
  const cp=e.target.closest('.comp[data-cp],.chip[data-cp]');if(cp){openComp(cp.dataset.cp);return}
 });
-$('#cpBack').onclick=closeComp;$('#fxBack').onclick=closeFixture;$('#fxBack2').onclick=closeFixture;
+$('#cpBack').onclick=closeComp;$('#tmBack').onclick=pageBack;$('#tmStar').onclick=()=>{const k=S.tm.id,i=S.stars.indexOf(k);i<0?S.stars.push(k):S.stars.splice(i,1);$('#tmStar').classList.toggle('on',i<0)};
+$('#tmScroll').addEventListener('scroll',()=>{if(S.tm&&S.tm.tab==='matches')syncMd()});$('#fxBack').onclick=closeFixture;$('#fxBack2').onclick=closeFixture;
 $('#fxScroll').addEventListener('scroll',e=>$('#phone').classList.toggle('fxs',e.target.scrollTop>150));
 $('#oddsChip').onclick=()=>setOddsOn(!S.oddsOn);
 $('#liveBadge').onclick=()=>{
@@ -1997,7 +2216,7 @@ $('#favOdds').addEventListener('click',e=>{const b=e.target.closest('[data-fo]')
 $('#cpDays').innerHTML=$('#days').innerHTML;            // R2: the calendar of a competition page is a copy of the feed's
 document.querySelectorAll('.day[data-day]').forEach(d=>d.onclick=()=>d.closest('#cpDays')?setCpDay(d.dataset.day):setDay(d.dataset.day));
 $('#cpLive').onclick=()=>setCpDay('today',S.cpDay==='today'?!S.cpLive:true);
-dragScroll($('#days'));dragScroll($('#leagues'));dragScroll($('#cpDays'));
+dragScroll($('#days'));dragScroll($('#leagues'));dragScroll($('#cpDays'));dragScroll($('#tmTabs'));
 $('#navX').onclick=()=>$('#nav').classList.add('off');$('#navOpen').onclick=()=>$('#nav').classList.remove('off');
 $('#editBtn').onclick=()=>{S.edit=!S.edit;applyEdit()};
 $('#placeBtn').onclick=placeBet;
@@ -2120,7 +2339,7 @@ function init(){
  for(const k in CHG)delete CHG[k];Object.values(chgTimers).flat().forEach(clearTimeout);document.querySelectorAll('.cv').forEach(e=>e.classList.remove('up','dn'));
  $('#oddsChip').classList.remove('off');$('#oddsChip').setAttribute('aria-checked','true');$('#liveBadge').classList.remove('on');
  $('#sheet').classList.remove('show','editing');$('#backdrop').classList.remove('show');$('#overlay').classList.remove('show');
- $('#fx').classList.remove('show');$('#cp').classList.remove('show','mt');$('#cpLive').classList.remove('on');$('#phone').classList.remove('infx','fxs','incp','limit');
+ $('#fx').classList.remove('show','left');$('#tm').classList.remove('show');$('#tm').setAttribute('aria-hidden','true');teamMenu(null);$('#cp').classList.remove('show','mt');$('#cpLive').classList.remove('on');$('#phone').classList.remove('infx','fxs','incp','intm','limit');
  clearTimeout(favT);$('#fav').classList.remove('show');paintDays(false);$('#leagues').scrollLeft=0;
  renderFeed();renderSheet();updateBar();$('#scroll').scrollTop=0;
  timers=[setInterval(liveTick,2600),setInterval(minuteTick,20000)];
