@@ -915,6 +915,13 @@ div.choice{cursor:default}
 .sc-row .odd.sel{background:var(--odd-sel-bg)}
 .cp-foot{padding:16px 0;font-size:12px;line-height:15px;letter-spacing:.01em;color:#c5c7ca}
 #phone.hasbar .cp-foot{padding-bottom:95px}
+/* R2 · Matches tab of a competition page (not drawn in Figma): the calendar of the feed under the tabs, then the tiles of the feed.
+   .cp.mt = the Matches tab is open. Empty day: two centred lines in the type of the chips (title) and of the footer (hint). */
+.cp-tabs span[data-cpv]{cursor:pointer}
+.cp-cal{position:static;flex:none}
+.cp:not(.mt) .cp-cal{display:none}
+.cp-empty{padding:48px 0;text-align:center;font-size:12px;line-height:15px;letter-spacing:.01em;color:#c5c7ca}
+.cp-empty b{display:block;margin-bottom:var(--spacing-4);font-size:14px;line-height:18px;letter-spacing:.01em;color:#f9fafa}
 /* fixture · Goalscorer carousel under "More bets" (Figma 4199:155577, round photo) */
 .gs{display:flex;flex-direction:column;gap:12px}
 .gs-h b{display:block;font-weight:700;font-size:18px;line-height:25px;color:#fff}
@@ -1024,6 +1031,13 @@ div.choice{cursor:default}
     <button class="fx-follow">Follow</button>
    </div>
    <div class="fx-tabs cp-tabs" id="cpTabs"></div>
+   <div class="calendar cp-cal" id="cpCal">
+    <div class="cal-live"><button class="livebadge" id="cpLive">LIVE</button></div>
+    <div class="vdiv"></div>
+    <div class="days" id="cpDays"></div>
+    <div class="vdiv"></div>
+    <div class="cal-ic"><img src="assets/img/calendar.png" alt=""></div>
+   </div>
    <div class="cp-scroll" id="cpScroll"></div>
   </div>
   <div class="tongue" id="tongue">You’ve reached maximum number of bets allowed.</div>
@@ -1371,7 +1385,7 @@ function won(m,g,o){
 }
 let S;
 /* st: dropped-out picks {"match|market":'suspended'|'locked'}; lk: locked odds in the feed ["match|market|outcome"]; day: a key of DAYS; more: the matches of the days other than today and Sat 3 Jan */
-function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fav:false,cp:null,cpTab:'win'}}
+function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fav:false,cp:null,cpTab:'win',cpView:'odds',cpDay:'today',cpLive:false}} // cpView / cpDay / cpLive: tab, day and LIVE filter of the competition page (R2)
 const $=s=>document.querySelector(s);
 const M=id=>S.matches.find(m=>m.id===id)||S.ft.find(m=>m.id===id)||S.more.find(m=>m.id===id)||OUT[id];
 const f2=n=>n.toFixed(2);
@@ -1400,8 +1414,9 @@ function tileHTML(m){
   </div>
   <div class="orow">${odds}</div></div>`;
 }
+const dayList=d=>d==='yest'?S.ft:d==='today'?S.matches.filter(m=>!m.hid):S.more.filter(m=>m.dk===d); // the matches of one day of the calendar
 function renderFeed(){
- const groups=Object.keys(COMPS),list=S.day==='yest'?S.ft:S.day==='today'?S.matches.filter(m=>!m.hid):S.more.filter(m=>m.dk===S.day);
+ const groups=Object.keys(COMPS),list=dayList(S.day);
  let h=LEGAL+'<div class="following"><i></i><span><img src="'+IMG.star+'" alt="">Following</span><i></i></div>';
  for(const g of groups){
   const ms=list.filter(m=>m.comp===g&&(!S.liveOnly||m.live));
@@ -1433,9 +1448,10 @@ function holdAnchor(sc,ms=800){
 }
 /* the list changes: the old one leaves quickly, the new one comes in.
    dir -1: from the left (an earlier day), 1: from the right (a later day), 0: rises (same day, LIVE filter) */
-function swapFeed(dir){
- const f=$('#feed'),from=dir?{opacity:0,transform:`translateX(${dir*20}px)`}:{opacity:0,transform:'translateY(8px)'};
- let done=false;const go=()=>{if(done)return;done=true;renderFeed();$('#scroll').scrollTop=0;soft(f,from,T.std)};
+const swapFeed=dir=>swapList($('#feed'),$('#scroll'),renderFeed,dir);
+function swapList(f,sc,render,dir){ // f: the list that moves, sc: its scroller, render: draws the new list (the feed; the Matches tab of a competition page)
+ const from=dir?{opacity:0,transform:`translateX(${dir*20}px)`}:{opacity:0,transform:'translateY(8px)'};
+ let done=false;const go=()=>{if(done)return;done=true;render();sc.scrollTop=0;soft(f,from,T.std)};
  if(HOLD||RM.matches||!f.animate){go();return}        // ready-made states and reduced motion: no exit step
  f.animate([{opacity:1,transform:'none'},{opacity:0,transform:dir?`translateX(${-dir*10}px)`:'none'}],{duration:120,easing:'ease-in'}).onfinish=go;
  setTimeout(go,160);                                  // the tab is in the background and animations don't tick: swap anyway
@@ -1447,9 +1463,9 @@ function setDay(d){
 }
 /* N1 · marks the selected day and brings it to the third slot of the calendar (108 px, where Today sits in Figma), as far as the strip can scroll.
    The strip slides there over --m-std with --ease, as it did before the calendar could scroll. */
-function paintDays(anim){
- const box=$('#days'),strip=box.firstElementChild;let el;
- document.querySelectorAll('.day').forEach(e=>{const on=e.dataset.day===S.day;e.classList.toggle('sel',on);if(on)el=e});if(!el)return;
+function paintDays(anim,box=$('#days'),day=S.day){ // R2: the same calendar sits on the Matches tab of a competition page (#cpDays, S.cpDay)
+ const strip=box.firstElementChild;let el;
+ box.querySelectorAll('.day').forEach(e=>{const on=e.dataset.day===day;e.classList.toggle('sel',on);if(on)el=e});if(!el)return;
  const to=Math.max(0,Math.min(el.offsetLeft-108,box.scrollWidth-box.clientWidth)),dx=to-box.scrollLeft;box.scrollLeft=to;
  if(anim&&dx&&!HOLD&&!RM.matches&&strip.animate)strip.animate([{transform:`translateX(${dx}px)`},{transform:'none'}],{duration:T.std,easing:getComputedStyle(document.documentElement).getPropertyValue('--ease').trim()||'ease'});
 }
@@ -1803,16 +1819,33 @@ function compHTML(id){
    <div class="sc-list">${c.scorers.map(p=>`<div class="sc-row">${photoOf(p)}<div class="tx"><b>${p.n}</b><span>${club(p)}</span></div>${oddBtn(id,'scorer',p.k,'',p.v,'only')}</div>`).join('')}</div>`;
  return LEGAL+`<div class="cp-chips">${chips}</div><div id="cpBody">${body}</div><div class="cp-foot">+18. Juega con responsabilidad. Publi.</div>`;
 }
-function renderComp(){$('#cpScroll').innerHTML=compHTML(S.cp)}
+/* R2 · Matches tab: the matches of this competition on the chosen day, drawn by the feed's own tileHTML(), so prices, picks and live changes are the same objects
+   as in the feed. Odds switched off in the feed: no odds, no warning, no footer here either. A day without matches: an empty state, nothing about betting on screen. */
+function compMatchesHTML(id){
+ const ms=dayList(S.cpDay).filter(m=>m.comp===id&&(!S.cpLive||m.live));
+ if(!ms.length)return `<div class="cp-empty"><b>${S.cpLive?'No live matches right now':'No matches on this day'}</b>${S.cpLive?'Tap LIVE again to see all matches of the day':'Pick another day in the calendar'}</div>`;
+ return (S.oddsOn?LEGAL:'')+`<div class="tiles">${ms.map(tileHTML).join('')}</div><div class="cp-foot">${S.oddsOn?'+18. Juega con responsabilidad. Publi.':''}</div>`;
+}
+function renderComp(){if(!S.cp)return;$('#cpScroll').innerHTML=S.cpView==='matches'?compMatchesHTML(S.cp):compHTML(S.cp)}
 function openComp(id,tab){
  const c=CP[id];if(!c)return;if(S.fav)closeFav();closeFixture();
- S.cp=id;if(tab)S.cpTab=tab;
+ S.cp=id;if(tab)S.cpTab=tab;S.cpView='odds';S.cpDay=S.day;S.cpLive=false;$('#cp').classList.remove('mt');$('#cpLive').classList.remove('on'); // the page opens on Odds; Matches starts on the day of the feed
  $('#cpLogo').src=IMG[c.img];$('#cpName').textContent=c.t;$('#cpSeason').textContent=c.season;
- const tb=$('#cpTabs');tb.classList.toggle('w5',c.tabs.includes('Playoff'));tb.innerHTML=c.tabs.map(t=>`<span${t==='Odds'?' class="on"':''}>${t}</span>`).join('');
+ const tb=$('#cpTabs');tb.classList.toggle('w5',c.tabs.includes('Playoff'));tb.innerHTML=c.tabs.map(t=>`<span${t==='Odds'?' class="on" data-cpv="odds"':t==='Matches'?' data-cpv="matches"':''}>${t}</span>`).join(''); // R2: Matches and Odds switch, the other tabs are labels
  renderComp();$('#cpScroll').scrollTop=0;
  $('#phone').classList.add('incp');$('#cp').classList.add('show');$('#cp').setAttribute('aria-hidden','false');hideToast();
 }
 function closeComp(){$('#cp').classList.remove('show');$('#cp').setAttribute('aria-hidden','true');S.cp=null;setTimeout(()=>{if(!S.cp)$('#phone').classList.remove('incp')},T.layout)}
+function setCompView(v){if(S.cpView===v)return;S.cpView=v;
+ $('#cp').classList.toggle('mt',v==='matches');document.querySelectorAll('#cpTabs [data-cpv]').forEach(e=>e.classList.toggle('on',e.dataset.cpv===v));
+ renderComp();$('#cpScroll').scrollTop=0;if(v==='matches')paintDays(false,$('#cpDays'),S.cpDay);
+ soft($('#cpScroll'),RISE,T.std)} // the new tab rises in, like a sub-tab
+/* a day of the competition calendar, or its LIVE badge (live matches are played today: LIVE on another day goes to Today with the filter on, as in the feed) */
+function setCpDay(d,live=false){
+ if(S.cpDay===d&&S.cpLive===live)return;const k=DAYS.map(x=>x[0]),dir=Math.sign(k.indexOf(d)-k.indexOf(S.cpDay));
+ S.cpDay=d;S.cpLive=live;$('#cpLive').classList.toggle('on',live);
+ paintDays(true,$('#cpDays'),d);swapList($('#cpScroll'),$('#cpScroll'),renderComp,dir);
+}
 function setCompTab(t){if(S.cpTab===t)return;S.cpTab=t;renderComp();$('#cpScroll').scrollTop=0;soft($('#cpBody'),RISE,T.std)} // the new list rises in, like the LIVE filter in the feed
 
 /* ---------- favourite-team popup (Figma section "Betting popup") ----------
@@ -1938,6 +1971,7 @@ document.addEventListener('click',e=>{
  if(e.target.closest('#fxMore')){showToast(`Opens ${M(S.fx).h} vs ${M(S.fx).a} in DAZN Bet`,null,null,2500);return}
  const t=e.target.closest('.tile[data-fx]');if(t){openFixture(t.dataset.fx);return}
  const ch=e.target.closest('[data-cpt]');if(ch){setCompTab(ch.dataset.cpt);return}
+ const tv=e.target.closest('[data-cpv]');if(tv){setCompView(tv.dataset.cpv);return}
  const cp=e.target.closest('.comp[data-cp],.chip[data-cp]');if(cp){openComp(cp.dataset.cp);return}
 });
 $('#cpBack').onclick=closeComp;$('#fxBack').onclick=closeFixture;$('#fxBack2').onclick=closeFixture;
@@ -1951,8 +1985,10 @@ $('#bar').onclick=openSheet;
 $('#backdrop').onclick=()=>{S.fav?closeFav():closeSheet()};
 $('#favX').onclick=closeFav;$('#favCta').onclick=favAdd;
 $('#favOdds').addEventListener('click',e=>{const b=e.target.closest('[data-fo]');if(!b)return;S.favPick=b.dataset.fo;document.querySelectorAll('#favOdds .odd').forEach(x=>x.classList.toggle('sel',x===b))});
-document.querySelectorAll('.day[data-day]').forEach(d=>d.onclick=()=>setDay(d.dataset.day));
-dragScroll($('#days'));dragScroll($('#leagues'));
+$('#cpDays').innerHTML=$('#days').innerHTML;            // R2: the calendar of a competition page is a copy of the feed's
+document.querySelectorAll('.day[data-day]').forEach(d=>d.onclick=()=>d.closest('#cpDays')?setCpDay(d.dataset.day):setDay(d.dataset.day));
+$('#cpLive').onclick=()=>setCpDay('today',S.cpDay==='today'?!S.cpLive:true);
+dragScroll($('#days'));dragScroll($('#leagues'));dragScroll($('#cpDays'));
 $('#navX').onclick=()=>$('#nav').classList.add('off');$('#navOpen').onclick=()=>$('#nav').classList.remove('off');
 $('#editBtn').onclick=()=>{S.edit=!S.edit;applyEdit()};
 $('#placeBtn').onclick=placeBet;
@@ -2014,7 +2050,7 @@ function init(){
  for(const k in CHG)delete CHG[k];Object.values(chgTimers).flat().forEach(clearTimeout);document.querySelectorAll('.cv').forEach(e=>e.classList.remove('up','dn'));
  $('#oddsChip').classList.remove('off');$('#oddsChip').setAttribute('aria-checked','true');$('#liveBadge').classList.remove('on');
  $('#sheet').classList.remove('show','editing');$('#backdrop').classList.remove('show');$('#overlay').classList.remove('show');
- $('#fx').classList.remove('show');$('#cp').classList.remove('show');$('#phone').classList.remove('infx','fxs','incp','limit');
+ $('#fx').classList.remove('show');$('#cp').classList.remove('show','mt');$('#cpLive').classList.remove('on');$('#phone').classList.remove('infx','fxs','incp','limit');
  clearTimeout(favT);$('#fav').classList.remove('show');paintDays(false);$('#leagues').scrollLeft=0;
  renderFeed();renderSheet();updateBar();$('#scroll').scrollTop=0;
  timers=[setInterval(liveTick,2600),setInterval(minuteTick,20000)];
