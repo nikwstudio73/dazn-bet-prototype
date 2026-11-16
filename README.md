@@ -69,7 +69,7 @@ The **Prototype states** panel on the left is the only navigation (see the next 
 One panel on the left, nothing else on screen except the phone, the "Copy screen" button under it and the phone-size switch.
 
 - **Free play** (selected when the page opens). Everything on the phone works by hand. Clicking it again, or the round arrow next to it, starts over.
-- **Topics.** Betslip, Suspended, Locked, Limit 20, Other screens. They hold only what cannot be reached by tapping the phone (a price that moves in a pick, suspended and locked bets, the limit of 20) plus three screens that are not obvious to find. The main flow (Odds toggle, picks, betslip, Edit, Place bet) is done by hand in Free play; its description says what to try. A topic opens its states; only one topic is open at a time. Opening a topic does not change the phone. A dot next to a folded topic marks where the current state lives.
+- **Topics.** Betslip, Suspended, Locked, Limit 20, Other screens. They hold only what cannot be reached by tapping the phone (a price that moves in a pick, suspended and locked bets, the limit of 20) plus the screens that are not obvious to find (Other screens: finished matches, the favourite-team popup, match pages, and the league and team pages added on 16 Nov — Relegation, league Matches, Team · Matches, the Matchday menu, Team · Overview before kick-off and live). The main flow (Odds toggle, picks, betslip, Edit, Place bet) is done by hand in Free play; its description says what to try. A topic opens its states; only one topic is open at a time. Opening a topic does not change the phone. A dot next to a folded topic marks where the current state lives.
 - **States.** One click sets the whole screen (picks, statuses, prices, sheet open or closed), whatever was on screen before. The selected state shows one or two lines about the rule it demonstrates. Click it again, or the round arrow, to start the same state again.
 - **Collapsed / Opened.** States that exist with the betslip folded and unfolded are one row with this switch. If you open or close the betslip on the phone by hand, the switch follows.
 - The **‹** button folds the panel into a small "States" button (it starts folded in windows narrower than 1000 px).
@@ -130,8 +130,8 @@ The 46 clubs added later (`TEAMS` in the code) come from the same library: `k.pn
 
 ## Showing it on a call: ready-made states
 
-- **26 screens in 19 rows.** Seven rows are a Collapsed / Opened pair. The topics follow the rows of the Figma section "Betslip states · PRD".
-- **Keyboard.** **→ / ←** step through all 26 screens in order (the panel follows). **L** pauses and resumes the live price ticker.
+- **32 screens in 25 rows.** Seven rows are a Collapsed / Opened pair. The topics follow the rows of the Figma section "Betslip states · PRD".
+- **Keyboard.** **→ / ←** step through all 32 screens in order (the panel follows). **L** pauses and resumes the live price ticker.
 - **Repeatable numbers.** A ready-made state pauses the live price ticker and uses fixed prices, so the totals are the same every time (for example Odds changed: 16.97 → 17.06). Arrows stay on screen while the state is shown. Free play turns the ticker back on.
 - To add or reorder a state, edit the `STATES` array in `index.html`: `g` = topic, `k` = name of the row, `v` = `'bar'` / `'sheet'` for a Collapsed / Opened pair (two neighbouring entries with the same `g` and `k`), `n` = the note under the row, `run()` = what to set. The panel is built from this array.
 
