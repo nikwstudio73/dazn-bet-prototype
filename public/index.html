@@ -1580,8 +1580,8 @@ const OUT={ucl:{id:'ucl',out:true,h:'UEFA Champions League',a:'',when:'2026/27',
  uel:{id:'uel',out:true,h:'UEFA Europa League',a:'',when:'2026/27',live:false},uecl:{id:'uecl',out:true,h:'UEFA Conference League',a:'',when:'2026/27',live:false}};
 const crest=k=>IMG['t_'+k]||IMG[k];
 /* C2 · the colour of a team = the main colour of its crest (the largest colour area of t_<key>.png; a trim colour such as a gold outline is skipped).
-   These are data of the team, like its name, not design tokens. A team that is not listed has a white or a very dark crest and glows white,
-   as Real Madrid does in Figma (owner, 16 Nov): rm, new, tot, ful, udi, scf, bmg, aja, juv, lask. Real Madrid white and Atlético 232,21,30 are the colours of the Figma blocks.
+   These are data of the team, like its name, not design tokens. A team that is not listed has a white or black-and-white crest (no colour to take) and glows white,
+   as Real Madrid does in Figma: rm, new, tot, ful, udi, scf, bmg, aja, juv, lask. Real Madrid white and Atlético 232,21,30 are the colours of the Figma blocks.
    The blocks keep their gradients in the CSS (shape, strength, the 16 stops): teamGlow() takes the gradient of a class as it is written there
    and repaints its white layer in the home colour and its red layer in the away colour, stop by stop, towards the colour that layer fades into. */
 const TCOL={
@@ -1592,7 +1592,20 @@ const TCOL={
  bvb:[255,217,0],rbl:[224,25,78],b04:[252,0,0],stu:[212,7,35],sge:[225,2,12],svw:[29,144,83],fcu:[227,7,19],tsg:[25,97,181],m05:[174,15,10],
  om:[11,97,172],ol:[15,35,170],asm:[255,0,46],los:[36,33,106],rcl:[183,19,21],por:[41,78,124],fen:[185,12,46],fey:[226,0,26],az:[219,0,33],
  sha:[235,106,10],aek:[252,210,15],twe:[230,0,26],slo:[31,123,169],vik:[114,18,28]};
-const TC_WHITE=[255,255,255],TC_RED=[232,21,30],tcol=k=>TCOL[k]||TC_WHITE,tcSame=(a,b)=>a.join()===b.join();
+const TC_WHITE=[255,255,255],TC_RED=[232,21,30],tcSame=(a,b)=>a.join()===b.join();
+/* A dark crest colour (PSG navy 0,65,112) hardly shows on the dark cards. Owner, 16 Nov: lighten it, keep the hue. One rule for every team:
+   a colour whose relative luminance is under TC_MIN gets its HSL lightness raised, hue and saturation untouched, until it reaches TC_MIN.
+   TC_MIN sits just under the red of the Figma block (Atlético 232,21,30 = 0.18), so the drawn match is not changed. */
+const TC_MIN=.15,TC_LIT={};
+const tcLum=c=>{const f=v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4};return .2126*f(c[0])+.7152*f(c[1])+.0722*f(c[2])};
+function tcLift(c){
+ if(tcLum(c)>=TC_MIN)return c;
+ const [r,g,b]=c.map(v=>v/255),mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let l=(mx+mn)/2;
+ const sat=d?d/(1-Math.abs(2*l-1)):0,h=!d?0:mx===r?((g-b)/d+6)%6:mx===g?(b-r)/d+2:(r-g)/d+4; // a grey has no hue: it only gets lighter
+ const rgb=l=>{const C=(1-Math.abs(2*l-1))*sat,X=C*(1-Math.abs(h%2-1)),m=l-C/2,t=[[C,X,0],[X,C,0],[0,C,X],[0,X,C],[X,0,C],[C,0,X]][Math.floor(h)%6];return t.map(v=>Math.round((v+m)*255))};
+ let out=c;while(tcLum(out)<TC_MIN&&l<.95){l+=.01;out=rgb(l)}return out;
+}
+const tcol=k=>TCOL[k]?TC_LIT[k]||(TC_LIT[k]=tcLift(TCOL[k])):TC_WHITE;
 const GLOW_CSS={};
 function glowCss(cls){if(!(cls in GLOW_CSS)){const d=document.createElement('div');d.className=cls;d.style.display='none';document.body.appendChild(d);GLOW_CSS[cls]=getComputedStyle(d).backgroundImage;d.remove()}return GLOW_CSS[cls]}
 function teamGlow(cls,m){
