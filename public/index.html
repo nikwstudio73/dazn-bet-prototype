@@ -1606,10 +1606,21 @@ function tcLift(c){
  let out=c;while(tcLum(out)<TC_MIN&&l<.95){l+=.01;out=rgb(l)}return out;
 }
 const tcol=k=>TCOL[k]?TC_LIT[k]||(TC_LIT[k]=tcLift(TCOL[k])):TC_WHITE;
+/* Two teams of the same colour (Bayern – PSV, both red) would glow alike. Owner, 17 Nov: the away side then takes the second colour of its crest
+   (TCOL2: the next largest colour area of another hue, lightened by the same rule), and white when the crest has none or the second colour is close to the home side too.
+   Same colour = both without a hue, or hues less than TC_NEAR degrees apart. Two white crests (Juventus – Real Madrid) stay white on both sides. */
+const TCOL2={
+ bay:[42,110,253],psv:[186,150,80],bar:[236,187,0],atm:[40,42,111],val:[255,223,28],vil:[231,0,5],bet:[228,138,5],ars:[156,130,74],liv:[37,146,128],
+ gal:[184,27,63],mun:[215,101,4],avl:[72,0,36],rom:[151,10,44],laz:[220,169,73],fio:[221,50,36],tor:[224,156,12],lec:[213,185,120],par:[255,207,1],
+ rbl:[14,42,80],b04:[252,252,0],stu:[255,220,0],fcu:[255,229,3],ol:[244,0,67],asm:[193,147,63],los:[224,30,19],rcl:[255,199,0],por:[185,117,35],
+ fen:[0,44,112],fey:[174,153,98],slo:[238,45,36],vik:[197,155,87]};
+const TC_NEAR=25,tcHue=c=>{const [r,g,b]=c.map(v=>v/255),mx=Math.max(r,g,b),d=mx-Math.min(r,g,b);return d<.08?null:((mx===r?(g-b)/d:mx===g?(b-r)/d+2:(r-g)/d+4)*60+360)%360};
+const tcNear=(a,b)=>{const x=tcHue(a),y=tcHue(b);if(x===null||y===null)return x===y;const d=Math.abs(x-y);return Math.min(d,360-d)<TC_NEAR};
+function pairCols(m){const h=tcol(m.hi);let a=tcol(m.ai);if(tcNear(h,a)){const s2=TCOL2[m.ai]&&tcLift(TCOL2[m.ai]);a=s2&&!tcNear(h,s2)?s2:TC_WHITE}return [h,a]}
 const GLOW_CSS={};
 function glowCss(cls){if(!(cls in GLOW_CSS)){const d=document.createElement('div');d.className=cls;d.style.display='none';document.body.appendChild(d);GLOW_CSS[cls]=getComputedStyle(d).backgroundImage;d.remove()}return GLOW_CSS[cls]}
 function teamGlow(cls,m){
- const h=tcol(m.hi),a=tcol(m.ai);
+ const [h,a]=pairCols(m);
  const RE=/rgba?\((\d+), (\d+), (\d+)(?:, ([\d.]+))?\) ([\d.]+)%/g;
  return glowCss(cls).split('radial-gradient(').map((part,i)=>{if(!i)return part;
   const st=[...part.matchAll(RE)];if(!st.length)return 'radial-gradient('+part;const c=Math.min(st[0][1],st[0][2],st[0][3])>245?h:a,end=st[st.length-1].slice(1,4).map(Number); // the first stop tells the side (white = home, anything else = away); the last one is the colour the glow fades into
@@ -1617,7 +1628,7 @@ function teamGlow(cls,m){
 }
 const tgStyle=(cls,m)=>` style="background-image:${teamGlow(cls,m)}"`;
 /* a segment of the chance bar in the colour of its team; the Figma pair (white home, red away) keeps the colours written in the CSS */
-const barCol=(m,i)=>{const c=tcol(i?m.ai:m.hi);return i===1||(!i&&tcSame(c,TC_WHITE))||(i&&tcSame(c,TC_RED))?'':tcSame(c,TC_WHITE)?';background:var(--t1)':`;background:rgb(${c.join(',')})`};
+const barCol=(m,i)=>{const c=pairCols(m)[i?1:0];return i===1||(!i&&tcSame(c,TC_WHITE))||(i&&tcSame(c,TC_RED))?'':tcSame(c,TC_WHITE)?';background:var(--t1)':`;background:rgb(${c.join(',')})`};
 const cpPlayer=(c,k)=>[...c.picks,...c.scorers].find(x=>x.k===k);
 /* photo of a player (img tag), or his initials when the Figma file has no photo of him */
 const photoOf=(p,key)=>{const k=key!==undefined?key:(p.ph!==undefined?p.ph:'pl_'+p.k);return k?`<img class="ph" src="${IMG[k]}" alt="">`:`<span class="ph ini">${p.n.split(' ').map(w=>w[0]).slice(0,2).join('')}</span>`};
