@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Scores & Sports Data — Design hub</title>
+<!-- H1 · Hub. Two entry points: the prototype (index.html, stays on the main address) and the motion tool (motion.html).
+     A plain page: no script, no images. Type and colours are the ones of the prototype; nothing here is a new token. -->
+<style>
+@font-face{font-family:'DAZN Oscine';font-weight:400;src:url(assets/fonts/DAZN-Oscine-Regular.woff2) format('woff2');ascent-override:104.8%;descent-override:24%;line-gap-override:0%}
+@font-face{font-family:'DAZN Oscine';font-weight:700;src:url(assets/fonts/DAZN-Oscine-Bold.woff2) format('woff2');ascent-override:104.8%;descent-override:24%;line-gap-override:0%}
+/* copied from index.html with the same names and values (Global foundation, dark; chrome variables of the "Prototype states" panel) */
+:root{
+  --spacing-8:8px;
+  --spacing-16:16px;
+  --spacer-spacer-lg:24px;
+  --spacer-spacer-xxl:40px;
+  --radius-12:12px;
+  --ui-panel:#0c161c;   /* surface/container-1 */
+  --ui-well:#080e12;    /* surface/default-0 */
+  --ui-line:#242d33;    /* border/full-color/subtle */
+  --ui-t1:#f9fafa;      /* text/primary */
+  --ui-t2:#c5c7ca;      /* text/secondary */
+  --ui-t3:#8d9295;      /* text/tertiary */
+  --m-quick:.2s;        /* colour, opacity, small state changes */
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--ui-well)}
+body{background:var(--ui-well);font-family:'DAZN Oscine',system-ui,sans-serif;color:var(--ui-t1);-webkit-font-smoothing:antialiased}
+
+/* page: one centred column, 40 between header, cards and footer */
+.hub{max-width:880px;margin:0 auto;padding:48px var(--spacer-spacer-lg) 56px;display:flex;flex-direction:column;gap:var(--spacer-spacer-xxl)}
+.hub-head h1{font-weight:700;font-size:20px;line-height:28px}
+.hub-head p{max-width:560px;font-size:15px;line-height:24px;color:var(--ui-t3)}
+
+/* cards: side by side, each at least 320 wide; below that they stack */
+.cards{display:flex;flex-wrap:wrap;gap:var(--spacing-16)}
+.card{flex:1 1 320px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;gap:var(--spacing-16);padding:var(--spacer-spacer-lg);border-radius:var(--radius-12);background:var(--ui-panel);border:1px solid var(--ui-line)}
+.card-text{display:flex;flex-direction:column;gap:var(--spacing-8)}
+.card-tag{font-size:12px;line-height:18px;color:var(--ui-t3)}
+.card h2{font-weight:700;font-size:18px;line-height:26px}
+.card-desc{font-size:14px;line-height:22px;color:var(--ui-t2)}
+.btn{display:inline-flex;align-items:center;height:44px;padding:0 20px;border-radius:8px;background:var(--ui-t1);font-weight:700;font-size:14px;line-height:22px;color:var(--ui-well);text-decoration:none;transition:opacity var(--m-quick)}
+.btn:hover{opacity:.85}
+.btn:focus-visible{outline:2px solid var(--ui-t1);outline-offset:2px}
+
+.hub-foot{padding-top:20px;border-top:1px solid var(--ui-line);font-size:13px;line-height:20px;color:var(--ui-t3)}
+</style>
+</head>
+<body>
+<main class="hub">
+  <header class="hub-head">
+    <h1>Scores &amp; Sports Data</h1>
+    <p>Design hub. Prototypes, states and motion for the work we hand over to development.</p>
+  </header>
+
+  <div class="cards">
+    <section class="card">
+      <div class="card-text">
+        <p class="card-tag">Prototype</p>
+        <h2>Scores</h2>
+        <p class="card-desc">Clickable prototype of betting in Scores, with all screens and states.</p>
+      </div>
+      <a class="btn" href="./" aria-label="Open Scores prototype">Open</a>
+    </section>
+    <section class="card">
+      <div class="card-text">
+        <p class="card-tag">Tool</p>
+        <h2>Motion</h2>
+        <p class="card-desc">Product animations on the real screens, with values for development.</p>
+      </div>
+      <a class="btn" href="./motion.html" aria-label="Open Motion tool">Open</a>
+    </section>
+  </div>
+
+  <footer class="hub-foot">Maintained by the Scores design team</footer>
+</main>
+</body>
+</html>
