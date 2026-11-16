@@ -928,7 +928,7 @@ div.choice{cursor:default}
 .cp-empty b{display:block;margin-bottom:var(--spacing-4);font-size:14px;line-height:18px;letter-spacing:.01em;color:#f9fafa}
 /* T1 · team page (#tm; not drawn in the new UI — the old frame 4309:169173 gives only what is on it and in which order).
    It is the competition page's own markup, cloned in JS (buildTeamPage), so header, tabs, scroller and footer are the .cp-* rules above.
-   Only what a team page adds is here: the star, the block that stays under the tabs (legal banner + Matchday), the menus, the line above a tile. */
+   Only what a team page adds is here: the block that stays under the tabs (legal banner + Matchday), the menus, the line above a tile. */
 .fx.left{transform:translateX(-100%)} /* a team page opened from a match page: the match page leaves to the left while the team page comes in from the right */
 .fx-team[data-team],.cp-row [data-team]{cursor:pointer}
 .fx-team[data-team]{transition:opacity var(--m-press)}
@@ -937,11 +937,6 @@ div.choice{cursor:default}
 .tm-comp{cursor:pointer}
 .tm-comp[disabled]{cursor:default}
 .tm-comp[disabled] svg{display:none}
-.tm-star{flex:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
-.tm-star img{display:none;width:24px;height:24px}
-.tm-star.on img{display:block}
-.tm-star.on svg{display:none}
-.tm-star:active{opacity:.6}
 .tm-fix{flex:none;position:relative;z-index:2;padding:12px 16px 0}
 .tm-fix:empty{display:none}
 .tm-fix .legal{height:28px;margin-bottom:12px}
@@ -1479,7 +1474,7 @@ function won(m,g,o){
 }
 let S;
 /* st: dropped-out picks {"match|market":'suspended'|'locked'}; lk: locked odds in the feed ["match|market|outcome"]; day: a key of DAYS; more: the matches of the days other than today and Sat 3 Jan */
-function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fav:false,cp:null,cpTab:'win',cpView:'odds',cpDay:'today',cpLive:false,stack:[],tm:null,tmMenu:null,stars:[]}} // cpView / cpDay / cpLive: tab, day and LIVE filter of the competition page (R2)
+function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fav:false,cp:null,cpTab:'win',cpView:'odds',cpDay:'today',cpLive:false,stack:[],tm:null,tmMenu:null}} // cpView / cpDay / cpLive: tab, day and LIVE filter of the competition page (R2)
 const $=s=>document.querySelector(s);
 const M=id=>S.matches.find(m=>m.id===id)||S.ft.find(m=>m.id===id)||S.more.find(m=>m.id===id)||OUT[id];
 const f2=n=>n.toFixed(2);
@@ -1955,7 +1950,7 @@ function setCompTab(t){if(S.cpTab===t)return;S.cpTab=t;renderComp();$('#cpScroll
 /* ---------- T1 + T2 · team page (#tm) ----------
  Opens from the crest or the name of a team: in the header of a match page and in the Competition winner / Relegation tables of a league page.
  The page is the competition page's markup (cloned once, ids cp… -> tm…): back, crest, name, competition + season (a menu when the team plays in
- more than one), a star, the tabs Matches / Overview / Table / Squad / Team stats (the first two switch).
+ more than one), the Follow button, the tabs Matches / Overview / Table / Squad / Team stats (the first two switch).
  Matches: the team's matches in the chosen competition, oldest first, each under a line with its matchday and day; the tiles are the feed's own
  tileHTML(), so prices, picks and live changes are the same objects as everywhere else. The Matchday menu brings the list to a matchday; the list
  starts at the match being played or the next one. The legal banner stays under the tabs with the menu, because the list starts scrolled.
@@ -1986,9 +1981,6 @@ function buildTeamPage(){
  const tm=$('#cp').cloneNode(true);tm.id='tm';tm.classList.add('tm');
  tm.querySelectorAll('[id]').forEach(e=>e.id=e.id.replace(/^cp/,'tm'));
  const fix=document.createElement('div');fix.className='tm-fix';fix.id='tmFix';tm.querySelector('.cp-cal').replaceWith(fix);
- const star=document.createElement('button');star.className='tm-star';star.id='tmStar';star.setAttribute('aria-label','Favourite');
- star.innerHTML='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3.2 2.7 5.6 6.1.8-4.5 4.3 1.1 6.1-5.4-3-5.4 3 1.1-6.1-4.5-4.3 6.1-.8L12 3.2Z" stroke="#F9FAFA" stroke-width="1.5" stroke-linejoin="round"/></svg><img src="assets/img/star.png" alt="">';
- tm.querySelector('.fx-follow').replaceWith(star);
  const sub=tm.querySelector('.cp-name>span');sub.classList.add('tm-comp');sub.dataset.tmm='comp';
  const menu=document.createElement('div');menu.className='tm-menu';menu.id='tmCompMenu';menu.hidden=true;tm.querySelector('.cp-name').append(menu);
  $('#cp').after(tm);
@@ -2035,7 +2027,6 @@ function drawTeam(e){
  S.tm=e;const c=CP[e.comp],cs=teamComps(e.id);
  $('#tmLogo').src=crest(e.id);$('#tmName').textContent=TEAMS[e.id][0];$('#tmSeason').textContent=c.t+' '+c.season;
  const sub=$('#tm .tm-comp');cs.length>1?sub.removeAttribute('disabled'):sub.setAttribute('disabled','');
- $('#tmStar').classList.toggle('on',S.stars.includes(e.id));
  $('#tmTabs').innerHTML=['Matches','Overview','Table','Squad','Team stats'].map((t,i)=>`<span${i<2?` data-tmv="${t.toLowerCase()}"${e.tab===t.toLowerCase()?' class="on"':''}`:''}>${t}</span>`).join(''); // Matches and Overview switch, the other tabs are labels
  $('#tmTabs').scrollLeft=0;teamMenu(null);renderTeam();
  if(e.tab!=='matches')$('#tmScroll').scrollTop=0;
@@ -2212,7 +2203,7 @@ document.addEventListener('click',e=>{
  const tv=e.target.closest('[data-cpv]');if(tv){setCompView(tv.dataset.cpv);return}
  const cp=e.target.closest('.comp[data-cp],.chip[data-cp]');if(cp){openComp(cp.dataset.cp);return}
 });
-$('#cpBack').onclick=closeComp;$('#tmBack').onclick=pageBack;$('#tmStar').onclick=()=>{const k=S.tm.id,i=S.stars.indexOf(k);i<0?S.stars.push(k):S.stars.splice(i,1);$('#tmStar').classList.toggle('on',i<0)};
+$('#cpBack').onclick=closeComp;$('#tmBack').onclick=pageBack;
 $('#tmScroll').addEventListener('scroll',()=>{if(S.tm&&S.tm.tab==='matches')syncMd()});$('#fxBack').onclick=closeFixture;$('#fxBack2').onclick=closeFixture;
 $('#fxScroll').addEventListener('scroll',e=>$('#phone').classList.toggle('fxs',e.target.scrollTop>150));
 $('#oddsChip').onclick=()=>setOddsOn(!S.oddsOn);
