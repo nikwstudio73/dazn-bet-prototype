@@ -55,7 +55,13 @@ The **Prototype states** panel on the left is the only navigation (see the next 
    - **Relegation** (not drawn in Figma): the same table with the price to be relegated, from the most likely team. Only leagues have it; Champions League, Europa League and Conference League show no such chip. Betslip card: "<team> to be relegated", market "Relegation".
    - The whole card or row is the tap target, not only the price (the same on the Goalscorer cards of a match).
    - **Matches tab** (not drawn in Figma): the calendar of the feed and the tiles of this competition only, drawn by the same `tileHTML()`, so picks and live prices are in sync with the feed, the match page and the betslip. It has its own selected day (`S.cpDay`; starts on the day of the feed) and its own LIVE filter. A tile opens the match page; back returns to this tab. A day without matches shows "No matches on this day". Conference League has no matches in the demo data.
+   - In the Competition winner and Relegation tables the crest and the name of a team open its page (see 10); the rest of the row still picks the price.
    - These are outright (season-long) picks. One pick per market: tapping another team or player replaces it. In the betslip the card shows the competition and the season instead of a match. The collapsed bar and the bottom nav stay on screen.
+10. **Team page** (not drawn in the new UI; the old-UI frame `4309:169173` gives only its content and order). Tap the crest or the name of a team in the header of a match page, or in the Competition winner / Relegation tables of a league page. Header: back, crest, name, competition and season, a star (tap: yellow). Tabs Matches / Overview / Table / Squad / Team stats (Matches and Overview are built and switch; the others are labels).
+   - **Matches:** the team's matches in the chosen competition, oldest first, each under a line with its matchday and day. The tiles are the feed's own `tileHTML()`, so picks and live prices are in sync with the feed, the match page and the betslip. The list opens at the match being played or the next one. The **Matchday** button under the tabs opens a list of matchdays; picking one brings the list to it. The gambling warning stays under the tabs with it. A tile opens the match page; Back returns to the team page, on the same tab.
+   - **Competition:** a team that plays in more than one (LaLiga and Champions League) has a small menu on the line under its name. The page opens in the competition it was opened from.
+   - **Overview:** one block, the nearest match of the team in any competition (the one being played first): the same tile with its three Match Result prices, under "Next match" / "Live now" and a line with the competition, matchday, day and time. No match to come: "No upcoming matches", nothing about betting on screen (AZ Alkmaar: Conference League → Competition winner).
+   - Match pages and team pages open one from another (match → team → match → the other team …); Back goes the same way back, one page at a time.
 
 ## Navigation: the "Prototype states" panel
 
@@ -116,6 +122,7 @@ The 46 clubs added later (`TEAMS` in the code) come from the same library: `k.pn
 | 953–1043 | Sheet: cards, `applyEdit()` / `releaseHeight()`, `updateSummary()`, remove + Undo, overlay |
 | 1044–1107 | Live engine: `liveTick()`, `changeOdd()`, `animateOdd()` (odds animation timings), event flash, arrows |
 | 1108–1129 | Fixture Odds tab |
+| after the competition page | Team page: `buildTeamPage()` (clones `#cp` into `#tm`), `teamMatches()` / `teamList()` / `teamNext()`, `renderTeam()`, Matchday menu, and the stack of pages (`S.stack`, `openTeam()`, `pageBack()`); its demo data (`tmRows()`) sits after `DAY_ADD` |
 | 1130–1179 | Favourite-team popup, `STATES` (ready-made states), `setState()`, `buildNav()` / `paintNav()` (navigation panel) |
 | 1180–1247 | Event wiring, drag-to-close, device fit, `init()` |
 
@@ -142,10 +149,11 @@ The 46 clubs added later (`TEAMS` in the code) come from the same library: `k.pn
 ### Demo data (not from Figma, not real prices)
 
 - **Match pages.** `fxOf()` builds the markets of a match from its 1X2 prices in the feed: implied chances, expected goals, a 6 % margin, prices rounded the way a bookmaker rounds them. So the numbers are consistent with each other and plausible, but invented. Live matches: goal lines start above the goals already scored; no 1st-half and no "Result & both teams to score" market; no "Both teams to score" once both have scored. Goalscorers per match are in `SCORERS`.
+- **Team pages.** The calendar holds 1–2 matches per team, so `tmRows()` adds rounds before and after its eight days (`CLUBS`, `PWR`, `TM_ROUNDS`): a round-robin of the clubs that have a crest, prices worked out from a fixed strength of each club, finished rounds with a fixed score. Nothing is random: the same matches, prices and scores on every load. They are in no feed and on no league page. Every team has four or more matches per competition. Matchday numbers on a team page count one by one from that team's match of today.
 - **LaLiga and Premier League pages.** Teams, players and prices in `CP` are close to the real season, not real odds. LaLiga has seven teams in the winner table because the Figma crest set has only those seven Spanish clubs.
 - **Photos.** The Figma file has photos of eleven players. They are reused wherever that player appears; everyone else shows initials on the same round plate.
 - **Crests.** From the Figma set "Football club assets 2026–27". `t_*.png` are the feed crests without their inner padding.
-- **Not drawn in Figma:** the header of a live match (score + red minute), the tabs of a league page (Matches / Table / Odds / Team stats / Player stats). The page of a finished match (built from the live header and the Result / Disabled states of the odds components; outcomes that happened are worked out from the final score, the 1st-half market is left out).
+- **Not drawn in Figma:** the header of a live match (score + red minute), the tabs of a league page (Matches / Table / Odds / Team stats / Player stats), the team page. The page of a finished match (built from the live header and the Result / Disabled states of the odds components; outcomes that happened are worked out from the final score, the 1st-half market is left out).
 
 ### Open points of the new pages (ask Roey / Marko)
 
@@ -158,7 +166,7 @@ The 46 clubs added later (`TEAMS` in the code) come from the same library: `k.pn
 ## Not in the prototype yet
 
 - **Top Bet / Bet Boost** cards exist in Figma (`Odds/Top Bet`, `.Bet/Price button`) but not here.
-- The **DAZN Bet promo banner** on top of the feed, odds on the **Team** page, and on the **Competition** page the tabs Table, Playoff, Team stats and Player stats.
+- The **DAZN Bet promo banner** on top of the feed, on the **Team** page the tabs Table, Squad and Team stats, and on the **Competition** page the tabs Table, Playoff, Team stats and Player stats.
 - **Live Updates** carousels after match events.
 - English legal texts: DAZN Bet has not sent them, the Spanish ones are shown.
 

@@ -1948,14 +1948,14 @@ function setCpDay(d,live=false){
 }
 function setCompTab(t){if(S.cpTab===t)return;S.cpTab=t;renderComp();$('#cpScroll').scrollTop=0;soft($('#cpBody'),RISE,T.std)} // the new list rises in, like the LIVE filter in the feed
 
-/* ---------- T1 · team page (#tm) ----------
+/* ---------- T1 + T2 · team page (#tm) ----------
  Opens from the crest or the name of a team: in the header of a match page and in the Competition winner / Relegation tables of a league page.
  The page is the competition page's markup (cloned once, ids cp… -> tm…): back, crest, name, competition + season (a menu when the team plays in
  more than one), a star, the tabs Matches / Overview / Table / Squad / Team stats (the first two switch).
  Matches: the team's matches in the chosen competition, oldest first, each under a line with its matchday and day; the tiles are the feed's own
  tileHTML(), so prices, picks and live changes are the same objects as everywhere else. The Matchday menu brings the list to a matchday; the list
  starts at the match being played or the next one. The legal banner stays under the tabs with the menu, because the list starts scrolled.
- Overview: the tab switches; its content is task T2. */
+ Overview (T2): one block, the nearest match of the team in any competition — the live one first — as the same tile: its three prices are Match Result. */
 const DAY_I=Object.fromEntries(DAYS.map((d,i)=>[d[0],i]));
 const ordOf=m=>m.ord!==undefined?m.ord:m.dk?DAY_I[m.dk]:m.ft?DAY_I.yest:DAY_I.today;   // place of a match in time: added finished rounds < the days of the calendar < added coming rounds
 const dayOf=m=>m.day||(m.ft?DAYS[DAY_I.yest][1]:'Today');
@@ -1974,6 +1974,7 @@ function teamList(k,comp){
 }
 const COMPS_MD={};Object.entries(COMPS).forEach(([k,c])=>COMPS_MD[k]=+c.m.match(/\d+/)[0]);COMPS_MD.uecl++; // matchday of today per competition. Conference League: the league phase (6 matchdays) is over, its last match is Matchday 6
 const teamComps=k=>Object.keys(CLUBS).filter(c=>CLUBS[c].includes(k)&&teamMatches(k,c).length);   // domestic league first, then the cups
+const teamNext=k=>{const ms=teamMatches(k).filter(m=>!m.ft);return ms.find(m=>m.live)||ms[0]};  // T2: the match being played, else the next one; any competition
 const CHEV_D='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.5 6.5 8 10l3.5-3.5" stroke="#F9FAFA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const FOOT18='<div class="cp-foot">+18. Juega con responsabilidad. Publi.</div>';
 const capHTML=(t,s)=>`<div class="tm-cap"><b>${t}</b><span>${s}</span></div>`;
@@ -1991,10 +1992,16 @@ function buildTeamPage(){
 function teamMatchesHTML(e){
  return `<div id="tmList">${teamList(e.id,e.comp).map(({m,md})=>`<div class="tm-md" data-md="${md}">${capHTML('Matchday '+md,dayOf(m))}${tileHTML(m)}</div>`).join('')}</div>`+(S.oddsOn?FOOT18:'<div class="cp-foot"></div>');
 }
+function teamOverviewHTML(e){
+ const m=teamNext(e.id);
+ if(!m)return `<div class="cp-empty"><b>No upcoming matches</b>Results are in the Matches tab</div>`;
+ const md=teamList(e.id,m.comp).find(x=>x.m===m).md;
+ return (S.oddsOn?LEGAL:'')+`<div class="cp-h">${m.live?'Live now':'Next match'}</div><div class="tm-md">${capHTML(CP[m.comp].t+' · Matchday '+md,dayOf(m)+(m.live?'':', '+m.ko)+(S.oddsOn?' · Match Result':''))}${tileHTML(m)}</div>`+(S.oddsOn?FOOT18:'');
+}
 function renderTeam(){
  const e=S.tm;if(!e)return;const mt=e.tab==='matches';if(S.tmMenu==='md')teamMenu(null);
  $('#tmFix').innerHTML=mt?(S.oddsOn?LEGAL:'')+`<button class="cp-chip tm-dd" id="tmMdBtn" data-tmm="md"><span id="tmMdT"></span>${CHEV_D}</button><div class="tm-menu" id="tmMdMenu" hidden></div>`:'';
- const sc=$('#tmScroll'),y=sc.scrollTop;sc.innerHTML=mt?teamMatchesHTML(e):'';sc.scrollTop=y;   // a re-render (a pick, a price) keeps the place in the list
+ const sc=$('#tmScroll'),y=sc.scrollTop;sc.innerHTML=mt?teamMatchesHTML(e):teamOverviewHTML(e);sc.scrollTop=y;   // a re-render (a pick, a price) keeps the place in the list
  if(mt)syncMd();
 }
 /* the matchday at the top of the list -> the label of the Matchday menu */
