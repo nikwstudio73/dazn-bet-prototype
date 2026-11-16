@@ -998,8 +998,9 @@ div.choice{cursor:default}
 .lu-seg button{flex:1;height:32px;border-radius:8px;font-weight:700;font-size:14px;line-height:18px;color:#8f9091;transition:background var(--m-quick) var(--ease),color var(--m-quick) var(--ease)} /* surface/container-1 and text/tertiary in the mode of the DS control: #0c1216, #8f9091 */
 .lu-seg button.on{background:rgba(195,209,219,.10);color:#f8f8f8} /* fill/overlay-3 and text/primary in the mode of the DS control, the same values as .fx-more */
 /* L2 · Live updates rebuilt (Figma "Live Updates with Odds" 4365:194526): the Live bet block on top, a feed without odds, the shot diagram in a goal card.
-   Nothing is pinned (L3). The glow stays only on goal cards. */
-.lu-top{position:relative;overflow:hidden;margin:calc(-1*var(--spacing-12)) calc(-1*var(--spacing-16)) 0;padding:var(--spacing-16);display:flex;flex-direction:column;gap:20px;border-radius:0 0 var(--radius-12) var(--radius-12);background:var(--fill-overlay-1);box-shadow:inset 0 -1px 0 var(--border-transparent-subtle)}
+   L4 (owner 16.11, reverses L3): the Live bet block (header 4365:210691: warning, label, question, prices) stays pinned under the compact header; the feed scrolls under it.
+   Its fill is fill/overlay-1 over the page colour, so nothing shows through. The glow stays only on goal cards. */
+.lu-top{position:sticky;top:calc(var(--sb) + 40px);z-index:2;overflow:hidden;margin:calc(-1*var(--spacing-12)) calc(-1*var(--spacing-16)) 0;padding:var(--spacing-16);display:flex;flex-direction:column;gap:20px;border-radius:0 0 var(--radius-12) var(--radius-12);background:linear-gradient(var(--fill-overlay-1),var(--fill-overlay-1)),var(--page);box-shadow:inset 0 -1px 0 var(--border-transparent-subtle)}
 /* the red glow of the frame is a turned ellipse (gradientTransform of 4365:194526 > header, 27 %): centre 109 / 11, half-axes 444.4 and 246.5, turned by 134.87deg on 375; the same transform on 440 gives the second set */
 .lu-top::before{content:"";position:absolute;left:109px;top:11px;width:888.8px;height:493px;margin:-246.5px 0 0 -444.4px;transform:rotate(134.87deg);pointer-events:none;background:radial-gradient(closest-side,rgba(209,36,36,0.270) 0.0%,rgba(198,36,36,0.253) 6.2%,rgba(186,36,36,0.236) 12.5%,rgba(175,36,36,0.219) 18.8%,rgba(164,36,36,0.203) 25.0%,rgba(152,36,37,0.186) 31.2%,rgba(141,36,37,0.169) 37.5%,rgba(129,36,37,0.152) 43.8%,rgba(118,36,37,0.135) 50.0%,rgba(107,35,37,0.118) 56.2%,rgba(95,35,37,0.101) 62.5%,rgba(84,35,37,0.084) 68.8%,rgba(72,35,38,0.068) 75.0%,rgba(61,35,38,0.051) 81.2%,rgba(50,35,38,0.034) 87.5%,rgba(38,35,38,0.017) 93.8%,rgba(27,35,38,0.000) 100.0%)}
 #stage.max .lu-top::before{left:127.9px;width:974px;height:528px;margin:-264px 0 0 -487px;transform:rotate(143.31deg)}
@@ -2199,7 +2200,7 @@ function closeFixture(){const t=topPage();t&&t.p==='fx'?pageBack():hideFixture()
 
 /* ---------- fixture · Live updates tab ----------
  L2 · Figma "Live Updates with Odds" 4365:194526. On top the Live bet block: "Who scores the next goal?" with three prices (home, No goal, away);
- it scrolls with the feed, nothing is pinned (L3). The feed has no odds: Commentary (minute + text), Event (goal, card, substitution) and Phase
+ it stays pinned under the compact header while the feed scrolls under it (L4, owner 16.11; reverses L3). The feed has no odds: Commentary (minute + text), Event (goal, card, substitution) and Phase
  (half-time, full-time, kick-off). A goal card has the glow of its side and the diagram of the shot. The block exists only while the match is played.
  Motion (owner, 16.11): a new event comes in from the top and pushes the feed down; if the feed is scrolled away nothing moves and a pill
  "1 new update" shows instead; a goal is an event like any other, the score in the header changes softly; the prices of the block move by the
@@ -2294,8 +2295,9 @@ function luPush(m,e0){
  if(S.fx===m.id){const t=$('#fxTime');if(setTxt(t,m.sh+' - '+m.sa,false))soft(t,{opacity:0})}                      // the score in the header changes softly, nothing travels
  const y=$('#scroll').scrollTop;renderFeed();$('#scroll').scrollTop=y;if(S.cp)renderComp();if(S.tm)renderTeam();renderSheet();updateBar(true);
 }
+function luEdge(){const t=$('#mkts .lu-top'),sc=$('#fxScroll'),q=sc.getBoundingClientRect(),k=sc.offsetHeight/q.height;return t?(t.getBoundingClientRect().bottom-q.top)*k:parseFloat(getComputedStyle($('#stage')).getPropertyValue('--sb'))+40} // L4: under the pinned Live bet block, or under the compact header when there is none
 function luAway(){const f=$('#luFeed'),sc=$('#fxScroll');if(!f)return false;const r=f.getBoundingClientRect(),q=sc.getBoundingClientRect(),k=sc.offsetHeight/q.height;   // k: the phone is scaled on the page
- return (r.top-q.top)*k<parseFloat(getComputedStyle($('#stage')).getPropertyValue('--sb'))+40}                      // the top of the feed is above the compact header
+ return (r.top-q.top)*k<luEdge()}                      // the top of the feed has gone under the pinned block (or the compact header)
 function luInsert(m,e){
  const f=$('#luFeed'),sc=$('#fxScroll'),away=luAway(),none=f.querySelector('.cp-empty');if(none)none.remove();
  const a=f.firstElementChild,t0=a?a.getBoundingClientRect().top:0;
@@ -2304,10 +2306,10 @@ function luInsert(m,e){
  if(away){if(a){const q=sc.getBoundingClientRect();sc.scrollTop+=(a.getBoundingClientRect().top-t0)*sc.offsetHeight/q.height}S.luNew++;luPill()} // whatever the browser's own scroll anchoring did, the card that was on top stays where it was                                                          // scrolled away: the reader stays where he is
  else{void w.offsetHeight;w.classList.add('on')}
 }
-function luPill(){const b=$('#luNew'),n=S&&S.fx&&S.fxTab==='live'?S.luNew:0;if(n)b.textContent=n+(n>1?' new updates':' new update');b.classList.toggle('show',n>0)}
+function luPill(){const b=$('#luNew'),n=S&&S.fx&&S.fxTab==='live'?S.luNew:0;if(n){b.textContent=n+(n>1?' new updates':' new update');b.style.top=$('#mkts .lu-top')?`calc(${luEdge()}px + var(--spacing-8))`:''}b.classList.toggle('show',n>0)} // L4: the pill sits spacing-8 under the pinned block, as under the compact header
 function luSeen(){if(S.luNew&&!luAway()){S.luNew=0;luPill()}}
 function luTop(){const f=$('#luFeed'),sc=$('#fxScroll');if(!f)return;const r=f.getBoundingClientRect(),q=sc.getBoundingClientRect(),k=sc.offsetHeight/q.height;
- S.luNew=0;luPill();sc.scrollTo({top:Math.max(0,sc.scrollTop+(r.top-q.top)*k-parseFloat(getComputedStyle($('#stage')).getPropertyValue('--sb'))-40-16)})} // a jump: the browser's smooth scroll has its own curve, outside the motion tokens
+ S.luNew=0;luPill();sc.scrollTo({top:Math.max(0,sc.scrollTop+(r.top-q.top)*k-luEdge()-16)})} // a jump: the browser's smooth scroll has its own curve, outside the motion tokens
 function paintFxTabs(){document.querySelectorAll('#fxTabs [data-fxv]').forEach(e=>e.classList.toggle('on',e.dataset.fxv===S.fxTab))}
 function fxKeep(){const t=topPage();if(t&&t.p==='fx'){t.tab=S.fxTab;t.key=S.luKey}}
 function setFxTab(v){if(S.fxTab===v||!S.fx)return;S.fxTab=v;S.luNew=0;luPill();fxKeep();paintFxTabs();renderMkts();restoreArrows();soft($('#mkts'),RISE,T.std)} // like the tabs of a league page: the new tab rises in
@@ -2535,7 +2537,7 @@ const STATES=[
  {g:'Fixture',k:'Odds tab',n:'Pre-match markets of one match (tap its tile in the feed), in groups: Match Result, Goals, Goalscorer, Handicap. Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
  {g:'Fixture',k:'Overview',n:'Tab “Overview” of a match that has not started: Match Results, then the carousel “Top Bets”. A Top Bet is a ready-made combination with one price: a tap on the price puts it into the betslip as one card, a second tap takes it out. The blocks below are drawn only.',run(){openFixture('m4');setFxTab('over')}},
  {g:'Fixture',k:'Live match',n:'Every match of the feed has its page. A live one shows the score and the minute, and only the markets that still make sense for the score.',run(){openFixture('m1')}},
- {g:'Fixture',k:'Live updates',n:'Tab “Live updates” of a live match. On top the Live bet block: “Who scores the next goal?” with three prices; it scrolls with the feed. The feed shows the events of the match and has no odds.',run(){openFixture('m1');setFxTab('live')}},
+ {g:'Fixture',k:'Live updates',n:'Tab “Live updates” of a live match. On top the Live bet block: “Who scores the next goal?” with three prices; it stays pinned under the header while the feed scrolls under it. The feed shows the events of the match and has no odds.',run(){openFixture('m1');setFxTab('live')}},
  {g:'Fixture',k:'Live updates · goal',n:'A goal comes in: its card opens on top of the feed and pushes it down, the line of the shot draws, the score in the header changes and the prices of the Live bet block move. With the feed scrolled away nothing moves: a pill “1 new update” shows instead.',run(){openFixture('m1');setFxTab('live');S.luQ.m1=2;const c=cur;setTimeout(()=>{if(cur===c&&S.fx==='m1'&&!(S.lu.m1||[]).length)luPush(M('m1'),LQ.m1[1])},T.sheet)}},
  {g:'Fixture',k:'Goalscorer',n:'Between Goals and Handicap: a carousel of Goalscorer cards. Every player is his own pick, so several can be in the betslip; a picked card turns white.',run(){openFixture('m4');setTimeout(()=>{const f=$('#fxScroll'),g=$('#mkts .gs');if(!g)return;const r=f.getBoundingClientRect();f.scrollTop+=(g.getBoundingClientRect().top-r.top)*f.offsetHeight/r.height-160},80)}},
  {g:'Competition',k:'Winner',n:'Odds tab of a competition (tap its header in the feed): who wins the season. One pick per market; it goes to the same betslip.',run(){openComp('ucl','win')}},
