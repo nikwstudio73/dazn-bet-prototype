@@ -1104,6 +1104,86 @@ div.choice{cursor:default}
 .ox-div{height:1px;margin:calc(var(--spacing-12) * -1) calc(var(--spacing-16) * -1);background:var(--border-transparent-subtle)}
 .ox .gs{gap:var(--spacing-16)}
 .ox .gs-h{padding-left:var(--spacing-4)}
+/* O1 · fixture · Overview tab, Figma "B · Top Bets carousel after Match Results" 4369:236502.
+   Match Results (Odds/Market, Style=Glow) and the Top Bets carousel (Odds/Top Bet 3975:39703) take picks; Form, League position, Match info and Next matches are drawn only.
+   Gradients: Figma mixes without premultiplying, so 16 stops each, as everywhere in this file. */
+.ovw{display:flex;flex-direction:column}
+.ov-mr{display:flex;flex-direction:column;gap:var(--spacing-12);padding:var(--spacing-16) var(--spacing-8) var(--spacing-12);border-radius:var(--radius-12);overflow:hidden;
+ background:radial-gradient(67.2% 106.6% at 100% 49.9%,rgba(232,21,30,0.220) 0.0%,rgba(219,22,30,0.206) 6.2%,rgba(206,23,31,0.193) 12.5%,rgba(194,24,32,0.179) 18.8%,rgba(181,24,32,0.165) 25.0%,rgba(168,25,32,0.151) 31.2%,rgba(155,26,33,0.138) 37.5%,rgba(142,27,34,0.124) 43.8%,rgba(130,28,34,0.110) 50.0%,rgba(117,29,34,0.096) 56.2%,rgba(104,30,35,0.083) 62.5%,rgba(91,31,36,0.069) 68.8%,rgba(78,32,36,0.055) 75.0%,rgba(65,32,36,0.041) 81.2%,rgba(53,33,37,0.028) 87.5%,rgba(40,34,38,0.014) 93.8%,rgba(27,35,38,0.000) 100.0%),radial-gradient(62% 156.7% at 0% 52%,rgba(255,255,255,0.220) 0.0%,rgba(241,241,241,0.206) 6.2%,rgba(226,228,228,0.193) 12.5%,rgba(212,214,214,0.179) 18.8%,rgba(198,200,201,0.165) 25.0%,rgba(184,186,187,0.151) 31.2%,rgba(170,172,174,0.138) 37.5%,rgba(155,159,160,0.124) 43.8%,rgba(141,145,146,0.110) 50.0%,rgba(127,131,133,0.096) 56.2%,rgba(112,118,119,0.083) 62.5%,rgba(98,104,106,0.069) 68.8%,rgba(84,90,92,0.055) 75.0%,rgba(70,76,79,0.041) 81.2%,rgba(56,62,65,0.028) 87.5%,rgba(41,49,52,0.014) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--surface-container-1)} /* "team glow": away red from the right, home white from the left, 22 % */
+.ov-mr>b{padding:0 var(--spacing-8);font-weight:700;font-size:18px;line-height:25px;color:var(--t1)}
+.ov-cr{display:flex;align-items:center;justify-content:space-between;height:59px;padding:17px 33px 2px 30px} /* .Odds/Crests, Layout=Question */
+.ov-cr img{width:40px;height:40px;object-fit:contain}
+.ov-cr img:last-child{width:36px;height:36px} /* the away crest is 36 in the frame */
+.ov-cr b{font-weight:700;font-size:18px;line-height:25px;color:var(--t1)}
+.tb{display:flex;flex-direction:column;gap:var(--spacing-12);margin-top:var(--spacing-16)}
+.tb-card{flex:none;width:283px;display:flex;flex-direction:column;border-radius:var(--radius-12);background:var(--surface-container-1);overflow:hidden}
+.tb-hd{display:flex;flex-direction:column;align-items:flex-start;gap:var(--spacing-6);padding:var(--spacing-16) var(--spacing-16) 10px;
+ background:radial-gradient(137.2% 174% at 49.5% 0%,rgba(255,79,26,0.160) 0.0%,rgba(241,76,27,0.150) 6.2%,rgba(226,74,28,0.140) 12.5%,rgba(212,71,28,0.130) 18.8%,rgba(198,68,29,0.120) 25.0%,rgba(184,65,30,0.110) 31.2%,rgba(170,62,30,0.100) 37.5%,rgba(155,60,31,0.090) 43.8%,rgba(141,57,32,0.080) 50.0%,rgba(127,54,33,0.070) 56.2%,rgba(112,52,34,0.060) 62.5%,rgba(98,49,34,0.050) 68.8%,rgba(84,46,35,0.040) 75.0%,rgba(70,43,36,0.030) 81.2%,rgba(56,40,36,0.020) 87.5%,rgba(41,38,37,0.010) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--fill-overlay-1)} /* orange glow of the frame, 16 % */
+.tb-lb{display:flex;align-items:center;gap:var(--spacing-4);height:20px;padding:0 var(--spacing-6);border-radius:2px;background:rgba(255,150,0,.1);font-weight:700;font-size:12px;line-height:20px;letter-spacing:.01em;text-transform:uppercase;color:var(--t1)} /* DS Label, orange secondary */
+.tb-lb svg{flex:none}
+.tb-m{align-self:stretch;min-width:0}
+.tb-m b{display:block;font-weight:700;font-size:18px;line-height:25px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-m span{display:flex;align-items:center;gap:var(--spacing-4);font-size:12px;line-height:18px;color:var(--t2)}
+.tb-m span i{width:1px;height:14px;margin-top:var(--spacing-4);background:var(--fill-overlay-3)}
+.tb-body{display:flex;flex-direction:column;gap:var(--spacing-8);padding:var(--spacing-12) var(--spacing-16)}
+.tb-legs{display:flex;flex-direction:column}
+.tb-leg{position:relative;display:flex;flex-direction:column;gap:var(--spacing-2);padding:0 0 var(--spacing-12) 22px} /* .Bet/Leg: a 6 px dot on a rail, selection and market */
+.tb-leg:last-child{padding-bottom:0}
+.tb-leg::before{content:"";position:absolute;left:0;top:6px;width:6px;height:6px;border-radius:50%;background:var(--t1)}
+.tb-leg:not(:last-child)::after{content:"";position:absolute;left:2.5px;top:12px;bottom:-6px;width:1px;background:var(--tdis)}
+.tb-leg b{font-weight:700;font-size:14px;line-height:18px;letter-spacing:.01em;color:var(--t1)}
+.tb-leg span{font-size:12px;line-height:18px;color:var(--text-tertiary)}
+.tb-more{padding-left:22px;font-size:12px;line-height:18px;color:var(--t2)}
+.tb-ft{display:flex;margin-top:auto;padding:var(--spacing-8)}
+.tb-ft .odd{flex:1;width:auto;height:48px;background:var(--surface-container-2);box-shadow:inset 0 0 0 1px var(--line)} /* .Bet/Price button */
+.tb-ft .odd.sel{background:var(--odd-sel-bg);box-shadow:none}
+/* the same legs on the betslip card (Betslip/Card, Type=Top Bet): the rail sits under the sport icon */
+.card .tb-legs{padding-left:7px;transition:opacity var(--m-std) var(--ease);transition-delay:calc(var(--i,0) * 45ms)}
+.card.out .tb-legs,.editing .card .tb-legs{opacity:.3}
+/* blocks without betting, as drawn in the frame; nothing here is tappable */
+.ov-s{display:flex;flex-direction:column;gap:10px}
+.ov-t{height:48px;padding-top:24px;font-weight:700;font-size:18px;line-height:16px;color:var(--t1)}
+.ov-s.fm{padding-bottom:30px}
+.ov-fc{display:flex;flex-direction:column;gap:20px;padding:24px var(--spacing-8);border-radius:var(--radius-12);background:var(--surface-container-2);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden}
+.ov-tn{display:flex;align-items:center;gap:var(--spacing-8);height:24px;font-size:16px;line-height:24px;color:var(--t1)}
+.ov-tn img{width:24px;height:24px;object-fit:contain}
+.ov-pills{display:flex;justify-content:flex-end;gap:7px;height:36px} /* the row is longer than the card: older results leave to the left */
+.ov-p{position:relative;flex:none;display:flex;align-items:center;justify-content:center;gap:var(--spacing-4);width:90px;height:36px;border-radius:36px;border:1px solid var(--navoff);background:rgba(61,69,73,.3);font-weight:700;font-size:16px;line-height:24px;color:var(--t1)}
+.ov-p img{width:20px;height:20px;object-fit:contain}
+.ov-p span{display:flex;justify-content:center;width:26px}
+.ov-p span b{width:9px;text-align:center}
+.ov-p span b.d{color:var(--t4)}
+.ov-p span i{width:8px;text-align:center;font-style:normal;font-size:14px}
+.ov-p.w{background:rgba(0,149,76,.2);border-color:#147e4a}
+.ov-p.l{background:rgba(209,36,36,.2);border-color:var(--live)}
+.ov-p.all{background:none;border-color:var(--t1)}
+.ov-p.last::after{content:"";position:absolute;left:50%;bottom:-6px;width:35px;height:1px;margin-left:-17.5px;background:var(--navoff)} /* the latest result is underlined in its colour */
+.ov-p.w.last::after{background:#147e4a}
+.ov-p.l.last::after{background:var(--live)}
+.ov-s.lg{padding-bottom:var(--spacing-16)}
+.ov-tbl{border-radius:var(--radius-12);background:var(--surface-container-2);box-shadow:inset 0 0 0 1px var(--line)}
+.ov-tr{display:flex;align-items:center;height:44px;padding-right:15px;color:var(--t1)}
+.ov-tr+.ov-tr{border-top:1px solid var(--line)}
+.ov-tr .p{flex:none;width:24px;text-align:center;font-size:12px;line-height:20px}
+.ov-tr .n{flex:1;min-width:0;display:flex;align-items:center;gap:var(--spacing-4);font-size:16px;line-height:24px;white-space:nowrap}
+.ov-tr .n img{width:20px;height:20px;object-fit:contain}
+.ov-tr i{flex:none;width:30px;text-align:right;font-style:normal;font-size:12px;line-height:20px}
+.ov-tr .n+i{width:26px}
+.ov-tr.hd .n{padding-left:var(--spacing-8);font-weight:700;font-size:14px;line-height:20px}
+.ov-tr.hd i{font-weight:700}
+.ov-all{display:flex;align-items:center;justify-content:flex-end;gap:var(--spacing-4);height:32px;padding:0 var(--spacing-8);font-size:14px;line-height:22px;color:var(--t1)}
+.ov-s.mi{gap:var(--spacing-16);padding-bottom:24px}
+.ov-ir{display:flex;align-items:center;gap:var(--spacing-12);min-height:24px}
+.ov-ir svg{flex:none}
+.ov-ir div{display:flex;flex-direction:column;gap:10px;min-width:0}
+.ov-ir b{font-weight:400;font-size:16px;line-height:13px;color:var(--t1)}
+.ov-ir span{font-size:14px;line-height:10px;color:var(--t4)}
+.ov-dv{height:1px;margin-left:31px;background:var(--line)}
+.ov-s.nx{gap:0;padding-bottom:24px}
+.ov-nx{display:flex;flex-direction:column;gap:var(--spacing-16)}
+.ov-ni{display:flex;flex-direction:column;gap:var(--spacing-12)}
+.ov-nm{display:flex;justify-content:space-between;height:15px;font-size:14px;line-height:15px;color:var(--t4);white-space:nowrap}
+.mkts .ov-ft{margin:20px 0 24px}
 </style>
 </head>
 <body>
@@ -1164,7 +1244,7 @@ div.choice{cursor:default}
      </div>
     </div>
     <div class="fx-comp"><div class="c"><i><img id="fxCompImg" src="assets/img/laliga.png" alt=""></i><span id="fxComp">LA Liga EA Sports</span></div><button class="fx-follow">Follow</button></div>
-    <div class="fx-tabs" id="fxTabs"><span>Overview</span><span>H2H</span><span class="on" data-fxv="odds">Odds</span><span data-fxv="live">Live updates</span><span>Lineups</span><span>Stats</span></div>
+    <div class="fx-tabs" id="fxTabs"><span data-fxv="over">Overview</span><span>H2H</span><span class="on" data-fxv="odds">Odds</span><span data-fxv="live">Live updates</span><span>Lineups</span><span>Stats</span></div>
     <div class="mkts" id="mkts"></div>
    </div>
   </div>
@@ -1697,7 +1777,7 @@ function mkt(mid,id){const f=FX[mid];return f&&(id==='nts'?S.nts[mid]||f.nts:f.m
 function oddsOf(s){
  const m=M(s.m);if(m.out){const c=CP[s.m];return s.g==='win'||s.g==='rel'?c[s.g].find(x=>x[0]===s.o)[2]:cpPlayer(c,s.o).v} // outright: Competition winner / Relegation / Top scorer
  if(s.g==='1x2')return m.o[+s.o];
- const [id,line]=s.g.split(':');if(id==='gs')return FX[s.m].scorers.find(x=>x.k===line).v;const k=mkt(s.m,id);
+ const [id,line]=s.g.split(':');if(id==='gs')return FX[s.m].scorers.find(x=>x.k===line).v;if(id==='tb')return tbGet(s).v;const k=mkt(s.m,id); // tb: a Top Bet has one price for the whole combination
  if(k.type==='hc')return k.lines[line][{'1':0,'X':1,'2':2}[s.o]];
  if(k.type==='lines'){const r=k.lines.find(x=>x[0]===line);return s.o==='o'?r[1]:r[2]}
  return k.opts.find(x=>x.k===s.o).v;
@@ -1707,6 +1787,7 @@ function selInfo(s){
  if(m.out){const c=CP[s.m];return s.g==='win'?{m,subj:c.win.find(x=>x[0]===s.o)[1],pred:'',mk:'Competition winner',odds}
   :s.g==='rel'?{m,subj:c.rel.find(x=>x[0]===s.o)[1],pred:'to be relegated',mk:'Relegation',odds}:{m,subj:cpPlayer(c,s.o).n,pred:'',mk:'Top scorer',odds}}
  if(id==='gs')return {m,subj:FX[s.m].scorers.find(x=>x.k===line).n,pred:'to score',mk:'Goalscorer',odds};
+ if(id==='tb'){const legs=tbGet(s).legs;return {m,subj:'Top Bet',pred:'',mk:`All ${legs.length} must win`,odds,legs}} // O1: one card, every leg listed
  if(s.g==='1x2'){const subj=s.o==='1'?'Draw':(s.o==='0'?m.h:m.a);return {m,subj,pred:s.o==='1'?'':'to win',mk:'Match result',odds}}
  if(id==='ou')return {m,subj:(s.o==='o'?'Over ':'Under ')+line,pred:'goals',mk:'Total goals',odds};
  if(id==='ou1h')return {m,subj:(s.o==='o'?'Over ':'Under ')+line,pred:'goals in 1st half',mk:'Total goals – 1st half',odds};
@@ -1741,7 +1822,8 @@ function toggleSel(mid,g,o){
 }
 function syncTiles(){document.querySelectorAll('[data-g]').forEach(b=>b.classList.toggle('sel',isSel(b.dataset.m,b.dataset.g,b.dataset.o)))}
 /* bet type: 1 pick = Single, picks from different matches = ACCA (odds multiply), any two picks on one match = Singles (no total odds) */
-function betType(){const n=S.sel.length;if(n<2)return 'Single';const ms=new Set(S.sel.map(s=>s.m));return ms.size<n?'Singles':'ACCA'}
+const isTb=s=>s.g.startsWith('tb:'); // O1: a Top Bet is one pick (one of the 20) with one price; mixed with anything else the slip reads "Singles" (working assumption, open with the PM)
+function betType(){const n=S.sel.length,tb=S.sel.some(isTb);if(n<2)return tb?'Top Bet':'Single';const ms=new Set(S.sel.map(s=>s.m));return tb||ms.size<n?'Singles':'ACCA'}
 function totalOdds(){const a=act();return a.length?a.reduce((p,s)=>p*oddsOf(s),1):0} // dropped-out picks leave the total
 
 /* ---------- collapsed bar ---------- */
@@ -1766,7 +1848,8 @@ function updateBar(bump,dir){ // dir: the total moved because a price moved (1 u
  $('#barCount').textContent=n;
  if(bump&&n!==lastCount){const b=$('#barCount');b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}
  lastCount=n;
- const names=S.sel.map(s=>selInfo(s).subj);setTxt($('#barItems'),n>3?names.slice(0,3).join(', ')+' +'+(n-3):names.join(', '),anim);
+ const names=S.sel.map(s=>{const i=selInfo(s);return i.legs&&n===1?i.m.h+' v '+i.m.a:i.subj}); // a Top Bet alone shows its match (Figma 4356:105404), in a list it reads "Top Bet"
+ setTxt($('#barItems'),n>3?names.slice(0,3).join(', ')+' +'+(n-3):names.join(', '),anim);
  const bt=betType();setTxt($('#barType'),bt,anim);
  const pill=$('#barTotal'),hide=bt==='Singles',was=pill.hidden;pill.hidden=hide;if(was&&!hide&&anim)soft(pill,{opacity:0,transform:'scale(.9)'});
  setTxt($('#barTotal .num'),act().length?fT(totalOdds()):'–',anim&&!was,dir?rise(dir):RISE); // no active pick: a dash, not 0 (odds are never 0); the PRD says 0, open with the PM
@@ -1774,7 +1857,7 @@ function updateBar(bump,dir){ // dir: the total moved because a price moved (1 u
 
 /* ---------- sheet ---------- */
 function cardHTML(s,i){
- const {m,subj,pred,mk,odds}=selInfo(s),out=S.st[key(s)];
+ const {m,subj,pred,mk,odds,legs}=selInfo(s),out=S.st[key(s)];
  const price=out?`<span class="bst">${out==='locked'?LOCK:'Suspended'}</span>`
                 :`<span class="od cv" data-codd="${key(s)}"><span class="arr">${ARROW}</span><span class="num">${f2(odds)}</span></span>`;
  const status=m.live?`<span class="st"><span class="ev" data-cev="${key(s)}"><span class="gl">Goal!</span></span><span class="livepill"><span data-cmin="${m.id}">${m.min}’</span><i></i></span></span>`
@@ -1782,7 +1865,7 @@ function cardHTML(s,i){
  const match=m.live?`<span>${m.h}</span><span data-csc="${m.id}">${m.sh}:${m.sa}</span><span>${m.a}</span>`:m.out?`<span>${m.h}</span>`:`<span>${m.h}</span><span>vs</span><span>${m.a}</span>`; // wrapped in .tm below; an outright shows its competition
  return `<div class="cardwrap" data-card="${key(s)}" style="--i:${i}"><div class="card${m.live?' live':''}${out?' out':''}${out==='locked'?' lkd':''}">
   <div class="ctop">${SPORT}<div class="selc"><span>${subj}</span>${pred?`<em>${pred}</em>`:''}</div>${price}<button class="rm" data-rm="${key(s)}" aria-label="Remove"><img src="${IMG.close}" alt=""></button></div>
-  <div class="cinfo"><div class="mk">${mk}</div><div class="mrow"><span class="tm">${match}</span>${status}</div></div>
+  ${legs?tbLegs(legs):''}<div class="cinfo"><div class="mk">${mk}</div><div class="mrow"><span class="tm">${match}</span>${status}</div></div>
  </div></div>`;
 }
 function snapW(root){root.querySelectorAll('.tm>span,.selc>span').forEach(e=>{e.style.width='';const w=parseFloat(getComputedStyle(e).width);if(w>0)e.style.width=Math.ceil(w-.01)+'px'})}
@@ -1792,7 +1875,7 @@ function renderSheet(){
  // a pick dropped out (Suspended / Locked) or came back while the sheet is open: the card dims or lights up softly, the price swaps with a small rise
  const prev=renderSheet.st||{},cur={};S.sel.forEach(x=>cur[key(x)]=S.st[key(x)]||'');
  if(S.sheet)for(const k in cur){if(!(k in prev)||prev[k]===cur[k])continue;const w=document.querySelector(`[data-card="${k}"]`);if(!w)continue;
-  const from=cur[k]?1:.3;w.querySelectorAll('.ctop>.sp,.ctop>.selc,.cinfo .mk,.cinfo .tm,.cinfo .ko,.cinfo .ev,.livepill').forEach(e=>soft(e,{opacity:from,transform:'none'},T.layout));
+  const from=cur[k]?1:.3;w.querySelectorAll('.ctop>.sp,.ctop>.selc,.tb-legs,.cinfo .mk,.cinfo .tm,.cinfo .ko,.cinfo .ev,.livepill').forEach(e=>soft(e,{opacity:from,transform:'none'},T.layout));
   soft(w.querySelector('.bst,.od'),RISE,T.std,60)}
  // a card that was not there before (added while the sheet is open): it rises in
  if(S.sheet&&renderSheet.st)for(const k in cur)if(!(k in prev))soft(document.querySelector(`[data-card="${k}"]`),RISE,T.std);
@@ -2038,6 +2121,55 @@ function oddsHTML(m){
   (f.scorers?`<i class="ox-div"></i><section class="gs"><div class="gs-h"><b>Goalscorer</b><span>In this match</span></div><div class="gs-row">${f.scorers.map(p=>`<div class="gs-card"><span class="gs-ph"><img src="${IMG[GSC[p.k]||'gsc_none']}" alt=""></span><b>${p.n}</b><span class="cl"><img src="${crest(p.cr)}" alt="">${p.team}</span>${oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only')}</div>`).join('')}</div></section>`:'')+
   (hc?hcHTML(m,hc):'')+(m.ft?'':`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`)+'</div>';
 }
+/* ---------- fixture · Overview tab (O1) ----------
+ Figma "B · Top Bets carousel after Match Results" 4369:236502. Match Results: the three 1X2 prices, the same picks as everywhere.
+ Top Bets: ready-made combinations of this match, each with one price; a tap on the price puts the whole combination into the betslip as one card,
+ a second tap takes it out. Working assumptions (not confirmed by the owner and the PM): a Top Bet is one of the 20 picks; it leaves only as a whole;
+ a suspended or locked Top Bet drops out as a whole (S.st by its key); a live or finished match has no Top Bets.
+ Form, League position, Match info and Next matches are drawn by the frame and take no taps. */
+Object.assign(IMG,{t_ala:'assets/img/t_ala.png',t_rso:'assets/img/t_rso.png',t_ben:'assets/img/t_ben.png'}); // whole paths, so build.py inlines them
+const TB={m4:[ // the drawn match: legs and prices of the frame (the second and third card of the frame are placeholders, so they get their own content)
+ {id:'1',v:14.20,legs:[['Real Madrid to win','Match Results'],['Over 2.5','Total Goals'],['Mbappé to score','Anytime Goalscorer'],['Both Teams To Score','Yes'],['Over 0.5','Total Goals - 1st Half']]},
+ {id:'2',v:3.40,legs:[['Mbappé to score','Anytime Goalscorer'],['Real Madrid or Draw','Double Chance'],['Over 1.5','Total Goals']]},
+ {id:'3',v:7.25,legs:[['Atlético or Draw','Double Chance'],['Under 3.5','Total Goals'],['Julián Álvarez to score','Anytime Goalscorer'],['Both Teams To Score','Yes']]}]};
+/* every other match: the same three combinations from its favourite, its underdog and their scorers; prices follow the 1X2 prices by the ratios of the drawn match (demo data) */
+function tbOf(m){
+ if(m.live||m.ft||m.out||!FX[m.id])return [];if(TB[m.id])return TB[m.id];
+ const sc=FX[m.id].scorers||[],hf=m.o[0]<=m.o[2],F=hf?m.h:m.a,U=hf?m.a:m.h,fo=Math.min(m.o[0],m.o[2]),uo=Math.max(m.o[0],m.o[2]);
+ const man=k=>{const p=sc.find(x=>x.cr.startsWith(k));return p?[p.n.split(' ').pop()+' to score','Anytime Goalscorer']:['Both Teams To Score','Yes']},fs=man(hf?m.hi:m.ai),us=man(hf?m.ai:m.hi);
+ const r5=x=>Math.round(x*20)/20; // a bookmaker rounds to .05
+ return TB[m.id]=[{id:'1',v:r5(fo*7.28),legs:[[F+' to win','Match Results'],['Over 2.5','Total Goals'],fs,['Over 1.5','Total Goals'],['Over 0.5','Total Goals - 1st Half']]},
+  {id:'2',v:r5(fo*1.744),legs:[fs,[F+' or Draw','Double Chance'],['Over 1.5','Total Goals']]},
+  {id:'3',v:r5(uo*1.859),legs:[[U+' or Draw','Double Chance'],['Under 3.5','Total Goals'],us,['Under 4.5','Total Goals']]}];
+}
+const tbGet=s=>(TB[s.m]||tbOf(M(s.m))).find(x=>x.id===s.g.split(':')[1]); // the Top Bet of a pick; TB keeps it after kick-off too, so a pick already in the betslip keeps its legs
+const tbLegs=l=>`<div class="tb-legs">${l.map(([a,b])=>`<div class="tb-leg"><b>${a}</b><span>${b}</span></div>`).join('')}</div>`;
+const TB_STAR='<svg width="16" height="16" viewBox="6 2 16 16" fill="none" aria-hidden="true"><path d="M17.68 16.345C17.57 16.345 17.46 16.315 17.35 16.265L14.15 14.575C14.06 14.525 13.96 14.525 13.87 14.575L10.67 16.265C10.43 16.385 10.15 16.365 9.93002 16.215C9.71002 16.055 9.61002 15.795 9.65002 15.535L10.26 11.965C10.28 11.865 10.24 11.765 10.17 11.695L7.58002 9.17503C7.39002 8.98503 7.32002 8.71503 7.40002 8.45503C7.48002 8.20503 7.70002 8.01503 7.96002 7.97503L11.54 7.45503C11.64 7.44503 11.72 7.37503 11.77 7.29503L13.37 4.04503C13.49 3.80503 13.73 3.65503 14 3.65503C14.27 3.65503 14.51 3.80503 14.63 4.04503L16.23 7.29503C16.27 7.38503 16.36 7.44503 16.46 7.45503L20.04 7.97503C20.3 8.01503 20.52 8.19503 20.6 8.45503C20.68 8.70503 20.61 8.98503 20.42 9.17503L17.83 11.695C17.76 11.765 17.73 11.865 17.74 11.965L18.35 15.535C18.39 15.795 18.29 16.065 18.07 16.215C17.95 16.305 17.8 16.345 17.66 16.345H17.68Z" fill="#FF9600"/></svg>';
+const OV_IC={ // icons of the frame (Match info, See all)
+ cal:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8.66602 12.9717C9.77089 12.9719 10.6669 13.8678 10.667 14.9727C10.667 16.0777 9.77095 16.9735 8.66602 16.9737C7.56094 16.9737 6.66504 16.0778 6.66504 14.9727C6.66514 13.8677 7.561 12.9717 8.66602 12.9717Z" fill="#B3B9BB"/><path fill-rule="evenodd" clip-rule="evenodd" d="M15.3877 2.35257C15.8846 2.3527 16.2881 2.75599 16.2881 3.25296V4.83304H18.4199C19.8862 4.83314 20.9002 6.13467 20.9004 7.51077V17.8526C20.9002 19.2287 19.8862 20.5302 18.4199 20.5303H5.58008C4.11375 20.5302 3.09975 19.2287 3.09961 17.8526V7.51077C3.09984 6.13469 4.11381 4.83314 5.58008 4.83304H7.71191V3.25296C7.71191 2.75599 8.11536 2.3527 8.6123 2.35257C9.10936 2.35257 9.5127 2.7559 9.5127 3.25296V4.83304H14.4873V3.25296C14.4873 2.7559 14.8906 2.35257 15.3877 2.35257ZM4.90039 17.8526C4.90053 18.4396 5.30117 18.7304 5.58008 18.7305L18.4199 18.7295C18.6988 18.7294 19.0995 18.4396 19.0996 17.8526V10.8594H4.90039V17.8526ZM5.58008 6.63382C5.3012 6.63394 4.90061 6.92384 4.90039 7.51077V9.05862H19.0996V7.51077C19.0994 6.92382 18.6988 6.63394 18.4199 6.63382H5.58008Z" fill="#B3B9BB"/></svg>',
+ pin:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12.2959 1.97815C14.4595 1.97827 16.5524 2.83851 18.0859 4.38245C19.6167 5.91324 20.4912 8.00631 20.4912 10.1744C20.4912 10.2448 20.4811 10.3128 20.4658 10.3785C20.3939 12.8844 19.016 15.3244 17.5498 17.2516C16.0228 19.2586 14.286 20.8576 13.418 21.611C13.3994 21.627 13.3801 21.6423 13.3604 21.6569C13.0519 21.8831 12.6749 22.0123 12.2852 22.0123C11.9119 22.0123 11.5084 21.892 11.1855 21.6383C11.175 21.63 11.1645 21.6217 11.1543 21.6129C10.2838 20.8629 8.54655 19.2639 7.01953 17.2555C5.51349 15.2746 4.09977 12.7515 4.09961 10.1744C4.09961 7.99912 4.96002 5.91568 6.50391 4.38245C8.0347 2.85166 10.1278 1.97815 12.2959 1.97815ZM5.90039 10.1744C5.90056 12.1447 7.01099 14.2701 8.45215 16.1656C9.847 18.0003 11.4478 19.4853 12.2842 20.2096C13.1233 19.4779 14.7232 17.9939 16.1172 16.1617C17.5585 14.2674 18.6698 12.1446 18.6699 10.1744C18.6699 10.1152 18.6746 10.0567 18.6855 10.0006C18.6406 8.3751 17.9681 6.81055 16.8135 5.65588L16.8115 5.65295C15.6191 4.45123 13.986 3.77905 12.2959 3.77893C10.6086 3.77893 8.97303 4.4602 7.77734 5.65588L7.77441 5.65784C6.57208 6.85085 5.90039 8.47422 5.90039 10.1744Z" fill="#B3B9BB"/><path d="M14.1228 10.1261C14.1228 9.11625 13.3055 8.29904 12.2957 8.29895C11.2858 8.29895 10.4685 9.1162 10.4685 10.1261C10.4686 11.1359 11.2858 11.9532 12.2957 11.9532C13.3054 11.9532 14.1227 11.1359 14.1228 10.1261ZM15.9226 10.1261C15.9225 12.13 14.2995 13.753 12.2957 13.7531C10.2917 13.7531 8.66781 12.13 8.66772 10.1261C8.66772 8.12209 10.2916 6.49817 12.2957 6.49817C14.2996 6.49826 15.9226 8.12214 15.9226 10.1261Z" fill="#B3B9BB"/></svg>',
+ ref:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11.9399 7.64002C12.4399 7.64002 12.8399 7.24002 12.8399 6.74002V3.92002C12.8399 3.42002 12.4399 3.02002 11.9399 3.02002C11.4399 3.02002 11.0399 3.42002 11.0399 3.92002V6.74002C11.0399 7.24002 11.4399 7.64002 11.9399 7.64002Z" fill="#9EA2A4"/><path d="M15.8799 7.65005C16.1099 7.65005 16.3399 7.56004 16.5199 7.39004L18.6399 5.27005C18.9899 4.92005 18.9899 4.35005 18.6399 4.00005C18.2899 3.65005 17.7199 3.65005 17.3699 4.00005L15.2499 6.12005C14.8999 6.47005 14.8999 7.04004 15.2499 7.39004C15.4299 7.57004 15.6599 7.65005 15.8899 7.65005H15.8799Z" fill="#9EA2A4"/><path d="M7.35993 7.38004C7.53993 7.56004 7.76993 7.64004 7.99993 7.64004C8.22993 7.64004 8.45993 7.55004 8.63993 7.38004C8.98993 7.03004 8.98993 6.46004 8.63993 6.11004L6.51993 3.99004C6.16993 3.64004 5.59993 3.64004 5.24993 3.99004C4.89993 4.34004 4.89993 4.91004 5.24993 5.26004L7.36993 7.38004H7.35993Z" fill="#9EA2A4"/><path d="M16.9399 9.11995C16.3199 8.86995 15.6699 8.72995 14.9699 8.69995H4.96993C4.03993 8.69995 3.26993 9.38995 3.17993 10.3599C3.17993 10.3799 3.17993 10.47 3.17993 10.49V13.0299C3.17993 14.0199 3.98993 14.8299 4.97993 14.8299H8.53993C8.53993 18.2199 11.2999 20.9799 14.6799 20.9799C18.0699 20.9799 20.8199 18.2199 20.8199 14.8299C20.8199 12.2999 19.2999 10.0499 16.9399 9.11995ZM14.6699 18.9799C12.3799 18.9799 10.5299 17.1199 10.5299 14.8299C10.5299 13.7299 9.62993 12.8299 8.52993 12.8299H5.16993V10.6899H14.8999C15.3499 10.7199 15.7899 10.8099 16.2099 10.9799C17.7999 11.61 18.8299 13.1199 18.8299 14.8299C18.8299 17.1199 16.9699 18.9699 14.6899 18.9799H14.6699Z" fill="#9EA2A4"/></svg>',
+ chev:'<svg width="12" height="12" viewBox="325 10 12 12" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M328.505 21.9949L327.5 20.9898L332.49 16L327.5 11.0102L328.505 10.0051L334.5 16L328.505 21.9949Z" fill="#F9FAFA"/></svg>'};
+function overHTML(m){
+ const f=FX[m.id],tb=tbOf(m),H=crest(m.hi),A=crest(m.ai),lg=(CP[m.comp]?CP[m.comp].t:f.comp).replace(' EA Sports',''),m4=m.id==='m4';
+ const pill=(l,a,b,r,k,last)=>`<span class="ov-p ${k}${last?' last':''}"><img src="${l}" alt=""><span><b${a<b?' class="d"':''}>${a}</b><i>-</i><b${b<a?' class="d"':''}>${b}</b></span><img src="${r}" alt=""></span>`;
+ const form=(n,c,p)=>`<div class="ov-fc"><div class="ov-tn"><img src="${c}" alt="">${n}</div><div class="ov-pills">${p}<span class="ov-p all">See all</span></div></div>`;
+ const row=(p,c,n,d)=>`<div class="ov-tr"><span class="p">${p}</span><span class="n"><img src="${c}" alt="">${n}</span>${d.map(x=>`<i>${x}</i>`).join('')}</div>`;
+ const next=(comp,date,ko,t)=>`<div class="ov-ni"><div class="ov-nm"><span>${comp}</span><span>${date}</span></div><div class="tile"><div class="trow"><div class="tmain"><div class="tcol"><img src="${IMG.bell}" alt=""><div class="ko">${ko}</div></div>
+  <div class="teams">${t.map(([n,c])=>`<div class="team"><div class="n"><img src="${c}" alt="">${n}</div><div class="r">-</div></div>`).join('')}</div></div><div class="cta"><div class="pc"><img src="${IMG.play}" alt=""></div><span>Watch</span></div></div></div></div>`;
+ return `<div class="ovw"><div class="ov-mr"><b>Match Results</b><div class="ov-cr"><img src="${IMG[f.hiImg]}" alt=""><b>Who will win?</b><img src="${IMG[f.aiImg]}" alt=""></div>
+  <div class="o3">${[m.hs,'X',m.as].map((l,i)=>oddBtn(m.id,'1x2',String(i),l,m.o[i])).join('')}</div></div>`+
+  (tb.length?`<section class="tb"><div class="gs-h"><b>Top Bets</b><span>Ready-made combos for this match</span></div><div class="gs-row">${tb.map(t=>{const more=t.legs.length-3;
+   return `<div class="tb-card"><div class="tb-hd"><span class="tb-lb">${TB_STAR}Top Bet</span><div class="tb-m"><b>${m.h} v ${m.a}</b><span>${lg}<i></i>${f.date}, ${f.time}</span></div></div>
+   <div class="tb-body">${tbLegs(t.legs.slice(0,3))}${more>0?`<div class="tb-more">+${more} more selection${more>1?'s':''}</div>`:''}</div><div class="tb-ft">${oddBtn(m.id,'tb:'+t.id,'y','',t.v,'only')}</div></div>`}).join('')}</div></section>`:'')+
+  `<section class="ov-s fm"><div class="ov-t">Form</div>${form(m.h,H,pill(A,0,0,H,'')+pill(H,4,2,IMG.t_ala,'w')+pill(IMG.t_rso,3,1,H,'l',1))}${form(m.a,A,pill(A,0,0,H,'')+pill(A,4,2,IMG.t_rso,'w')+pill(IMG.t_ala,1,3,A,'w',1))}</section>
+  <section class="ov-s lg"><div class="ov-t">League  position</div><div class="ov-tbl"><div class="ov-tr hd"><span class="n">Team</span><i>MP</i><i>GD</i><i>PTS</i></div>${row(1,H,m.h,[19,'+24',49])}${row(3,A,m.a,[19,'+14',40])}</div><div class="ov-all">See all${OV_IC.chev}</div></section>
+  <section class="ov-s mi"><div class="ov-t">Match info</div><div class="ov-ir">${OV_IC.cal}<div><b>${m.live||m.ft?'Today':f.date}, ${m.ko||f.time}</b><span>Weather condition: Good</span></div></div><i class="ov-dv"></i>
+   <div class="ov-ir">${OV_IC.pin}<div><b>${m4?'Santiago Bernabeu, Madrid':m.h+' stadium'}</b><span>${m4?'Capacity: 83,186 · ':''}Pitch condition: Good</span></div></div><i class="ov-dv"></i>
+   <div class="ov-ir">${OV_IC.ref}<div><b>Ramon Angel Diaz</b></div></div></section>
+  <section class="ov-s nx"><div class="ov-t">Next matches</div><div class="ov-nx">${next('Champions League · Semi final','27 Sep. 2026','21.00',[[m.h,H],['Bayern Munich',crest('bay')]])}${next('Europa League · Final','20 Sep. 2026','21.00',[[m.a,A],['Benfica',IMG.t_ben]])}</div></section>
+  <div class="sgfoot ov-ft">+18. Juega con responsabilidad. Publi.</div></div>`;
+}
 /* fills the match page (T1: openFixture() puts it on screen and on the stack of pages) */
 function drawFixture(mid){
  const m=M(mid),f=FX[mid];
@@ -2061,7 +2193,7 @@ function openFixture(mid){
 }
 /* C1: cut-out photos of the Goalscorer card (Figma has two); every other player gets the silhouette of the component */
 const GSC={mbappe:'gsc_mbappe',alvarez:'gsc_alvarez'};Object.assign(IMG,{gsc_mbappe:'assets/img/gsc_mbappe.png',gsc_alvarez:'assets/img/gsc_alvarez.png',gsc_none:'assets/img/gsc_none.png'}); // whole paths, so build.py inlines them
-function renderMkts(mid=S.fx){const m=M(mid);$('#mkts').innerHTML=S.fxTab==='live'?liveHTML(m):LEGAL+oddsHTML(m)}
+function renderMkts(mid=S.fx){const m=M(mid);$('#mkts').innerHTML=S.fxTab==='live'?liveHTML(m):S.fxTab==='over'?LEGAL+overHTML(m):LEGAL+oddsHTML(m)}
 function hideFixture(){$('#luNew').classList.remove('show');const fx=$('#fx');fx.classList.contains('left')?snap(fx,()=>fx.classList.remove('show','left')):fx.classList.remove('show');fx.setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},T.layout)}
 function closeFixture(){const t=topPage();t&&t.p==='fx'?pageBack():hideFixture()} // Back on a match page: to the page it was opened from (feed, league page, team page)
 
@@ -2401,6 +2533,7 @@ const STATES=[
  {g:'Limit 20',k:'Tap on a 21st odd',n:'Nothing is added and nothing is swapped. The odd presses and springs back slightly, an orange tongue slides out from behind the betslip and the counter pulses.',run(){fill20();refresh();toggleSel('m1','1x2','2')}},
  {g:'Limit 20',k:'Limit + suspended bet',n:'20 selections and one of them suspended: the line under Total odds explains the dropped bet.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet();toEnd()}},
  {g:'Fixture',k:'Odds tab',n:'Pre-match markets of one match (tap its tile in the feed), in groups: Match Result, Goals, Goalscorer, Handicap. Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
+ {g:'Fixture',k:'Overview',n:'Tab “Overview” of a match that has not started: Match Results, then the carousel “Top Bets”. A Top Bet is a ready-made combination with one price: a tap on the price puts it into the betslip as one card, a second tap takes it out. The blocks below are drawn only.',run(){openFixture('m4');setFxTab('over')}},
  {g:'Fixture',k:'Live match',n:'Every match of the feed has its page. A live one shows the score and the minute, and only the markets that still make sense for the score.',run(){openFixture('m1')}},
  {g:'Fixture',k:'Live updates',n:'Tab “Live updates” of a live match. On top the Live bet block: “Who scores the next goal?” with three prices; it scrolls with the feed. The feed shows the events of the match and has no odds.',run(){openFixture('m1');setFxTab('live')}},
  {g:'Fixture',k:'Live updates · goal',n:'A goal comes in: its card opens on top of the feed and pushes it down, the line of the shot draws, the score in the header changes and the prices of the Live bet block move. With the feed scrolled away nothing moves: a pill “1 new update” shows instead.',run(){openFixture('m1');setFxTab('live');S.luQ.m1=2;const c=cur;setTimeout(()=>{if(cur===c&&S.fx==='m1'&&!(S.lu.m1||[]).length)luPush(M('m1'),LQ.m1[1])},T.sheet)}},
