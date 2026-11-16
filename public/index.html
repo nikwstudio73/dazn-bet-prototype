@@ -2250,21 +2250,22 @@ const STATES=[
  {g:'Limit 20',k:'20 picks',v:'sheet',n:'20 selections in the sheet: the number is only in the header, “Betslip 20”. No extra message.',run(){fill20();refresh();openSheet()}},
  {g:'Limit 20',k:'Tap on a 21st odd',n:'Nothing is added and nothing is swapped. The odd presses and springs back slightly, an orange tongue slides out from behind the betslip and the counter pulses.',run(){fill20();refresh();toggleSel('m1','1x2','2')}},
  {g:'Limit 20',k:'Limit + suspended bet',n:'20 selections and one of them suspended: the line under Total odds explains the dropped bet.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet();toEnd()}},
- {g:'Other screens',k:'Finished matches',n:'Yesterday (Sat 3 Jan in the calendar): last prices stay, everything is disabled, the outcome that happened is white.',run(){setDay('yest')}},
- {g:'Other screens',k:'Favourite team popup',n:'The favourite team plays today: its win is preselected, "Add to my Betslip" puts the pick in the bar.',run(){openFav()}},
- {g:'Other screens',k:'Fixture · Odds tab',n:'Pre-match markets of one match (tap its tile in the feed). Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
- {g:'Other screens',k:'Fixture · Live match',n:'Every match of the feed has its page. A live one shows the score and the minute, and only the markets that still make sense for the score.',run(){openFixture('m1')}},
- {g:'Other screens',k:'Fixture · Live updates',n:'Tab “Live updates” of a match. Match Result stays pinned with its implied chance; the feed shows the events, and a key moment opens one more market: the latest goal “Next team to score”, half-time “Total Goals”.',run(){openFixture('m1');setFxTab('live')}},
- {g:'Other screens',k:'Fixture · Goalscorer',n:'Under the markets, above “More bets”: a carousel of Goalscorer cards. Every player is his own pick, so several can be in the betslip; a picked card turns white.',run(){openFixture('m4');setTimeout(()=>{const f=$('#fxScroll');f.scrollTop=f.scrollHeight},80)}},
- {g:'Other screens',k:'Competition · Winner',n:'Odds tab of a competition (tap its header in the feed): who wins the season. One pick per market; it goes to the same betslip.',run(){openComp('ucl','win')}},
- {g:'Other screens',k:'Competition · Top scorer',n:'Second sub-tab: two Top Picks cards and the list of players. A picked Top Pick turns white as a whole.',run(){openComp('ucl','scorer')}},
+ {g:'Fixture',k:'Odds tab',n:'Pre-match markets of one match (tap its tile in the feed). Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
+ {g:'Fixture',k:'Live match',n:'Every match of the feed has its page. A live one shows the score and the minute, and only the markets that still make sense for the score.',run(){openFixture('m1')}},
+ {g:'Fixture',k:'Live updates',n:'Tab “Live updates” of a match. Match Result stays pinned with its implied chance; the feed shows the events, and a key moment opens one more market: the latest goal “Next team to score”, half-time “Total Goals”.',run(){openFixture('m1');setFxTab('live')}},
+ {g:'Fixture',k:'Goalscorer',n:'Under the markets, above “More bets”: a carousel of Goalscorer cards. Every player is his own pick, so several can be in the betslip; a picked card turns white.',run(){openFixture('m4');setTimeout(()=>{const f=$('#fxScroll');f.scrollTop=f.scrollHeight},80)}},
+ {g:'Competition',k:'Winner',n:'Odds tab of a competition (tap its header in the feed): who wins the season. One pick per market; it goes to the same betslip.',run(){openComp('ucl','win')}},
+ {g:'Competition',k:'Top scorer',n:'Second sub-tab: two Top Picks cards and the list of players. A picked Top Pick turns white as a whole.',run(){openComp('ucl','scorer')}},
  /* N2 · the screens of 16 Nov. Fixed teams and leagues, so every show opens the same screen with the same numbers */
- {g:'Other screens',k:'Competition · Relegation',n:'Third sub-tab, only for leagues: who goes down, from the most likely team. Same rules as Competition winner: one pick per market, same betslip.',run(){openComp('laliga','rel')}},
- {g:'Other screens',k:'Competition · Matches',n:'Tab Matches of a competition: the calendar and the tiles of the feed, this competition only. Picks stay in sync with the feed and the betslip.',run(){openComp('laliga');setCompView('matches')}},
- {g:'Other screens',k:'Team · Matches',n:'Team page (tap a crest or a team name on a match page or in a league table): the season by matchday, opened at the current one, with the odds of the feed.',run(){openTeam('rm','laliga')}},
- {g:'Other screens',k:'Team · Matchday menu',n:'The Matchday select, open: pick a matchday and the list goes to it. The current one is marked.',run(){openTeam('rm','laliga');teamMenu('md')}},
- {g:'Other screens',k:'Team · Overview',n:'Tab Overview: the next match of the team in any competition, with its Match Result prices. Tap the tile to open the match.',run(){openTeam('bar','laliga');setTeamTab('overview')}},
- {g:'Other screens',k:'Team · Overview · live',n:'The team is playing now: the live match comes first, with the score, the minute and its current prices (L starts the live ticker).',run(){openTeam('rm','laliga');setTeamTab('overview')}}
+ {g:'Competition',k:'Relegation',n:'Third sub-tab, only for leagues: who goes down, from the most likely team. Same rules as Competition winner: one pick per market, same betslip.',run(){openComp('laliga','rel')}},
+ {g:'Competition',k:'Matches',n:'Tab Matches of a competition: the calendar and the tiles of the feed, this competition only. Picks stay in sync with the feed and the betslip.',run(){openComp('laliga');setCompView('matches')}},
+ {g:'Team',k:'Matches',n:'Team page (tap a crest or a team name on a match page or in a league table): the season by matchday, opened at the current one, with the odds of the feed.',run(){openTeam('rm','laliga')}},
+ {g:'Team',k:'Matchday menu',n:'The Matchday select, open: pick a matchday and the list goes to it. The current one is marked.',run(){openTeam('rm','laliga');teamMenu('md')}},
+ {g:'Team',k:'Overview',n:'Tab Overview: the next match of the team in any competition, with its Match Result prices. Tap the tile to open the match.',run(){openTeam('bar','laliga');setTeamTab('overview')}},
+ {g:'Team',k:'Overview · live',n:'The team is playing now: the live match comes first, with the score, the minute and its current prices (L starts the live ticker).',run(){openTeam('rm','laliga');setTeamTab('overview')}},
+ /* N2 · what is left: screens of the feed itself. They come last, so the topics read Betslip … Limit 20, Fixture, Competition, Team, Other screens */
+ {g:'Other screens',k:'Finished matches',n:'Yesterday (Sat 3 Jan in the calendar): last prices stay, everything is disabled, the outcome that happened is white.',run(){setDay('yest')}},
+ {g:'Other screens',k:'Favourite team popup',n:'The favourite team plays today: its win is preselected, "Add to my Betslip" puts the pick in the bar.',run(){openFav()}}
 ];
 STATES.forEach(s=>s.t=s.g+' · '+s.k+(s.v?' · '+s.v:''));        // full unique name (tests, logs)
 /* panel model: topics -> items; an item is one state, or a collapsed + opened pair */
