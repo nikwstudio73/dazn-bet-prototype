@@ -994,20 +994,23 @@ div.choice{cursor:default}
 .lu-pct b{font-weight:700;font-size:14px;line-height:18px;letter-spacing:.01em}
 .lu-pct span{font-size:12px;line-height:18px;color:var(--text-tertiary)}
 .lu-hero .o3{gap:var(--spacing-8)}
-.lu-seg{display:flex;padding:var(--spacing-4);border-radius:var(--radius-12);background:var(--surface-container-1)} /* DS Segmented Control, as on the V2 Odds page */
-.lu-seg button{flex:1;height:32px;border-radius:8px;font-weight:700;font-size:14px;line-height:18px;color:var(--text-tertiary);transition:background var(--m-quick) var(--ease),color var(--m-quick) var(--ease)}
+.lu-seg{display:flex;padding:var(--spacing-4);border-radius:var(--radius-12);background:#0c1216} /* DS Segmented Control, as on the V2 Odds page */
+.lu-seg button{flex:1;height:32px;border-radius:8px;font-weight:700;font-size:14px;line-height:18px;color:#8f9091;transition:background var(--m-quick) var(--ease),color var(--m-quick) var(--ease)} /* surface/container-1 and text/tertiary in the mode of the DS control: #0c1216, #8f9091 */
 .lu-seg button.on{background:rgba(195,209,219,.10);color:#f8f8f8} /* fill/overlay-3 and text/primary in the mode of the DS control, the same values as .fx-more */
 /* L2 · Live updates rebuilt (Figma "Live Updates with Odds" 4365:194526): the Live bet block on top, a feed without odds, the shot diagram in a goal card.
    Nothing is pinned (L3). The glow stays only on goal cards. */
-.lu-top{margin:calc(-1*var(--spacing-12)) calc(-1*var(--spacing-16)) 0;padding:var(--spacing-16);display:flex;flex-direction:column;gap:20px;border-radius:0 0 var(--radius-12) var(--radius-12);border-bottom:1px solid var(--border-transparent-subtle);
- background:radial-gradient(85% 160% at 29% 5%,rgba(209,36,36,0.270) 0.0%,rgba(198,36,36,0.253) 6.2%,rgba(186,36,36,0.236) 12.5%,rgba(175,36,36,0.219) 18.8%,rgba(164,36,36,0.203) 25.0%,rgba(152,36,37,0.186) 31.2%,rgba(141,36,37,0.169) 37.5%,rgba(129,36,37,0.152) 43.8%,rgba(118,36,37,0.135) 50.0%,rgba(107,35,37,0.118) 56.2%,rgba(95,35,37,0.101) 62.5%,rgba(84,35,37,0.084) 68.8%,rgba(72,35,38,0.068) 75.0%,rgba(61,35,38,0.051) 81.2%,rgba(50,35,38,0.034) 87.5%,rgba(38,35,38,0.017) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--fill-overlay-1)} /* fill/overlay-1 + the red glow of the frame (27 %, turned in Figma; here an upright ellipse from the same centre) */
+.lu-top{position:relative;overflow:hidden;margin:calc(-1*var(--spacing-12)) calc(-1*var(--spacing-16)) 0;padding:var(--spacing-16);display:flex;flex-direction:column;gap:20px;border-radius:0 0 var(--radius-12) var(--radius-12);background:var(--fill-overlay-1);box-shadow:inset 0 -1px 0 var(--border-transparent-subtle)}
+/* the red glow of the frame is a turned ellipse (gradientTransform of 4365:194526 > header, 27 %): centre 109 / 11, half-axes 444.4 and 246.5, turned by 134.87deg on 375; the same transform on 440 gives the second set */
+.lu-top::before{content:"";position:absolute;left:109px;top:11px;width:888.8px;height:493px;margin:-246.5px 0 0 -444.4px;transform:rotate(134.87deg);pointer-events:none;background:radial-gradient(closest-side,rgba(209,36,36,0.270) 0.0%,rgba(198,36,36,0.253) 6.2%,rgba(186,36,36,0.236) 12.5%,rgba(175,36,36,0.219) 18.8%,rgba(164,36,36,0.203) 25.0%,rgba(152,36,37,0.186) 31.2%,rgba(141,36,37,0.169) 37.5%,rgba(129,36,37,0.152) 43.8%,rgba(118,36,37,0.135) 50.0%,rgba(107,35,37,0.118) 56.2%,rgba(95,35,37,0.101) 62.5%,rgba(84,35,37,0.084) 68.8%,rgba(72,35,38,0.068) 75.0%,rgba(61,35,38,0.051) 81.2%,rgba(50,35,38,0.034) 87.5%,rgba(38,35,38,0.017) 93.8%,rgba(27,35,38,0.000) 100.0%)}
+#stage.max .lu-top::before{left:127.9px;width:974px;height:528px;margin:-264px 0 0 -487px;transform:rotate(143.31deg)}
+.lu-top>*{position:relative}
 .lu-top .legal{margin-bottom:0}
 .lu-q{display:flex;flex-direction:column;gap:var(--spacing-4)}
 .lu-q span{height:20px;font-weight:700;font-size:12px;line-height:20px;letter-spacing:.01em;text-transform:uppercase;color:#f45a5a} /* DS Label, red tertiary: components/label/red/tertiary/text */
 .lu-q b{font-weight:700;font-size:18px;line-height:25px;color:var(--t1)}
 .lu-top .o3 .odd:not(.sel){background:var(--odd-bg)}
 .lu-feed{margin-bottom:calc(-1*var(--spacing-8))}
-.lu-card{margin-bottom:var(--spacing-8);border-radius:var(--radius-12);padding:var(--spacing-16) var(--spacing-12) var(--spacing-12);background:var(--fill-overlay-1);box-shadow:inset 0 0 0 1px var(--border-transparent-subtle)} /* Live/Event card */
+.lu-card{margin-bottom:var(--spacing-8);border-radius:var(--radius-12);padding:calc(var(--spacing-16) + 1px) calc(var(--spacing-12) + 1px) calc(var(--spacing-12) + 1px);background:var(--fill-overlay-1);box-shadow:inset 0 0 0 1px var(--border-transparent-subtle)} /* Live/Event card */
 .lu-card.g.h{background:radial-gradient(76.4% 206% at 0% 40.5%,rgba(255,255,255,0.240) 0.0%,rgba(241,241,241,0.225) 6.2%,rgba(226,228,228,0.210) 12.5%,rgba(212,214,214,0.195) 18.8%,rgba(198,200,201,0.180) 25.0%,rgba(184,186,187,0.165) 31.2%,rgba(170,172,174,0.150) 37.5%,rgba(155,159,160,0.135) 43.8%,rgba(141,145,146,0.120) 50.0%,rgba(127,131,133,0.105) 56.2%,rgba(112,118,119,0.090) 62.5%,rgba(98,104,106,0.075) 68.8%,rgba(84,90,92,0.060) 75.0%,rgba(70,76,79,0.045) 81.2%,rgba(56,62,65,0.030) 87.5%,rgba(41,49,52,0.015) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--page)} /* goal of the home side: glow from the left */
 .lu-card.g.a{background:radial-gradient(74.5% 141.2% at 100% 41.4%,rgba(232,21,30,0.240) 0.0%,rgba(219,22,30,0.225) 6.2%,rgba(206,23,31,0.210) 12.5%,rgba(194,24,32,0.195) 18.8%,rgba(181,24,32,0.180) 25.0%,rgba(168,25,32,0.165) 31.2%,rgba(155,26,33,0.150) 37.5%,rgba(142,27,34,0.135) 43.8%,rgba(130,28,34,0.120) 50.0%,rgba(117,29,34,0.105) 56.2%,rgba(104,30,35,0.090) 62.5%,rgba(91,31,36,0.075) 68.8%,rgba(78,32,36,0.060) 75.0%,rgba(65,32,36,0.045) 81.2%,rgba(53,33,37,0.030) 87.5%,rgba(40,34,38,0.015) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--page)} /* goal of the away side: glow from the right */
 .lu-body{display:flex;flex-direction:column;gap:var(--spacing-12);padding:0 0 var(--spacing-8)}
@@ -1027,7 +1030,7 @@ div.choice{cursor:default}
 .lu-ph .tx{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--spacing-6)}
 .lu-ph .tx span{font-size:12px;line-height:18px;color:var(--t2)}
 .lu-ph .tx b{font-weight:700;font-size:16px;line-height:12px;color:var(--t1)}
-.lu-shot{display:block;width:calc(100% - 2*var(--spacing-4));height:auto;margin:0 var(--spacing-4)} /* shot diagram of a goal, 311 x 198 in the frame */
+.lu-shot{display:block;width:calc(100% - 6px);height:auto;margin:0 auto} /* shot diagram of a goal, 311 x 198 in the frame */
 /* a new event comes in from the top and pushes the feed down; the line of the shot draws once the card has landed */
 .lu-in{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows var(--m-layout) var(--soft),opacity var(--m-std) var(--soft)}
 .lu-in>div{overflow:hidden;min-height:0}
@@ -1043,6 +1046,7 @@ div.choice{cursor:default}
 .lu-new.show:active{opacity:.6}
 @media (prefers-reduced-motion:reduce){.lu-in,.lu-in .lu-card,.lu-in.on .dr,.lu-new{transition:none}}
 .mkts .sgfoot{margin-top:0}
+.mkts .lu-feed+.sgfoot{margin-top:var(--spacing-12);margin-bottom:calc(-1*var(--spacing-8))}
 /* U4 · fixture · Odds tab, Figma "[V2] Odds Pre-game" 4326:231817: markets in groups. Match Result reuses the block of Live updates (.lu-hero). */
 .ox{display:flex;flex-direction:column;gap:24px}
 .ox-s{display:flex;flex-direction:column;gap:10px}
