@@ -1069,6 +1069,8 @@ div.choice{cursor:default}
 .ox-step button.p{width:40px;height:40px;background:var(--fill-overlay-3)}
 .ox-step button:active{transform:scale(.97)}
 .ox-step button:disabled{opacity:.3;cursor:default;transform:none}
+.ox-step.tg{cursor:pointer} /* U6: the − / + of the Total Goals line are hidden; a tap on the chip shows them, they leave by themselves (OX_HOLD) */
+.ox-step.tg:not(.on) button{opacity:0;visibility:hidden;transition:opacity var(--m-quick),transform var(--m-press),visibility 0s var(--m-quick)}
 .ox-step.hcs{height:48px;padding:0 var(--spacing-8);background:var(--fill-overlay-1)}
 .ox-step.hcs b+button svg{transform:scaleX(-1)}
 .ox-div{height:1px;margin:calc(var(--spacing-12) * -1) calc(var(--spacing-16) * -1);background:var(--border-transparent-subtle)}
@@ -1961,7 +1963,7 @@ function goalsHTML(m){
  const k=mkt(m.id,OX_PER.find(p=>p[0]===u.per)[2]),ln=oxLine(m,k),i=k.lines.findIndex(r=>r[0]===ln),[,ov,un]=k.lines[i],g=k.id+':'+ln,bt=mkt(m.id,'btts'),rb=mkt(m.id,'rbtts'),full=u.per==='ft';
  return (pers.length>1?`<div class="lu-seg ox-seg">${pers.map(([p,l])=>`<button data-oxp="${p}"${p===u.per?' class="on"':''}>${l}</button>`).join('')}</div>`:'')+
   `<div class="ox-blks" id="oxBlks"><div class="ox-blk"><div class="ox-sub"><b>Total Goals</b><small>Pick a line, then over or under.</small></div>
-  <div class="ox-step"><button data-oxl="-1" aria-label="Lower line"${i<=0?' disabled':''}>${OX_IC.m}</button><b id="oxLv">${ln}</b><button class="p" data-oxl="1" aria-label="Higher line"${i>=k.lines.length-1?' disabled':''}>${OX_IC.p}</button></div>
+  <div class="ox-step tg${u.step?' on':''}" data-oxs><button data-oxl="-1" aria-label="Lower line"${i<=0?' disabled':''}>${OX_IC.m}</button><b id="oxLv">${ln}</b><button class="p" data-oxl="1" aria-label="Higher line"${i>=k.lines.length-1?' disabled':''}>${OX_IC.p}</button></div>
   <div class="ox-o2" id="oxOU">${oddBtn(m.id,g,'o','Over '+ln,ov)}${oddBtn(m.id,g,'u','Under '+ln,un)}</div></div>`+
   (full&&bt?`<div class="ox-blk f">${oxHead('Both Teams to Score','btts',u.btts)}${oxFold('btts',u.btts,`<div class="ox-o2">${bt.opts.map(x=>oddBtn(m.id,'btts',x.k,x.l,x.v)).join('')}</div>`)}</div>`:'')+
   (full&&rb?`<div class="ox-blk c"><div class="ox-sub"><b>Combinations</b></div><div class="clist">${['1','2','X'].map(o=>rb.opts.find(x=>x.k===o)).map(x=>choiceBtn(m.id,'rbtts',x.k,{code:x.c,label:x.l,v:x.v,stack:true})).join('')}</div></div>`:'')+'</div>';
@@ -1985,7 +1987,15 @@ function oxToggle(key){const u=S.ox,f=document.querySelector(`[data-oxf="${key}"
 /* Goals: another half swaps the card (its height eases), another line swaps the number and the two prices; the new content rises in */
 function oxGoals(fn,after){const m=M(S.fx),c=$('#oxGoals');if(!c||!S.ox)return;fn(S.ox);smoothH(c,()=>{c.innerHTML=goalsHTML(m)});after()}
 function setOxPer(p){if(!S.ox||S.ox.per===p)return;oxGoals(u=>u.per=p,()=>soft($('#oxBlks'),RISE,T.std))}
-function setOxLine(step){const m=M(S.fx),u=S.ox;if(!u)return;const k=mkt(m.id,OX_PER.find(p=>p[0]===u.per)[2]),r=k.lines[k.lines.findIndex(x=>x[0]===u.line[k.id])+step];if(!r)return;
+/* U6: − / + of the Total Goals line. Hidden at rest; a tap on the chip shows them, and after OX_HOLD without a tap on the chip they fade out.
+   The hint: the first time the chip is on screen in a session, they show and leave once by themselves. */
+const OX_HOLD=2000; // ms the buttons stay (Nik 16.11) — a pause, not a motion duration
+let oxStepT=0,oxHinted=false;
+function oxStep(){if(!S.ox)return;S.ox.step=true;$('.ox-step.tg')?.classList.add('on');clearTimeout(oxStepT);
+ oxStepT=setTimeout(()=>{if(S.ox)S.ox.step=false;$('.ox-step.tg')?.classList.remove('on')},OX_HOLD)}
+function oxHint(){if(oxHinted||!S.fx)return;const c=$('.ox-step.tg');if(!c)return;const a=c.getBoundingClientRect();
+ if(c.contains(document.elementFromPoint(a.left+a.width/2,a.top+a.height/2))){oxHinted=true;oxStep()}} // really on screen: not under the header, the bar or a sheet
+function setOxLine(step){const m=M(S.fx),u=S.ox;if(!u)return;oxStep();const k=mkt(m.id,OX_PER.find(p=>p[0]===u.per)[2]),r=k.lines[k.lines.findIndex(x=>x[0]===u.line[k.id])+step];if(!r)return;
  oxGoals(()=>u.line[k.id]=r[0],()=>{soft($('#oxLv'),rise(-step),T.std);soft($('#oxOU'),RISE,T.std)})} // a higher line comes down from above, a lower one rises from below
 function oddsHTML(m){
  const f=FX[m.id],u=oxUi(m),dc=mkt(m.id,'dc'),dnb=mkt(m.id,'dnb'),hc=mkt(m.id,'hc');
@@ -2008,7 +2018,7 @@ function drawFixture(mid){
  ft.textContent=sc?m.sh+' - '+m.sa:f.time;fd.textContent=m.live?m.min+'’':m.ft?'FT':f.date;ft.classList.toggle('sc',sc);fd.classList.toggle('lv',!!m.live);
  if(m.live)fd.dataset.min=m.id;else fd.removeAttribute('data-min');
  [['#fxHi',m.hi],['#fxAi',m.ai]].forEach(([q,k])=>{const b=$(q).parentNode;if(TEAMS[k]){b.dataset.team=k;b.dataset.tc=m.comp}else b.removeAttribute('data-team')}); // T1: crest and name open the team page
- S.hc=null;S.ox=null;paintFxTabs();renderMkts(mid);$('#fxScroll').scrollTop=0;$('#phone').classList.remove('fxs');S.fx=mid;
+ S.hc=null;S.ox=null;clearTimeout(oxStepT);paintFxTabs();renderMkts(mid);$('#fxScroll').scrollTop=0;$('#phone').classList.remove('fxs');S.fx=mid;
 }
 function openFixture(mid){
  if(!FX[mid])return;const fx=$('#fx'),t=topPage();
@@ -2017,6 +2027,7 @@ function openFixture(mid){
  S.fxTab='odds';S.luKey=false;$('#fxTabs').scrollLeft=0;                                  // a match opens on its Odds tab
  drawFixture(mid);S.stack.push({p:'fx',id:mid,tab:'odds',key:false});teamMenu(null); // tab / key: its tab and its Key events filter, so Back returns to the page as it was left
  $('#phone').classList.add('infx');fx.classList.add('show');fx.setAttribute('aria-hidden','false');hideToast();
+ setTimeout(oxHint,T.layout); // U6: once the page has arrived
 }
 /* C1: cut-out photos of the Goalscorer card (Figma has two); every other player gets the silhouette of the component */
 const GSC={mbappe:'gsc_mbappe',alvarez:'gsc_alvarez'};Object.assign(IMG,{gsc_mbappe:'assets/img/gsc_mbappe.png',gsc_alvarez:'assets/img/gsc_alvarez.png',gsc_none:'assets/img/gsc_none.png'}); // whole paths, so build.py inlines them
@@ -2396,7 +2407,7 @@ document.addEventListener('click',e=>{
  const card=e.target.closest('.tp,.sc-row,.cp-row,.gs-card');if(card){const o=card.querySelector('.odd');if(o&&!o.classList.contains('locked'))toggleSel(o.dataset.m,o.dataset.g,o.dataset.o);return} // the whole card picks its price
  const fv=e.target.closest('[data-fxv]');if(fv){setFxTab(fv.dataset.fxv);return}
  const lk=e.target.closest('[data-luk]');if(lk){setLuKey(lk.dataset.luk==='1');return}
- const ox=e.target.closest('[data-oxc],[data-oxp],[data-oxl]');if(ox){if(ox.dataset.oxc)oxToggle(ox.dataset.oxc);else if(ox.dataset.oxp)setOxPer(ox.dataset.oxp);else if(!ox.disabled)setOxLine(+ox.dataset.oxl);return}
+ const ox=e.target.closest('[data-oxc],[data-oxp],[data-oxl],[data-oxs]');if(ox){if(ox.dataset.oxc)oxToggle(ox.dataset.oxc);else if(ox.dataset.oxp)setOxPer(ox.dataset.oxp);else if('oxs' in ox.dataset)oxStep();else if(!ox.disabled)setOxLine(+ox.dataset.oxl);return}
  const hb=e.target.closest('[data-hct],[data-hcs]');if(hb){if(!hb.disabled)setHc(hb.dataset.hct,+hb.dataset.hcs||0);return}
  if(e.target.closest('#fxMore')){showToast(`Opens ${M(S.fx).h} vs ${M(S.fx).a} in DAZN Bet`,null,null,2500);return}
  const t=e.target.closest('.tile[data-fx]');if(t){openFixture(t.dataset.fx);return}
@@ -2406,7 +2417,7 @@ document.addEventListener('click',e=>{
 });
 $('#cpBack').onclick=closeComp;$('#tmBack').onclick=pageBack;
 $('#tmScroll').addEventListener('scroll',()=>{if(S.tm&&S.tm.tab==='matches')syncMd()});$('#fxBack').onclick=closeFixture;$('#fxBack2').onclick=closeFixture;
-$('#fxScroll').addEventListener('scroll',e=>$('#phone').classList.toggle('fxs',e.target.scrollTop>150));
+$('#fxScroll').addEventListener('scroll',e=>{$('#phone').classList.toggle('fxs',e.target.scrollTop>150);oxHint()});
 $('#oddsChip').onclick=()=>setOddsOn(!S.oddsOn);
 $('#liveBadge').onclick=()=>{
  if(S.day!=='today'){const k=DAYS.map(x=>x[0]),dir=k.indexOf('today')<k.indexOf(S.day)?-1:1;       // live matches are played today: LIVE on another day goes back to Today with the filter on
