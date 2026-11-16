@@ -270,12 +270,13 @@ const FOCUS={M01:'#feed .odd[data-m="m1"][data-o="1"]',M02:'#mkts .choice',M03:'
  vp = the box a framed prototype is cropped to (null for the big phone); whole = show the whole phone in it, not a close-up. */
 let rate=1;
 function makeProto(F,vp,whole){
- const P={F,W:null,D:null,ready:false,runId:0,pressed:[],anim:null,onready:null,ov:null,extra:0};
+ const P={F,W:null,D:null,ready:false,runId:0,pressed:[],anim:null,onready:null,ov:null,extra:0,step:0};
  const q=s=>P.D.querySelector(s),scale=()=>+q('#stage').dataset.scale||1;
  const G={                                  // helpers for the scenarios; live on the prototype's window as G
   /* the next step of a scenario (close what was opened): on the prototype's clock, so it is slowed with everything else and dropped on the next run.
-     P.extra = how much longer than usual the preset being tried takes, so a long one is never closed before it has finished coming in */
-  after:(ms,fn)=>P.W.setTimeout(fn,ms+P.extra),
+     P.extra = how much longer than usual the slowest preset on the phone takes. Each next step waits that much more than the one
+     before it (P.step counts them), so nothing is closed or interrupted before it has finished */
+  after:(ms,fn)=>P.W.setTimeout(fn,ms+P.extra*++P.step),
   click(sel){const e=q(sel);if(e)e.click()},
   show(sel,scSel){const e=q(sel),sc=q(scSel);if(e&&sc)sc.scrollTop+=(e.getBoundingClientRect().top-sc.getBoundingClientRect().top)/scale()-sc.clientHeight*.45},
   /* a press cannot be started from code, so the element's own :active rules are applied to it for a moment:
@@ -317,7 +318,7 @@ function makeProto(F,vp,whole){
    /* the preset being tried (P.ov): extra CSS on top of the prototype's, and where a value lives in JS, a wrapped function */
    let ov=P.D.getElementById('mg-ov');if(!ov){ov=P.D.createElement('style');ov.id='mg-ov';P.D.head.appendChild(ov)}ov.textContent=(P.ov&&P.ov.css)||'';
    P.W.MOTION.tokens({});   // the prototype's JS copies of its times (T) follow the CSS as it is now; a preset may then set the ones it owns
-   if(!P.W.__o)P.W.__o={soft:P.W.soft,setOddsOn:P.W.setOddsOn,updateBar:P.W.updateBar};Object.assign(P.W,P.W.__o);if(P.ov&&P.ov.js)P.ov.js(P.W,P.W.__o);
+   if(!P.W.__o)P.W.__o={soft:P.W.soft,setOddsOn:P.W.setOddsOn,updateBar:P.W.updateBar,closeFixture:P.W.closeFixture,closeComp:P.W.closeComp};Object.assign(P.W,P.W.__o);if(P.ov&&P.ov.js)P.ov.js(P.W,P.W.__o);
    root.classList.add('mg-freeze');                 // set the state instantly: no entrance of the bar, the sheet or the page
    P.reset();const id=P.runId;
    if(a.setup)P.W.eval(a.setup);
@@ -325,7 +326,7 @@ function makeProto(F,vp,whole){
    void P.D.body.offsetWidth;P.D.getAnimations().forEach(x=>x.cancel());
    if(vp)P.frameOn(a);
    requestAnimationFrame(()=>{if(id!==P.runId)return;root.classList.remove('mg-freeze');void P.D.body.offsetWidth;
-    requestAnimationFrame(()=>{if(id!==P.runId)return;try{if(a.play)P.W.eval(a.play);fail('')}catch(e){fail('This preview did not play ('+a.n+'). Saved decisions are not affected.');console.error(e)}})});
+    requestAnimationFrame(()=>{if(id!==P.runId)return;try{P.step=0;if(a.play)P.W.eval(a.play);fail('')}catch(e){fail('This preview did not play ('+a.n+'). Saved decisions are not affected.');console.error(e)}})});
   }catch(e){root.classList.remove('mg-freeze');fail('This preview did not play ('+a.n+'). Saved decisions are not affected.');console.error(e)}
  };
  F.addEventListener('load',P.boot);
@@ -396,11 +397,14 @@ const QS=[
   scope:'Duration and easing are the release; the press-in stays 0.12 s.',
   /* background and colour are the state group's: they keep its time (--m-quick) and its curve (--mg-state, set by that group).
      The betslip bar: its release is this group's, its appearance is the sheets group's. Both are a transition of transform,
-     so the bar is marked (.mg-in) while it is appearing, and the release rule skips it then */
+     so the bar is marked (.mg-in) for the time of its appearance, and the release rule skips it then */
   apply:(f,k)=>({css:`${PRESS}{transition:transform ${k.t}ms ${k.e},opacity ${k.t}ms ${k.flat},background var(--m-quick) var(--mg-state,ease),color var(--m-quick) var(--mg-state,ease)}html .bar.show:not(.mg-in){transition:transform ${k.t}ms ${k.e},opacity ${k.t}ms ${k.flat}}${act(PRESS)},html .bar.show:active{transform:scale(${f.scale});opacity:${f.op};transition-duration:var(--m-press);transition-timing-function:ease-out}`,
    js:(W,o)=>{W.updateBar=(...a)=>{const b=W.document.querySelector('#bar'),was=b.classList.contains('show');if(!was)b.classList.add('mg-in');o.updateBar(...a);
-     if(!b.classList.contains('show'))b.classList.remove('mg-in');
-     else if(!was)b.addEventListener('transitionend',function end(e){if(e.target===b&&e.propertyName==='transform'){b.classList.remove('mg-in');b.removeEventListener('transitionend',end)}})}}})},
+     if(was&&b.classList.contains('show'))return;
+     const id=b.__in=(b.__in||0)+1,off=()=>{if(b.__in===id)b.classList.remove('mg-in')};   // a later appearance has its own mark
+     if(!b.classList.contains('show')){off();return}
+     const t=Math.max(0,...W.getComputedStyle(b).transitionDuration.split(',').map(x=>parseFloat(x)*(/ms\s*$/.test(x)?1:1000)||0));
+     if(t>0)W.setTimeout(off,t);else off()}}})},
  {id:'state',t:'State change',
   places:[PL('M09','Odd picked'),PL('M10','Top Pick card picked'),PL('M11','Odds switch: knob and colour'),PL('M12','LIVE badge'),PL('M15','Place bet on / off')],
   today:['0.2 s (--m-quick) everywhere.','Three curves: browser default, ease-out, --ease.','On the match page the text of an outcome switches at once.'],
@@ -454,7 +458,10 @@ const QS=[
   fx:[],presets:[{n:'Soft landing',fx:{},m:M('soft',500)},{n:'Firm',fx:{},m:M('emph',300)},
    {n:'Quick',fx:{},m:M('out',220)},{n:'Springy',fx:{},m:M('gentle')},{n:'Even',fx:{},m:M('inout',380)}],
   scope:'The slide of the page. The betslip bar still jumps to its new place.',
-  apply:(f,k)=>({css:`html .fx,html .cp{transition:transform ${k.t}ms ${k.e}}`,js:W=>W.eval('T.layout='+k.t)})}
+  /* closing a page waits for the slide in JS, on the shared layout time. That time is also used inside the sheet,
+     so it is lent the preset's value only for the moment the page is told to close */
+  apply:(f,k)=>({css:`html .fx,html .cp{transition:transform ${k.t}ms ${k.e}}`,
+   js:(W,o)=>{const T=W.eval('T');['closeFixture','closeComp'].forEach(n=>{W[n]=(...a)=>{const l=T.layout;T.layout=k.t;try{return o[n](...a)}finally{T.layout=l}}})}})}
 ];
 /* differences found in the prototype that a preset does not settle: they go to development as they are (notes/MOTION.md has the full list) */
 const DEVNOTES=['Today similar things differ from place to place (press scale .97 / .98 / .985, three dim speeds in Edit, cascade gaps 32 and 45 ms). A saved preset is one value for its group; exceptions are listed under it.',
@@ -476,14 +483,14 @@ try{const h=location.hash.match(/^#d=(.+)$/);if(h){const o=JSON.parse(decodeURIC
 const LEGACY={press:5,state:4,swap:4,cascade:3,sheets:4,pages:4};   // how many presets from the start of each list kept their place
 const inRange=(v,a,b)=>typeof v==='number'&&isFinite(v)&&v>=a&&v<=b;
 function valid(q,d){
- if(!d||typeof d!=='object'||!Number.isInteger(d.i)||d.i<-1||d.i>=q.presets.length)return false;
+ if(!d||typeof d!=='object'||!Number.isInteger(d.i)||d.i<-1)return false;
  if(d.i>=0){   // by name when it has one; a decision saved before names were kept is trusted only where the list did not move
   if(typeof d.n==='string'&&d.n){const j=q.presets.findIndex(x=>x.n===d.n);if(j<0)return false;d.i=j}
-  else if(d.i>=(LEGACY[q.id]||0))return false;else d.n=q.presets[d.i].n}
+  else if(d.i>=Math.min(q.presets.length,LEGACY[q.id]||0))return false;else d.n=q.presets[d.i].n}
  if(!Array.isArray(d.v)||d.v.length!==2||!d.v.every(x=>Number.isInteger(x)&&x>=-1&&x<STEP.length))d.v=[-1,-1];
  if(d.i<0){d.p=null;return true}
  const p=d.p,m=p&&p.m;if(!p||typeof p.fx!=='object'||!p.fx||typeof m!=='object'||!m)return false;
- if(!q.fx.every(f=>inRange(p.fx[f.k],f.min,f.max))||!EZ.concat(SP).some(x=>x[0]===m.ease)||!inRange(m.dur,0,2000)||!inRange(m.bounce,0,.8)||!inRange(m.delay,0,280))return false;
+ if(!q.fx.every(f=>inRange(p.fx[f.k],f.min,f.max))||!EZ.concat(q.springs===false?[]:SP).some(x=>x[0]===m.ease)||!inRange(m.dur,0,2000)||!inRange(m.bounce,0,.8)||!inRange(m.delay,0,280))return false;
  d.p={fx:Object.fromEntries(q.fx.map(f=>[f.k,p.fx[f.k]])),m:{ease:m.ease,dur:m.dur,bounce:m.bounce,delay:m.delay}};return true}
 function sanitize(){const D={},E={},N={},obj=x=>x&&typeof x==='object'?x:{};dec=obj(dec);ex=obj(ex);notes=obj(notes);
  QS.forEach(q=>{if(valid(q,dec[q.id]))D[q.id]={i:dec[q.id].i,n:dec[q.id].n||'',p:dec[q.id].p,v:dec[q.id].v};
@@ -492,22 +499,23 @@ function sanitize(){const D={},E={},N={},obj=x=>x&&typeof x==='object'?x:{};dec=
  dec=D;ex=E;notes=N}
 let saved=true;   // false when the browser refused to store: the decisions then live only until the page is closed
 const save=()=>{try{localStorage.setItem('motionPresets5',JSON.stringify(dec));localStorage.setItem('motionExceptions',JSON.stringify(ex));localStorage.setItem('motionNotes',JSON.stringify(notes));saved=true}catch(e){saved=false}};
-const exOf=(q,n)=>ex[q.id]&&ex[q.id][n],savedFor=(q,n)=>exOf(q,n)||dec[q.id];
+const exOf=(q,n)=>ex[q.id]&&ex[q.id][n];
+const hasScope=q=>!!q.scope&&((dec[q.id]&&dec[q.id].i>=0)||exList(q).some(x=>x[1].i>=0));
 const exList=q=>Object.keys(ex[q.id]||{}).map(k=>[q.places[+k],ex[q.id][k]]).filter(x=>x[0]);
 
 /* ---------- what is being tried ----------
  qi = the open group (QS.length = My decisions), pi = its animation on the stage,
  ps = the preset being tried (-1 = Current), pp = its values {fx, m}. */
-let qi=0,pi=0,ps=-1,pp=null;
+let qi=0,pi=0,ps=-1,pp=null,trial=false;   // trial = something was picked or changed here and not saved yet
 /* ready-made variants of a preset, the same two questions for every preset: how strong (Amount) and how long (Duration).
-   Amount scales what the group's effect is made of (press depth and dimming, travel, the gap of a cascade) and the bounce of a spring;
+   Amount scales what the group's effect is made of (press depth and dimming, travel, the gap of a cascade); in a group without one, the bounce of a spring;
    Duration scales the time. M / M is the preset itself. va / vs = the chosen steps, -1 once a value was set by hand in Advanced. */
 const AMT=[.3,.6,1,1.7,2.6],DUR=[.5,.75,1,1.5,2.2],STEP=['XS','S','M','L','XL'],MID=2;
 let va=MID,vs=MID;
 function variant(q,i,a,d){
  const b=q.presets[i],p=clone({fx:b.fx,m:b.m});
  p.m.dur=Math.round(p.m.dur*DUR[d]/10)*10;
- if(isSpring(p.m.ease)){p.m.bounce=Math.min(.8,+(p.m.bounce*AMT[a]).toFixed(2));if(a!==MID||d!==MID)p.m.ease='spring'}
+ if(isSpring(p.m.ease)){if(!q.amt)p.m.bounce=Math.min(.8,+(p.m.bounce*AMT[a]).toFixed(2));if(p.m.dur!==b.m.dur||p.m.bounce!==b.m.bounce)p.m.ease='spring'}
  if(q.amt)q.amt(p,AMT[a]);
  return p}
 /* a row of steps is shown only if the steps differ for this preset (Amount of a preset with nothing to scale, Duration of an instant one) */
@@ -516,12 +524,14 @@ const edited=(q,i,p)=>i>=0&&!same(clone({fx:q.presets[i].fx,m:q.presets[i].m}),p
 function pick(i){const q=QS[qi];ps=i;va=vs=MID;pp=i<0?null:variant(q,i,MID,MID)}
 /* what the controls show for this animation: its own exception if it has one, else the group's preset, else Current */
 function loadTarget(){const q=QS[qi],d=exOf(q,pi)||dec[q.id];
- if(d&&d.i>=0){ps=d.i;pp=clone(d.p);[va,vs]=d.v||[-1,-1]}else pick(-1)}
+ if(d&&d.i>=0){ps=d.i;pp=clone(d.p);[va,vs]=d.v||[-1,-1]}else pick(-1);trial=false}
 const nowDec=()=>({i:ps,n:ps<0?'':QS[qi].presets[ps].n,p:pp?clone(pp):null,v:[va,vs]});
 const dropEx=()=>{const q=QS[qi];if(ex[q.id]){delete ex[q.id][pi];if(!Object.keys(ex[q.id]).length)delete ex[q.id]}};
 
 /* ---------- a decision in words ---------- */
-const presetName=(q,d)=>d.i<0?'Original':q.presets[d.i].n+(d.v&&d.v[0]>=0?(d.v[0]===MID&&d.v[1]===MID?'':' · '+[hasAmt(q,d.i)&&d.v[0]!==MID?(q.amtL||'Bounce').toLowerCase()+' '+STEP[d.v[0]]:'',d.v[1]!==MID?(q.durL||'Duration').toLowerCase()+' '+STEP[d.v[1]]:''].filter(Boolean).join(', ')):edited(q,d.i,d.p)?' (edited)':'');
+function presetName(q,d){if(d.i<0)return 'Original';const v=d.v||[-1,-1];
+ const parts=[v[0]>=0&&v[0]!==MID&&hasAmt(q,d.i)?(q.amtL||'Bounce').toLowerCase()+' '+STEP[v[0]]:'',v[1]>=0&&v[1]!==MID?(q.durL||'Duration').toLowerCase()+' '+STEP[v[1]]:''].filter(Boolean);
+ return q.presets[d.i].n+(parts.length?' · '+parts.join(', '):'')+((v[0]<0||v[1]<0)&&edited(q,d.i,d.p)?' (edited)':'')}
 /* the Motion of a decision, the way a developer needs it */
 function moText(q,m){const k=mo(m);
  return (isSpring(m.ease)?`spring ${ezName(m.ease)} (duration ${m.dur} ms, bounce ${Math.round(m.bounce*100)}%, settles in ${k.t} ms)`:`${ezName(m.ease)} cubic-bezier(${bezOf(m).map(n2).join(', ')}), ${m.dur} ms`)+(q.delay?`, ${m.delay} ms per item`:'')}
@@ -530,15 +540,15 @@ function decText(q,d=dec[q.id]){if(!d)return '';if(d.i<0)return 'Original (no ch
  const fx=q.fx.map(f=>f.l.toLowerCase()+' '+f.fmt(d.p.fx[f.k])).join(', ');
  return presetName(q,d)+' — '+(fx?fx+'; ':'')+phase(q)+moText(q,d.p.m)}
 function decisionsText(){
- return 'Motion presets — DAZN Bet in Scores\n'+QS.map((q,i)=>`${i+1}. ${q.t}: ${decText(q)||'not decided'}`+exList(q).map(([pl,d])=>`\n   Except ${pl.n}: ${decText(q,d)}`).join('')+(dec[q.id]&&dec[q.id].i>=0&&q.scope?`\n   Scope: ${q.scope}`:'')+(notes[q.id]?`\n   Why: ${notes[q.id]}`:'')).join('\n')+'\n\nFor development:\n'+DEVNOTES.map(t=>'- '+t).join('\n');
+ return 'Motion presets — DAZN Bet in Scores\n'+QS.map((q,i)=>`${i+1}. ${q.t}: ${decText(q)||'not decided'}`+exList(q).map(([pl,d])=>`\n   Except ${pl.n}: ${decText(q,d)}`).join('')+(hasScope(q)?`\n   Scope: ${q.scope}`:'')+(notes[q.id]?`\n   Why: ${notes[q.id]}`:'')).join('\n')+'\n\nFor development:\n'+DEVNOTES.map(t=>'- '+t).join('\n');
 }
 const shareLink=()=>location.href.split('#')[0]+'#d='+btoa(unescape(encodeURIComponent(JSON.stringify({dec,notes,ex}))));
 
 /* ---------- playing ---------- */
 /* what is put on top of the prototype: every group that already has an applied preset, plus what is being tried in this group */
+const onPhone=()=>QS.map(x=>[x,x===QS[qi]?(ps<0?null:pp):dec[x.id]&&dec[x.id].i>=0?dec[x.id].p:null]).filter(x=>x[1]);
 function ovNow(){
- const q=QS[qi],parts=[];
- QS.forEach(x=>{const p=x===q?(ps<0?null:pp):dec[x.id]&&dec[x.id].i>=0?dec[x.id].p:null;if(p)parts.push(x.apply(p.fx,mo(p.m),p.m))});
+ const parts=onPhone().map(([x,p])=>x.apply(p.fx,mo(p.m),p.m));
  return parts.length?{css:parts.slice().reverse().map(o=>o.css||'').join(''),   // reversed: the press rules come last, so on buttons their release curve wins over the state group's
   js:(W,o)=>parts.forEach(x=>x.js&&x.js(W,o))}:null;
 }
@@ -554,9 +564,9 @@ function buildView(){
 function play(rebuild=true){
  clearTimeout(loopT);if(qi>=QS.length)return;
  const q=QS[qi],ov=ovNow(),framed=cmp||zoom;
- /* how much longer than the prototype's usual half second the tried preset takes, the last item of a cascade included:
-    the scenario waits that much more before it closes what it opened, and a loop before it starts again */
- const extra=ps<0?0:Math.max(0,mo(pp.m).t+(q.delay?6*pp.m.delay:0)-500);
+ /* how much longer than the prototype's usual half second the slowest preset on the phone takes (saved ones of other groups
+    included, and the last item of a cascade): each step of the scenario waits that much more, and a loop before it starts again */
+ const extra=Math.max(0,...onPhone().map(([x,p])=>mo(p.m).t+(x.delay?6*p.m.delay:0)-500));
  if(rebuild||framed!==!$('#grid').hidden)buildView();
  if(framed){cards.forEach((c,n)=>{c.ov=n===cards.length-1?ov:null;c.extra=extra});if(cards.every(c=>c.ready))cards.forEach(c=>c.run(c.anim))}   // not loaded yet: they start by themselves when ready; both sides close together
  else{main.ov=ov;main.extra=extra;main.run(q.places[pi])}
@@ -571,14 +581,13 @@ function go(n,place=0){
  if(qi===QS.length){showSummary();return}
  /* An unsaved trial stays on while you move between the animations of one group, so a preset can be seen on all of them
     before it is saved. It is dropped when you leave the group. Without a trial, an animation opens on what is saved for it */
- const was=QS[prev],keep=prev===qi&&!!was&&!(savedFor(was,pi)?eqNow(savedFor(was,pi)):ps<0);
- pi=Math.max(0,Math.min(QS[qi].places.length-1,place));if(!keep)loadTarget();
+ pi=Math.max(0,Math.min(QS[qi].places.length-1,place));if(prev!==qi||!trial)loadTarget();
  $('#sum').hidden=true;$('#why').value=notes[QS[qi].id]||'';paint();play();   // the note belongs to the group
 }
 function showSummary(){
  clearTimeout(loopT);dropCards();$('#frame').classList.add('off');if(main.ready)main.reset();main.ov=null;
  const s=$('#sum');s.hidden=false;
- s.innerHTML=`<h1>Decisions and export</h1>`+QS.map((q,i)=>`<div class="sr" data-q="${i}" role="button" tabindex="0"><b>${esc(q.t)}</b><span${dec[q.id]?'':' class="no"'}>${esc(decText(q)||'Not decided')}</span>${dec[q.id]&&dec[q.id].i>=0&&q.scope?`<small>${esc(q.scope)}</small>`:''}${notes[q.id]?`<small>Why: ${esc(notes[q.id])}</small>`:''}</div>`+
+ s.innerHTML=`<h1>Decisions and export</h1>`+QS.map((q,i)=>`<div class="sr" data-q="${i}" role="button" tabindex="0"><b>${esc(q.t)}</b><span${dec[q.id]?'':' class="no"'}>${esc(decText(q)||'Not decided')}</span>${hasScope(q)?`<small>${esc(q.scope)}</small>`:''}${notes[q.id]?`<small>Why: ${esc(notes[q.id])}</small>`:''}</div>`+
    exList(q).map(([pl,d])=>`<div class="sr sub" data-q="${i}" data-p="${q.places.indexOf(pl)}" role="button" tabindex="0"><b>Except ${esc(pl.n)}</b><span>${esc(decText(q,d))}</span></div>`).join('')).join('')+
   `<div class="acts"><button class="btn" id="copyDec">Copy decisions</button><button class="btn q" id="copyLink" title="A link that opens this page with the same decisions">Copy link</button></div><h2>For development</h2><ul>${DEVNOTES.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`;
  paint();
@@ -599,12 +608,16 @@ const UNIT={scale:'%',op:'%',bounce:'%',off:'px',dur:'ms',delay:'ms'};
 const toShow=(k,v)=>UNIT[k]==='%'?Math.round(v*1000)/10:v,fromShow=(k,v)=>UNIT[k]==='%'?v/100:v;
 const sl=(grp,k,l,min,max,step,v,ends)=>(v=+v||0,`<div class="prm"><span>${esc(l)}</span><input type="range" data-g="${grp}" data-k="${k}" min="${min}" max="${max}" step="${step}" value="${v}" aria-label="${esc(l)}"><label class="nf"><input type="number" data-g="${grp}" data-k="${k}" min="${toShow(k,min)}" max="${toShow(k,max)}" step="${toShow(k,step)}" value="${toShow(k,v)}" aria-label="${esc(l)}"><i>${UNIT[k]}</i></label>${ends?`<small class="ends"><span>${ends[0]}</span><span>${ends[1]}</span></small>`:''}</div>`);
 /* the controls of the preset being tried: variants (basic) and exact values (Advanced) */
-function paintParams(){
- const q=QS[qi];if(ps<0){$('#basic').innerHTML='';$('#mo').innerHTML='';return}
+function paintBasic(){
+ const q=QS[qi];if(ps<0){$('#basic').innerHTML='';return}
  const m=pp.m,durL=q.durL||'Duration';
  /* a row of steps: what it changes, its value right now, five steps */
  const seg=(id,l,val,v)=>`<div class="vr"><span>${esc(l)}<small>${esc(val)}</small></span><div class="seg" id="${id}" role="group" aria-label="${esc(l)}">${STEP.map((n,i)=>`<button data-v="${i}" aria-pressed="${v===i}"${v===i?' class="on"':''}>${n}</button>`).join('')}</div></div>`;
- $('#basic').innerHTML=(hasAmt(q,ps)?seg('vAmt',q.amtL||'Bounce',q.amtV?q.amtV(pp):Math.round(m.bounce*100)+'%',va):'')+(hasDur(q,ps)?seg('vDur',durL,(isSpring(m.ease)?mo(m).t:m.dur)+' ms',vs):'');
+ $('#basic').innerHTML=(hasAmt(q,ps)&&(q.amt||isSpring(m.ease))?seg('vAmt',q.amtL||'Bounce',q.amtV?q.amtV(pp):Math.round(m.bounce*100)+'%',va):'')+(hasDur(q,ps)?seg('vDur',durL,(isSpring(m.ease)?mo(m).t:m.dur)+' ms',vs):'');
+}
+function paintParams(){
+ paintBasic();const q=QS[qi];if(ps<0){$('#mo').innerHTML='';return}
+ const m=pp.m,durL=q.durL||'Duration';
  $('#mo').innerHTML=q.fx.map(f=>sl('fx',f.k,f.l,f.min,f.max,f.step,pp.fx[f.k],f.ends)).join('')+sl('m','dur',durL,0,2000,10,m.dur)+
   `<div class="prm sel"><span>Easing</span><select id="ezSel" aria-label="Easing"><optgroup label="Curve">${EZ.map(x=>`<option value="${x[0]}"${m.ease===x[0]?' selected':''}>${esc(x[1])}</option>`).join('')}</optgroup>${q.springs===false?'':`<optgroup label="Spring">${SP.map(x=>`<option value="${x[0]}"${m.ease===x[0]?' selected':''}>${esc(x[1])}</option>`).join('')}</optgroup>`}</select>${easeSvg(m)}</div>`+
   (isSpring(m.ease)?sl('m','bounce','Bounce',0,.8,.05,m.bounce):'')+
@@ -641,14 +654,14 @@ function paint(){
 /* ---------- controls ---------- */
 $('#list').onclick=e=>{const b=e.target.closest('.gq,.pq');if(b)go(+b.dataset.q,+b.dataset.p||0)};
 $('#allDec').onclick=()=>go(QS.length);
-$('#presets').onclick=e=>{const b=e.target.closest('.chip2');if(!b)return;pick(+b.dataset.ps);paint();play(false)};
+$('#presets').onclick=e=>{const b=e.target.closest('.chip2');if(!b)return;pick(+b.dataset.ps);trial=true;paint();play(false)};
 /* a variant step sets only its own value from the preset; what was set by hand elsewhere stays */
 $('#basic').onclick=e=>{const b=e.target.closest('.seg button');if(!b||ps<0)return;
- const q=QS[qi],v=+b.dataset.v,base=q.presets[ps].m.ease;
+ const q=QS[qi],v=+b.dataset.v,base=q.presets[ps].m;
  if(b.parentNode.id==='vDur'){vs=v;pp.m.dur=variant(q,ps,MID,v).m.dur}                                               // only the time
- else{va=v;const x=variant(q,ps,v,MID);pp.fx=x.fx;pp.m.bounce=x.m.bounce;pp.m.delay=x.m.delay}                        // only what Amount is made of
- if(isSpring(base)&&va>=0&&vs>=0)pp.m.ease=va===MID&&vs===MID?base:'spring';
- paintParams();paintApply();play(false)};
+ else{va=v;const x=variant(q,ps,v,MID);if(q.amt){pp.fx=x.fx;pp.m.delay=x.m.delay}else pp.m.bounce=x.m.bounce}         // only what the row is named after
+ if(isSpring(base.ease)&&(pp.m.ease===base.ease||pp.m.ease==='spring'))pp.m.ease=pp.m.dur===base.dur&&pp.m.bounce===base.bounce?base.ease:'spring';
+ trial=true;paintParams();paintApply();play(false)};
 /* Advanced: a slider or its number field. A value set by hand is no longer one of the variant steps;
    Duration or Bounce of a named spring makes it a custom spring */
 $('#dock').addEventListener('input',e=>{const r=e.target,k=r.dataset.k;if(ps<0||!r.dataset.g)return;
@@ -658,15 +671,15 @@ $('#dock').addEventListener('input',e=>{const r=e.target,k=r.dataset.k;if(ps<0||
  if(r.dataset.g==='fx')pp.fx[k]=v;
  else{pp.m[k]=v;if(isSpring(pp.m.ease)&&k!=='delay'&&pp.m.ease!=='spring'){pp.m.ease='spring';$('#ezSel').value='spring'}
   $('#mo svg').outerHTML=easeSvg(pp.m)}
- va=vs=-1;$$('#basic .seg button.on').forEach(b=>b.classList.remove('on'));
+ va=vs=-1;trial=true;paintBasic();   // the rows of steps show the same value; the field being typed in is not touched
  paintApply();later()});
 /* leaving a number field: show the value that is really in use (clamped, rounded) */
 $('#dock').addEventListener('focusout',e=>{const r=e.target;if(r.type!=='number'||!r.dataset.g||ps<0)return;const k=r.dataset.k;r.value=toShow(k,r.dataset.g==='fx'?pp.fx[k]:pp.m[k])});
 $('#dock').addEventListener('change',e=>{if(e.target.id!=='ezSel'||ps<0)return;const m=pp.m,sp=SP.find(x=>x[0]===e.target.value);
  m.ease=e.target.value;if(sp&&sp[2]){m.dur=sp[2].dur;m.bounce=sp[2].bounce}   // a named spring brings its own duration and bounce
- va=vs=-1;paintParams();paintApply();play(false)});
-$('#applyB').onclick=()=>{dec[QS[qi].id]=nowDec();dropEx();save();paint()};                              // the group, this animation included
-$('#onlyB').onclick=()=>{const q=QS[qi];(ex[q.id]=ex[q.id]||{})[pi]=nowDec();save();paint()};            // an exception for this animation
+ va=vs=-1;trial=true;paintParams();paintApply();play(false)});
+$('#applyB').onclick=()=>{dec[QS[qi].id]=nowDec();dropEx();trial=false;save();paint()};                              // the group, this animation included
+$('#onlyB').onclick=()=>{const q=QS[qi];(ex[q.id]=ex[q.id]||{})[pi]=nowDec();trial=false;save();paint()};            // an exception for this animation
 $('#backB').onclick=()=>{dropEx();save();loadTarget();paint();play(false)};
 $('#why').oninput=e=>{const q=QS[qi],v=e.target.value.trim();if(v)notes[q.id]=v;else delete notes[q.id];save();paintApply()};   // a note is kept as you type
 $('#again').onclick=()=>play(false);
