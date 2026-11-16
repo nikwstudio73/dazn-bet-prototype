@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
 <title>DAZN Bet in Scores — Motion</title>
-<!-- A2 · Motion presets. Desktop only; nothing in the prototype links here.
+<!-- A2 · Motion presets. Desktop only; nothing in the prototype links here. The hub (hub.html) does, and the header of the left panel links back to it.
      The phone is the real prototype (index.html?embed) in a frame. This page sets a state in it, starts one of its own
      animations, slows its clock, and — to try a preset — puts extra CSS on top of it. The prototype itself is never changed.
      Groups and presets: QS below. The inventory of every animation of the prototype: notes/MOTION.md. -->
@@ -52,6 +52,9 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
 
 /* left panel: groups with a chevron; the open group lists its animations on a guide line; My decisions is pinned below */
 .ph{flex:none;padding:16px 16px 12px;font-weight:700;font-size:16px;line-height:24px;color:var(--ui-t1)}
+.ph a{display:block;width:fit-content;font-size:12px;line-height:16px;color:var(--ui-t3);text-decoration:none;transition:color .2s}   /* the way back to the hub: the same small line as the group name above an animation's title (.qh span) */
+.ph a:hover{color:var(--ui-t1)}
+.ph a:focus-visible{outline:2px solid var(--ui-t1);outline-offset:2px;border-radius:4px}
 .list{flex:1;padding:0 8px 8px;display:flex;flex-direction:column}
 .gq{flex:none;display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:8px;border-radius:8px;text-align:left;color:var(--ui-t1);transition:background .2s}
 .gq:hover{background:var(--ui-hover)}
@@ -185,7 +188,7 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
 </head>
 <body>
 <aside class="panel">
- <div class="ph">Motion</div>
+ <div class="ph"><a href="./hub.html">Design hub</a>Motion</div>
  <div class="scroll list" id="list"></div>
  <button class="alld" id="allDec"><b>Decisions and export</b><small></small></button>
 </aside>
