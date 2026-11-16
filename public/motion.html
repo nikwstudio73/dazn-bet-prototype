@@ -235,7 +235,9 @@ const fail=t=>{const e=$('#err');e.textContent=t;e.hidden=!t};
  Both run INSIDE the prototype, with its own names (S, P3, openSheet…). G.* are helpers of this page (see makeProto). */
 const SCN={
  M01:{setup:"",play:"G.press('#feed .odd[data-m=\"m1\"][data-o=\"1\"]')"},
- M02:{setup:"openFixture('m4');G.show('#mkts .choice','#fxScroll')",play:"G.press('#mkts .choice')"},
+ /* the first .choice of the match page is Double chance, folded under "Show more" since U5: the press was played on a button nobody sees.
+    Combinations in the Goals card are the first .choice that is on the page as it opens */
+ M02:{setup:"openFixture('m4');G.show('#oxGoals .choice','#fxScroll')",play:"G.press('#oxGoals .choice')"},
  M03:{setup:"openComp('ucl','scorer')",play:"G.press('#cpScroll .tp')"},
  M04:{setup:"openComp('ucl','win')",play:"G.press('#cpScroll .cp-row')"},
  M05:{setup:"S.sel=P3();refresh();openSheet();",play:"G.press('#placeBtn')"},
@@ -262,7 +264,7 @@ const SCN={
  M42:{setup:"openComp('ucl','win')",play:"G.click('[data-cpt=\"scorer\"]');G.after(1200,()=>G.click('[data-cpt=\"win\"]'))"}
 };
 /* the element to zoom to; an animation without one is shown as the whole phone */
-const FOCUS={M01:'#feed .odd[data-m="m1"][data-o="1"]',M02:'#mkts .choice',M03:'#cpScroll .tp',M04:'#cpScroll .cp-row',M05:'#placeBtn',M06:'#bar',M07:'#editBtn',
+const FOCUS={M01:'#feed .odd[data-m="m1"][data-o="1"]',M02:'#oxGoals .choice',M03:'#cpScroll .tp',M04:'#cpScroll .cp-row',M05:'#placeBtn',M06:'#bar',M07:'#editBtn',
  M09:'#feed .odd[data-m="m1"][data-o="1"]',M10:'#cpScroll .tp',M11:'#oddsChip',M12:'#liveBadge',M15:'#placeBtn',M17:'#cards .cardwrap',M21:'#feed [data-tile="m1"]',M23:'[data-card="m4|1x2"]',M24:'#bar',M27:'#bar'};
 
 /* ---------- a prototype in a frame ----------
