@@ -978,7 +978,7 @@ div.choice{cursor:default}
 .fx-tabs span[data-fxv]{cursor:pointer}
 .lu-sec{padding:var(--spacing-4) 0 var(--spacing-4) var(--spacing-4);font-weight:700;font-size:18px;line-height:25px;color:var(--t1)} /* section title of V2 (heading/h6), 33 tall */
 .mkts>.lu-hero{margin-top:calc(var(--spacing-12) - var(--spacing-16))} /* banner, title and block sit 12 apart inside the 16 rhythm of the page (the banner already pulls the title up by 4) */
-.lu-hero{position:sticky;top:calc(var(--sb) + 40px);z-index:2;display:flex;flex-direction:column;gap:28px;padding:24px var(--spacing-12) var(--spacing-12);border-radius:var(--radius-12);box-shadow:inset 0 0 0 1px var(--border-transparent-subtle);
+.lu-hero{display:flex;flex-direction:column;gap:28px;padding:24px var(--spacing-12) var(--spacing-12);border-radius:var(--radius-12);box-shadow:inset 0 0 0 1px var(--border-transparent-subtle);
  background:radial-gradient(74.5% 141.2% at 100% 41.4%,rgba(232,21,30,0.240) 0.0%,rgba(219,22,30,0.225) 6.2%,rgba(206,23,31,0.210) 12.5%,rgba(194,24,32,0.195) 18.8%,rgba(181,24,32,0.180) 25.0%,rgba(168,25,32,0.165) 31.2%,rgba(155,26,33,0.150) 37.5%,rgba(142,27,34,0.135) 43.8%,rgba(130,28,34,0.120) 50.0%,rgba(117,29,34,0.105) 56.2%,rgba(104,30,35,0.090) 62.5%,rgba(91,31,36,0.075) 68.8%,rgba(78,32,36,0.060) 75.0%,rgba(65,32,36,0.045) 81.2%,rgba(53,33,37,0.030) 87.5%,rgba(40,34,38,0.015) 93.8%,rgba(27,35,38,0.000) 100.0%),radial-gradient(76.4% 206% at 0% 40.5%,rgba(255,255,255,0.240) 0.0%,rgba(241,241,241,0.225) 6.2%,rgba(226,228,228,0.210) 12.5%,rgba(212,214,214,0.195) 18.8%,rgba(198,200,201,0.180) 25.0%,rgba(184,186,187,0.165) 31.2%,rgba(170,172,174,0.150) 37.5%,rgba(155,159,160,0.135) 43.8%,rgba(141,145,146,0.120) 50.0%,rgba(127,131,133,0.105) 56.2%,rgba(112,118,119,0.090) 62.5%,rgba(98,104,106,0.075) 68.8%,rgba(84,90,92,0.060) 75.0%,rgba(70,76,79,0.045) 81.2%,rgba(56,62,65,0.030) 87.5%,rgba(41,49,52,0.015) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--page)} /* Live/Match result: stays under the compact header while the feed scrolls */
 .lu-hd{display:flex;flex-direction:column;gap:20px}
 .lu-teams{display:flex;align-items:center}
@@ -1021,11 +1021,11 @@ div.choice{cursor:default}
 .lu-mk small{padding:0 var(--spacing-8);font-size:12px;line-height:18px;color:var(--text-tertiary)}
 .lu-mk .o3 .odd:not(.sel){background:var(--odd-bg)}
 .mkts .sgfoot{margin-top:0}
-/* U4 · fixture · Odds tab, Figma "[V2] Odds Pre-game" 4326:231817: markets in groups. Match Result reuses the block of Live updates (.lu-hero), not pinned here. */
+/* U4 · fixture · Odds tab, Figma "[V2] Odds Pre-game" 4326:231817: markets in groups. Match Result reuses the block of Live updates (.lu-hero). */
 .ox{display:flex;flex-direction:column;gap:24px}
 .ox-s{display:flex;flex-direction:column;gap:10px}
 .ox-s.g{gap:var(--spacing-8)}
-.ox-hero{position:static;z-index:auto;gap:0;padding-bottom:var(--spacing-8);border:1px solid var(--border-transparent-subtle);box-shadow:none} /* in the frame the 1 px stroke takes room, so the content is 317 wide; z-index is reset because a flex item obeys it even when static, and the card slid over the compact header */
+.ox-hero{gap:0;padding-bottom:var(--spacing-8);border:1px solid var(--border-transparent-subtle);box-shadow:none} /* in the frame the 1 px stroke takes room, so the content is 317 wide */
 /* U5 · Odds/Hero · Match Result 4379:148158: shut = crests, chance and 1X2 (343 x 244); "Show more" opens Double chance and Draw no bet (343 x 591). The glow is set in % of the card, so it stretches with it, as in the two variants. */
 .ox-mr{display:flex;flex-direction:column;gap:28px}
 .ox-hero>.ox-fold>div>div{display:flex;flex-direction:column;gap:var(--spacing-16);padding-top:24px}
@@ -2038,7 +2038,7 @@ function hideFixture(){const fx=$('#fx');fx.classList.contains('left')?snap(fx,(
 function closeFixture(){const t=topPage();t&&t.p==='fx'?pageBack():hideFixture()} // Back on a match page: to the page it was opened from (feed, league page, team page)
 
 /* ---------- fixture · Live updates tab ----------
- Figma "Live Updates · final" 4325:69899. Match Result stays pinned on top (Live/Match result); the feed below is Live/Event card:
+ Figma "Live Updates · final" 4325:69899. Match Result sits on top (Live/Match result) and scrolls with the feed, nothing is pinned (L3, owner 16.11); the feed below is Live/Event card:
  Commentary (minute + text), Event (goal, card, substitution; glow on the side of the team) and Phase (half-time, full-time).
  Odds inside the feed (owner, 16.11): only markets other than Match Result, each once, under the latest event that moves it —
  the latest goal opens "Next team to score", half-time opens "Total Goals". Prices are the current ones. A finished match shows no market in the feed.
@@ -2326,7 +2326,7 @@ const STATES=[
  {g:'Limit 20',k:'Limit + suspended bet',n:'20 selections and one of them suspended: the line under Total odds explains the dropped bet.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet();toEnd()}},
  {g:'Fixture',k:'Odds tab',n:'Pre-match markets of one match (tap its tile in the feed), in groups: Match Result, Goals, Goalscorer, Handicap. Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
  {g:'Fixture',k:'Live match',n:'Every match of the feed has its page. A live one shows the score and the minute, and only the markets that still make sense for the score.',run(){openFixture('m1')}},
- {g:'Fixture',k:'Live updates',n:'Tab “Live updates” of a match. Match Result stays pinned with its implied chance; the feed shows the events, and a key moment opens one more market: the latest goal “Next team to score”, half-time “Total Goals”.',run(){openFixture('m1');setFxTab('live')}},
+ {g:'Fixture',k:'Live updates',n:'Tab “Live updates” of a match. Match Result sits on top with its implied chance and scrolls with the feed; the feed shows the events, and a key moment opens one more market: the latest goal “Next team to score”, half-time “Total Goals”.',run(){openFixture('m1');setFxTab('live')}},
  {g:'Fixture',k:'Goalscorer',n:'Between Goals and Handicap: a carousel of Goalscorer cards. Every player is his own pick, so several can be in the betslip; a picked card turns white.',run(){openFixture('m4');setTimeout(()=>{const f=$('#fxScroll'),g=$('#mkts .gs');if(!g)return;const r=f.getBoundingClientRect();f.scrollTop+=(g.getBoundingClientRect().top-r.top)*f.offsetHeight/r.height-160},80)}},
  {g:'Competition',k:'Winner',n:'Odds tab of a competition (tap its header in the feed): who wins the season. One pick per market; it goes to the same betslip.',run(){openComp('ucl','win')}},
  {g:'Competition',k:'Top scorer',n:'Second sub-tab: two Top Picks cards and the list of players. A picked Top Pick turns white as a whole.',run(){openComp('ucl','scorer')}},
