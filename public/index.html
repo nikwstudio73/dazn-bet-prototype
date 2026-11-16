@@ -1016,8 +1016,16 @@ div.choice{cursor:default}
 .ox{display:flex;flex-direction:column;gap:24px}
 .ox-s{display:flex;flex-direction:column;gap:10px}
 .ox-s.g{gap:var(--spacing-8)}
-.ox-hero{position:static;padding-bottom:24px;border:1px solid var(--border-transparent-subtle);box-shadow:none} /* in the frame the 1 px stroke takes room, so the content is 317 wide */
-.ox-low{display:flex;flex-direction:column}
+.ox-hero{position:static;gap:0;padding-bottom:var(--spacing-8);border:1px solid var(--border-transparent-subtle);box-shadow:none} /* in the frame the 1 px stroke takes room, so the content is 317 wide */
+/* U5 · Odds/Hero · Match Result 4379:148158: shut = crests, chance and 1X2 (343 x 244); "Show more" opens Double chance and Draw no bet (343 x 591). The glow is set in % of the card, so it stretches with it, as in the two variants. */
+.ox-mr{display:flex;flex-direction:column;gap:28px}
+.ox-hero>.ox-fold>div>div{display:flex;flex-direction:column;gap:var(--spacing-16);padding-top:24px}
+.ox-hero .ox-sub{gap:0}
+.ox-hero .ox-sub b{height:auto;font-size:14px;line-height:18px;letter-spacing:.01em} /* label/md, as the titles of the component */
+.ox-tg{display:flex;align-items:center;justify-content:center;gap:var(--spacing-4);width:100%;height:36px;margin-top:var(--spacing-12);font-weight:700;font-size:12px;line-height:15px;letter-spacing:.01em;color:var(--t1)} /* text and chevron only: no fill, no blur */
+.ox-tg svg{flex:none;transition:transform var(--m-std) var(--ease)}
+.ox-tg[aria-expanded="true"] svg{transform:scaleY(-1)}
+.ox-tg:active{opacity:.6}
 .ox-h{display:flex;align-items:center;justify-content:space-between;width:100%;height:20px;padding-right:var(--spacing-8);text-align:left;color:var(--t1)}
 .ox-h b,.ox-sub b{font-weight:700;font-size:16px;line-height:20px}
 .ox-h svg{flex:none;transform:rotate(90deg);transition:transform var(--m-std) var(--ease)} /* chevron: up = open */
@@ -1031,7 +1039,7 @@ div.choice{cursor:default}
 .ox-sub{display:flex;flex-direction:column;gap:var(--spacing-4)}
 .ox-sub b{display:block;height:11px;line-height:11px;color:var(--t1)} /* Fonts alias/lg bold, trimmed to the cap height as in Figma */
 .ox-sub small{font-size:12px;line-height:18px;color:var(--text-tertiary)}
-.ox-dnb{display:flex;flex-direction:column;gap:var(--spacing-16);margin-top:var(--spacing-16);padding-top:var(--spacing-12)}
+.ox-dnb{display:flex;flex-direction:column;gap:var(--spacing-16)}
 .ox-o2{display:flex;gap:var(--spacing-8)}
 .ox .choice{border-radius:var(--choice-soft-radius)}
 .ox .choice:not(.sel){background:var(--choice-soft-bg)}
@@ -1929,11 +1937,12 @@ function choiceBtn(mid,g,o,{code,label,icon,v,stack}){const fm=M(mid);if(fm.ft)r
 const CHEV='<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12.5 4.5 7 10l5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const OX_IC={m:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',p:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M10 4v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'};
 const OX_PER=[['ft','Full Time','ou'],['h1','1st half','ou1h'],['h2','2nd half','ou2h']];
-function oxUi(m){if(!S.ox||S.ox.mid!==m.id)S.ox={mid:m.id,dc:true,btts:true,per:'ft',line:{}};return S.ox}
+function oxUi(m){if(!S.ox||S.ox.mid!==m.id)S.ox={mid:m.id,mr:S.sel.some(s=>s.m===m.id&&(s.g==='dc'||s.g==='dnb')),btts:true,per:'ft',line:{}};return S.ox} // U5: Match Result opens shut; open when a pick of this match sits behind "Show more"
 /* the line shown first: the one of my pick on this market, otherwise the most even one (2.5 on the drawn match) */
 function oxLine(m,k){const u=oxUi(m);if(!k.lines.some(r=>r[0]===u.line[k.id])){const p=S.sel.find(s=>s.m===m.id&&s.g.startsWith(k.id+':'));
   const pl=p&&p.g.split(':')[1];u.line[k.id]=k.lines.some(r=>r[0]===pl)?pl:k.lines.reduce((a,r)=>Math.abs(r[1]-r[2])<Math.abs(a[1]-a[2])?r:a)[0]}return u.line[k.id]}
 const oxHead=(t,key,open)=>`<button class="ox-h" data-oxc="${key}" aria-expanded="${open}"><b>${t}</b>${CHEV}</button>`;
+const CHEV_MR='<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15.5652 6.75368C15.8776 7.0661 15.8776 7.57212 15.5652 7.88454L10.5652 12.8845C10.2528 13.197 9.74677 13.197 9.43435 12.8845L4.43435 7.88454C4.12193 7.57212 4.12193 7.0661 4.43435 6.75368C4.74677 6.44126 5.25279 6.44126 5.56521 6.75368L9.99978 11.1883L14.4343 6.75368C14.7468 6.44126 15.2528 6.44126 15.5652 6.75368Z" fill="currentColor"/></svg>'; // chevron-down-medium of the component
 const oxFold=(key,open,c)=>`<div class="ox-fold${open?'':' shut'}" data-oxf="${key}"${open?'':' inert'}><div><div>${c}</div></div></div>`;
 /* crests, "Who will win?", implied chance and the three 1X2 prices: the same block on the Odds tab and in Live updates */
 function mrTop(m,x){const f=FX[m.id],c=luChance(m);
@@ -1965,7 +1974,7 @@ function setHc(t,step){const k=mkt(S.fx,'hc');if(!k||!S.hc)return;
  if(step){const away=S.hc.t==='a',list=HC_LINES.map(x=>away?-x:x).sort((a,b)=>a-b),v=list[list.indexOf(away?-S.hc.l:S.hc.l)+step];if(v===undefined)return;S.hc.l=away?-v:v}
  const y=$('#fxScroll').scrollTop;renderMkts();$('#fxScroll').scrollTop=y;soft($('#hcList'),RISE,T.std)} // the new line rises in, like a sub-tab of the competition page
 /* a folded block opens and closes in place (height on --m-layout / --soft, chevron on --m-std); nothing is drawn again */
-function oxToggle(key){const u=S.ox,f=document.querySelector(`[data-oxf="${key}"]`),h=document.querySelector(`[data-oxc="${key}"]`);if(!u||!f)return;u[key]=!u[key];f.classList.toggle('shut',!u[key]);f.inert=!u[key];h.setAttribute('aria-expanded',u[key])}
+function oxToggle(key){const u=S.ox,f=document.querySelector(`[data-oxf="${key}"]`),h=document.querySelector(`[data-oxc="${key}"]`);if(!u||!f)return;u[key]=!u[key];f.classList.toggle('shut',!u[key]);f.inert=!u[key];h.setAttribute('aria-expanded',u[key]);const l=h.querySelector('[data-lb]');if(l)l.textContent=u[key]?'Show less':'Show more'}
 /* Goals: another half swaps the card (its height eases), another line swaps the number and the two prices; the new content rises in */
 function oxGoals(fn,after){const m=M(S.fx),c=$('#oxGoals');if(!c||!S.ox)return;fn(S.ox);smoothH(c,()=>{c.innerHTML=goalsHTML(m)});after()}
 function setOxPer(p){if(!S.ox||S.ox.per===p)return;oxGoals(u=>u.per=p,()=>soft($('#oxBlks'),RISE,T.std))}
@@ -1974,9 +1983,10 @@ function setOxLine(step){const m=M(S.fx),u=S.ox;if(!u)return;const k=mkt(m.id,OX
 function oddsHTML(m){
  const f=FX[m.id],u=oxUi(m),dc=mkt(m.id,'dc'),dnb=mkt(m.id,'dnb'),hc=mkt(m.id,'hc');
  const dcl={'1X':`${m.h} to win or draw`,'X2':`${m.a} to win or draw`,'12':`${m.h} or ${m.a} to win`};
- return `<div class="ox"><section class="ox-s"><div class="lu-sec">Match Result</div><div class="lu-hero ox-hero">${mrTop(m,m.live?'X':'Draw')}<div class="ox-low">`+ // live: "X", as in Live updates ("Draw" with the arrow of a moving price does not fit the tile)
-  (dc?oxHead('Double chance','dc',u.dc)+oxFold('dc',u.dc,`<div class="clist">${['1X','X2','12'].map(o=>dc.opts.find(x=>x.k===o)).map(x=>choiceBtn(m.id,'dc',x.k,{code:x.k,label:dcl[x.k],v:x.v,stack:true})).join('')}</div>`):'')+
-  (dnb?`<div class="ox-dnb"><div class="ox-sub"><b>Draw no bet</b><small>Money back if it ends in a draw.</small></div><div class="ox-o2">${dnb.opts.map((x,i)=>oddBtn(m.id,'dnb',x.k,i?m.as:m.hs,x.v)).join('')}</div></div>`:'')+`</div></div></section>
+ return `<div class="ox"><section class="ox-s"><div class="lu-sec">Match Result</div><div class="lu-hero ox-hero"><div class="ox-mr">${mrTop(m,m.live?'X':'Draw')}</div>`+oxFold('mr',u.mr, // live: "X", as in Live updates ("Draw" with the arrow of a moving price does not fit the tile)
+  (dc?`<div class="ox-sub"><b>Double chance</b></div><div class="clist">${['1X','X2','12'].map(o=>dc.opts.find(x=>x.k===o)).map(x=>choiceBtn(m.id,'dc',x.k,{code:x.k,label:dcl[x.k],v:x.v,stack:true})).join('')}</div>`:'')+
+  (dnb?`<div class="ox-dnb"><div class="ox-sub"><b>Draw no bet</b><small>Money back if it ends in a draw.</small></div><div class="ox-o2">${dnb.opts.map((x,i)=>oddBtn(m.id,'dnb',x.k,i?m.as:m.hs,x.v)).join('')}</div></div>`:''))+
+  `<button class="ox-tg" data-oxc="mr" aria-expanded="${u.mr}"><span data-lb>${u.mr?'Show less':'Show more'}</span>${CHEV_MR}</button></div></section>
   <section class="ox-s g"><div class="lu-sec">Goals</div><div class="ox-card" id="oxGoals">${goalsHTML(m)}</div></section>`+
   (f.scorers?`<i class="ox-div"></i><section class="gs"><div class="gs-h"><b>Goalscorer</b><span>In this match</span></div><div class="gs-row">${f.scorers.map(p=>`<div class="gs-card"><span class="gs-ph"><img src="${IMG[GSC[p.k]||'gsc_none']}" alt=""></span><b>${p.n}</b><span class="cl"><img src="${crest(p.cr)}" alt="">${p.team}</span>${oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only')}</div>`).join('')}</div></section>`:'')+
   (hc?hcHTML(m,hc):'')+(m.ft?'':`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`)+'</div>';
