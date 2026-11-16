@@ -331,9 +331,13 @@ img{display:block}
 .shot{position:absolute;left:50%;top:calc(100% + 11px + var(--spacing-12));transform:translateX(-50%);transform-origin:top center;height:36px;display:flex;align-items:center;gap:var(--spacing-8);padding:0 var(--spacing-16) 0 var(--spacing-12);border-radius:12px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);font-weight:700;font-size:14px;line-height:20px;color:var(--ui-t1);white-space:nowrap}
 .shot:hover{background:linear-gradient(var(--ui-hover),var(--ui-hover)),var(--ui-panel)}
 .shot svg{flex:none;color:var(--ui-t3)}
-/* H1 · "Design hub": a quiet text link back to hub.html in the free top-right corner, on the line of the "States" button. Desktop chrome only */
-.hublink{position:fixed;right:var(--ui-edge);top:var(--ui-edge);z-index:99;height:36px;display:flex;align-items:center;padding:0 var(--spacing-12);border-radius:12px;font-weight:700;font-size:12px;line-height:18px;color:var(--ui-t3);text-decoration:none;white-space:nowrap;transition:color var(--m-quick),background var(--m-quick)}
+/* H1 · "Design hub": the way back to hub.html, a quiet text link above the States panel (top-left, the same place as in motion.html).
+   The panel and the "States" button start 28 (the link) + 8 lower; without the link (the offline file drops it) they stay at the window edge. Desktop chrome only */
+.hublink{position:fixed;left:var(--ui-edge);top:var(--ui-edge);z-index:99;height:28px;display:flex;align-items:center;gap:var(--spacing-4);padding:0 var(--spacing-8) 0 var(--spacing-4);border-radius:8px;font-weight:700;font-size:12px;line-height:18px;color:var(--ui-t3);text-decoration:none;white-space:nowrap;transition:color var(--m-quick),background var(--m-quick)}
 .hublink:hover{color:var(--ui-t1);background:var(--ui-hover)}
+.hublink svg{flex:none}
+.hublink~.nav,.hublink~.nav-open{top:calc(var(--ui-edge) + 28px + var(--spacing-8))}
+.hublink~.nav{max-height:calc(100vh - 2*var(--ui-edge) - 28px - var(--spacing-8))}
 html.shooting,html.shooting *{cursor:none!important} /* while the frame is taken: no pointer in the picture */
 html.shooting .over{visibility:hidden} /* narrow window: the panel or the size switch lies over the frame, so it steps aside for the picture */
 html.embed .nav,html.embed .nav-open,html.embed .devsw,html.embed .shot,html.embed .hublink{display:none} /* A2: inside the motion gallery the gallery has its own controls */
@@ -1330,12 +1334,12 @@ div.choice{cursor:default}
  </div>
  <button class="shot" id="shot" title="Copy the phone screen as a picture"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2v-.2a.5.5 0 0 0-.5-.5H4.5a2 2 0 0 0-2 2V10a.5.5 0 0 0 .5.5h.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span id="shotT" aria-live="polite">Copy screen</span></button>
 </div>
+<a class="hublink" href="./hub.html"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3.5 5.5 8 10 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Design hub</a>
 <aside class="nav" id="nav" aria-label="Prototype states">
  <div class="nav-h"><b>Prototype states</b><button class="nav-x" id="navX" aria-label="Hide the panel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3.5 5.5 8 10 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
  <div class="nav-b" id="navB"></div>
 </aside>
 <button class="nav-open" id="navOpen" aria-label="Show the states panel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 4h11M2.5 8h11M2.5 12h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>States</button>
-<a class="hublink" href="./hub.html">Design hub</a>
 <div class="devsw seg" role="tablist" aria-label="Phone size">
  <button role="tab" class="on" data-dev="mini" aria-selected="true">iPhone 13 mini</button>
  <button role="tab" data-dev="max" aria-selected="false">iPhone 17 Pro Max</button>
