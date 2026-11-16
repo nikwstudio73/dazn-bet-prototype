@@ -997,29 +997,51 @@ div.choice{cursor:default}
 .lu-seg{display:flex;padding:var(--spacing-4);border-radius:var(--radius-12);background:var(--surface-container-1)} /* DS Segmented Control, as on the V2 Odds page */
 .lu-seg button{flex:1;height:32px;border-radius:8px;font-weight:700;font-size:14px;line-height:18px;color:var(--text-tertiary);transition:background var(--m-quick) var(--ease),color var(--m-quick) var(--ease)}
 .lu-seg button.on{background:rgba(195,209,219,.10);color:#f8f8f8} /* fill/overlay-3 and text/primary in the mode of the DS control, the same values as .fx-more */
-.lu-feed{display:flex;flex-direction:column;gap:var(--spacing-8)}
-.lu-feed .lu-sec.nx{padding-top:var(--spacing-16)}
-.lu-card{border-radius:var(--radius-12);padding:var(--spacing-16) var(--spacing-8) var(--spacing-8);background:var(--fill-overlay-1);box-shadow:inset 0 0 0 1px var(--border-transparent-subtle)} /* Live/Event card */
-.lu-card.h{background:radial-gradient(76.4% 206% at 0% 40.5%,rgba(255,255,255,0.240) 0.0%,rgba(241,241,241,0.225) 6.2%,rgba(226,228,228,0.210) 12.5%,rgba(212,214,214,0.195) 18.8%,rgba(198,200,201,0.180) 25.0%,rgba(184,186,187,0.165) 31.2%,rgba(170,172,174,0.150) 37.5%,rgba(155,159,160,0.135) 43.8%,rgba(141,145,146,0.120) 50.0%,rgba(127,131,133,0.105) 56.2%,rgba(112,118,119,0.090) 62.5%,rgba(98,104,106,0.075) 68.8%,rgba(84,90,92,0.060) 75.0%,rgba(70,76,79,0.045) 81.2%,rgba(56,62,65,0.030) 87.5%,rgba(41,49,52,0.015) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--page)} /* Team = Home: glow from the left */
-.lu-card.a{background:radial-gradient(74.5% 141.2% at 100% 41.4%,rgba(232,21,30,0.240) 0.0%,rgba(219,22,30,0.225) 6.2%,rgba(206,23,31,0.210) 12.5%,rgba(194,24,32,0.195) 18.8%,rgba(181,24,32,0.180) 25.0%,rgba(168,25,32,0.165) 31.2%,rgba(155,26,33,0.150) 37.5%,rgba(142,27,34,0.135) 43.8%,rgba(130,28,34,0.120) 50.0%,rgba(117,29,34,0.105) 56.2%,rgba(104,30,35,0.090) 62.5%,rgba(91,31,36,0.075) 68.8%,rgba(78,32,36,0.060) 75.0%,rgba(65,32,36,0.045) 81.2%,rgba(53,33,37,0.030) 87.5%,rgba(40,34,38,0.015) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--page)} /* Team = Away: glow from the right */
-.lu-body{display:flex;flex-direction:column;gap:var(--spacing-12);padding:0 var(--spacing-8) var(--spacing-8)}
+/* L2 · Live updates rebuilt (Figma "Live Updates with Odds" 4365:194526): the Live bet block on top, a feed without odds, the shot diagram in a goal card.
+   Nothing is pinned (L3). The glow stays only on goal cards. */
+.lu-top{margin:calc(-1*var(--spacing-12)) calc(-1*var(--spacing-16)) 0;padding:var(--spacing-16);display:flex;flex-direction:column;gap:20px;border-radius:0 0 var(--radius-12) var(--radius-12);border-bottom:1px solid var(--border-transparent-subtle);
+ background:radial-gradient(85% 160% at 29% 5%,rgba(209,36,36,0.270) 0.0%,rgba(198,36,36,0.253) 6.2%,rgba(186,36,36,0.236) 12.5%,rgba(175,36,36,0.219) 18.8%,rgba(164,36,36,0.203) 25.0%,rgba(152,36,37,0.186) 31.2%,rgba(141,36,37,0.169) 37.5%,rgba(129,36,37,0.152) 43.8%,rgba(118,36,37,0.135) 50.0%,rgba(107,35,37,0.118) 56.2%,rgba(95,35,37,0.101) 62.5%,rgba(84,35,37,0.084) 68.8%,rgba(72,35,38,0.068) 75.0%,rgba(61,35,38,0.051) 81.2%,rgba(50,35,38,0.034) 87.5%,rgba(38,35,38,0.017) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--fill-overlay-1)} /* fill/overlay-1 + the red glow of the frame (27 %, turned in Figma; here an upright ellipse from the same centre) */
+.lu-top .legal{margin-bottom:0}
+.lu-q{display:flex;flex-direction:column;gap:var(--spacing-4)}
+.lu-q span{height:20px;font-weight:700;font-size:12px;line-height:20px;letter-spacing:.01em;text-transform:uppercase;color:#f45a5a} /* DS Label, red tertiary: components/label/red/tertiary/text */
+.lu-q b{font-weight:700;font-size:18px;line-height:25px;color:var(--t1)}
+.lu-top .o3 .odd:not(.sel){background:var(--odd-bg)}
+.lu-feed{margin-bottom:calc(-1*var(--spacing-8))}
+.lu-card{margin-bottom:var(--spacing-8);border-radius:var(--radius-12);padding:var(--spacing-16) var(--spacing-12) var(--spacing-12);background:var(--fill-overlay-1);box-shadow:inset 0 0 0 1px var(--border-transparent-subtle)} /* Live/Event card */
+.lu-card.g.h{background:radial-gradient(76.4% 206% at 0% 40.5%,rgba(255,255,255,0.240) 0.0%,rgba(241,241,241,0.225) 6.2%,rgba(226,228,228,0.210) 12.5%,rgba(212,214,214,0.195) 18.8%,rgba(198,200,201,0.180) 25.0%,rgba(184,186,187,0.165) 31.2%,rgba(170,172,174,0.150) 37.5%,rgba(155,159,160,0.135) 43.8%,rgba(141,145,146,0.120) 50.0%,rgba(127,131,133,0.105) 56.2%,rgba(112,118,119,0.090) 62.5%,rgba(98,104,106,0.075) 68.8%,rgba(84,90,92,0.060) 75.0%,rgba(70,76,79,0.045) 81.2%,rgba(56,62,65,0.030) 87.5%,rgba(41,49,52,0.015) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--page)} /* goal of the home side: glow from the left */
+.lu-card.g.a{background:radial-gradient(74.5% 141.2% at 100% 41.4%,rgba(232,21,30,0.240) 0.0%,rgba(219,22,30,0.225) 6.2%,rgba(206,23,31,0.210) 12.5%,rgba(194,24,32,0.195) 18.8%,rgba(181,24,32,0.180) 25.0%,rgba(168,25,32,0.165) 31.2%,rgba(155,26,33,0.150) 37.5%,rgba(142,27,34,0.135) 43.8%,rgba(130,28,34,0.120) 50.0%,rgba(117,29,34,0.105) 56.2%,rgba(104,30,35,0.090) 62.5%,rgba(91,31,36,0.075) 68.8%,rgba(78,32,36,0.060) 75.0%,rgba(65,32,36,0.045) 81.2%,rgba(53,33,37,0.030) 87.5%,rgba(40,34,38,0.015) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--page)} /* goal of the away side: glow from the right */
+.lu-body{display:flex;flex-direction:column;gap:var(--spacing-12);padding:0 0 var(--spacing-8)}
 .lu-meta{display:flex;align-items:center;justify-content:space-between;min-height:18px}
 .lu-meta b,.lu-body>b{font-weight:700;font-size:14px;line-height:18px;letter-spacing:.01em;color:var(--t2)}
+.lu-body>b,.lu-txt{padding:0 var(--spacing-4)}
 .lu-meta img,.lu-ph img{width:28px;height:28px;object-fit:contain;flex:none}
 .lu-title{display:flex;align-items:center;gap:var(--spacing-8);height:16px;font-weight:700;font-size:16px;line-height:16px;color:var(--t1)}
+.lu-card.g .lu-title{height:32px}
 .lu-title svg,.lu-pl svg{flex:none;display:block}
-.lu-pl{display:flex;align-items:center;gap:var(--spacing-12);padding:var(--spacing-12);border-radius:8px;background:var(--fill-overlay-1)} /* .Live/Player row */
+.lu-pl{display:flex;align-items:center;gap:var(--spacing-12);padding:var(--spacing-12);border-radius:8px;background:rgba(249,250,250,.08)} /* .Live/Player row on fill/overlay-2 */
 .lu-pl div{flex:1;min-width:0}
 .lu-pl b{display:block;font-weight:700;font-size:14px;line-height:18px;letter-spacing:.01em;color:var(--t1)}
 .lu-pl span{display:block;font-size:12px;line-height:18px;color:var(--t2)}
 .lu-txt{font-size:14px;line-height:21px;color:var(--t2)}
-.lu-ph .lu-body{flex-direction:row;align-items:center;gap:var(--spacing-8)}
+.lu-ph .lu-body{flex-direction:row;align-items:center;gap:var(--spacing-8);padding:0 var(--spacing-4) var(--spacing-8)}
 .lu-ph .tx{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--spacing-6)}
 .lu-ph .tx span{font-size:12px;line-height:18px;color:var(--t2)}
 .lu-ph .tx b{font-weight:700;font-size:16px;line-height:12px;color:var(--t1)}
-.lu-mk{display:flex;flex-direction:column;gap:var(--spacing-8);padding-top:var(--spacing-8)} /* .Live/Market strip */
-.lu-mk small{padding:0 var(--spacing-8);font-size:12px;line-height:18px;color:var(--text-tertiary)}
-.lu-mk .o3 .odd:not(.sel){background:var(--odd-bg)}
+.lu-shot{display:block;width:calc(100% - 2*var(--spacing-4));height:auto;margin:0 var(--spacing-4)} /* shot diagram of a goal, 311 x 198 in the frame */
+/* a new event comes in from the top and pushes the feed down; the line of the shot draws once the card has landed */
+.lu-in{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows var(--m-layout) var(--soft),opacity var(--m-std) var(--soft)}
+.lu-in>div{overflow:hidden;min-height:0}
+.lu-in .lu-card{transform:translateY(calc(-1*var(--spacing-8)));transition:transform var(--m-layout) var(--soft)}
+.lu-in.on{grid-template-rows:1fr;opacity:1}
+.lu-in.on .lu-card{transform:none}
+.lu-in .dr{stroke-dashoffset:1}
+.lu-in.on .dr{stroke-dashoffset:0;transition:stroke-dashoffset var(--m-layout) var(--soft) var(--m-layout)}
+.lu-in.now,.lu-in.now .lu-card,.lu-in.now .dr{transition:none}
+/* the feed is scrolled away: nothing moves, a pill under the compact header says how many events came in */
+.lu-new{position:absolute;left:50%;top:calc(var(--sb) + 40px + var(--spacing-8));z-index:3;transform:translate(-50%,calc(-1*var(--spacing-8)));opacity:0;pointer-events:none;white-space:nowrap;transition:opacity var(--m-std) var(--soft),transform var(--m-std) var(--soft)}
+.lu-new.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.lu-new.show:active{opacity:.6}
+@media (prefers-reduced-motion:reduce){.lu-in,.lu-in .lu-card,.lu-in.on .dr,.lu-new{transition:none}}
 .mkts .sgfoot{margin-top:0}
 /* U4 · fixture · Odds tab, Figma "[V2] Odds Pre-game" 4326:231817: markets in groups. Match Result reuses the block of Live updates (.lu-hero). */
 .ox{display:flex;flex-direction:column;gap:24px}
@@ -1127,6 +1149,7 @@ div.choice{cursor:default}
 
   <div class="fx" id="fx" aria-hidden="true">
    <div class="fx-top"><button class="fx-back" id="fxBack2" aria-label="Back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.3266 15.9932L3.33337 8L11.3266 0.00679016L12.6667 1.34691L6.01362 8L12.6667 14.6531L11.3266 15.9932Z" fill="#F9FAFA"/></svg></button><span id="fxTitle"></span></div>
+   <button class="fx-follow lu-new" id="luNew" aria-live="polite"></button>
    <div class="fx-scroll" id="fxScroll">
     <div class="fx-hero">
      <div class="fx-nav"><button class="fx-back" id="fxBack" aria-label="Back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.3266 15.9932L3.33337 8L11.3266 0.00679016L12.6667 1.34691L6.01362 8L12.6667 14.6531L11.3266 15.9932Z" fill="#F9FAFA"/></svg></button><span id="fxLeague">Spain · LaLiga</span></div>
@@ -1562,7 +1585,7 @@ function won(m,g,o){
 }
 let S;
 /* st: dropped-out picks {"match|market":'suspended'|'locked'}; lk: locked odds in the feed ["match|market|outcome"]; day: a key of DAYS; more: the matches of the days other than today and Sat 3 Jan */
-function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fxTab:'odds',luKey:false,fav:false,cp:null,cpTab:'win',cpView:'odds',cpDay:'today',cpLive:false,stack:[],tm:null,tmMenu:null}} // cpView / cpDay / cpLive: tab, day and LIVE filter of the competition page (R2)
+function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fxTab:'odds',luKey:false,lu:{},luQ:{},nts:{},luNew:0,fav:false,cp:null,cpTab:'win',cpView:'odds',cpDay:'today',cpLive:false,stack:[],tm:null,tmMenu:null}} // cpView / cpDay / cpLive: tab, day and LIVE filter of the competition page (R2)
 const $=s=>document.querySelector(s);
 const M=id=>S.matches.find(m=>m.id===id)||S.ft.find(m=>m.id===id)||S.more.find(m=>m.id===id)||OUT[id];
 const f2=n=>n.toFixed(2);
@@ -1666,7 +1689,7 @@ function isSel(mid,g,o){return S.sel.some(s=>s.m===mid&&s.g===g&&s.o===String(o)
 const isOut=s=>!!S.st[key(s)];                 // suspended or locked: stays in the betslip, counts, but is not sent to DAZN Bet
 const act=()=>S.sel.filter(s=>!isOut(s));      // picks that still have a price
 function oddState(mid,g,o){const sel=isSel(mid,g,o);return {sel,locked:(sel&&!!S.st[mid+'|'+g])||S.lk.includes(mid+'|'+g+'|'+o)}}
-function mkt(mid,id){const f=FX[mid];return f&&(id==='nts'?f.nts:f.markets.find(x=>x.id===id))} // nts: Next team to score lives only in Live updates, not in the list of the Odds tab
+function mkt(mid,id){const f=FX[mid];return f&&(id==='nts'?S.nts[mid]||f.nts:f.markets.find(x=>x.id===id))} // nts: Next team to score lives only in Live updates, not in the list of the Odds tab
 function oddsOf(s){
  const m=M(s.m);if(m.out){const c=CP[s.m];return s.g==='win'||s.g==='rel'?c[s.g].find(x=>x[0]===s.o)[2]:cpPlayer(c,s.o).v} // outright: Competition winner / Relegation / Top scorer
  if(s.g==='1x2')return m.o[+s.o];
@@ -1898,14 +1921,14 @@ function changeOdd(m,o,dir,nv){
    (its tile, its card, the totals) keeps the arrow ~5 s and fades .6 s. Mirrors --chg-fade / --chg-fade-pick in CSS. */
 const CHG_T={hold:2000,fade:1500,pickHold:5000,pickFade:600};
 const oddTimers={};
-function animateOdd(mid,o,dir){
- const key=mid+o;(oddTimers[key]||[]).forEach(clearTimeout);oddTimers[key]=[];
- document.querySelectorAll(`.odd[data-m="${mid}"][data-g="1x2"][data-o="${o}"]`).forEach(b=>{   // the feed tile and the same odd on the fixture page
+function animateOdd(mid,o,dir,g='1x2'){
+ const key=mid+(g==='1x2'?'':g)+o;(oddTimers[key]||[]).forEach(clearTimeout);oddTimers[key]=[];
+ document.querySelectorAll(`.odd[data-m="${mid}"][data-g="${g}"][data-o="${o}"]`).forEach(b=>{   // the feed tile and the same odd on the fixture page
   if(b.classList.contains('locked'))return;
   const num=b.querySelector('.num'),arr=b.querySelector('.arr'),mine=b.classList.contains('sel');
   b.classList.remove('up','down','flash');arr.classList.remove('fade');void b.offsetWidth;
   b.classList.add(dir>0?'up':'down');
-  num.textContent=f2(M(mid).o[o]);soft(num,rise(dir));
+  num.textContent=f2(g==='1x2'?M(mid).o[o]:oddsOf({m:mid,g,o:String(o)}));soft(num,rise(dir));
   b.classList.add('flash');                                  // tint dissolves in over --chg-in
   if(HOLD)return;                                            // a ready-made state keeps the arrow on screen
   const hold=mine?CHG_T.pickHold:CHG_T.hold,fade=mine?CHG_T.pickFade:CHG_T.fade;
@@ -1935,6 +1958,7 @@ function restoreArrows(){ // after a re-render, keep arrows that are still withi
 }
 function minuteTick(){if(!LIVE)return;
  S.matches.filter(m=>m.live).forEach(m=>{if(m.min<90){m.min++;document.querySelectorAll(`[data-min="${m.id}"]`).forEach(e=>e.textContent=m.min+'’');document.querySelectorAll(`[data-cmin="${m.id}"]`).forEach(e=>e.textContent=m.min+'’')}});
+ S.matches.filter(m=>m.live&&FX[m.id]).forEach(luDue);   // L2: the feed of Live updates grows with the minute
 }
 
 /* ---------- fixture · Odds tab ---------- */
@@ -2020,7 +2044,7 @@ function drawFixture(mid){
  ft.textContent=sc?m.sh+' - '+m.sa:f.time;fd.textContent=m.live?m.min+'’':m.ft?'FT':f.date;ft.classList.toggle('sc',sc);fd.classList.toggle('lv',!!m.live);
  if(m.live)fd.dataset.min=m.id;else fd.removeAttribute('data-min');
  [['#fxHi',m.hi],['#fxAi',m.ai]].forEach(([q,k])=>{const b=$(q).parentNode;if(TEAMS[k]){b.dataset.team=k;b.dataset.tc=m.comp}else b.removeAttribute('data-team')}); // T1: crest and name open the team page
- S.hc=null;S.ox=null;clearTimeout(oxStepT);paintFxTabs();renderMkts(mid);$('#fxScroll').scrollTop=0;$('#phone').classList.remove('fxs');S.fx=mid;
+ S.hc=null;S.ox=null;S.luNew=0;luPill();clearTimeout(oxStepT);paintFxTabs();renderMkts(mid);$('#fxScroll').scrollTop=0;$('#phone').classList.remove('fxs');S.fx=mid;
 }
 function openFixture(mid){
  if(!FX[mid])return;const fx=$('#fx'),t=topPage();
@@ -2034,20 +2058,30 @@ function openFixture(mid){
 /* C1: cut-out photos of the Goalscorer card (Figma has two); every other player gets the silhouette of the component */
 const GSC={mbappe:'gsc_mbappe',alvarez:'gsc_alvarez'};Object.assign(IMG,{gsc_mbappe:'assets/img/gsc_mbappe.png',gsc_alvarez:'assets/img/gsc_alvarez.png',gsc_none:'assets/img/gsc_none.png'}); // whole paths, so build.py inlines them
 function renderMkts(mid=S.fx){const m=M(mid);$('#mkts').innerHTML=S.fxTab==='live'?liveHTML(m):LEGAL+oddsHTML(m)}
-function hideFixture(){const fx=$('#fx');fx.classList.contains('left')?snap(fx,()=>fx.classList.remove('show','left')):fx.classList.remove('show');fx.setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},T.layout)}
+function hideFixture(){$('#luNew').classList.remove('show');const fx=$('#fx');fx.classList.contains('left')?snap(fx,()=>fx.classList.remove('show','left')):fx.classList.remove('show');fx.setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},T.layout)}
 function closeFixture(){const t=topPage();t&&t.p==='fx'?pageBack():hideFixture()} // Back on a match page: to the page it was opened from (feed, league page, team page)
 
 /* ---------- fixture · Live updates tab ----------
- Figma "Live Updates · final" 4325:69899. Match Result sits on top (Live/Match result) and scrolls with the feed, nothing is pinned (L3, owner 16.11); the feed below is Live/Event card:
- Commentary (minute + text), Event (goal, card, substitution; glow on the side of the team) and Phase (half-time, full-time).
- Odds inside the feed (owner, 16.11): only markets other than Match Result, each once, under the latest event that moves it —
- the latest goal opens "Next team to score", half-time opens "Total Goals". Prices are the current ones. A finished match shows no market in the feed.
- LU holds a hand-written feed (Real Madrid v PSG); every other match gets one worked out from its score (luOf). */
+ L2 · Figma "Live Updates with Odds" 4365:194526. On top the Live bet block: "Who scores the next goal?" with three prices (home, No goal, away);
+ it scrolls with the feed, nothing is pinned (L3). The feed has no odds: Commentary (minute + text), Event (goal, card, substitution) and Phase
+ (half-time, full-time, kick-off). A goal card has the glow of its side and the diagram of the shot. The block exists only while the match is played.
+ Motion (owner, 16.11): a new event comes in from the top and pushes the feed down; if the feed is scrolled away nothing moves and a pill
+ "1 new update" shows instead; a goal is an event like any other, the score in the header changes softly; the prices of the block move by the
+ pattern of any price (animateOdd); the line of the shot draws once the card has landed.
+ LU holds a hand-written feed (Real Madrid v PSG); every other match gets one worked out from its score (luBase). Events that come in later sit in S.lu. */
 const LU_IC={goal:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8.00033" cy="7.99984" r="7.33333" fill="#F9FAFA"/><path d="M7.99968 1.3335C6.68114 1.3335 5.3922 1.72449 4.29588 2.45703C3.19955 3.18957 2.34506 4.23077 1.84048 5.44894C1.3359 6.66711 1.20387 8.00756 1.46111 9.30076C1.71834 10.594 2.35328 11.7819 3.28563 12.7142C4.21798 13.6466 5.40587 14.2815 6.69908 14.5387C7.99228 14.796 9.33273 14.6639 10.5509 14.1594C11.7691 13.6548 12.8103 12.8003 13.5428 11.704C14.2754 10.6076 14.6663 9.3187 14.6663 8.00016C14.6663 7.12468 14.4939 6.25778 14.1589 5.44894C13.8238 4.6401 13.3328 3.90517 12.7137 3.28612C12.0947 2.66706 11.3597 2.176 10.5509 1.84097C9.74206 1.50593 8.87516 1.3335 7.99968 1.3335ZM9.94194 12.962L7.99968 11.8668L6.05742 12.962C5.20925 12.6296 4.45991 12.0863 3.88029 11.3835L4.32229 9.19506L2.68217 7.68778C2.73394 6.77696 3.02025 5.89498 3.51331 5.1274L5.72689 4.87195L6.65398 2.84554C7.53529 2.60726 8.46407 2.60726 9.34538 2.84554L10.2725 4.87195L12.486 5.1274C12.9791 5.89498 13.2654 6.77696 13.3172 7.68778L11.6771 9.19503L12.1191 11.3835C11.5395 12.0863 10.7901 12.6296 9.94194 12.962Z" fill="#080E12"/><path d="M6.87245 6L5.74512 8L6.87245 10H9.12845L10.2558 8L9.12845 6H6.87245Z" fill="#080E12"/></svg>',
  yc:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.28675 3.97599L4.81784 13.318C4.93098 14.0084 5.58234 14.4763 6.27269 14.3632L11.6674 13.479C12.3577 13.3659 12.8257 12.7145 12.7125 12.0242L11.1814 2.68212C11.0683 1.99177 10.4169 1.52385 9.72657 1.63699L4.33188 2.52114C3.64153 2.63428 3.17361 3.28564 3.28675 3.97599Z" fill="#FFFA00" stroke="#FFFA00" stroke-width="1.33333" stroke-linecap="round"/></svg>',
  in:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.1143 8.17442C13.16 8.17442 14 7.31977 14 6.25581C12.56 4.7907 8.53143 0.5 8.17143 0.5C7.81143 0.5 3.54286 4.68605 2 6.25581C2 7.31977 2.84 8.17442 3.88571 8.17442H5.08571L6.61143 14C6.61143 14 6.97143 15.5 8 15.5C8.80571 15.5 9.14857 14.8372 9.33714 14L10.9143 8.17442H12.1143Z" fill="#147E4A"/></svg>',
  out:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.88571 7.82558C2.84 7.82558 2 8.68023 2 9.74418C3.44 11.2093 7.46857 15.5 7.82857 15.5C8.18857 15.5 12.4571 11.314 14 9.74419C14 8.68023 13.16 7.82558 12.1143 7.82558L10.9143 7.82558L9.38857 2C9.38857 2 9.02857 0.499998 8 0.499998C7.19429 0.499997 6.85143 1.16279 6.66286 2L5.08572 7.82558L3.88571 7.82558Z" fill="#D12424"/></svg>'};
-/* one event: min, type (text / goal / yc / sub / ph), side (h / a), title, pl = player rows [name, detail, icon], text, key = shown under "Key events" */
+const LU_BALL='<svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M17.7156 12.1578C18.0206 12.1984 18.2936 12.3778 18.45 12.6484L20.0719 15.4578C20.2505 15.7672 20.2505 16.1484 20.0719 16.4578L18.45 19.2672C18.2714 19.5762 17.9412 19.7669 17.5844 19.7672H14.3391C13.9819 19.7672 13.6505 19.5764 13.4719 19.2672L11.85 16.4578C11.6713 16.1484 11.6714 15.7672 11.85 15.4578L13.4719 12.6484C13.6505 12.3392 13.9819 12.1484 14.3391 12.1484H17.5844L17.7156 12.1578Z" fill="#F9FAFA"/><path fill-rule="evenodd" clip-rule="evenodd" d="M16 2.66718C23.3634 2.66744 29.3341 8.63659 29.3344 16L29.3172 16.6859C28.9602 23.7308 23.1335 29.3341 16 29.3344L15.3141 29.3172C8.26945 28.9599 2.66748 23.1333 2.66718 16C2.66746 8.6366 8.6366 2.66746 16 2.66718ZM16 5.22655C14.9041 5.2266 13.8464 5.39106 12.85 5.6953L11.5219 8.5703H11.5078C11.2866 9.04037 10.8303 9.37278 10.3187 9.42811L7.20311 9.78124C6.00335 11.4753 5.28308 13.53 5.2328 15.7516L7.56718 17.8766L7.58124 17.8906C7.96815 18.2362 8.13403 18.7761 8.03749 19.2875L7.38905 22.4734C8.63615 24.1293 10.3495 25.413 12.3344 26.1312L15.2281 24.5C15.6841 24.2378 16.2378 24.2376 16.6937 24.5L19.6125 26.1484C21.6025 25.4399 23.3213 24.1641 24.5766 22.5141L23.9265 19.2734H23.9125C23.8159 18.762 23.9817 18.2359 24.3687 17.8766L26.7641 15.6828C26.7009 13.4979 25.9882 11.4782 24.8109 9.80624L21.5344 9.42811C21.009 9.37279 20.565 9.04039 20.3437 8.5703L18.9875 5.64843C18.0387 5.37499 17.0368 5.2266 16 5.22655Z" fill="#F9FAFA"/></svg>'; // .Betslip/Sport icon, Football, 32
+/* shot diagram (Figma group "Group 40" of the goal card): the pitch is the export of the frame; the ball and the dotted line are drawn here, so the line can draw.
+   The data has no shot positions: four fixed ones, picked by the minute of the goal. */
+const LU_PITCH='<path d="M311 197.275L311 13.4508C311 6.8234 305.627 1.45082 299 1.45082L12 1.45082C5.37259 1.45082 2.4666e-08 6.82342 2.38174e-08 13.4508L2.78646e-10 197.275L311 197.275Z" fill="#F9FAFA" fill-opacity="0.08"/><path d="M310.5 13.4508L310.5 196.775L0.5 196.775L0.5 13.4508C0.500007 7.09955 5.64874 1.95082 12 1.95082L299 1.95082C305.153 1.95082 310.177 6.78277 310.485 12.859L310.5 13.4508Z" stroke="#F9FAFA" stroke-opacity="0.1"/><path d="M155.037 198C133.366 198 138.142 197.275 115.742 196.656C115.742 174.916 133.372 157.225 155.037 157.225C176.702 157.225 194.332 174.916 194.332 196.656C174.304 196.656 176.702 198 155.037 198ZM155.037 159.411C134.571 159.411 117.92 176.119 117.92 196.656C143.928 196.656 136.48 196.656 156.946 196.656C177.412 196.656 177.921 195.824 192.153 196.656C192.153 176.119 175.503 159.411 155.037 159.411Z" fill="#3D4549"/><path d="M246.655 73.8454H64.3447L64.3447 2.15276L246.648 2.15173L246.648 73.8454H246.655ZM66.8782 71.6946L244.128 71.6946L244.128 3.64516L66.8782 3.64516L66.8782 71.6946Z" fill="#3D4549"/><path d="M196.553 25.0574L114.391 25.0574L114.391 2.11478L196.553 2.11478L196.553 25.0574ZM116.534 22.9066L194.343 22.9066L194.343 3.19088L116.534 3.54935L116.534 22.9066Z" fill="#3D4549"/><path d="M155.14 97.5045C141.738 97.5045 130.834 86.3139 130.834 72.5588L130.834 71.6948H179.45L179.45 72.5588C179.45 86.3139 168.546 97.5045 155.144 97.5045H155.14ZM132.531 73.4182C132.976 85.8248 142.949 95.7765 155.14 95.7765C167.331 95.7765 177.303 85.8248 177.749 73.4182H132.531Z" fill="#3D4549"/><path d="M128.609 7.2455L128.609 9.72748e-05L179.186 9.49153e-05L179.186 7.2455L128.609 7.2455Z" fill="#3D4549"/>';
+const LU_SHOTS=[[179.5,73.3,164.5,7],[136,58,150,7],[208,92,171,7],[160,112,158,7]];let luShotN=0;
+function luShot(e){const [x,y,gx,gy]=LU_SHOTS[Math.floor(e.min)%LU_SHOTS.length],id='luM'+(++luShotN);
+ return `<svg class="lu-shot" viewBox="0 0 311 198" fill="none" role="img" aria-label="Where the shot came from"><defs><mask id="${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="311" height="198"><line class="dr" x1="${x}" y1="${y}" x2="${gx}" y2="${gy}" stroke="#fff" stroke-width="8" pathLength="1" stroke-dasharray="1"/></mask></defs>${LU_PITCH}<line x1="${x}" y1="${y}" x2="${gx}" y2="${gy}" stroke="#FFFA00" stroke-dasharray="2 2" mask="url(#${id})"/><circle cx="${x}" cy="${y}" r="6.9" fill="#F9FAFA"/><circle cx="${x}" cy="${y}" r="2.4" fill="#080E12"/></svg>`}
+/* one event: min, type (text / goal / yc / sub / ph), side (h / a), title, pl = player rows [name, detail, icon], text, key = shown under "Key Events" */
+const LU_KO={min:0,type:'ph',key:true,title:'Kick Off',detail:'0’'};
 const LU={m1:[
  {min:83,type:'text',text:'PSG throw bodies forward, Madrid sit deeper and look to counter.'},
  {min:78,type:'goal',side:'h',key:true,title:'Goal! Real Madrid 2 – 1',pl:[['K. Mbappé','Assist J. Bellingham']],text:'Bellingham slips it through and Mbappé finishes low into the corner.'},
@@ -2055,55 +2089,93 @@ const LU={m1:[
  {min:58,type:'yc',side:'h',key:true,title:'Yellow card',pl:[['A. Güler']],text:'Booked for a late challenge in midfield.'},
  {min:45.5,type:'ph',key:true,title:'Half-time',detail:'1 – 1'},
  {min:41,type:'goal',side:'a',key:true,title:'Goal! PSG 1 – 1',pl:[['O. Dembélé','Assist A. Hakimi']],text:'Dembélé meets the cross at the near post and heads in the equaliser.'},
- {min:23,type:'goal',side:'h',key:true,title:'Goal! Real Madrid 1 – 0',pl:[['Vinícius Jr.','Assist F. Valverde']]}]};
+ {min:23,type:'goal',side:'h',key:true,title:'Goal! Real Madrid 1 – 0',pl:[['Vinícius Jr.','Assist F. Valverde']]},LU_KO]};
 LU.f1=[{min:91,type:'ph',key:true,title:'Full-time',detail:'2 – 1'},...LU.m1.slice(1)]; // the same match on the day of finished matches
-function luOf(m){
+/* events that are still to come while the page is open: they arrive with the minute (minuteTick -> luDue). A goal without a title gets it from the score at that moment */
+const LQ={m1:[
+ {min:84,type:'text',text:'Madrid slow the game down and keep the ball in the PSG half.'},
+ {min:86,type:'goal',side:'h',key:true,pl:[['J. Bellingham','Assist Vinícius Jr.']],text:'Bellingham arrives late at the far post and sweeps it in.'},
+ {min:88,type:'text',text:'PSG make a double change for the final minutes.'}]};
+function luQueue(m){
+ if(LQ[m.id])return LQ[m.id];
+ const t=LU_MIN[m.id]||0,side=m.o[0]<=m.o[2]?'h':'a',n=[...m.id].reduce((a,c)=>a+c.charCodeAt(0),0)%4;   // the favourite scores; the matches do not all score in the same minute
+ return LQ[m.id]=[{min:t+1,type:'text',text:'The tempo drops for a moment as both sides reset.'},{min:t+2+n*2,type:'goal',side,key:true},{min:t+3+n*2,type:'text',text:'Play restarts from the centre circle.'}];
+}
+function luBase(m){
  if(LU[m.id])return LU[m.id];
  const min=m.ft?90:LU_MIN[m.id]||0,sc=FX[m.id].scorers||[],by=s=>sc.filter(p=>p.cr===(s==='h'?m.hi:m.ai)).map(p=>p.n);
- const slots=[9,17,23,31,38,41,52,58,64,69,74,81,86].filter(x=>x<min),n=m.sh+m.sa,ev=[],q=[],cnt={h:0,a:0};
- let h=m.sh,a=m.sa,rh=0,ra=0,hh=0,ha=0;while(h+a){if(h>=a){q.push('h');h--}else{q.push('a');a--}}                  // goals in turn, the side with more goals first
+ const b=INIT().find(x=>x.id===m.id)||m,sh=b.sh||0,sa=b.sa||0;                                                       // the score the match starts the session with: goals that come in later are in S.lu
+ const slots=[9,17,23,31,38,41,52,58,64,69,74,81,86].filter(x=>x<min),n=sh+sa,ev=[],q=[],cnt={h:0,a:0};
+ let h=sh,a=sa,rh=0,ra=0,hh=0,ha=0;while(h+a){if(h>=a){q.push('h');h--}else{q.push('a');a--}}                  // goals in turn, the side with more goals first
  q.forEach((s,i)=>{const t=slots.length?slots[Math.min(slots.length-1,Math.floor((i+.5)*slots.length/n))]:Math.max(1,min-1),nm=by(s);s==='h'?rh++:ra++;if(t<=45){hh=rh;ha=ra}
   ev.push({min:t,type:'goal',side:s,key:true,title:`Goal! ${s==='h'?m.h:m.a} ${rh} – ${ra}`,pl:nm.length?[[nm[cnt[s]++%nm.length]]]:[]})});
  if(min>55){const nm=by('a');ev.push({min:55,type:'yc',side:'a',key:true,title:'Yellow card',pl:nm.length>cnt.a?[[nm[cnt.a]]]:[],text:'Booked for a late challenge in midfield.'})}
  if(min>45)ev.push({min:45.5,type:'ph',key:true,title:'Half-time',detail:hh+' – '+ha},{min:46,type:'text',text:'Second half is under way.'});
- if(m.ft)ev.push({min:91,type:'ph',key:true,title:'Full-time',detail:m.sh+' – '+m.sa});
- else if(min)ev.push({min,type:'text',text:m.sh===m.sa?'All square, both sides push for the next goal.':`${m.sh>m.sa?m.h:m.a} are in front, ${m.sh>m.sa?m.a:m.h} push for a way back.`});
+ if(m.ft)ev.push({min:91,type:'ph',key:true,title:'Full-time',detail:sh+' – '+sa});
+ else if(min)ev.push({min,type:'text',text:sh===sa?'All square, both sides push for the next goal.':`${sh>sa?m.h:m.a} are in front, ${sh>sa?m.a:m.h} push for a way back.`});
+ ev.push(LU_KO);
  return LU[m.id]=ev.sort((x,y)=>y.min-x.min);
 }
+function luOf(m){return [...(S.lu[m.id]||[]),...luBase(m)]}
 /* Next team to score of a live match: from the goals still expected and the strength of the sides */
 function ntsOf(m){const inv=m.o.map(x=>1/x),p1=inv[0]/(inv[0]+inv[2]),left=(2.45+1.1*Math.abs(2*p1-1))*(90-m.min)/90,none=Math.exp(-left);
  return {id:'nts',t:'Next team to score',opts:[{k:'h',v:priceOf((1-none)*p1)},{k:'n',v:priceOf(none)},{k:'a',v:priceOf((1-none)*(1-p1))}]}}
 function luChance(m){const inv=m.o.map(x=>1/x),s=inv[0]+inv[1]+inv[2],h=Math.round(inv[0]/s*100),a=Math.round(inv[2]/s*100);return [h,100-h-a,a]}
 function luPaintChance(m){const t=$('#luPct');if(!t)return;const c=luChance(m),b=document.querySelectorAll('#luBar i');b.forEach((e,i)=>e.style.flexGrow=c[i]);
  t.children[0].textContent=c[0]+'%';t.children[1].textContent=c[1]+'% draw';t.children[2].textContent=c[2]+'%'}
-function luStrip(t,tiles){return `<div class="lu-mk"><small>${t}</small><div class="o3">${tiles}</div></div>`}
-function luCard(m,e,mk){
+function luCard(m,e){
  if(e.type==='text')return `<div class="lu-card"><div class="lu-body"><b>${e.min}’</b><div class="lu-txt">${e.text}</div></div></div>`;
  const f=FX[m.id];
- if(e.type==='ph')return `<div class="lu-card lu-ph"><div class="lu-body"><img src="${IMG[f.hiImg]}" alt=""><div class="tx"><span>${e.detail}</span><b>${e.title}</b></div><img src="${IMG[f.aiImg]}" alt=""></div>${mk}</div>`;
- const ic={goal:LU_IC.goal,yc:LU_IC.yc}[e.type]||'';
- return `<div class="lu-card ${e.side}"><div class="lu-body"><div class="lu-meta"><b>${e.min}’</b><img src="${IMG[e.side==='h'?f.hiImg:f.aiImg]}" alt=""></div><div class="lu-title">${ic}<span>${e.title}</span></div>${
-  (e.pl||[]).map(([n,d,i])=>`<div class="lu-pl"><div><b>${n}</b>${d?`<span>${d}</span>`:''}</div>${i?LU_IC[i]:''}</div>`).join('')}${e.text?`<div class="lu-txt">${e.text}</div>`:''}</div>${mk}</div>`;
+ if(e.type==='ph')return `<div class="lu-card lu-ph"><div class="lu-body"><img src="${IMG[f.hiImg]}" alt=""><div class="tx"><span>${e.detail}</span><b>${e.title}</b></div><img src="${IMG[f.aiImg]}" alt=""></div></div>`;
+ const goal=e.type==='goal',ic=goal?LU_BALL:e.type==='yc'?LU_IC.yc:'';
+ return `<div class="lu-card ${goal?'g ':''}${e.side}"><div class="lu-body"><div class="lu-meta"><b>${e.min}’</b><img src="${IMG[e.side==='h'?f.hiImg:f.aiImg]}" alt=""></div><div class="lu-title">${ic}<span>${e.title}</span></div>${
+  (e.pl||[]).map(([n,d,i])=>`<div class="lu-pl"><div><b>${n}</b>${d?`<span>${d}</span>`:''}</div>${i?LU_IC[i]:''}</div>`).join('')}${e.text?`<div class="lu-txt">${e.text}</div>`:''}</div>${goal?luShot(e):''}</div>`;
 }
+const LU_NONE='<div class="cp-empty"><b>No key events yet</b>Goals, cards and half-time will show here</div>';
 function liveHTML(m){
- const f=FX[m.id],on=m.live||m.ft;
- let h=LEGAL+`<div class="lu-sec">Match Result</div><div class="lu-hero">${mrTop(m,'X')}</div>`;
- if(!on)return h+`<div class="cp-empty"><b>Live updates start at kick-off</b>${f.date}, ${f.time}</div><button class="fx-more" id="fxMore">More bets on DAZN Bet</button><div class="sgfoot">+18. Juega con responsabilidad. Publi.</div>`;
- const ev=luOf(m).filter(e=>!S.luKey||e.key),goal=m.live&&f.nts?luOf(m).find(e=>e.type==='goal'):null,ou=m.live&&mkt(m.id,'ou');
- let half=0;
- const feed=ev.map(e=>{
-  let mk='',t='';const hf=e.min>45?2:1;
-  if(hf!==half){t=`<div class="lu-sec${half?' nx':''}">${hf===2?'2nd half':'1st half'}</div>`;half=hf}
-  if(e===goal)mk=luStrip(f.nts.t,[[m.hs,'h'],['No goal','n'],[m.as,'a']].map(([l,k],i)=>oddBtn(m.id,'nts',k,l,f.nts.opts[i].v)).join(''));
-  if(e.type==='ph'&&e.min<46&&ou){const [ln,ov,un]=ou.lines[0];mk=luStrip(ou.t,oddBtn(m.id,'ou:'+ln,'o','Over '+ln,ov)+oddBtn(m.id,'ou:'+ln,'u','Under '+ln,un))}
-  return t+luCard(m,e,mk)}).join('');
- return h+`<div class="lu-seg"><button data-luk="0"${S.luKey?'':' class="on"'}>All</button><button data-luk="1"${S.luKey?' class="on"':''}>Key events</button></div><div class="lu-feed" id="luFeed">${feed||'<div class="cp-empty"><b>No key events yet</b>Goals, cards and half-time will show here</div>'}</div>`+
-  (m.ft?'':`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`)+`<div class="sgfoot">+18. Juega con responsabilidad. Publi.</div>`;
+ const f=FX[m.id];
+ if(!m.live&&!m.ft)return `<div class="cp-empty"><b>Live updates start at kick-off</b>${f.date}, ${f.time}</div>`;                     // not started: no events and no odds, so no legal texts either
+ const nts=m.live&&mkt(m.id,'nts'),feed=luOf(m).filter(e=>!S.luKey||e.key).map(e=>luCard(m,e)).join('');
+ return (nts?`<div class="lu-top">${LEGAL}<div class="lu-q"><span>Live bet</span><b>Who scores the next goal?</b></div><div class="o3">${[[m.hs,'h'],['No goal','n'],[m.as,'a']].map(([l,k],i)=>oddBtn(m.id,'nts',k,l,nts.opts[i].v)).join('')}</div></div>`:'')+
+  `<div class="lu-seg"><button data-luk="0"${S.luKey?'':' class="on"'}>All</button><button data-luk="1"${S.luKey?' class="on"':''}>Key Events</button></div><div class="lu-feed" id="luFeed">${feed||LU_NONE}</div>`+
+  (nts?'<div class="sgfoot">+18. Juega con responsabilidad. Publi.</div>':'');
 }
+/* --- the feed grows --- */
+function luDue(m){const q=luQueue(m);let i=S.luQ[m.id]||0;while(q[i]&&q[i].min<=m.min)luPush(m,q[i++]);S.luQ[m.id]=i}
+function luPush(m,e0){
+ const e={...e0};
+ if(e.min>m.min){m.min=Math.floor(e.min);document.querySelectorAll(`[data-min="${m.id}"],[data-cmin="${m.id}"]`).forEach(x=>x.textContent=m.min+'’')} // an event pushed by a ready-made state brings its minute with it
+ if(e.type==='goal'){
+  e.side==='h'?m.sh++:m.sa++;
+  if(!e.title)e.title=`Goal! ${e.side==='h'?m.h:m.a} ${m.sh} – ${m.sa}`;
+  if(!e.pl){const nm=(FX[m.id].scorers||[]).filter(p=>p.cr===(e.side==='h'?m.hi:m.ai)).map(p=>p.n);e.pl=nm.length?[[nm[0]]]:[]}
+ }
+ (S.lu[m.id]=S.lu[m.id]||[]).unshift(e);
+ if(S.fx===m.id&&S.fxTab==='live'&&(!S.luKey||e.key))luInsert(m,e);
+ if(e.type!=='goal')return;
+ const old=mkt(m.id,'nts'),now=ntsOf(m);S.nts[m.id]=now;                                                           // a goal: the prices of the Live bet block move, by the pattern of any price
+ now.opts.forEach((o,i)=>{const d=o.v-old.opts[i].v;if(d)animateOdd(m.id,o.k,d>0?1:-1,'nts')});
+ if(S.fx===m.id){const t=$('#fxTime');if(setTxt(t,m.sh+' - '+m.sa,false))soft(t,{opacity:0})}                      // the score in the header changes softly, nothing travels
+ const y=$('#scroll').scrollTop;renderFeed();$('#scroll').scrollTop=y;if(S.cp)renderComp();if(S.tm)renderTeam();renderSheet();updateBar(true);
+}
+function luAway(){const f=$('#luFeed'),sc=$('#fxScroll');if(!f)return false;const r=f.getBoundingClientRect(),q=sc.getBoundingClientRect(),k=sc.offsetHeight/q.height;   // k: the phone is scaled on the page
+ return (r.top-q.top)*k<parseFloat(getComputedStyle($('#stage')).getPropertyValue('--sb'))+40}                      // the top of the feed is above the compact header
+function luInsert(m,e){
+ const f=$('#luFeed'),sc=$('#fxScroll'),away=luAway(),none=f.querySelector('.cp-empty');if(none)none.remove();
+ const a=f.firstElementChild,t0=a?a.getBoundingClientRect().top:0;
+ f.insertAdjacentHTML('afterbegin',`<div class="lu-in${away?' now on':''}"><div>${luCard(m,e)}</div></div>`);
+ const w=f.firstElementChild;
+ if(away){if(a){const q=sc.getBoundingClientRect();sc.scrollTop+=(a.getBoundingClientRect().top-t0)*sc.offsetHeight/q.height}S.luNew++;luPill()} // whatever the browser's own scroll anchoring did, the card that was on top stays where it was                                                          // scrolled away: the reader stays where he is
+ else{void w.offsetHeight;w.classList.add('on')}
+}
+function luPill(){const b=$('#luNew'),n=S&&S.fx&&S.fxTab==='live'?S.luNew:0;if(n)b.textContent=n+(n>1?' new updates':' new update');b.classList.toggle('show',n>0)}
+function luSeen(){if(S.luNew&&!luAway()){S.luNew=0;luPill()}}
+function luTop(){const f=$('#luFeed'),sc=$('#fxScroll');if(!f)return;const r=f.getBoundingClientRect(),q=sc.getBoundingClientRect(),k=sc.offsetHeight/q.height;
+ S.luNew=0;luPill();sc.scrollTo({top:Math.max(0,sc.scrollTop+(r.top-q.top)*k-parseFloat(getComputedStyle($('#stage')).getPropertyValue('--sb'))-40-16)})} // a jump: the browser's smooth scroll has its own curve, outside the motion tokens
 function paintFxTabs(){document.querySelectorAll('#fxTabs [data-fxv]').forEach(e=>e.classList.toggle('on',e.dataset.fxv===S.fxTab))}
 function fxKeep(){const t=topPage();if(t&&t.p==='fx'){t.tab=S.fxTab;t.key=S.luKey}}
-function setFxTab(v){if(S.fxTab===v||!S.fx)return;S.fxTab=v;fxKeep();paintFxTabs();renderMkts();restoreArrows();soft($('#mkts'),RISE,T.std)} // like the tabs of a league page: the new tab rises in
-function setLuKey(k){if(S.luKey===k)return;S.luKey=k;fxKeep();const y=$('#fxScroll').scrollTop;renderMkts();$('#fxScroll').scrollTop=y;restoreArrows();soft($('#luFeed'),RISE,T.std)}
+function setFxTab(v){if(S.fxTab===v||!S.fx)return;S.fxTab=v;S.luNew=0;luPill();fxKeep();paintFxTabs();renderMkts();restoreArrows();soft($('#mkts'),RISE,T.std)} // like the tabs of a league page: the new tab rises in
+function setLuKey(k){if(S.luKey===k)return;S.luKey=k;S.luNew=0;luPill();fxKeep();const y=$('#fxScroll').scrollTop;renderMkts();$('#fxScroll').scrollTop=y;restoreArrows();soft($('#luFeed'),RISE,T.std)}
 
 /* ---------- competition page · Odds tab (Figma section "Odds in Competition") ----------
  Opens from the competition header in the feed (competitions listed in CP). Sub-tabs are chips; Competition winner and Top scorer are designed.
@@ -2326,7 +2398,8 @@ const STATES=[
  {g:'Limit 20',k:'Limit + suspended bet',n:'20 selections and one of them suspended: the line under Total odds explains the dropped bet.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet();toEnd()}},
  {g:'Fixture',k:'Odds tab',n:'Pre-match markets of one match (tap its tile in the feed), in groups: Match Result, Goals, Goalscorer, Handicap. Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
  {g:'Fixture',k:'Live match',n:'Every match of the feed has its page. A live one shows the score and the minute, and only the markets that still make sense for the score.',run(){openFixture('m1')}},
- {g:'Fixture',k:'Live updates',n:'Tab “Live updates” of a match. Match Result sits on top with its implied chance and scrolls with the feed; the feed shows the events, and a key moment opens one more market: the latest goal “Next team to score”, half-time “Total Goals”.',run(){openFixture('m1');setFxTab('live')}},
+ {g:'Fixture',k:'Live updates',n:'Tab “Live updates” of a live match. On top the Live bet block: “Who scores the next goal?” with three prices; it scrolls with the feed. The feed shows the events of the match and has no odds.',run(){openFixture('m1');setFxTab('live')}},
+ {g:'Fixture',k:'Live updates · goal',n:'A goal comes in: its card opens on top of the feed and pushes it down, the line of the shot draws, the score in the header changes and the prices of the Live bet block move. With the feed scrolled away nothing moves: a pill “1 new update” shows instead.',run(){openFixture('m1');setFxTab('live');S.luQ.m1=2;const c=cur;setTimeout(()=>{if(cur===c&&S.fx==='m1'&&!(S.lu.m1||[]).length)luPush(M('m1'),LQ.m1[1])},T.sheet)}},
  {g:'Fixture',k:'Goalscorer',n:'Between Goals and Handicap: a carousel of Goalscorer cards. Every player is his own pick, so several can be in the betslip; a picked card turns white.',run(){openFixture('m4');setTimeout(()=>{const f=$('#fxScroll'),g=$('#mkts .gs');if(!g)return;const r=f.getBoundingClientRect();f.scrollTop+=(g.getBoundingClientRect().top-r.top)*f.offsetHeight/r.height-160},80)}},
  {g:'Competition',k:'Winner',n:'Odds tab of a competition (tap its header in the feed): who wins the season. One pick per market; it goes to the same betslip.',run(){openComp('ucl','win')}},
  {g:'Competition',k:'Top scorer',n:'Second sub-tab: two Top Picks cards and the list of players. A picked Top Pick turns white as a whole.',run(){openComp('ucl','scorer')}},
@@ -2409,6 +2482,7 @@ document.addEventListener('click',e=>{
  const card=e.target.closest('.tp,.sc-row,.cp-row,.gs-card');if(card){const o=card.querySelector('.odd');if(o&&!o.classList.contains('locked'))toggleSel(o.dataset.m,o.dataset.g,o.dataset.o);return} // the whole card picks its price
  const fv=e.target.closest('[data-fxv]');if(fv){setFxTab(fv.dataset.fxv);return}
  const lk=e.target.closest('[data-luk]');if(lk){setLuKey(lk.dataset.luk==='1');return}
+ if(e.target.closest('#luNew')){luTop();return}
  const ox=e.target.closest('[data-oxc],[data-oxp],[data-oxl],[data-oxs]');if(ox){if(ox.dataset.oxc)oxToggle(ox.dataset.oxc);else if(ox.dataset.oxp)setOxPer(ox.dataset.oxp);else if('oxs' in ox.dataset)oxStep();else if(!ox.disabled)setOxLine(+ox.dataset.oxl);return}
  const hb=e.target.closest('[data-hct],[data-hcs]');if(hb){if(!hb.disabled)setHc(hb.dataset.hct,+hb.dataset.hcs||0);return}
  if(e.target.closest('#fxMore')){showToast(`Opens ${M(S.fx).h} vs ${M(S.fx).a} in DAZN Bet`,null,null,2500);return}
@@ -2419,7 +2493,7 @@ document.addEventListener('click',e=>{
 });
 $('#cpBack').onclick=closeComp;$('#tmBack').onclick=pageBack;
 $('#tmScroll').addEventListener('scroll',()=>{if(S.tm&&S.tm.tab==='matches')syncMd()});$('#fxBack').onclick=closeFixture;$('#fxBack2').onclick=closeFixture;
-$('#fxScroll').addEventListener('scroll',e=>{$('#phone').classList.toggle('fxs',e.target.scrollTop>150);oxHint()});
+$('#fxScroll').addEventListener('scroll',e=>{$('#phone').classList.toggle('fxs',e.target.scrollTop>150);oxHint();luSeen()});
 $('#oddsChip').onclick=()=>setOddsOn(!S.oddsOn);
 $('#liveBadge').onclick=()=>{
  if(S.day!=='today'){const k=DAYS.map(x=>x[0]),dir=k.indexOf('today')<k.indexOf(S.day)?-1:1;       // live matches are played today: LIVE on another day goes back to Today with the filter on
@@ -2555,7 +2629,7 @@ function init(){
  for(const k in CHG)delete CHG[k];Object.values(chgTimers).flat().forEach(clearTimeout);document.querySelectorAll('.cv').forEach(e=>e.classList.remove('up','dn'));
  $('#oddsChip').classList.remove('off');$('#oddsChip').setAttribute('aria-checked','true');$('#liveBadge').classList.remove('on');
  $('#sheet').classList.remove('show','editing');$('#backdrop').classList.remove('show');$('#overlay').classList.remove('show');
- $('#fx').classList.remove('show','left');$('#tm').classList.remove('show');$('#tm').setAttribute('aria-hidden','true');teamMenu(null);$('#cp').classList.remove('show','mt');$('#cpLive').classList.remove('on');$('#phone').classList.remove('infx','fxs','incp','intm','limit');
+ $('#fx').classList.remove('show','left');$('#luNew').classList.remove('show');$('#tm').classList.remove('show');$('#tm').setAttribute('aria-hidden','true');teamMenu(null);$('#cp').classList.remove('show','mt');$('#cpLive').classList.remove('on');$('#phone').classList.remove('infx','fxs','incp','intm','limit');
  clearTimeout(favT);$('#fav').classList.remove('show');paintDays(false);$('#leagues').scrollLeft=0;
  renderFeed();renderSheet();updateBar();$('#scroll').scrollTop=0;
  timers=[setInterval(liveTick,2600),setInterval(minuteTick,20000)];
