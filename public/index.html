@@ -880,6 +880,7 @@ div.choice{cursor:default}
 .cp-table{position:relative;border-radius:14px;background:radial-gradient(55% 340px at 50% 0,rgba(56,71,231,.15),rgba(56,71,231,0)),rgba(255,255,255,.04);padding-bottom:8px;overflow:hidden}
 .cp-table::after{content:"";position:absolute;inset:0;border-radius:14px;box-shadow:inset 0 0 0 1px #242d33;pointer-events:none}
 .cp-row{height:58px;display:flex;align-items:center;padding-right:12px;background:linear-gradient(rgba(255,255,255,.05),rgba(255,255,255,.05)) bottom/100% 1px no-repeat} /* 0.5px line at 10% */
+.cp-row:last-child{background:none} /* no line under the last row: the table ends there */
 .cp-row .rk{flex:none;width:30px;margin-left:4px;text-align:center;font-weight:700;font-size:12px;line-height:16px;letter-spacing:.01em}
 .cp-row .cr{flex:none;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
 .cp-row .cr img{width:auto;height:auto;max-width:28px;max-height:34px} /* crests fill the 28 px slot by width; a tall one (Arsenal) may stick out, as in Figma */
