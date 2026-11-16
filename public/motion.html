@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
 <title>DAZN Bet in Scores — Motion</title>
-<!-- A2 · Motion presets. Desktop only; nothing in the prototype links here. The hub (hub.html) does, and the header of the left panel links back to it.
+<!-- A2 · Motion presets. Desktop only; nothing in the prototype links here. The hub (hub.html) does, and the link above the left panel leads back to it.
      The phone is the real prototype (index.html?embed) in a frame. This page sets a state in it, starts one of its own
      animations, slows its clock, and — to try a preset — puts extra CSS on top of it. The prototype itself is never changed.
      Groups and presets: QS below. The inventory of every animation of the prototype: notes/MOTION.md. -->
@@ -29,7 +29,15 @@
 /* One spacing scale for the whole page: 4 / 8 / 12 / 16 / 24. Control heights 24 / 32 / 40. Type 12/16, 14/20, 16/24, 20/24, 24/32. Radii 4 / 8 / 16. */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{background:var(--ui-canvas);font-family:'DAZN Oscine',system-ui,sans-serif;font-size:14px;line-height:20px;color:var(--ui-t2);-webkit-font-smoothing:antialiased;display:grid;grid-template-columns:248px minmax(520px,1fr);gap:12px;padding:12px;min-width:1100px;overflow:auto hidden}
+body{background:var(--ui-canvas);font-family:'DAZN Oscine',system-ui,sans-serif;font-size:14px;line-height:20px;color:var(--ui-t2);-webkit-font-smoothing:antialiased;display:grid;grid-template-columns:248px minmax(520px,1fr);grid-template-rows:28px minmax(0,1fr);gap:8px 12px;padding:12px;min-width:1100px;overflow:auto hidden}
+/* H1 · the way back to the hub: the same link in the same place as in the prototype (.hublink in index.html) — above the left panel, on its left edge,
+   8 px over it. Its height and type (28, 12/18) are the prototype's, so the two pages match; the stage keeps the full height */
+.hublink{grid-column:1;grid-row:1;justify-self:start;height:28px;display:flex;align-items:center;gap:4px;padding:0 8px 0 4px;border-radius:8px;font-weight:700;font-size:12px;line-height:18px;color:var(--ui-t3);text-decoration:none;white-space:nowrap;transition:color .2s,background .2s}
+.hublink:hover{color:var(--ui-t1);background:var(--ui-hover)}
+.hublink:focus-visible{outline:2px solid var(--ui-t1);outline-offset:-2px}
+.hublink svg{flex:none}
+body>.panel{grid-column:1;grid-row:2}
+body>.stage{grid-column:2;grid-row:1/3}
 button,input,select,textarea{font:inherit;color:inherit}
 button{background:none;border:0;cursor:pointer}
 button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline-offset:-2px}
@@ -52,9 +60,6 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
 
 /* left panel: groups with a chevron; the open group lists its animations on a guide line; My decisions is pinned below */
 .ph{flex:none;padding:16px 16px 12px;font-weight:700;font-size:16px;line-height:24px;color:var(--ui-t1)}
-.ph a{display:block;width:fit-content;font-size:12px;line-height:16px;color:var(--ui-t3);text-decoration:none;transition:color .2s}   /* the way back to the hub: the same small line as the group name above an animation's title (.qh span) */
-.ph a:hover{color:var(--ui-t1)}
-.ph a:focus-visible{outline:2px solid var(--ui-t1);outline-offset:2px;border-radius:4px}
 .list{flex:1;padding:0 8px 8px;display:flex;flex-direction:column}
 .gq{flex:none;display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:8px;border-radius:8px;text-align:left;color:var(--ui-t1);transition:background .2s}
 .gq:hover{background:var(--ui-hover)}
@@ -187,8 +192,9 @@ button:focus-visible,select:focus-visible{outline:2px solid var(--ui-t1);outline
 </style>
 </head>
 <body>
+<a class="hublink" href="./hub.html"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3.5 5.5 8 10 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Design hub</a>
 <aside class="panel">
- <div class="ph"><a href="./hub.html">Design hub</a>Motion</div>
+ <div class="ph">Motion</div>
  <div class="scroll list" id="list"></div>
  <button class="alld" id="allDec"><b>Decisions and export</b><small></small></button>
 </aside>
