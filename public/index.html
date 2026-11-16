@@ -875,8 +875,7 @@ div.choice{cursor:default}
 .cp-chips::-webkit-scrollbar{display:none}
 .cp-chip{flex:none;height:36px;padding:0 16px 1px;border-radius:9999px;box-shadow:inset 0 0 0 1px #3d4549;font-weight:700;font-size:14px;line-height:18px;letter-spacing:.01em;color:#c5c7ca;white-space:nowrap;transition:background var(--m-quick),color var(--m-quick),box-shadow var(--m-quick)}
 .cp-chip.on{background:#f9fafa;color:#080e12;box-shadow:none}
-.cp-chip:not(.off):active{opacity:.6}
-.cp-chip.off{cursor:default} /* Relegation: the chip is in the design, its content is not designed yet */
+.cp-chip:active{opacity:.6}
 /* Competition winner: one table, a row per team (local component "row" 3598:78738) */
 .cp-table{position:relative;border-radius:14px;background:radial-gradient(55% 340px at 50% 0,rgba(56,71,231,.15),rgba(56,71,231,0)),rgba(255,255,255,.04);padding-bottom:8px;overflow:hidden}
 .cp-table::after{content:"";position:absolute;inset:0;border-radius:14px;box-shadow:inset 0 0 0 1px #242d33;pointer-events:none}
@@ -1269,6 +1268,17 @@ Object.assign(CP,{
  scorers:[{k:'parrott',n:'Troy Parrott',team:'AZ Alkmaar',cr:'az',ph:null,v:9.00},{k:'amiri',n:'Nadiem Amiri',team:'Mainz 05',cr:'m05',ph:null,v:11.00},{k:'sarr',n:'Ismaïla Sarr',team:'Crystal Palace',cr:'cry',ph:null,v:13.00},
   {k:'jovic',n:'Luka Jović',team:'AEK Athens',cr:'aek',ph:null,v:15.00},{k:'elias',n:'Kauã Elias',team:'Shakhtar Donetsk',cr:'sha',ph:null,v:17.00},{k:'gudmundsson',n:'Albert Guðmundsson',team:'Fiorentina',cr:'fio',ph:null,v:19.00},
   {k:'wolfswinkel',n:'Ricky van Wolfswinkel',team:'FC Twente',cr:'twe',ph:null,v:21.00},{k:'barseghyan',n:'Tigran Barseghyan',team:'Slovan Bratislava',cr:'slo',ph:null,v:34.00}]}});
+/* R1 · Relegation: [crest, team, price to be relegated], from the most likely to the least likely. Not drawn in Figma: the table of Competition winner
+   with demo prices (outsiders low, top clubs very high). Only the clubs with a crest in the library, so LaLiga and Ligue 1 are short.
+   Cups (Champions League, Europa League, Conference League) have no relegation: no rel list, no chip. */
+CP.laliga.rel=[['val','Valencia',4.50],['bet','Real Betis',13.00],['vil','Villarreal',26.00],['ath','Athletic Club',34.00],['atm','Atlético Madrid',251.00],['bar','Barcelona',501.00],['rm','Real Madrid',501.00]];
+CP.pl.rel=[['bre','Brentford',2.50],['ful','Fulham',3.25],['bou','Bournemouth',3.75],['eve','Everton',4.50],['cry','Crystal Palace',6.50],['nfo','Nottingham Forest',7.00],['bha','Brighton',13.00],
+ ['mun','Man United',41.00],['tot','Tottenham',51.00],['avl','Aston Villa',67.00],['new','Newcastle',101.00],['che','Chelsea',251.00],['mci','Man City',501.00],['ars','Arsenal',501.00],['liv','Liverpool',501.00]];
+CP.seriea.rel=[['lec','Lecce',2.20],['par','Parma',2.60],['udi','Udinese',4.50],['tor','Torino',6.00],['com','Como',9.00],['fio','Fiorentina',15.00],['bol','Bologna',34.00],
+ ['laz','Lazio',41.00],['ata','Atalanta',81.00],['rom','Roma',151.00],['juv','Juventus',251.00],['mil','AC Milan',251.00],['nap','Napoli',501.00],['inter','Inter',501.00]];
+CP.bundes.rel=[['fcu','Union Berlin',2.75],['m05','Mainz 05',3.25],['bmg','Mönchengladbach',3.50],['svw','Werder Bremen',5.00],['tsg','Hoffenheim',7.00],['scf','SC Freiburg',13.00],
+ ['sge','Eintracht Frankfurt',41.00],['stu','VfB Stuttgart',51.00],['rbl','RB Leipzig',151.00],['b04','Bayer Leverkusen',251.00],['bvb','Borussia Dortmund',251.00],['bay','Bayern München',501.00]];
+CP.ligue1.rel=[['rcl','Lens',9.00],['los','Lille',13.00],['ol','Lyon',15.00],['asm','Monaco',51.00],['om','Marseille',67.00],['psg','Paris Saint-Germain',501.00]];
 /* an outright pick has no match: this stands in for it in the betslip (card line and DAZN Bet overlay) */
 const OUT={ucl:{id:'ucl',out:true,h:'UEFA Champions League',a:'',when:'2026/27',live:false},laliga:{id:'laliga',out:true,h:'LaLiga EA Sports',a:'',when:'2026/27',live:false},pl:{id:'pl',out:true,h:'Premier League',a:'',when:'2026/27',live:false},
  seriea:{id:'seriea',out:true,h:'Serie A',a:'',when:'2026/27',live:false},bundes:{id:'bundes',out:true,h:'Bundesliga',a:'',when:'2026/27',live:false},ligue1:{id:'ligue1',out:true,h:'Ligue 1',a:'',when:'2026/27',live:false},
@@ -1465,7 +1475,7 @@ const act=()=>S.sel.filter(s=>!isOut(s));      // picks that still have a price
 function oddState(mid,g,o){const sel=isSel(mid,g,o);return {sel,locked:(sel&&!!S.st[mid+'|'+g])||S.lk.includes(mid+'|'+g+'|'+o)}}
 function mkt(mid,id){const f=FX[mid];return f&&f.markets.find(x=>x.id===id)}
 function oddsOf(s){
- const m=M(s.m);if(m.out){const c=CP[s.m];return s.g==='win'?c.win.find(x=>x[0]===s.o)[2]:cpPlayer(c,s.o).v} // outright: Competition winner / Top scorer
+ const m=M(s.m);if(m.out){const c=CP[s.m];return s.g==='win'||s.g==='rel'?c[s.g].find(x=>x[0]===s.o)[2]:cpPlayer(c,s.o).v} // outright: Competition winner / Relegation / Top scorer
  if(s.g==='1x2')return m.o[+s.o];
  const [id,line]=s.g.split(':');if(id==='gs')return FX[s.m].scorers.find(x=>x.k===line).v;const k=mkt(s.m,id);
  if(k.type==='hc')return k.lines[line][{'1':0,'X':1,'2':2}[s.o]];
@@ -1474,7 +1484,8 @@ function oddsOf(s){
 }
 function selInfo(s){
  const m=M(s.m),odds=oddsOf(s);const [id,line]=s.g.split(':');
- if(m.out){const c=CP[s.m];return s.g==='win'?{m,subj:c.win.find(x=>x[0]===s.o)[1],pred:'',mk:'Competition winner',odds}:{m,subj:cpPlayer(c,s.o).n,pred:'',mk:'Top scorer',odds}}
+ if(m.out){const c=CP[s.m];return s.g==='win'?{m,subj:c.win.find(x=>x[0]===s.o)[1],pred:'',mk:'Competition winner',odds}
+  :s.g==='rel'?{m,subj:c.rel.find(x=>x[0]===s.o)[1],pred:'to be relegated',mk:'Relegation',odds}:{m,subj:cpPlayer(c,s.o).n,pred:'',mk:'Top scorer',odds}}
  if(id==='gs')return {m,subj:FX[s.m].scorers.find(x=>x.k===line).n,pred:'to score',mk:'Goalscorer',odds};
  if(s.g==='1x2'){const subj=s.o==='1'?'Draw':(s.o==='0'?m.h:m.a);return {m,subj,pred:s.o==='1'?'':'to win',mk:'Match result',odds}}
  if(id==='ou')return {m,subj:(s.o==='o'?'Over ':'Under ')+line,pred:'goals',mk:'Total goals',odds};
@@ -1780,13 +1791,14 @@ function renderMkts(mid=S.fx){const m=M(mid),f=FX[mid];$('#mkts').innerHTML=LEGA
 function closeFixture(){$('#fx').classList.remove('show');$('#fx').setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},T.layout)}
 
 /* ---------- competition page · Odds tab (Figma section "Odds in Competition") ----------
- Opens from the competition header in the feed (competitions listed in CP). Sub-tabs are chips; only Competition winner and Top scorer are designed. */
+ Opens from the competition header in the feed (competitions listed in CP). Sub-tabs are chips; Competition winner and Top scorer are designed.
+ R1 · Relegation is the Competition winner table with the price to be relegated; a competition without relegation (no c.rel) has no such chip. */
 function compHTML(id){
- const c=CP[id],tab=S.cpTab;
- const chips=[['win','Competition winner'],['scorer','Top scorer'],['rel','Relegation']].map(([k,l])=>`<button class="cp-chip${k===tab?' on':''}${k==='rel'?' off':''}"${k==='rel'?'':` data-cpt="${k}"`}>${l}</button>`).join('');
+ const c=CP[id],tab=S.cpTab==='rel'&&!c.rel?'win':S.cpTab;   // the Relegation sub-tab was open and this competition has none: Competition winner
+ const chips=[['win','Competition winner'],['scorer','Top scorer'],['rel','Relegation']].filter(([k])=>k!=='rel'||c.rel).map(([k,l])=>`<button class="cp-chip${k===tab?' on':''}" data-cpt="${k}">${l}</button>`).join('');
  const club=p=>`<img src="${crest(p.cr)}" alt="">${p.team}`;
- const body=tab==='win'
-  ?`<div class="cp-table">${c.win.map(([k,n,v],i)=>`<div class="cp-row"><span class="rk">${i+1}</span><span class="cr"><img src="${crest(k)}" alt=""></span><span class="nm">${n}</span>${oddBtn(id,'win',k,'',v,'only')}</div>`).join('')}</div>`
+ const body=tab!=='scorer'
+  ?`<div class="cp-table">${c[tab].map(([k,n,v],i)=>`<div class="cp-row"><span class="rk">${i+1}</span><span class="cr"><img src="${crest(k)}" alt=""></span><span class="nm">${n}</span>${oddBtn(id,tab,k,'',v,'only')}</div>`).join('')}</div>`
   :`<div class="cp-h">Top Picks</div><div class="tps">${c.picks.map((p,i)=>`<div class="tp"><div class="tp-in"><div class="tp-top"><i>0${i+1}</i>${photoOf(p)}</div><span>${p.f}</span><b>${p.l}</b><div class="tp-club">${club(p)}</div></div>${oddBtn(id,'scorer',p.k,'',p.v,'only')}</div>`).join('')}</div>
    <div class="sc-list">${c.scorers.map(p=>`<div class="sc-row">${photoOf(p)}<div class="tx"><b>${p.n}</b><span>${club(p)}</span></div>${oddBtn(id,'scorer',p.k,'',p.v,'only')}</div>`).join('')}</div>`;
  return LEGAL+`<div class="cp-chips">${chips}</div><div id="cpBody">${body}</div><div class="cp-foot">+18. Juega con responsabilidad. Publi.</div>`;
