@@ -317,8 +317,8 @@ img{display:block}
   --ui-t3:var(--text-tertiary);                    /* text/tertiary */
   --ui-edge:var(--spacing-16);                     /* panel and switch: distance from the window edges */
 }
-.nav,.nav-open,.devsw{font-family:'DAZN Oscine',system-ui,sans-serif}
-.nav button:focus-visible,.nav-open:focus-visible,.devsw button:focus-visible{outline:2px solid var(--ui-t1);outline-offset:-2px}
+.nav,.nav-open,.devsw,.shot{font-family:'DAZN Oscine',system-ui,sans-serif}
+.nav button:focus-visible,.nav-open:focus-visible,.devsw button:focus-visible,.shot:focus-visible{outline:2px solid var(--ui-t1);outline-offset:-2px}
 /* segmented control (DS "Segmented Control", Figma 3392:71978): phone size in the bottom-right corner, betslip view inside the panel */
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;align-items:center;padding:var(--spacing-2);border-radius:8px;background:var(--ui-well)}
 .seg button{height:28px;padding:0 var(--spacing-12);border-radius:6px;font-weight:700;font-size:12px;line-height:18px;color:var(--ui-t3);white-space:nowrap;transition:background .2s,color .2s}
@@ -326,7 +326,14 @@ img{display:block}
 .seg button:not(.on):hover{color:var(--ui-t2)}
 .devsw{position:fixed;right:var(--ui-edge);bottom:var(--ui-edge);z-index:100;padding:var(--spacing-4);border-radius:12px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line)}
 .devsw button{border-radius:8px}
-html.embed .nav,html.embed .nav-open,html.embed .devsw{display:none} /* A2: inside the motion gallery the gallery has its own controls */
+/* P1 · "Copy screen" under the phone: same plate as the "States" button. It lives inside the stage, so it follows the phone when the size
+   switches; fit() rewrites top and transform to undo the scale of the stage, so it keeps the size of the rest of the chrome. 11px = the ring of the frame */
+.shot{position:absolute;left:50%;top:calc(100% + 11px + var(--spacing-12));transform:translateX(-50%);transform-origin:top center;height:36px;display:flex;align-items:center;gap:var(--spacing-8);padding:0 var(--spacing-16) 0 var(--spacing-12);border-radius:12px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);font-weight:700;font-size:14px;line-height:20px;color:var(--ui-t1);white-space:nowrap}
+.shot:hover{background:linear-gradient(var(--ui-hover),var(--ui-hover)),var(--ui-panel)}
+.shot svg{flex:none;color:var(--ui-t3)}
+html.shooting,html.shooting *{cursor:none!important} /* while the frame is taken: no pointer in the picture */
+html.shooting .over{visibility:hidden} /* narrow window: the panel or the size switch lies over the frame, so it steps aside for the picture */
+html.embed .nav,html.embed .nav-open,html.embed .devsw,html.embed .shot{display:none} /* A2: inside the motion gallery the gallery has its own controls */
 
 /* ---------- M1 · on a phone (html.app, set in <head>) ----------
    The prototype is the whole screen: no frame, no States panel, no size switch, no drawn status bar or home indicator (the phone has its own).
@@ -336,7 +343,7 @@ html.app,html.app body{overflow:hidden;overscroll-behavior:none;touch-action:pan
 html.app body{background:var(--page)}
 html.app #stage{--sb:env(safe-area-inset-top,0px);position:fixed;left:0;top:0;width:100%;height:100%;height:100dvh;transform:none}
 html.app #phone{border-radius:0;box-shadow:none}
-html.app .island,html.app .status .time,html.app .status .sr,html.app .hind,html.app .nav,html.app .nav-open,html.app .devsw{display:none}
+html.app .island,html.app .status .time,html.app .status .sr,html.app .hind,html.app .nav,html.app .nav-open,html.app .devsw,html.app .shot{display:none}
 html.app .navbar{height:calc(52px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)))}
 html.app .scroll,html.app .cp{bottom:calc(52px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)))}
 html.app .bar{bottom:calc(62px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)))}
@@ -1097,6 +1104,7 @@ div.choice{cursor:default}
    </div>
   </div>
  </div>
+ <button class="shot" id="shot" title="Copy the phone screen as a picture"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 3.2v-.2a.5.5 0 0 0-.5-.5H4.5a2 2 0 0 0-2 2V10a.5.5 0 0 0 .5.5h.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span id="shotT" aria-live="polite">Copy screen</span></button>
 </div>
 <aside class="nav" id="nav" aria-label="Prototype states">
  <div class="nav-h"><b>Prototype states</b><button class="nav-x" id="navX" aria-label="Hide the panel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3.5 5.5 8 10 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
@@ -2028,10 +2036,12 @@ const DEV={mini:{w:375,h:812},max:{w:440,h:956}};let dev='mini';
 const APP=document.documentElement.classList.contains('app'); // M1: opened on a phone
 /* One scale for both devices (fitted to the biggest), so 17 Pro Max really looks bigger than the mini.
    Each device sits in the middle of the window; on a switch the phone grows or shrinks around that middle. */
+const RING=11; // the frame around the screen (box-shadow of #phone)
 function fit(){if(APP){$('#stage').dataset.scale=1;return} // phone: the stage is the screen itself (CSS, html.app)
- const big=DEV.max,d=DEV[dev],ring=11;
- const s=Math.min(1,(innerHeight-48)/(big.h+2*ring),(innerWidth-96)/(big.w+2*ring));
- const st=$('#stage');st.style.top=Math.max(24+ring*s,(innerHeight-d.h*s)/2)+'px';st.style.transform=`translateX(-50%) scale(${s})`;st.dataset.scale=s}
+ const big=DEV.max,d=DEV[dev],ring=RING,below=document.documentElement.classList.contains('embed')?24:64; // P1: under the phone there is room for "Copy screen" (12 gap + 36 button + 16 to the window edge); the gallery has no button
+ const s=Math.min(1,(innerHeight-24-below)/(big.h+2*ring),(innerWidth-96)/(big.w+2*ring));
+ const st=$('#stage');st.style.top=Math.max(24+ring*s,Math.min((innerHeight-d.h*s)/2,innerHeight-below-ring*s-d.h*s))+'px';st.style.transform=`translateX(-50%) scale(${s})`;st.dataset.scale=s;
+ const sb=$('#shot');sb.style.top=`calc(100% + ${ring}px + ${12/s}px)`;sb.style.transform=`translateX(-50%) scale(${1/s})`} // P1: 12 px under the frame at any scale, the button itself is not scaled
 addEventListener('resize',fit);
 if(APP)addEventListener('gesturestart',e=>e.preventDefault()); // Safari: no pinch zoom of the whole page
 let devT;
@@ -2043,6 +2053,65 @@ document.querySelectorAll('.devsw button').forEach(b=>b.onclick=()=>{
  st.classList.toggle('max',dev==='max');fit();
  clearTimeout(devT);devT=setTimeout(()=>st.classList.remove('anim'),600);
 });
+
+/* ---------- P1 · Copy screen ----------
+ A real picture of this tab (Screen Capture), cut to the phone with its frame, corners transparent, at the density of the screen.
+ The browser asks once; the stream stays alive until the page closes (or "Stop sharing") and is reused by the next clicks.
+ Works where the browser can share a single tab (Chrome, Edge). No clipboard: the picture is saved as a file. */
+const SHOT_ID='dazn-bet-'+Math.random().toString(36).slice(2),SHOT_LABEL='Copy screen';
+try{navigator.mediaDevices.setCaptureHandleConfig({handle:SHOT_ID,permittedOrigins:['*']})}catch(e){} // Chrome: lets us see that the shared tab is this one
+let shotStream=null,shotVideo=null,shotBusy=false,shotT;
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+function shotSay(t){setTxt($('#shotT'),t);clearTimeout(shotT);if(t!==SHOT_LABEL)shotT=setTimeout(()=>setTxt($('#shotT'),SHOT_LABEL),2500)}
+function shotDrop(){if(shotStream)shotStream.getTracks().forEach(t=>t.stop());shotStream=shotVideo=null}
+async function shotFrame(){ // -> PNG blob; throws a short message for the button
+ let fresh=false;
+ if(!shotStream){
+  const md=navigator.mediaDevices;if(!md||!md.getDisplayMedia)throw 'Open in Chrome or Edge';
+  let s;try{s=await md.getDisplayMedia({video:{displaySurface:'browser',cursor:'never'},audio:false,preferCurrentTab:true,selfBrowserSurface:'include',surfaceSwitching:'exclude',monitorTypeSurfaces:'exclude'})}
+  catch(e){throw e&&e.name==='NotAllowedError'?'Allow sharing to copy':'Screen capture is not available'}
+  const tr=s.getVideoTracks()[0],set=tr.getSettings(),h=tr.getCaptureHandle&&tr.getCaptureHandle();
+  if((set.displaySurface&&set.displaySurface!=='browser')||(h&&h.handle!==SHOT_ID)){s.getTracks().forEach(t=>t.stop());throw 'Choose this tab'} // a window, a screen or another tab
+  const v=document.createElement('video');v.muted=true;v.playsInline=true;v.srcObject=s;
+  try{await v.play()}catch(e){s.getTracks().forEach(t=>t.stop());throw 'Screen capture is not available'}
+  tr.addEventListener('ended',()=>{if(shotStream===s)shotStream=shotVideo=null}); // "Stop sharing": the next click asks again
+  shotStream=s;shotVideo=v;fresh=true;
+ }
+ const root=document.documentElement,v=shotVideo,st=$('#stage'),ph=$('#phone');
+ const fr=ph.getBoundingClientRect(),pad=RING*(+st.dataset.scale||1),over=[...document.querySelectorAll('.nav:not(.off),.nav.off+.nav-open,.devsw')].filter(e=>{const b=e.getBoundingClientRect();return b.left<fr.right+pad&&b.right>fr.left-pad&&b.top<fr.bottom+pad&&b.bottom>fr.top-pad});
+ over.forEach(e=>e.classList.add('over'));root.classList.add('shooting');
+ try{
+  await wait(fresh?T.sheet:T.quick); // the pointer is gone and the frame has caught up; the first time Chrome also adds its "sharing" bar and the phone refits
+  const view=()=>{const vv=window.visualViewport;return vv?{w:vv.width,h:vv.height,x:vv.offsetLeft,y:vv.offsetTop}:{w:innerWidth,h:innerHeight,x:0,y:0}};
+  let fits=false;for(let i=0;i<12&&!fits;i++){const a=view();fits=v.videoWidth&&!st.classList.contains('anim')&&Math.abs(v.videoWidth/v.videoHeight-a.w/a.h)<.01;if(!fits)await wait(T.quick/2)} // polls (not motion) up to ~1 s: the frame has the proportions of the window, the size switch has finished
+  if(!v.videoWidth)throw 'Screen capture is not available';
+  if(!fits)throw 'Try again'; // the frame is still of another window size: better no picture than a shifted one
+  /* window -> frame: one scale, whatever the zoom of the page or the browser; if the frame comes letterboxed, the picture sits in its middle */
+  const a=view(),k=Math.min(v.videoWidth/a.w,v.videoHeight/a.h),lx=(v.videoWidth-a.w*k)/2,ly=(v.videoHeight-a.h*k)/2;
+  const s=+st.dataset.scale||1,r=ph.getBoundingClientRect(),g=RING*s;
+  const x=Math.ceil(lx+(r.left-g-a.x)*k),y=Math.ceil(ly+(r.top-g-a.y)*k),w=Math.floor(lx+(r.right+g-a.x)*k)-x,h=Math.floor(ly+(r.bottom+g-a.y)*k)-y;
+  const rad=(parseFloat(getComputedStyle(ph).borderTopLeftRadius)+RING)*s*k;
+  const c=document.createElement('canvas');c.width=w;c.height=h;const cx=c.getContext('2d');
+  cx.beginPath();cx.moveTo(rad,0);cx.arcTo(w,0,w,h,rad);cx.arcTo(w,h,0,h,rad);cx.arcTo(0,h,0,0,rad);cx.arcTo(0,0,w,0,rad);cx.closePath();cx.clip(); // outside the rounded frame the picture stays transparent
+  cx.drawImage(v,x,y,w,h,0,0,w,h);
+  if(g*k>=4){const p=cx.getImageData(w>>1,Math.round(g*k/2),1,1).data;if(p[3]<255||p[0]+p[1]+p[2]>120){shotDrop();throw 'Choose this tab'}} // the top of the frame is black; if not, this is not our tab
+  const blob=await new Promise(res=>c.toBlob(res,'image/png'));if(!blob)throw 'Screen capture is not available';
+  return blob;
+ }finally{root.classList.remove('shooting');over.forEach(e=>e.classList.remove('over'))}
+}
+function shotSave(blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='dazn-bet-screen.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1e4)}
+$('#shot').onclick=async()=>{
+ if(shotBusy)return;shotBusy=true;clearTimeout(shotT);setTxt($('#shotT'),'Copying…');
+ const shot=shotFrame(),put=d=>navigator.clipboard.write([new ClipboardItem({'image/png':d})]);
+ let ok=false;
+ try{await put(shot);ok=true}catch(e){} // the write starts inside the click (Safari needs that); it waits for the picture
+ try{
+  const blob=await shot;
+  if(!ok)try{await put(blob);ok=true}catch(e){}
+  if(ok)shotSay('Copied');else{shotSave(blob);shotSay('Saved as a file')}
+ }catch(e){shotSay(typeof e==='string'?e:'Screen capture is not available')}
+ shotBusy=false;
+};
 
 let timers=[];
 function init(){

@@ -59,13 +59,14 @@ The **Prototype states** panel on the left is the only navigation (see the next 
 
 ## Navigation: the "Prototype states" panel
 
-One panel on the left, nothing else on screen except the phone and the phone-size switch.
+One panel on the left, nothing else on screen except the phone, the "Copy screen" button under it and the phone-size switch.
 
 - **Free play** (selected when the page opens). Everything on the phone works by hand. Clicking it again, or the round arrow next to it, starts over.
 - **Topics.** Betslip, Suspended, Locked, Limit 20, Other screens. They hold only what cannot be reached by tapping the phone (a price that moves in a pick, suspended and locked bets, the limit of 20) plus three screens that are not obvious to find. The main flow (Odds toggle, picks, betslip, Edit, Place bet) is done by hand in Free play; its description says what to try. A topic opens its states; only one topic is open at a time. Opening a topic does not change the phone. A dot next to a folded topic marks where the current state lives.
 - **States.** One click sets the whole screen (picks, statuses, prices, sheet open or closed), whatever was on screen before. The selected state shows one or two lines about the rule it demonstrates. Click it again, or the round arrow, to start the same state again.
 - **Collapsed / Opened.** States that exist with the betslip folded and unfolded are one row with this switch. If you open or close the betslip on the phone by hand, the switch follows.
 - The **‹** button folds the panel into a small "States" button (it starts folded in windows narrower than 1000 px).
+- **Copy screen** (under the phone, desktop only). Copies the phone with its frame as a PNG: a real picture of the tab (Screen Capture), cut to the frame, transparent outside the rounded corners, at the density of the screen. The browser asks for permission once; the stream stays alive until the page is closed or "Stop sharing" is pressed. It needs a browser that can share a single tab (Chrome, Edge). Without clipboard access the picture is saved as `dazn-bet-screen.png`. Code: block "P1 · Copy screen" (`shotFrame()`); `fit()` keeps 64 px under the biggest phone for the button.
 - The panel and the phone-size switch use the same Global foundation tokens as the product UI (`--ui-*` variables in the CSS, each with its token name). The only accent is white (text/primary); no brand yellow and no orange outside the phone.
 
 ### Motion
