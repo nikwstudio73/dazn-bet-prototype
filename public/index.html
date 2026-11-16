@@ -317,8 +317,8 @@ img{display:block}
   --ui-t3:var(--text-tertiary);                    /* text/tertiary */
   --ui-edge:var(--spacing-16);                     /* panel and switch: distance from the window edges */
 }
-.nav,.nav-open,.devsw,.shot{font-family:'DAZN Oscine',system-ui,sans-serif}
-.nav button:focus-visible,.nav-open:focus-visible,.devsw button:focus-visible,.shot:focus-visible{outline:2px solid var(--ui-t1);outline-offset:-2px}
+.nav,.nav-open,.devsw,.shot,.hublink{font-family:'DAZN Oscine',system-ui,sans-serif}
+.nav button:focus-visible,.nav-open:focus-visible,.devsw button:focus-visible,.shot:focus-visible,.hublink:focus-visible{outline:2px solid var(--ui-t1);outline-offset:-2px}
 /* segmented control (DS "Segmented Control", Figma 3392:71978): phone size in the bottom-right corner, betslip view inside the panel */
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;align-items:center;padding:var(--spacing-2);border-radius:8px;background:var(--ui-well)}
 .seg button{height:28px;padding:0 var(--spacing-12);border-radius:6px;font-weight:700;font-size:12px;line-height:18px;color:var(--ui-t3);white-space:nowrap;transition:background .2s,color .2s}
@@ -331,9 +331,12 @@ img{display:block}
 .shot{position:absolute;left:50%;top:calc(100% + 11px + var(--spacing-12));transform:translateX(-50%);transform-origin:top center;height:36px;display:flex;align-items:center;gap:var(--spacing-8);padding:0 var(--spacing-16) 0 var(--spacing-12);border-radius:12px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);font-weight:700;font-size:14px;line-height:20px;color:var(--ui-t1);white-space:nowrap}
 .shot:hover{background:linear-gradient(var(--ui-hover),var(--ui-hover)),var(--ui-panel)}
 .shot svg{flex:none;color:var(--ui-t3)}
+/* H1 · "Design hub": a quiet text link back to hub.html in the free top-right corner, on the line of the "States" button. Desktop chrome only */
+.hublink{position:fixed;right:var(--ui-edge);top:var(--ui-edge);z-index:99;height:36px;display:flex;align-items:center;padding:0 var(--spacing-12);border-radius:12px;font-weight:700;font-size:12px;line-height:18px;color:var(--ui-t3);text-decoration:none;white-space:nowrap;transition:color var(--m-quick),background var(--m-quick)}
+.hublink:hover{color:var(--ui-t1);background:var(--ui-hover)}
 html.shooting,html.shooting *{cursor:none!important} /* while the frame is taken: no pointer in the picture */
 html.shooting .over{visibility:hidden} /* narrow window: the panel or the size switch lies over the frame, so it steps aside for the picture */
-html.embed .nav,html.embed .nav-open,html.embed .devsw,html.embed .shot{display:none} /* A2: inside the motion gallery the gallery has its own controls */
+html.embed .nav,html.embed .nav-open,html.embed .devsw,html.embed .shot,html.embed .hublink{display:none} /* A2: inside the motion gallery the gallery has its own controls */
 
 /* ---------- M1 · on a phone (html.app, set in <head>) ----------
    The prototype is the whole screen: no frame, no States panel, no size switch, no drawn status bar or home indicator (the phone has its own).
@@ -343,7 +346,7 @@ html.app,html.app body{overflow:hidden;overscroll-behavior:none;touch-action:pan
 html.app body{background:var(--page)}
 html.app #stage{--sb:env(safe-area-inset-top,0px);position:fixed;left:0;top:0;width:100%;height:100%;height:100dvh;transform:none}
 html.app #phone{border-radius:0;box-shadow:none}
-html.app .island,html.app .status .time,html.app .status .sr,html.app .hind,html.app .nav,html.app .nav-open,html.app .devsw,html.app .shot{display:none}
+html.app .island,html.app .status .time,html.app .status .sr,html.app .hind,html.app .nav,html.app .nav-open,html.app .devsw,html.app .shot,html.app .hublink{display:none}
 html.app .navbar{height:calc(52px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)))}
 html.app .scroll,html.app .cp{bottom:calc(52px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)))}
 html.app .bar{bottom:calc(62px + max(env(safe-area-inset-bottom,0px),var(--spacing-8)))}
@@ -1332,6 +1335,7 @@ div.choice{cursor:default}
  <div class="nav-b" id="navB"></div>
 </aside>
 <button class="nav-open" id="navOpen" aria-label="Show the states panel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 4h11M2.5 8h11M2.5 12h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>States</button>
+<a class="hublink" href="./hub.html">Design hub</a>
 <div class="devsw seg" role="tablist" aria-label="Phone size">
  <button role="tab" class="on" data-dev="mini" aria-selected="true">iPhone 13 mini</button>
  <button role="tab" data-dev="max" aria-selected="false">iPhone 17 Pro Max</button>
@@ -2778,7 +2782,7 @@ async function shotFrame(){ // -> PNG blob; throws a short message for the butto
   shotStream=s;shotVideo=v;fresh=true;
  }
  const root=document.documentElement,v=shotVideo,st=$('#stage'),ph=$('#phone');
- const fr=ph.getBoundingClientRect(),pad=RING*(+st.dataset.scale||1),over=[...document.querySelectorAll('.nav:not(.off),.nav.off+.nav-open,.devsw')].filter(e=>{const b=e.getBoundingClientRect();return b.left<fr.right+pad&&b.right>fr.left-pad&&b.top<fr.bottom+pad&&b.bottom>fr.top-pad});
+ const fr=ph.getBoundingClientRect(),pad=RING*(+st.dataset.scale||1),over=[...document.querySelectorAll('.nav:not(.off),.nav.off+.nav-open,.devsw,.hublink')].filter(e=>{const b=e.getBoundingClientRect();return b.left<fr.right+pad&&b.right>fr.left-pad&&b.top<fr.bottom+pad&&b.bottom>fr.top-pad});
  over.forEach(e=>e.classList.add('over'));root.classList.add('shooting');
  try{
   await wait(fresh?T.sheet:T.quick); // the pointer is gone and the frame has caught up; the first time Chrome also adds its "sharing" bar and the phone refits

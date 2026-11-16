@@ -18,6 +18,7 @@ def inline(m):
 
 src = open(os.path.join(SRC, 'index.html'), encoding='utf-8').read()
 out = re.sub(r'assets/(?:img|fonts)/[\w.-]+\.(?:png|woff2|svg|jpg|webp)', inline, src)
+out = re.sub(r'<a class="hublink"[^>]*>.*?</a>\n?', '', out)  # H1: the single file travels without hub.html, so it carries no link to it
 os.makedirs(os.path.join(ROOT, 'dist'), exist_ok=True)
 dst = os.path.join(ROOT, 'dist', 'DAZN-Bet-in-Scores-prototype.html')
 open(dst, 'w', encoding='utf-8').write(out)
