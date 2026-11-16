@@ -693,10 +693,10 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .fx-comp .c i{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center}
 .fx-comp .c img{width:24px;height:24px}
 .fx-follow{height:32px;padding:0 12px 2px;border-radius:9999px;background:#f9fafa;color:#0c161c;font-weight:700;font-size:14px}
-.fx-tabs{display:flex;height:44px;padding:4px 0 0 16px;box-shadow:inset 0 -1px 0 #3d4549;overflow-x:auto;scrollbar-width:none;white-space:nowrap}
+.fx-tabs{display:flex;height:44px;padding:4px 0 0 16px; /* tab-nav of Scores-Redesign 212:99096, the same on every page: 16 before the first tab, 16 on each side of every label, the row scrolls */
+ box-shadow:inset 0 -1px 0 #3d4549;overflow-x:auto;scrollbar-width:none;white-space:nowrap}
 .fx-tabs::-webkit-scrollbar{display:none}
 .fx-tabs span{height:40px;padding:10px 16px 0;font-weight:700;font-size:14px;line-height:18px;color:#b3b9bb;border-bottom:2px solid transparent}
-.fx-tabs span:first-child{padding-left:12px;padding-right:12px}
 .fx-tabs span.on{color:#f9fafa;border-color:#fffa00}
 .mkts{padding:12px 16px 32px;display:flex;flex-direction:column;gap:16px}
 .mkt{position:relative;overflow:hidden;border-radius:var(--mk-radius);padding:var(--mk-pad-t) var(--mk-pad-r) var(--mk-pad-b) var(--mk-pad-l);display:flex;flex-direction:column;gap:var(--mk-gap)}
@@ -868,13 +868,9 @@ div.choice{cursor:default}
 .cp-logo img{max-width:32px;max-height:32px}
 .cp-name{display:flex;flex-direction:column;min-width:0;position:relative;top:-3px}
 .cp-name b{font-weight:700;font-size:16px;line-height:20px;white-space:nowrap}
-.cp-name>span{display:flex;align-items:center;margin-top:-2px;font-size:14px;line-height:16px;color:#f9fafa}
+.cp-name>span{display:flex;align-items:center;margin-top:1px;font-size:14px;line-height:16px;color:#f9fafa}
 .cp-name span svg{margin-top:2px}
-.cp-tabs{flex:none;padding-left:0;margin:0 -3px;overflow:hidden} /* five tabs are 381 wide in a 375 frame: they stick out 3 px on each side, as in Figma */
-.cp-tabs span:first-child{padding-left:16px;padding-right:16px}
-/* .w5 = the five tabs drawn in Figma (UEFA Champions League), with their exact widths; other competitions use natural widths */
-.cp-tabs.w5 span,.cp-tabs.w5 span:first-child{flex:none;padding-left:0;padding-right:0;text-align:center}
-.cp-tabs.w5 span:nth-child(1){width:84px}.cp-tabs.w5 span:nth-child(2){width:65px}.cp-tabs.w5 span:nth-child(3){width:64px}.cp-tabs.w5 span:nth-child(4){width:76px}.cp-tabs.w5 span:nth-child(5){width:92px}
+.cp-tabs{flex:none}
 .cp-scroll{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;overscroll-behavior:contain;padding:12px 16px 0}
 .cp-scroll::-webkit-scrollbar{display:none}
 .cp-scroll .legal{height:28px;margin-bottom:12px}
@@ -937,7 +933,6 @@ div.choice{cursor:default}
 .fx-team[data-team],.cp-row [data-team]{cursor:pointer}
 .fx-team[data-team]{transition:opacity var(--m-press)}
 .fx-team[data-team]:active,.cp-row [data-team]:active{opacity:.6}
-.tm .cp-tabs{margin:0;overflow-x:auto} /* Matches / Overview / Table / Squad / Team stats are wider than 375: the row scrolls, as on the old frame */
 .tm .cp-tabs span[data-tmv]{cursor:pointer}
 .tm-comp{cursor:pointer}
 .tm-comp[disabled]{cursor:default}
@@ -1202,9 +1197,11 @@ const OTHER=()=>[...Object.entries(DAY_ADD).flatMap(([dk,rows])=>{const lab=DAYS
    They are in no feed and on no league page (no dk), only on team pages; picks, match pages and the betslip treat them as any other match.
    CLUBS: the clubs of a competition that have a crest. PWR: strength of a club, 60–92; the 1X2 prices of an added match follow from it
    (home advantage, 6 % margin, bookmaker rounding), and so does the score of a finished one — the same numbers on every load, nothing is random.
-   TM_ROUNDS: per competition [days of the added finished rounds, days of the added coming rounds, turns of the round-robin]. The turns are picked so that
-   no added match repeats a pairing of the calendar and every club gets four matches or more. Cups have no coming rounds: the league phase ends inside
-   the calendar (Conference League: before it, so its clubs without a domestic league here have no match to come). */
+   TM_ROUNDS: per competition — last: the day of the latest added finished round (earlier ones go back from it, a week apart; step: 14 days for a cup),
+   next: the day of the first added coming round (leagues only), near: the turns of the round-robin for the rounds next to the calendar, picked so that
+   those rounds repeat no pairing of the calendar (further away a pairing may come back). The finished rounds go back to Matchday 1 of the season, so a team page holds the whole season so far.
+   Cups have no coming rounds: the league phase ends inside the calendar (Conference League: before it, so its clubs without a domestic league here
+   have no match to come). */
 Object.assign(TEAMS,{juv:['Juventus','JUV'],az:['AZ Alkmaar','AZ'],sha:['Shakhtar Donetsk','SHA'],aek:['AEK Athens','AEK'],twe:['FC Twente','TWE'],slo:['Slovan Bratislava','SLO'],lask:['LASK','LAS'],vik:['Viking','VIK']});
 const CLUBS={laliga:['bar','rm','atm','vil','bet','ath','val'],
  pl:['new','liv','ars','mci','che','mun','tot','avl','bha','nfo','cry','eve','ful','bre','bou'],
@@ -1217,30 +1214,37 @@ const CLUBS={laliga:['bar','rm','atm','vil','bet','ath','val'],
 const PWR={rm:92,bar:91,atm:84,ath:78,vil:78,bet:75,val:70,liv:90,ars:90,mci:89,che:84,new:81,avl:80,mun:79,tot:79,bha:76,nfo:75,cry:75,bou:74,ful:73,bre:73,eve:72,
  inter:87,nap:85,mil:82,juv:82,rom:80,ata:80,laz:77,bol:76,fio:75,com:73,tor:70,udi:69,par:67,lec:66,bay:92,bvb:83,b04:83,rbl:82,stu:78,sge:78,scf:75,tsg:73,svw:72,m05:72,bmg:71,fcu:70,
  psg:92,om:80,asm:79,ol:77,los:77,rcl:75,scp:79,psv:78,por:78,gal:77,fen:76,fey:75,brg:74,aja:74,az:72,sha:72,aek:70,twe:69,slo:64,lask:64,vik:63};
-const TM_ROUNDS={laliga:[['Sat 13 Dec','Sat 20 Dec'],['Sat 10 Jan','Sat 17 Jan'],[0,3,4,5]],pl:[['Sat 13 Dec','Sat 20 Dec'],['Sat 10 Jan','Sat 17 Jan'],[3,4,5,7]],
- seriea:[['Sun 14 Dec','Sun 21 Dec'],['Sun 11 Jan','Sun 18 Jan'],[1,3,5,6]],bundes:[['Sat 13 Dec','Sat 20 Dec'],['Sat 10 Jan','Sat 17 Jan'],[0,6,7,8]],ligue1:[['Sun 14 Dec','Sun 21 Dec'],['Sun 11 Jan'],[0,2,4]],
- ucl:[['Tue 21 Oct','Tue 4 Nov','Tue 25 Nov','Tue 9 Dec'],[],[3,6,8,10]],uel:[['Thu 6 Nov','Thu 27 Nov','Thu 11 Dec'],[],[3,6,7]],uecl:[['Thu 23 Oct','Thu 6 Nov','Thu 27 Nov','Thu 18 Dec'],[],[0,1,2,3]]};
+const TM_ROUNDS={laliga:{last:[2025,12,20],next:[2026,1,10],near:[0,3,4,5]},pl:{last:[2025,12,20],next:[2026,1,10],near:[3,4,5,7]},
+ seriea:{last:[2025,12,21],next:[2026,1,11],near:[1,3,5,6]},bundes:{last:[2025,12,20],next:[2026,1,10],near:[0,6,7,8]},ligue1:{last:[2025,12,21],next:[2026,1,11],near:[0,2,4]},
+ ucl:{last:[2025,12,9],step:14,near:[3,6,8,10]},uel:{last:[2025,12,11],step:14,near:[3,6,7]},uecl:{last:[2025,12,18],step:14,past:6,near:[0,1,2,3]}};
+const TM_NEXT=8;   // coming rounds added to a league
 const TM_KO=['14:00','16:15','18:30','21:00'],TM_SC=[['1-0','2-0','2-1','3-1','3-0'],['1-1','0-0','2-2'],['0-1','1-2','0-2','1-3']];
 let TM_ROWS;
 /* one round of a round-robin (circle method): the first club stays, the others turn; with an odd number of clubs one of them rests */
 function tmRows(){
  if(TM_ROWS)return TM_ROWS;TM_ROWS=[];
  const hash=s=>{let h=0;for(const c of s)h=(h*131+c.charCodeAt(0))%1000003;return h*7919%1000/1000}; // a fixed number 0…1 for a text
- for(const [comp,[past,next,turns]] of Object.entries(TM_ROUNDS)){
-  const cl=CLUBS[comp],fix=cl.length%2?null:cl[0],turn=fix?cl.slice(1):cl,n=turn.length+1;
-  [...past,...next].forEach((day,r)=>{
-   const row=[fix,...turn.map((_,i)=>turn[(i+turns[r])%turn.length])];
+ const dayAt=([y,m,d],plus)=>{const t=new Date(Date.UTC(y,m-1,d+plus));return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][t.getUTCDay()]+' '+t.getUTCDate()+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][t.getUTCMonth()]};
+ for(const [comp,c] of Object.entries(TM_ROUNDS)){
+  const cl=CLUBS[comp],fix=cl.length%2?null:cl[0],turn=fix?cl.slice(1):cl,n=turn.length+1,L=turn.length,step=c.step||7;
+  const N=+COMPS[comp].m.match(/\d+/)[0],P=c.past||N+5,F=c.next?TM_NEXT:0;                 // finished rounds back to the first matchday (some to spare: a club rests now and then in a league with an odd number of clubs)
+  const seq=[...c.near,...turn.map((_,i)=>i).filter(i=>!c.near.includes(i))];            // the turns in one circle: the checked ones sit next to the calendar; going round it, a pairing comes back after a full circle
+  const round=(pre,j,at,day,ft,ord)=>{                                                     // at: place on the circle (below zero for finished rounds)
+   const t=seq[(at%L+L)%L],row=[fix,...turn.map((_,i)=>turn[(i+t)%L])],lap=Math.floor(at/L);
    for(let i=0;i<n/2;i++){
-    let h=row[i],a=row[n-1-i];if(!h||!a)continue;if((r+i)%2)[h,a]=[a,h];
-    const e=1/(1+Math.pow(10,-(PWR[h]-PWR[a]+3)/28)),px=.25*(1-(2*e-1)**2)+.04,p=[e*(1-px),px,(1-e)*(1-px)],id='t'+comp+r+'_'+i,ft=r<past.length;
-    const u=hash(id+h+a),res=u<p[0]?0:u<p[0]+px?1:2,sc=TM_SC[res],ko=TM_KO[(i+r)%4];
-    TM_ROWS.push([id,[comp,h,a,ft?sc[Math.floor(hash(a+id)*sc.length)]:ko,...p.map(priceOf)],{day,ord:ft?r-10:20+r,when:ft?'':day+', '+ko}]);
+    let h=row[i],a=row[n-1-i];if(!h||!a)continue;if(((i?i:(at%L+L)%L)+lap)%2)[h,a]=[a,h];          // home and away alternate, and swap on the next lap
+    const e=1/(1+Math.pow(10,-(PWR[h]-PWR[a]+3)/28)),px=.25*(1-(2*e-1)**2)+.04,p=[e*(1-px),px,(1-e)*(1-px)],id='t'+comp+pre+j+'_'+i;
+    const u=hash(id+h+a),res=u<p[0]?0:u<p[0]+px?1:2,sc=TM_SC[res],ko=TM_KO[(i+j)%4];
+    TM_ROWS.push([id,[comp,h,a,ft?sc[Math.floor(hash(a+id)*sc.length)]:ko,...p.map(priceOf)],{day,ord,when:ft?'':day+', '+ko}]);
    }
-  });
+  };
+  const np=c.next?c.near.length-2:c.near.length;                                         // near = [turns of the latest finished rounds, turns of the first two coming rounds]
+  for(let j=0;j<P;j++)round('p',j,np-1-j,dayAt(c.last,-j*step),true,-1-j);
+  for(let k=0;k<F;k++)round('n',k,np+k,dayAt(c.next,k*7),false,20+k);
  }
  return TM_ROWS;
 }
-Object.assign(IMG,{t_juv:'assets/img/juv.svg'});
+Object.assign(IMG,{t_juv:'assets/img/juv.svg'}); // the header of a match page takes the crest without padding
 /* matches outside the feed: only for the "Fill betslip to 20" scenario (cards and bar need names and prices, no crests) */
 const EXTRA=[['Leverkusen','Stuttgart','Tomorrow, 15:30',1.28],['Real Sociedad','Girona','Tomorrow, 14:00',1.42],['Sporting CP','Braga','Tomorrow, 21:15',1.33],['Celtic','Rangers','Tomorrow, 13:30',1.57],
  ['Monaco','Lille','Tomorrow, 17:00',1.38],['Lyon','Marseille','Tomorrow, 20:45',1.44],['Ajax','Feyenoord','Tomorrow, 14:30',1.52],['Benfica','Porto','Today, 21:15',1.65],
@@ -1931,7 +1935,7 @@ function openComp(id,tab){
  const c=CP[id];if(!c)return;if(S.fav)closeFav();closePages();
  S.cp=id;if(tab)S.cpTab=tab;S.cpView='odds';S.cpDay=S.day;S.cpLive=false;$('#cp').classList.remove('mt');$('#cpLive').classList.remove('on'); // the page opens on Odds; Matches starts on the day of the feed
  $('#cpLogo').src=IMG[c.img];$('#cpName').textContent=c.t;$('#cpSeason').textContent=c.season;
- const tb=$('#cpTabs');tb.classList.toggle('w5',c.tabs.includes('Playoff'));tb.innerHTML=c.tabs.map(t=>`<span${t==='Odds'?' class="on" data-cpv="odds"':t==='Matches'?' data-cpv="matches"':''}>${t}</span>`).join(''); // R2: Matches and Odds switch, the other tabs are labels
+ const tb=$('#cpTabs');tb.scrollLeft=0;tb.innerHTML=c.tabs.map(t=>`<span${t==='Odds'?' class="on" data-cpv="odds"':t==='Matches'?' data-cpv="matches"':''}>${t}</span>`).join(''); // R2: Matches and Odds switch, the other tabs are labels
  renderComp();$('#cpScroll').scrollTop=0;
  $('#phone').classList.add('incp');$('#cp').classList.add('show');$('#cp').setAttribute('aria-hidden','false');hideToast();
 }
@@ -1970,7 +1974,7 @@ function teamList(k,comp){
  const ms=teamMatches(k,comp),N=+COMPS_MD[comp];let i0=ms.findIndex(m=>ordOf(m)===DAY_I.today),n0=N;
  if(i0<0){i0=ms.findIndex(m=>!m.ft);n0=N+1}
  if(i0<0){i0=ms.length-1;n0=N-1}
- return ms.map((m,i)=>({m,md:n0+i-i0}));
+ return ms.map((m,i)=>({m,md:n0+i-i0})).filter(x=>x.md>0);   // the season starts at Matchday 1: spare rounds before it are dropped
 }
 const COMPS_MD={};Object.entries(COMPS).forEach(([k,c])=>COMPS_MD[k]=+c.m.match(/\d+/)[0]);COMPS_MD.uecl++; // matchday of today per competition. Conference League: the league phase (6 matchdays) is over, its last match is Matchday 6
 const teamComps=k=>Object.keys(CLUBS).filter(c=>CLUBS[c].includes(k)&&teamMatches(k,c).length);   // domestic league first, then the cups
@@ -2223,7 +2227,7 @@ $('#favOdds').addEventListener('click',e=>{const b=e.target.closest('[data-fo]')
 $('#cpDays').innerHTML=$('#days').innerHTML;            // R2: the calendar of a competition page is a copy of the feed's
 document.querySelectorAll('.day[data-day]').forEach(d=>d.onclick=()=>d.closest('#cpDays')?setCpDay(d.dataset.day):setDay(d.dataset.day));
 $('#cpLive').onclick=()=>setCpDay('today',S.cpDay==='today'?!S.cpLive:true);
-dragScroll($('#days'));dragScroll($('#leagues'));dragScroll($('#cpDays'));dragScroll($('#tmTabs'));
+dragScroll($('#days'));dragScroll($('#leagues'));dragScroll($('#cpDays'));dragScroll($('#tmTabs'));dragScroll($('#cpTabs'));dragScroll($('#fx .fx-tabs'));
 $('#navX').onclick=()=>$('#nav').classList.add('off');$('#navOpen').onclick=()=>$('#nav').classList.remove('off');
 $('#editBtn').onclick=()=>{S.edit=!S.edit;applyEdit()};
 $('#placeBtn').onclick=placeBet;
