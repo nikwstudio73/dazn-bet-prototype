@@ -1023,7 +1023,7 @@ div.choice{cursor:default}
 .ox{display:flex;flex-direction:column;gap:24px}
 .ox-s{display:flex;flex-direction:column;gap:10px}
 .ox-s.g{gap:var(--spacing-8)}
-.ox-hero{position:static;gap:0;padding-bottom:var(--spacing-8);border:1px solid var(--border-transparent-subtle);box-shadow:none} /* in the frame the 1 px stroke takes room, so the content is 317 wide */
+.ox-hero{position:static;z-index:auto;gap:0;padding-bottom:var(--spacing-8);border:1px solid var(--border-transparent-subtle);box-shadow:none} /* in the frame the 1 px stroke takes room, so the content is 317 wide; z-index is reset because a flex item obeys it even when static, and the card slid over the compact header */
 /* U5 · Odds/Hero · Match Result 4379:148158: shut = crests, chance and 1X2 (343 x 244); "Show more" opens Double chance and Draw no bet (343 x 591). The glow is set in % of the card, so it stretches with it, as in the two variants. */
 .ox-mr{display:flex;flex-direction:column;gap:28px}
 .ox-hero>.ox-fold>div>div{display:flex;flex-direction:column;gap:var(--spacing-16);padding-top:24px}
