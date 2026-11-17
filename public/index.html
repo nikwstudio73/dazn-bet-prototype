@@ -1026,6 +1026,15 @@ div.choice{cursor:default}
 #stage.max .lu-bet::before{left:76.8px;width:993.8px;height:452.2px;margin:-226.1px 0 0 -496.9px;transform:rotate(145.47deg)}
 .lu-bet>*{position:relative}
 .lu-q{display:flex;flex-direction:column}
+/* L5 · widget of a match moment (Figma section 4479:140933, component Live/Moment widget 4478:141674): the tag of the event next to the label, the market under the question.
+   Variant A: it is the block on top (.lu-bet in .lu-top) and its content changes in place. Variant B: the same block as a card in the feed, under its event (.lu-w);
+   position:sticky pins it under the banner when its event scrolls away and lets it go without a jump. */
+.lu-lr{display:flex;align-items:center;gap:var(--spacing-8);height:20px}
+.lu-lr i{font-style:normal;font-size:12px;line-height:18px;color:var(--text-tertiary)}
+.lu-q small{font-size:12px;line-height:18px;color:var(--text-tertiary)}
+.lu-w{position:sticky;top:calc(var(--sb) + 84px + var(--spacing-16) + 28px + var(--spacing-8));z-index:1;margin-bottom:var(--spacing-8);padding:var(--spacing-12);border-radius:var(--radius-12);box-shadow:inset 0 0 0 1px var(--border-transparent-subtle);background:linear-gradient(var(--fill-overlay-1),var(--fill-overlay-1)),var(--page)} /* 16 + 28 + 8: the pinned banner above it */
+.lu-w .lu-lr i{opacity:0;transition:opacity var(--m-quick) var(--ease)}
+.lu-w.stuck .lu-lr i{opacity:1} /* pinned: its event is out of sight, so the tag names it */
 .lu-q span{height:20px;font-weight:700;font-size:12px;line-height:20px;letter-spacing:.01em;text-transform:uppercase;color:#f45a5a} /* DS Label, red tertiary: components/label/red/tertiary/text */
 .lu-q b{font-weight:700;font-size:14px;line-height:18px;letter-spacing:.01em;color:var(--t1)}
 .lu-bet .o3{gap:var(--spacing-8)}
@@ -1077,7 +1086,7 @@ div.choice{cursor:default}
 .lu-new{position:absolute;left:50%;top:calc(var(--sb) + 84px + var(--spacing-8));z-index:3;transform:translate(-50%,calc(-1*var(--spacing-8)));opacity:0;pointer-events:none;white-space:nowrap;transition:opacity var(--m-std) var(--soft),transform var(--m-std) var(--soft)}
 .lu-new.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .lu-new.show:active{opacity:.6}
-@media (prefers-reduced-motion:reduce){.lu-in,.lu-in .lu-card,.lu-in.on .dr,.lu-new{transition:none}}
+@media (prefers-reduced-motion:reduce){.lu-in,.lu-in .lu-card,.lu-in.on .dr,.lu-new,.lu-w .lu-lr i{transition:none}}
 .mkts .sgfoot{margin-top:0}
 .mkts .lu-feed+.sgfoot{margin-top:var(--spacing-12);margin-bottom:calc(-1*var(--spacing-8))}
 /* U4 · fixture · Odds tab, Figma "[V2] Odds Pre-game" 4326:231817: markets in groups. Match Result reuses the block of Live updates (.lu-hero). */
@@ -1763,7 +1772,7 @@ function won(m,g,o){
 }
 let S;
 /* st: locked picks {"match|market":'locked'} (S5: one state; any value counts as locked, the motion gallery still writes 'suspended'); lk: locked odds in the feed ["match|market|outcome"]; day: a key of DAYS; more: the matches of the days other than today and Sat 3 Jan */
-function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fxTab:'odds',luKey:false,lu:{},luQ:{},nts:{},luNew:0,fav:false,cp:null,cpTab:'win',cpView:'odds',cpDay:'today',cpLive:false,stack:[],tm:null,tmMenu:null}} // cpView / cpDay / cpLive: tab, day and LIVE filter of the competition page (R2)
+function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fxTab:'odds',luKey:false,lu:{},luQ:{},nts:{},luNew:0,mw:{},mwOut:null,luFresh:null,fav:false,cp:null,cpTab:'win',cpView:'odds',cpDay:'today',cpLive:false,stack:[],tm:null,tmMenu:null}} // cpView / cpDay / cpLive: tab, day and LIVE filter of the competition page (R2)
 const $=s=>document.querySelector(s);
 const M=id=>S.matches.find(m=>m.id===id)||S.ft.find(m=>m.id===id)||S.more.find(m=>m.id===id)||OUT[id];
 const f2=n=>n.toFixed(2);
@@ -2302,6 +2311,7 @@ const LU_IC={goal:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><
  yc:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.28675 3.97599L4.81784 13.318C4.93098 14.0084 5.58234 14.4763 6.27269 14.3632L11.6674 13.479C12.3577 13.3659 12.8257 12.7145 12.7125 12.0242L11.1814 2.68212C11.0683 1.99177 10.4169 1.52385 9.72657 1.63699L4.33188 2.52114C3.64153 2.63428 3.17361 3.28564 3.28675 3.97599Z" fill="#FFFA00" stroke="#FFFA00" stroke-width="1.33333" stroke-linecap="round"/></svg>',
  in:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.1143 8.17442C13.16 8.17442 14 7.31977 14 6.25581C12.56 4.7907 8.53143 0.5 8.17143 0.5C7.81143 0.5 3.54286 4.68605 2 6.25581C2 7.31977 2.84 8.17442 3.88571 8.17442H5.08571L6.61143 14C6.61143 14 6.97143 15.5 8 15.5C8.80571 15.5 9.14857 14.8372 9.33714 14L10.9143 8.17442H12.1143Z" fill="#147E4A"/></svg>',
  out:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.88571 7.82558C2.84 7.82558 2 8.68023 2 9.74418C3.44 11.2093 7.46857 15.5 7.82857 15.5C8.18857 15.5 12.4571 11.314 14 9.74419C14 8.68023 13.16 7.82558 12.1143 7.82558L10.9143 7.82558L9.38857 2C9.38857 2 9.02857 0.499998 8 0.499998C7.19429 0.499997 6.85143 1.16279 6.66286 2L5.08572 7.82558L3.88571 7.82558Z" fill="#D12424"/></svg>'};
+LU_IC.rc='<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="12.918" y="13.2739" width="8" height="12" rx="1.27" transform="rotate(170.692 12.918 13.2739)" fill="#D12424"/></svg>'; // .Live/Event icon, Red card
 const LU_BALL='<svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M17.7156 12.1578C18.0206 12.1984 18.2936 12.3778 18.45 12.6484L20.0719 15.4578C20.2505 15.7672 20.2505 16.1484 20.0719 16.4578L18.45 19.2672C18.2714 19.5762 17.9412 19.7669 17.5844 19.7672H14.3391C13.9819 19.7672 13.6505 19.5764 13.4719 19.2672L11.85 16.4578C11.6713 16.1484 11.6714 15.7672 11.85 15.4578L13.4719 12.6484C13.6505 12.3392 13.9819 12.1484 14.3391 12.1484H17.5844L17.7156 12.1578Z" fill="#F9FAFA"/><path fill-rule="evenodd" clip-rule="evenodd" d="M16 2.66718C23.3634 2.66744 29.3341 8.63659 29.3344 16L29.3172 16.6859C28.9602 23.7308 23.1335 29.3341 16 29.3344L15.3141 29.3172C8.26945 28.9599 2.66748 23.1333 2.66718 16C2.66746 8.6366 8.6366 2.66746 16 2.66718ZM16 5.22655C14.9041 5.2266 13.8464 5.39106 12.85 5.6953L11.5219 8.5703H11.5078C11.2866 9.04037 10.8303 9.37278 10.3187 9.42811L7.20311 9.78124C6.00335 11.4753 5.28308 13.53 5.2328 15.7516L7.56718 17.8766L7.58124 17.8906C7.96815 18.2362 8.13403 18.7761 8.03749 19.2875L7.38905 22.4734C8.63615 24.1293 10.3495 25.413 12.3344 26.1312L15.2281 24.5C15.6841 24.2378 16.2378 24.2376 16.6937 24.5L19.6125 26.1484C21.6025 25.4399 23.3213 24.1641 24.5766 22.5141L23.9265 19.2734H23.9125C23.8159 18.762 23.9817 18.2359 24.3687 17.8766L26.7641 15.6828C26.7009 13.4979 25.9882 11.4782 24.8109 9.80624L21.5344 9.42811C21.009 9.37279 20.565 9.04039 20.3437 8.5703L18.9875 5.64843C18.0387 5.37499 17.0368 5.2266 16 5.22655Z" fill="#F9FAFA"/></svg>'; // .Betslip/Sport icon, Football, 32
 /* shot diagram (Figma group "Group 40" of the goal card): the pitch is the export of the frame; the ball and the dotted line are drawn here, so the line can draw.
    The data has no shot positions: four fixed ones, picked by the minute of the goal. */
@@ -2367,20 +2377,88 @@ function luCard(m,e){
  if(e.type==='goal')return `<div class="lu-card g ${e.side}">${luGlow(m,e.side)}<div class="lu-body">${meta}<div class="lu-title">${LU_BALL}<span>${e.title}</span></div>${
   (e.pl||[]).map(([n,d])=>`<div class="lu-pl"><div><b>${n}</b>${d?`<span>${d}</span>`:''}</div></div>`).join('')}${e.text?`<div class="lu-txt">${e.text}</div>`:''}</div>${luShot(e)}</div>`;
  const rows=(e.pl||[]).map(([n,d,i,num])=>`<div class="lu-pr">${luShirt(num||luNum(n))}<b>${n}</b>${i?LU_IC[i]:''}</div>`).join('');   // yellow card, substitution: rows of players; a substitution has no title, as in the frame
- return `<div class="lu-card"><div>${meta}${e.type==='yc'?`<div class="lu-title">${LU_IC.yc}<span>${e.title}</span></div>`:''}</div>${rows||e.text?`<div class="lu-rows">${rows}${e.text?`<div class="lu-txt">${e.text}</div>`:''}</div>`:''}</div>`;
+ const ic={yc:LU_IC.yc,rc:LU_IC.rc,pen:''}[e.type];                                                                  // L5: a red card and a penalty have a title too
+ return `<div class="lu-card"><div>${meta}${ic!==undefined?`<div class="lu-title">${ic}<span>${e.title}</span></div>`:''}</div>${rows||e.text?`<div class="lu-rows">${rows}${e.text?`<div class="lu-txt">${e.text}</div>`:''}</div>`:''}</div>`;
 }
 const LU_NONE='<div class="cp-empty"><b>No key events yet</b>Goals, cards and half-time will show here</div>';
+/* --- L5 · the widget of a match moment ---
+ LUW = the variant on show: 'a' the slot on top, 'b' in the feed under the event (panel "Prototype states" switches it; Free play keeps A).
+ S.mw[match] = the widget of the last moment: k = its market (www Match Result / nts Next team to score / ou Total Goals), tag, ev = the event it belongs to,
+ keys = its prices while they are under lock. No moment yet: variant A shows "Who will win?" without a tag, variant B shows nothing.
+ A moment: the event comes into the feed, the prices are locked (S.lk, the Locked state of S5), after CHG_T.hold they come back and the ones that moved show their arrow.
+ Relevance ends with the next moment; there are no timers for that. */
+let LUW='a';const luTm={};
+const MW={www:{q:'Who will win?',s:'Match Result'},nts:{q:'Who scores the next goal?',s:'Next team to score'},ou:{q:'How many goals in the match?',s:'Total Goals'}};
+const mwCur=m=>S.mw[m.id]||(LUW==='a'?{k:'www'}:null);
+function mwOuts(m,w){                                        // [market, outcome, label] of the tiles
+ if(w.k==='nts')return [['nts','h',m.hs],['nts','a',m.as]];
+ if(w.k==='ou'){const ln=mkt(m.id,'ou').lines[0][0];return [['ou:'+ln,'o','Over '+ln],['ou:'+ln,'u','Under '+ln]]}
+ return [['1x2','0',m.hs],['1x2','1','X'],['1x2','2',m.as]];
+}
+const luTiles=(m,w)=>mwOuts(m,w).map(([g,o,l])=>oddBtn(m.id,g,o,l,oddsOf({m:m.id,g,o}))).join('');
+function luBetHTML(m,w,feed,id='luBet'){const d=MW[w.k];
+ return `<div class="lu-bet${feed?' lu-w':''}" id="${id}"><div class="lu-q"><div class="lu-lr"><span>Live bet</span>${w.tag?`<i>${w.tag}</i>`:''}</div><b>${d.q}</b><small>${d.s}</small></div><div class="o3">${luTiles(m,w)}</div></div>`}
 function liveHTML(m){
  const f=FX[m.id];
  if(!m.live&&!m.ft)return `<div class="cp-empty"><b>Live updates start at kick-off</b>${f.date}, ${f.time}</div>`;                     // not started: no events and no odds, so no legal texts either
- const nts=m.live&&mkt(m.id,'nts'),feed=luOf(m).filter(e=>!S.luKey||e.key).map(e=>luCard(m,e)).join('');
- return (nts?`<div class="lu-top"><div class="lu-bet"><div class="lu-q"><span>Live bet</span><b>Who scores the next goal?</b></div><div class="o3">${[[m.hs,'h'],[m.as,'a']].map(([l,k])=>oddBtn(m.id,'nts',k,l,nts.opts.find(o=>o.k===k).v)).join('')}</div></div>${LEGAL}</div>`:'')+ // two prices, home and away (block 4425:251722); the banner under the block, pinned with it; "No goal" stays in the data, it is not offered
+ const w=m.live?mwCur(m):null,slot=w&&LUW==='a',out=LUW==='b'&&S.mwOut&&S.mwOut!==w?S.mwOut:null;
+ const wrap=(h,c='')=>`<div class="lu-in${c}"><div>${h}</div></div>`;                                                                  // a new card comes in (.lu-in), a widget that is no longer relevant goes out (.lu-in.on.out)
+ const feed=luOf(m).filter(e=>!S.luKey||e.key).map(e=>{const fresh=S.luFresh===e;let h=luCard(m,e);if(fresh)h=wrap(h);
+  if(w&&!slot&&w.ev===e)h+=fresh?wrap(luBetHTML(m,w,true)):luBetHTML(m,w,true);
+  if(out&&out.ev===e)h+=wrap(luBetHTML(m,out,true,'luOut'),' on out');
+  return h}).join('');
+ return (w?`<div class="lu-top">${slot?luBetHTML(m,w):''}${LEGAL}</div>`:'')+                                                           // odds on the tab: the legal banner, pinned (L4); variant A: the widget is the block above it
   `<div class="lu-seg"><button data-luk="0"${S.luKey?'':' class="on"'}>All</button><button data-luk="1"${S.luKey?' class="on"':''}>Key Events</button></div><div class="lu-feed" id="luFeed">${feed||LU_NONE}</div>`+
-  (nts?'<div class="sgfoot">+18. Juega con responsabilidad. Publi.</div>':'');
+  (w?'<div class="sgfoot">+18. Juega con responsabilidad. Publi.</div>':'');
 }
+/* re-draws the tab around a moment. The reader stays where he is: at the top the new card and its widget come in, scrolled away nothing moves (the distance to the end of the page is kept) and the pill counts the event */
+function luRender(m,fresh,swap){
+ if(S.fx!==m.id||S.fxTab!=='live'){S.mwOut=null;return}
+ const sc=$('#fxScroll'),away=luAway(),d=sc.scrollHeight-sc.scrollTop;
+ S.luFresh=away?null:fresh;if(away)S.mwOut=null;renderMkts();S.luFresh=S.mwOut=null;
+ if(away){sc.scrollTop=sc.scrollHeight-d;luStuck();if(fresh&&(!S.luKey||fresh.key)){S.luNew++;luPill()}}
+ else{const ws=[...document.querySelectorAll('#luFeed .lu-in')];void sc.offsetHeight;ws.forEach(x=>x.classList.toggle('on',!x.classList.contains('out')));
+  clearTimeout(luTm.wrap);luTm.wrap=setTimeout(()=>{ws.forEach(x=>{if(!x.isConnected)return;x.classList.contains('out')?x.remove():x.querySelector('.lu-w')&&x.replaceWith(...x.firstElementChild.childNodes)});luStuck()},T.layout+T.std)} // landed: the widget leaves its wrapper, so it can stick; a card stays in .lu-in.on, as in luInsert, and the line of its shot finishes drawing
+ if(swap&&LUW==='a'){soft($('#luBet .lu-q'),RISE,T.std);soft($('#luBet .o3'),{opacity:0},T.std)}                                   // variant A: the question changes in place
+ luStuck();fxHead();
+}
+function mwLock(m,w){w.keys=mwOuts(m,w).map(([g,o])=>m.id+'|'+g+'|'+o);S.lk.push(...w.keys)}
+function mwFree(m){const w=S.mw[m.id];clearTimeout(luTm[m.id]);if(w&&w.keys){S.lk=S.lk.filter(k=>!w.keys.includes(k));w.keys=null}}
+function mwSync(){const y=$('#scroll').scrollTop;renderFeed();$('#scroll').scrollTop=y;if(S.cp)renderComp();if(S.tm)renderTeam();renderSheet();updateBar(true)}
+/* the prices come back; moves = [market, outcome, direction] of the ones that changed */
+function mwOpen(m,moves){const w=S.mw[m.id];if(!w)return;mwFree(m);mwSync();
+ const t=S.fx===m.id&&S.fxTab==='live'&&$('#luBet .o3');if(t)t.innerHTML=luTiles(m,w);else if(S.fx===m.id&&S.fxTab!=='live'){const sc=$('#fxScroll'),y=sc.scrollTop;renderMkts();sc.scrollTop=y} // another tab of the match showed the locks too
+ moves.forEach(([g,o,dir])=>animateOdd(m.id,o,dir,g));
+}
+function luMoment(m,kind,ev){
+ if(!m.live)return;mwFree(m);
+ const prev=S.mw[m.id]||null,side=ev&&ev.side||'h',team=side==='h'?m.h:m.a;let w,e,moves=[];
+ if(kind==='end'){S.mw[m.id]=null;S.mwOut=prev;luRender(m,null,true);return}                                        // no longer relevant: A goes back to "Who will win?", B lets the widget go
+ if(kind==='var'){e=luPush(m,{min:m.min,type:'text',text:'VAR check: the referee is looking at a possible offside.'},true);        // VAR: only the lock, the question stays
+  w=mwCur(m);if(w){w=S.mw[m.id]={...w,tag:'VAR · '+m.min+'’'};mwLock(m,w);luTm[m.id]=setTimeout(()=>mwOpen(m,[]),CHG_T.hold)}
+  mwSync();luRender(m,e,false);return}
+ if(kind==='goal'){const old=mkt(m.id,'nts');e=luPush(m,ev||{min:m.min,type:'goal',side:m.o[0]<=m.o[2]?'h':'a',key:true},true);
+  const now=S.nts[m.id]=ntsOf(m);moves=now.opts.filter(o=>o.k!=='n').map(o=>['nts',o.k,Math.sign(o.v-old.opts.find(x=>x.k===o.k).v)]).filter(x=>x[2]);
+  w={k:'nts',tag:'Goal · '+e.min+'’',ev:e}}
+ if(kind==='red'){const nm=(FX[m.id].scorers||[]).filter(p=>p.cr===(side==='h'?m.hi:m.ai)).map(p=>p.n);
+  e=luPush(m,{min:m.min,type:'rc',side,key:true,title:'Red card',pl:nm.length?[[nm[nm.length-1]]]:[],text:'Straight red for a last-man foul.'},true);
+  const f=side==='h'?[1.6,1.25,.8]:[.8,1.25,1.6];                                                                       // ten men: the other side shortens. Fixed factors, so a ready-made state gives the same prices every time
+  m.o=m.o.map((v,i)=>{const nv=Math.max(1.01,+(v*f[i]).toFixed(2));moves.push(['1x2',i,nv>v?1:-1]);return nv});
+  w={k:'www',tag:'Red card · '+e.min+'’',ev:e}}
+ if(kind==='pen'){e=luPush(m,{min:m.min,type:'pen',side,key:true,title:'Penalty',text:`Penalty to ${team}: handball in the box.`},true);   // penalty: prices under lock until the kick
+  w=S.mw[m.id]={k:'nts',tag:'Penalty · '+e.min+'’',ev:e};S.mwOut=prev;mwLock(m,w);mwSync();luRender(m,e,true);
+  luTm[m.id]=setTimeout(()=>luMoment(m,'goal',{min:m.min,type:'goal',side,key:true,text:'Converted from the spot.'}),CHG_T.pickHold);return}
+ if(kind==='ht'){e=luPush(m,{min:45.5,type:'ph',key:true,title:'Half-time',detail:m.sh+' – '+m.sa},true);w={k:mkt(m.id,'ou')?'ou':'www',tag:'Half-time',ev:e}}
+ if(!w)return;
+ S.mw[m.id]=w;S.mwOut=prev;mwLock(m,w);mwSync();luRender(m,e,true);
+ luTm[m.id]=setTimeout(()=>mwOpen(m,moves),CHG_T.hold);                                                                // the same hold as an arrow of a price that moved
+}
+/* variant B: is the widget pinned now? (its event has scrolled away) */
+function luStuck(){const w=$('#luFeed>.lu-w'),sc=$('#fxScroll');if(!w)return;const q=sc.getBoundingClientRect(),k=sc.offsetHeight/q.height;
+ w.classList.toggle('stuck',(w.getBoundingClientRect().top-q.top)*k<=parseFloat(getComputedStyle(w).top)+1)}
 /* --- the feed grows --- */
-function luDue(m){const q=luQueue(m);let i=S.luQ[m.id]||0;while(q[i]&&q[i].min<=m.min)luPush(m,q[i++]);S.luQ[m.id]=i}
-function luPush(m,e0){
+function luDue(m){const q=luQueue(m);let i=S.luQ[m.id]||0;while(q[i]&&q[i].min<=m.min){const e=q[i++];S.luQ[m.id]=i;e.type==='goal'?luMoment(m,'goal',e):luPush(m,e)}S.luQ[m.id]=i} // L5: a goal is a moment
+function luPush(m,e0,quiet){                                  // quiet: a moment draws the tab itself (luRender)
  const e={...e0};
  if(e.min>m.min){m.min=Math.floor(e.min);document.querySelectorAll(`[data-min="${m.id}"],[data-cmin="${m.id}"]`).forEach(x=>x.textContent=m.min+'’')} // an event pushed by a ready-made state brings its minute with it
  if(e.type==='goal'){
@@ -2389,15 +2467,14 @@ function luPush(m,e0){
   if(!e.pl){const nm=(FX[m.id].scorers||[]).filter(p=>p.cr===(e.side==='h'?m.hi:m.ai)).map(p=>p.n);e.pl=nm.length?[[nm[0]]]:[]}
  }
  (S.lu[m.id]=S.lu[m.id]||[]).unshift(e);
- if(S.fx===m.id&&S.fxTab==='live'&&(!S.luKey||e.key))luInsert(m,e);
- if(e.type!=='goal')return;
- const old=mkt(m.id,'nts'),now=ntsOf(m);S.nts[m.id]=now;                                                           // a goal: the prices of the Live bet block move, by the pattern of any price
- now.opts.forEach((o,i)=>{const d=o.v-old.opts[i].v;if(d)animateOdd(m.id,o.k,d>0?1:-1,'nts')});
+ if(!quiet&&S.fx===m.id&&S.fxTab==='live'&&(!S.luKey||e.key))luInsert(m,e);
+ if(e.type!=='goal')return e;
  if(S.fx===m.id){const t=$('#fxTime'),c=$('#fxcS'),tx=m.sh+' - '+m.sa;if(setTxt(t,tx,false))soft(t,{opacity:0});
   if(setTxt(c,tx,false)&&c.animate)c.animate([{opacity:0},{opacity:1}],{duration:RM.matches?120:T.std,easing:SOFT});fxHead()} // the score in the header changes softly, nothing travels; U11: the copy in the compact bar fades the same way (soft() would also reset its place)
  const y=$('#scroll').scrollTop;renderFeed();$('#scroll').scrollTop=y;if(S.cp)renderComp();if(S.tm)renderTeam();renderSheet();updateBar(true);
+ return e;
 }
-function luEdge(){const t=$('#mkts .lu-top'),sc=$('#fxScroll'),q=sc.getBoundingClientRect(),k=sc.offsetHeight/q.height;return t?(t.getBoundingClientRect().bottom-q.top)*k:fxPin()} // L4: under the pinned Live bet block, or under the pinned tabs when there is none
+function luEdge(){const t=$('#mkts .lu-top'),sc=$('#fxScroll'),q=sc.getBoundingClientRect(),k=sc.offsetHeight/q.height;const w=$('#luFeed>.lu-w.stuck');return w?(w.getBoundingClientRect().bottom-q.top)*k:t?(t.getBoundingClientRect().bottom-q.top)*k:fxPin()} // L5: under a pinned widget of variant B; L4: under the pinned Live bet block, or under the pinned tabs when there is none
 function luAway(){const f=$('#luFeed'),sc=$('#fxScroll');if(!f)return false;const r=f.getBoundingClientRect(),q=sc.getBoundingClientRect(),k=sc.offsetHeight/q.height;   // k: the phone is scaled on the page
  return (r.top-q.top)*k<luEdge()}                      // the top of the feed has gone under the pinned block (or the compact header)
 function luInsert(m,e){
@@ -2408,8 +2485,8 @@ function luInsert(m,e){
  if(away){if(a){const q=sc.getBoundingClientRect();sc.scrollTop+=(a.getBoundingClientRect().top-t0)*sc.offsetHeight/q.height}S.luNew++;luPill()} // whatever the browser's own scroll anchoring did, the card that was on top stays where it was                                                          // scrolled away: the reader stays where he is
  else{void w.offsetHeight;w.classList.add('on')}
 }
-function luPill(){const b=$('#luNew'),n=S&&S.fx&&S.fxTab==='live'?S.luNew:0;if(n){b.textContent=n+(n>1?' new updates':' new update');b.style.top=$('#mkts .lu-top')?`calc(${luEdge()}px + var(--spacing-8))`:''}b.classList.toggle('show',n>0)} // L4: the pill sits spacing-8 under the pinned block, as under the compact header
-function luSeen(){if(S.luNew&&!luAway()){S.luNew=0;luPill()}}
+function luPill(){const b=$('#luNew'),n=S&&S.fx&&S.fxTab==='live'?S.luNew:0;if(n){b.textContent=n+(n>1?' new updates':' new update');b.style.top=$('#mkts .lu-top,#luFeed>.lu-w.stuck')?`calc(${luEdge()}px + var(--spacing-8))`:''}b.classList.toggle('show',n>0)} // L4: the pill sits spacing-8 under the pinned block, as under the compact header
+function luSeen(){luStuck();if(S.luNew){if(!luAway())S.luNew=0;luPill()}} // the pill also follows a widget that pins or lets go
 function luTop(){const f=$('#luFeed'),sc=$('#fxScroll');if(!f)return;const r=f.getBoundingClientRect(),q=sc.getBoundingClientRect(),k=sc.offsetHeight/q.height;
  S.luNew=0;luPill();sc.scrollTo({top:Math.max(0,sc.scrollTop+(r.top-q.top)*k-luEdge()-16)})} // a jump: the browser's smooth scroll has its own curve, outside the motion tokens
 function paintFxTabs(){document.querySelectorAll('#fxTabs [data-fxv]').forEach(e=>e.classList.toggle('on',e.dataset.fxv===S.fxTab))}
@@ -2662,9 +2739,20 @@ const STATES=[
  {g:'Fixture',k:'Odds tab',n:'Pre-match markets of one match (tap its tile in the feed), in groups: Match Result, Goals, Goalscorer, Handicap. Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
  {g:'Fixture',k:'Overview',n:'Tab “Overview” of a match that has not started: Match Result (the compact view of the card of the Odds tab), then the carousel “Top Bets”. A Top Bet is a ready-made combination with one price: a tap on the price puts it into the betslip as one card, a second tap takes it out. The blocks below are drawn only.',run(){openFixture('m4');setFxTab('over')}},
  {g:'Fixture',k:'Live match',n:'Every match of the feed has its page. A live one shows the score and the minute; the goal lines start above the goals already scored, the rest of the markets is as before kick-off (demo prices).',run(){openFixture('m1')}},
- {g:'Fixture',k:'Live updates',n:'Tab “Live updates” of a live match. On top the Live bet block: “Who scores the next goal?” with three prices; it stays pinned under the header while the feed scrolls under it. The feed shows the events of the match and has no odds.',run(){openFixture('m1');setFxTab('live')}},
- {g:'Fixture',k:'Live updates · goal',n:'A goal comes in: its card opens on top of the feed and pushes it down, the line of the shot draws, the score in the header changes and the prices of the Live bet block move. With the feed scrolled away nothing moves: a pill “1 new update” shows instead.',run(){openFixture('m1');setFxTab('live');S.luQ.m1=2;const c=cur;setTimeout(()=>{if(cur===c&&S.fx==='m1'&&!(S.lu.m1||[]).length)luPush(M('m1'),LQ.m1[1])},T.sheet)}},
+ {g:'Fixture',k:'Live updates',n:'Tab “Live updates” of a live match. On top the Live bet block (“Who will win?” with three prices until a moment changes the question), the legal banner under it; both stay pinned while the feed scrolls under them. The feed shows the events of the match and has no odds.',run(){openFixture('m1');setFxTab('live')}},
+ {g:'Fixture',k:'Live updates · goal',n:'A goal comes in: its card opens on top of the feed and pushes it down, the line of the shot draws, the score in the header changes and the prices of the Live bet block come back with arrows. With the feed scrolled away nothing moves: a pill “1 new update” shows instead.',run(){openFixture('m1');setFxTab('live');S.luQ.m1=2;const c=cur;luTm.go=setTimeout(()=>{if(cur===c&&S.fx==='m1'&&!(S.lu.m1||[]).length)luMoment(M('m1'),'goal',LQ.m1[1])},T.sheet)}},
  {g:'Fixture',k:'Goalscorer',n:'Between Goals and Handicap: a carousel of compact Goalscorer cards — the same card as Top Picks of a competition, with the shirt number in the corner. Every player is his own pick, so several can be in the betslip; a picked card turns white.',run(){openFixture('m4');setTimeout(()=>{const f=$('#fxScroll'),g=$('#mkts .gs');if(!g)return;const r=f.getBoundingClientRect();f.scrollTop+=(g.getBoundingClientRect().top-r.top)*f.offsetHeight/r.height-160},80)}},
+ /* L5 · moments of a match, each in both variants. The moment starts T.sheet after the screen is up, so the change is seen; prices are fixed, the same on every show */
+ ...[['At rest','No moment yet. A: the block asks “Who will win?”. B: no widget and no odds on the tab.',()=>{}],
+  ['Goal','A goal: its card comes in, the prices are under lock for a moment, then “Who scores the next goal?” comes back with arrows.',m=>luMoment(m,'goal',LQ.m1[1])],
+  ['Red card','A red card for the away side: “Who will win?” with new prices.',m=>luMoment(m,'red',{side:'a'})],
+  ['Penalty','A penalty: the prices stay under lock until the kick, then the goal brings its own question.',m=>luMoment(m,'pen',{side:'h'})],
+  ['VAR','A VAR check after a goal: only the lock, the question does not change; the prices come back as they were.',m=>luMoment(m,'var'),'goal'],
+  ['Half-time','Half-time (Roma v Atalanta): the widget turns to Total Goals.',m=>luMoment(m,'ht'),0,'m14'],
+  ['No longer relevant','The moment is over. A: the block goes back to “Who will win?” without a tag. B: the widget leaves, and the legal texts with it.',m=>luMoment(m,'end'),'goal']
+ ].flatMap(([k,n,go,pre,mid='m1'])=>['a','b'].map(v=>({g:'Live moments',k,v,sw:['A · on top','B · in the feed'],n:n+(v==='a'?' Variant A: the block on top keeps its place and its height.':' Variant B: the widget sits under its event and pins when the event scrolls away.'),run(){
+   LUW=v;S.luQ[mid]=9;openFixture(mid);if(pre){const m=M(mid),e=luPush(m,LQ.m1[1],true);S.nts[mid]=ntsOf(m);S.mw[mid]={k:'nts',tag:'Goal · '+e.min+'’',ev:e}}   // the moment before: a goal whose prices are already back
+   setFxTab('live');const c=cur;luTm.go=setTimeout(()=>{if(cur===c&&S.fx===mid)go(M(mid))},T.sheet)}}))),
  {g:'Competition',k:'Winner',n:'Odds tab of a competition (tap its header in the feed): who wins the season. One pick per market; it goes to the same betslip.',run(){openComp('ucl','win')}},
  {g:'Competition',k:'Top scorer',n:'Second sub-tab: two Top Picks cards and the list of players. A picked Top Pick turns white as a whole.',run(){openComp('ucl','scorer')}},
  /* N2 · the screens of 16 Nov. Fixed teams and leagues, so every show opens the same screen with the same numbers */
@@ -2696,7 +2784,7 @@ function setState(i){
 function freePlay(){LIVE=true;cur=-1;init();paintNav()}
 /* the user opened or closed the sheet by hand inside a collapsed / opened pair: the panel follows, the screen is not rebuilt */
 function navSync(){
- if(HOLD||cur<0)return;const it=ITEM[cur];if(it.ix.length<2)return;
+ if(HOLD||cur<0)return;const it=ITEM[cur];if(it.ix.length<2||STATES[cur].sw)return;
  const i=it.ix[S.sheet?1:0];if(i!==cur){cur=i;paintNav()}
 }
 function paintNav(reveal){
@@ -2718,7 +2806,7 @@ function buildNav(){
  let h=item('Free play','data-free',`<p>${FREE}</p>`)+'<hr>';
  TOPICS.forEach((t,ti)=>{
   h+=`<div class="nv-t" data-t="${ti}"><button class="nv-th" aria-expanded="false">${ICO_CH}<span>${t.g}</span><u></u><i>${t.items.length}</i></button><div class="nv-tb"><div>`+
-   t.items.map((x,n)=>item(x.k,`data-tp="${ti}" data-it="${n}"`,'<p></p>'+(x.ix.length>1?'<div class="seg" role="tablist" aria-label="Betslip"><button role="tab" data-v="0">Collapsed</button><button role="tab" data-v="1">Opened</button></div>':''))).join('')+
+   t.items.map((x,n)=>item(x.k,`data-tp="${ti}" data-it="${n}"`,'<p></p>'+(x.ix.length>1?`<div class="seg" role="tablist" aria-label="${STATES[x.ix[0]].sw?'Variant':'Betslip'}"><button role="tab" data-v="0">${(STATES[x.ix[0]].sw||['Collapsed'])[0]}</button><button role="tab" data-v="1">${(STATES[x.ix[0]].sw||[,'Opened'])[1]}</button></div>`:''))).join('')+
    '</div></div></div>';
  });
  $('#navB').innerHTML=h;
@@ -2728,7 +2816,7 @@ function buildNav(){
   if(el.hasAttribute('data-free')){freePlay();return}
   const x=TOPICS[+el.dataset.tp].items[+el.dataset.it],v=e.target.closest('[data-v]');
   if(v){setState(x.ix[+v.dataset.v]);return}
-  if(e.target.closest('.nv-ib,.nv-re'))setState(ITEM[cur]===x?cur:x.ix[0]);   // the selected row or the round arrow: start the same state again
+  if(e.target.closest('.nv-ib,.nv-re'))setState(ITEM[cur]===x?cur:x.ix[STATES[x.ix[0]].sw&&cur>=0&&STATES[cur].sw&&STATES[cur].v==='b'?1:0]);   // L5: stepping between moments keeps the variant on show   // the selected row or the round arrow: start the same state again
  };
 }
 
@@ -2890,6 +2978,7 @@ $('#shot').onclick=async()=>{
 let timers=[];
 function init(){
  timers.forEach(clearInterval);hideToast();
+ Object.keys(luTm).forEach(k=>{clearTimeout(luTm[k]);delete luTm[k]});LUW='a';                 // L5: pending locks of a moment; Free play and every state start from variant A
  S=freshState();
  for(const k in CHG)delete CHG[k];Object.values(chgTimers).flat().forEach(clearTimeout);document.querySelectorAll('.cv').forEach(e=>e.classList.remove('up','dn'));
  $('#oddsChip').classList.remove('off');$('#oddsChip').setAttribute('aria-checked','true');$('#liveBadge').classList.remove('on');
