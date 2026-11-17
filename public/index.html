@@ -1667,8 +1667,8 @@ const photoOf=(p,key)=>{const k=key!==undefined?key:(p.ph!==undefined?p.ph:'pl_'
 /* ---------- generated fixture pages ----------
  Only Real Madrid v Atlético is drawn in Figma (FX.m4 above). Every other match of the feed gets a page of the same template.
  Its markets are derived from the 1X2 prices of the feed (implied chances, expected goals, 6 % margin), so the numbers are plausible, not real.
- A live match gets only the markets that still make sense for the score: goal lines above the goals already scored,
- no 1st-half and no "Result & both teams to score" market, no "Both teams to score" once both have scored. */
+ A live match: the goal lines of Total Goals start above the goals already scored. The rest of the Goals card is the one of Figma for every match
+ (owner 17.11, U8): halves, "Both teams to score" and "Result & both teams to score" stay with demo prices even when the score has settled them. */
 const SCORERS={
  m1:[{k:'mbappe',n:'Kylian Mbappe',team:'Real Madrid',img:'gs_mbappe',cr:'rm',v:2.40},{k:'dembele',n:'Ousmane Dembélé',team:'PSG',img:'pl_dembele',cr:'psg',v:3.75},{k:'vinicius',n:'Vinícius Júnior',team:'Real Madrid',img:null,cr:'rm',v:3.20}],
  m2:[{k:'palmer',n:'Cole Palmer',team:'Chelsea',img:null,cr:'che',v:2.60},{k:'woltemade',n:'Nick Woltemade',team:'Newcastle',img:null,cr:'new',v:3.40},{k:'joaopedro',n:'João Pedro',team:'Chelsea',img:null,cr:'che',v:3.00}],
@@ -1717,13 +1717,13 @@ function fxOf(m){
  const lines=(from,n,exp,done)=>Array.from({length:n},(_,i)=>{const ln=from+i,po=1-poisCum(exp,Math.floor(ln)-done);return [ln.toFixed(1),priceOf(po),priceOf(1-po)]});
  const L=COMPS[m.comp].fx;
  const mk=[{id:'1x2',t:'Match Results',type:'1x2',glow:true},{id:'ou',t:'Total Goals',type:'lines',lines:m.live?lines(scored+.5,2,left,scored):lines(1.5,5,goals,0)}];
- if(!(m.live&&m.sh>0&&m.sa>0)){
+ {                                                      // U8 (owner 17.11): a live match keeps the whole Goals card of Figma, so this market stays even when both have scored — a demo price then
   let py=Math.min(.68,Math.max(.36,.6-.35*gap));
-  if(m.live){const lh=left*(.5+(p1-p2)*.4),la=left-lh;py=(m.sh>0?1:1-Math.exp(-lh))*(m.sa>0?1:1-Math.exp(-la))}        // only the side still on 0 has to score
+  if(m.live&&!(m.sh>0&&m.sa>0)){const lh=left*(.5+(p1-p2)*.4),la=left-lh;py=(m.sh>0?1:1-Math.exp(-lh))*(m.sa>0?1:1-Math.exp(-la))}        // only the side still on 0 has to score
   mk.push({id:'btts',t:'Both Teams To Score',type:'two',opts:[{k:'y',l:'Yes',v:priceOf(py)},{k:'n',l:'No',v:priceOf(1-py)}]});
  }
  mk.push({id:'dc',t:'Double Chance',glow:true,sub:'Pick two outcomes. You win if either one happens.',type:'list',opts:[{k:'1X',l:`${m.h} or Draw`,v:priceOf(p1+px)},{k:'12',l:`${m.h} or ${m.a}`,v:priceOf(p1+p2)},{k:'X2',l:`${m.a} or Draw`,v:priceOf(p2+px)}]});
- if(!m.live){
+ {                                                      // U8 (owner 17.11): also for a live match — halves and Combinations with demo prices, as before kick-off
   if(!m.ft)mk.push({id:'ou1h',t:'Total Goals - 1st Half',type:'lines',lines:lines(.5,4,goals*.44,0)},ou2hOf(m)); // finished: the half-time score is not in the data, so this market cannot be settled and is not shown
   mk.push({id:'rbtts',t:'Result & Both teams to score',glow:true,sub:'Both parts must happen for the bet to win.',type:'stack',opts:[{k:'1',c:'1 & BTTS',l:`${m.hs} to win & both teams to score`,v:priceOf(p1*.42)},{k:'X',c:'X & BTTS',l:'Draw & both teams to score',v:priceOf(px*.72)},{k:'2',c:'2 & BTTS',l:`${m.as} to win & both teams to score`,v:priceOf(p2*.42)}]});
  }
@@ -2639,7 +2639,7 @@ const STATES=[
  {g:'Limit 20',k:'Limit + locked bet',n:'20 selections and one of them locked: the line under Total odds explains the locked bet.',run(){fill20();S.st['m1|1x2']='locked';refresh();openSheet();toEnd()}},
  {g:'Fixture',k:'Odds tab',n:'Pre-match markets of one match (tap its tile in the feed), in groups: Match Result, Goals, Goalscorer, Handicap. Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
  {g:'Fixture',k:'Overview',n:'Tab “Overview” of a match that has not started: Match Result (the compact view of the card of the Odds tab), then the carousel “Top Bets”. A Top Bet is a ready-made combination with one price: a tap on the price puts it into the betslip as one card, a second tap takes it out. The blocks below are drawn only.',run(){openFixture('m4');setFxTab('over')}},
- {g:'Fixture',k:'Live match',n:'Every match of the feed has its page. A live one shows the score and the minute, and only the markets that still make sense for the score.',run(){openFixture('m1')}},
+ {g:'Fixture',k:'Live match',n:'Every match of the feed has its page. A live one shows the score and the minute; the goal lines start above the goals already scored, the rest of the markets is as before kick-off (demo prices).',run(){openFixture('m1')}},
  {g:'Fixture',k:'Live updates',n:'Tab “Live updates” of a live match. On top the Live bet block: “Who scores the next goal?” with three prices; it stays pinned under the header while the feed scrolls under it. The feed shows the events of the match and has no odds.',run(){openFixture('m1');setFxTab('live')}},
  {g:'Fixture',k:'Live updates · goal',n:'A goal comes in: its card opens on top of the feed and pushes it down, the line of the shot draws, the score in the header changes and the prices of the Live bet block move. With the feed scrolled away nothing moves: a pill “1 new update” shows instead.',run(){openFixture('m1');setFxTab('live');S.luQ.m1=2;const c=cur;setTimeout(()=>{if(cur===c&&S.fx==='m1'&&!(S.lu.m1||[]).length)luPush(M('m1'),LQ.m1[1])},T.sheet)}},
  {g:'Fixture',k:'Goalscorer',n:'Between Goals and Handicap: a carousel of compact Goalscorer cards — the same card as Top Picks of a competition, with the shirt number in the corner. Every player is his own pick, so several can be in the betslip; a picked card turns white.',run(){openFixture('m4');setTimeout(()=>{const f=$('#fxScroll'),g=$('#mkts .gs');if(!g)return;const r=f.getBoundingClientRect();f.scrollTop+=(g.getBoundingClientRect().top-r.top)*f.offsetHeight/r.height-160},80)}},
