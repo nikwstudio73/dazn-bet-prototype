@@ -585,9 +585,9 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .cv .num{transition:color var(--chg-fade-pick)}
 .cv.up .num{color:var(--odd-up-arrow)}.cv.dn .num{color:var(--odd-down-arrow)}
 .cv.up .num,.cv.dn .num{transition-duration:var(--m-quick)} /* colour comes fast, leaves slowly */
-/* bet dropped out (Betslip/Card Status Suspended / Locked): content at 30%, price replaced by the status */
+/* bet dropped out (Betslip/Card Status Locked; S5: Suspended is the platform's name for the same state): content at 30%, a lock replaces the price */
 .bst{flex:none;display:flex;align-items:center;height:18px;margin-top:1px;font-size:14px;line-height:18px;letter-spacing:.01em;color:#8d9295;white-space:nowrap}
-.card.out .ctop>.sp,.card.out .ctop>.selc,.card.out .cinfo .mk,.card.out .cinfo .tm,.card.out .cinfo .ko,.card.out .cinfo .ev{opacity:.3} /* Suspended and Locked dim the same way (Figma 12.11) */
+.card.out .ctop>.sp,.card.out .ctop>.selc,.card.out .cinfo .mk,.card.out .cinfo .tm,.card.out .cinfo .ko,.card.out .cinfo .ev{opacity:.3}
 /* edit mode (Figma 06.10): a 20px round × (fill/overlay-2, close 16) grows in the card header of every card,
    same height as the header row, so the card doesn't grow (no row jump); cards animate one after another (--i = card index).
    Summary dims to .4 and "Place bet on DAZN Bet" is disabled until Confirm */
@@ -613,7 +613,7 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .cinfo .mrow .st .ev .gl{display:inline-block;opacity:0;transform:translateY(4px);transition:opacity var(--m-std) ease-out,transform var(--m-std) var(--soft)}
 .cinfo .mrow .st .ev.on .gl{opacity:1;transform:none}
 .cinfo .mrow .st .ev:not(.on):not(.out){display:none} /* no event = no gap before the minute */
-.card.out .livepill{opacity:.3} /* suspended or locked pick: the live mark drops to 30% (Figma J, P) */
+.card.out .livepill{opacity:.3} /* locked pick: the live mark drops to 30% (Figma J, P) */
 .livepill{display:flex;align-items:center;gap:var(--livepill-gap);font-weight:700;font-size:14px;line-height:21px;color:var(--livepill-color)} /* .Betslip/Live pill: minute Bold 14 + 4px dot, both accent/notification, no plate */
 .livepill i{width:4px;height:4px;border-radius:50%;background:var(--livepill-color);animation:livedot 2.4s ease-in-out infinite}
 @keyframes livedot{0%,100%{opacity:1}50%{opacity:.2}} /* slow pulse (Nik 11.11) */
@@ -631,7 +631,6 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .sdiv{position:relative;height:1px;background:var(--sum-divider)}
 /* Betslip/Summary "Show unavailable note": small second line under the Total odds label (text/tertiary) */
 #sumOddsRow{height:auto;align-items:center} /* Betslip/Summary: the total is centred against label + note */
-#sumOdds.struck .num{text-decoration:line-through}
 .lbg{display:flex;flex-direction:column}
 .sn{font-size:12px;line-height:18px;color:var(--t3)}
 .sn[hidden]{display:none}
@@ -1729,7 +1728,7 @@ function won(m,g,o){
  return false;
 }
 let S;
-/* st: dropped-out picks {"match|market":'suspended'|'locked'}; lk: locked odds in the feed ["match|market|outcome"]; day: a key of DAYS; more: the matches of the days other than today and Sat 3 Jan */
+/* st: locked picks {"match|market":'locked'} (S5: one state; any value counts as locked, the motion gallery still writes 'suspended'); lk: locked odds in the feed ["match|market|outcome"]; day: a key of DAYS; more: the matches of the days other than today and Sat 3 Jan */
 function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fxTab:'odds',luKey:false,lu:{},luQ:{},nts:{},luNew:0,fav:false,cp:null,cpTab:'win',cpView:'odds',cpDay:'today',cpLive:false,stack:[],tm:null,tmMenu:null}} // cpView / cpDay / cpLive: tab, day and LIVE filter of the competition page (R2)
 const $=s=>document.querySelector(s);
 const M=id=>S.matches.find(m=>m.id===id)||S.ft.find(m=>m.id===id)||S.more.find(m=>m.id===id)||OUT[id];
@@ -1831,7 +1830,7 @@ function dragScroll(el){
  Same match + same group: tapping another outcome replaces the pick. Different groups on one match stay separate (Singles). */
 const key=s=>s.m+'|'+s.g;
 function isSel(mid,g,o){return S.sel.some(s=>s.m===mid&&s.g===g&&s.o===String(o))}
-const isOut=s=>!!S.st[key(s)];                 // suspended or locked: stays in the betslip, counts, but is not sent to DAZN Bet
+const isOut=s=>!!S.st[key(s)];                 // locked pick: stays in the betslip, counts, but is not sent to DAZN Bet
 const act=()=>S.sel.filter(s=>!isOut(s));      // picks that still have a price
 function oddState(mid,g,o){const sel=isSel(mid,g,o);return {sel,locked:(sel&&!!S.st[mid+'|'+g])||S.lk.includes(mid+'|'+g+'|'+o)}}
 function mkt(mid,id){const f=FX[mid];return f&&(id==='nts'?S.nts[mid]||f.nts:f.markets.find(x=>x.id===id))} // nts: Next team to score lives only in Live updates, not in the list of the Odds tab
@@ -1918,13 +1917,13 @@ function updateBar(bump,dir){ // dir: the total moved because a price moved (1 u
 
 /* ---------- sheet ---------- */
 function cardHTML(s,i){
- const {m,subj,pred,mk,odds,legs}=selInfo(s),out=S.st[key(s)];
- const price=out?`<span class="bst">${out==='locked'?LOCK:'Suspended'}</span>`
+ const {m,subj,pred,mk,odds,legs}=selInfo(s),out=isOut(s);
+ const price=out?`<span class="bst">${LOCK}</span>`
                 :`<span class="od cv" data-codd="${key(s)}"><span class="arr">${ARROW}</span><span class="num">${f2(odds)}</span></span>`;
  const status=m.live?`<span class="st"><span class="ev" data-cev="${key(s)}"><span class="gl">Goal!</span></span><span class="livepill"><span data-cmin="${m.id}">${m.min}’</span><i></i></span></span>`
                     :`<span class="st"><span class="ko">${m.when||'Today, '+m.ko}</span></span>`;
  const match=m.live?`<span>${m.h}</span><span data-csc="${m.id}">${m.sh}:${m.sa}</span><span>${m.a}</span>`:m.out?`<span>${m.h}</span>`:`<span>${m.h}</span><span>vs</span><span>${m.a}</span>`; // wrapped in .tm below; an outright shows its competition
- return `<div class="cardwrap" data-card="${key(s)}" style="--i:${i}"><div class="card${m.live?' live':''}${out?' out':''}${out==='locked'?' lkd':''}">
+ return `<div class="cardwrap" data-card="${key(s)}" style="--i:${i}"><div class="card${m.live?' live':''}${out?' out':''}">
   <div class="ctop">${SPORT}<div class="selc"><span>${subj}</span>${pred?`<em>${pred}</em>`:''}</div>${price}<button class="rm" data-rm="${key(s)}" aria-label="Remove"><img src="${IMG.close}" alt=""></button></div>
   ${legs?tbLegs(legs):''}<div class="cinfo"><div class="mk">${mk}</div><div class="mrow"><span class="tm">${match}</span>${status}</div></div>
  </div></div>`;
@@ -1933,8 +1932,8 @@ function snapW(root){root.querySelectorAll('.tm>span,.selc>span').forEach(e=>{e.
 function renderSheet(){
  const n=S.sel.length;
  $('#cards').innerHTML=S.sel.map(cardHTML).join('');snapW($('#cards'));restoreArrows();
- // a pick dropped out (Suspended / Locked) or came back while the sheet is open: the card dims or lights up softly, the price swaps with a small rise
- const prev=renderSheet.st||{},cur={};S.sel.forEach(x=>cur[key(x)]=S.st[key(x)]||'');
+ // a pick got locked or came back while the sheet is open: the card dims or lights up softly, the price swaps with a small rise
+ const prev=renderSheet.st||{},cur={};S.sel.forEach(x=>cur[key(x)]=isOut(x)?'locked':'');
  if(S.sheet)for(const k in cur){if(!(k in prev)||prev[k]===cur[k])continue;const w=document.querySelector(`[data-card="${k}"]`);if(!w)continue;
   const from=cur[k]?1:.3;w.querySelectorAll('.ctop>.sp,.ctop>.selc,.tb-legs,.cinfo .mk,.cinfo .tm,.cinfo .ko,.cinfo .ev,.livepill').forEach(e=>soft(e,{opacity:from,transform:'none'},T.layout));
   soft(w.querySelector('.bst,.od'),RISE,T.std,60)}
@@ -1964,10 +1963,10 @@ function applyEdit(){
 function updateSummary(dir){ // dir: the total moved because a price moved (1 up, -1 down)
  const a=act().length,t=totalOdds();
  // the sheet always reads as one combined bet: total = product of the active odds, return = €10 × total.
- // Dropped picks are explained under the label: "Excludes N suspended selection(s)".
- // No active bets (every pick is suspended or locked): a dash instead of a price, "Your selection is locked", no return line, CTA disabled.
- const out=S.sel.filter(isOut),ns=out.filter(s=>S.st[key(s)]==='suspended').length,kind=ns&&ns<out.length?'unavailable':ns?'suspended':'locked',many=out.length>1;
- const note=!out.length?'':a?`Excludes ${out.length} ${kind} selection${many?'s':''}`:`Your selection${many?'s are':' is'} ${kind}`;
+ // Locked picks are explained under the label: "Excludes N locked selection(s)". They do not block the slip: the rest can be placed (S5, working assumption 17.11).
+ // No active bets (every pick is locked): a dash instead of a price, "Your selection is locked", no return line, CTA disabled.
+ const n=S.sel.filter(isOut).length,many=n>1;
+ const note=!n?'':a?`Excludes ${n} locked selection${many?'s':''}`:`Your selection${many?'s are':' is'} locked`;
  const on=S.sheet; // animate only while the sheet is open
  smoothH($('#sheet .summary'),()=>{
   const sn=$('#sumNote'),snWas=sn.hidden,rr=$('#sumRetRow'),rrWas=rr.hidden;
@@ -1978,9 +1977,7 @@ function updateSummary(dir){ // dir: the total moved because a price moved (1 up
   $('#sumReturnLabel').innerHTML='<b>€10</b> may return';
   setTxt($('#sumReturn'),money(10*t),on&&!rrWas);
  },on);
- // a locked pick blocks the whole slip until its odds reopen (Figma screen J, Nik 11.11): total struck through, CTA off
- const lkd=a>0&&out.some(s=>S.st[key(s)]==='locked');$('#sumOdds').classList.toggle('struck',lkd);
- $('#placeBtn').disabled=S.edit||!a||lkd;
+ $('#placeBtn').disabled=S.edit||!a;
 }
 function openSheet(){if(!S.sel.length)return;S.sheet=true;renderSheet();$('#sbody').scrollTop=0;$('#sheet').classList.add('show');$('#backdrop').classList.add('show');updateBar();moreCheck();navSync()}
 function closeSheet(){S.sheet=false;S.edit=false;$('#sheet').classList.remove('show');$('#backdrop').classList.remove('show');$('#sheet').classList.remove('editing');setTimeout(()=>{if(!S.sheet)renderSheet()},T.sheet+20);updateBar();navSync()}
@@ -2186,7 +2183,7 @@ function oddsHTML(m){
  Figma "B · Top Bets carousel after Match Results" 4369:236502. Match Results: the three 1X2 prices, the same picks as everywhere.
  Top Bets: ready-made combinations of this match, each with one price; a tap on the price puts the whole combination into the betslip as one card,
  a second tap takes it out. Working assumptions (not confirmed by the owner and the PM): a Top Bet is one of the 20 picks; it leaves only as a whole;
- a suspended or locked Top Bet drops out as a whole (S.st by its key); a live or finished match has no Top Bets.
+ a locked Top Bet drops out as a whole (S.st by its key); a live or finished match has no Top Bets.
  Form, League position, Match info and Next matches are drawn by the frame and take no taps. */
 Object.assign(IMG,{t_ala:'assets/img/t_ala.png',t_rso:'assets/img/t_rso.png',t_ben:'assets/img/t_ben.png'}); // whole paths, so build.py inlines them
 const TB={m4:[ // the drawn match: legs and prices of the frame (the second and third card of the frame are placeholders, so they get their own content)
@@ -2562,7 +2559,7 @@ function favAdd(){const o=S.favPick||'0',i=S.sel.findIndex(s=>s.m==='m4'&&s.g===
 function refresh(){const y=$('#scroll').scrollTop;renderFeed();$('#scroll').scrollTop=y;if(S.fx)renderMkts();if(S.cp)renderComp();if(S.tm)renderTeam();if(S.fav)openFav();renderSheet();updateBar(true)}
 /* ---------- ready-made states (navigation panel) ----------
  Each state sets the whole screen by itself (picks, statuses, prices, sheet open or closed), whatever was on screen before.
- Only states that cannot be reached by tapping the phone are here (prices that move in a pick, suspended and locked bets, the limit of 20)
+ Only states that cannot be reached by tapping the phone are here (prices that move in a pick, locked bets, the limit of 20)
  plus three screens that are not obvious to find. The main flow (Odds toggle, picks, betslip, Edit, Place bet) is done by hand in Free play.
  g = topic in the panel, k = name of the state, v = betslip view when the state exists both collapsed ('bar') and opened ('sheet'):
  the two are one row in the panel with a Collapsed / Opened switch. n = what the state demonstrates.
@@ -2580,20 +2577,16 @@ const STATES=[
  {g:'Betslip',k:'Three picks',v:'sheet',n:'Cards, Total odds and "€10 may return". Try Edit (the total stays at the bottom while cards are removed) and Place bet (closing DAZN Bet clears the betslip).',run(){S.sel=P3();refresh();openSheet()}},
  {g:'Betslip',k:'Odds changed',v:'bar',n:'PRD · Odds change: the total in the bar is recalculated; the arrow shows the direction. The selected tile stays white.',run(){S.sel=P3();refresh();moved()}},
  {g:'Betslip',k:'Odds changed',v:'sheet',n:'The price on the card takes the arrow and its colour; Total odds and "€10 may return" are recalculated.',run(){S.sel=P3();refresh();openSheet();moved()}},
- {g:'Suspended',k:'One of three bets',v:'bar',n:'PRD · Cancelled bet: its odds leave the total (3.20 × 1.36), the counter still says 3.',run(){S.sel=P3();S.st['m4|1x2']='suspended';refresh();showTile('m5')}},
- {g:'Suspended',k:'One of three bets',v:'sheet',n:'"Suspended" replaces the price. The line under Total odds says what is not included.',run(){S.sel=P3();S.st['m4|1x2']='suspended';refresh();openSheet()}},
- {g:'Suspended',k:'The only bet',v:'bar',n:'One pick and it is suspended: the counter stays 1, the total shows a dash (the PRD says 0; odds are never 0).',run(){S.sel=ONE();S.st['m1|1x2']='suspended';refresh()}},
- {g:'Suspended',k:'The only bet',v:'sheet',n:'The card stays, there is no return line, the button is disabled.',run(){S.sel=ONE();S.st['m1|1x2']='suspended';refresh();openSheet()}},
  {g:'Locked',k:'Odd in the feed',n:'PRD · Locked bet: grey text, a lock instead of the price, the odd is not tappable.',run(){S.lk=['m1|1x2|0'];refresh()}},
  {g:'Locked',k:'Whole market in the feed',n:'The whole 1X2 market of a match is closed: three locks.',run(){S.lk=['m1|1x2|0','m1|1x2|1','m1|1x2|2'];refresh()}},
- {g:'Locked',k:'One of three bets',v:'bar',n:'A pick that gets locked stays white with a lock; its odds leave the total.',run(){S.sel=P3();S.st['m1|1x2']='locked';refresh()}},
- {g:'Locked',k:'One of three bets',v:'sheet',n:'A lock replaces the price on the card. Same rules as a suspended bet.',run(){S.sel=P3();S.st['m1|1x2']='locked';refresh();openSheet()}},
+ {g:'Locked',k:'One of three bets',v:'bar',n:'A pick that gets locked stays white with a lock; its odds leave the total (3.20 × 3.90), the counter still says 3.',run(){S.sel=P3();S.st['m1|1x2']='locked';refresh()}},
+ {g:'Locked',k:'One of three bets',v:'sheet',n:'A lock replaces the price on the card. The line under Total odds says what is not included; the other two bets can still be placed.',run(){S.sel=P3();S.st['m1|1x2']='locked';refresh();openSheet()}},
  {g:'Locked',k:'The only bet',v:'bar',n:'One pick and it is locked: the counter stays 1, the total shows a dash.',run(){S.sel=ONE();S.st['m1|1x2']='locked';refresh()}},
- {g:'Locked',k:'The only bet',v:'sheet',n:'A dash instead of the total, "Your selection is locked", the button is disabled.',run(){S.sel=ONE();S.st['m1|1x2']='locked';refresh();openSheet()}},
+ {g:'Locked',k:'The only bet',v:'sheet',n:'The card stays. A dash instead of the total, "Your selection is locked", no return line, the button is disabled.',run(){S.sel=ONE();S.st['m1|1x2']='locked';refresh();openSheet()}},
  {g:'Limit 20',k:'20 picks',v:'bar',n:'PRD · Maximum bets: at 20 selections the counter turns orange.',run(){fill20();refresh()}},
  {g:'Limit 20',k:'20 picks',v:'sheet',n:'20 selections in the sheet: the number is only in the header, “Betslip 20”. No extra message.',run(){fill20();refresh();openSheet()}},
  {g:'Limit 20',k:'Tap on a 21st odd',n:'Nothing is added and nothing is swapped. The odd presses and springs back slightly, an orange tongue slides out from behind the betslip and the counter pulses.',run(){fill20();refresh();toggleSel('m1','1x2','2')}},
- {g:'Limit 20',k:'Limit + suspended bet',n:'20 selections and one of them suspended: the line under Total odds explains the dropped bet.',run(){fill20();S.st['m1|1x2']='suspended';refresh();openSheet();toEnd()}},
+ {g:'Limit 20',k:'Limit + locked bet',n:'20 selections and one of them locked: the line under Total odds explains the locked bet.',run(){fill20();S.st['m1|1x2']='locked';refresh();openSheet();toEnd()}},
  {g:'Fixture',k:'Odds tab',n:'Pre-match markets of one match (tap its tile in the feed), in groups: Match Result, Goals, Goalscorer, Handicap. Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
  {g:'Fixture',k:'Overview',n:'Tab “Overview” of a match that has not started: Match Results, then the carousel “Top Bets”. A Top Bet is a ready-made combination with one price: a tap on the price puts it into the betslip as one card, a second tap takes it out. The blocks below are drawn only.',run(){openFixture('m4');setFxTab('over')}},
  {g:'Fixture',k:'Live match',n:'Every match of the feed has its page. A live one shows the score and the minute, and only the markets that still make sense for the score.',run(){openFixture('m1')}},
