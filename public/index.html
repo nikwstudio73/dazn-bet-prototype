@@ -1015,42 +1015,54 @@ div.choice{cursor:default}
 .lu-seg{display:flex;padding:var(--spacing-4);border-radius:var(--radius-12);background:#0c1216} /* DS Segmented Control, as on the V2 Odds page */
 .lu-seg button{flex:1;height:32px;border-radius:8px;font-weight:700;font-size:14px;line-height:18px;color:#8f9091;transition:background var(--m-quick) var(--ease),color var(--m-quick) var(--ease)} /* surface/container-1 and text/tertiary in the mode of the DS control: #0c1216, #8f9091 */
 .lu-seg button.on{background:rgba(195,209,219,.10);color:#f8f8f8} /* fill/overlay-3 and text/primary in the mode of the DS control, the same values as .fx-more */
-/* L2 · Live updates rebuilt (Figma "Live Updates with Odds" 4365:194526): the Live bet block on top, a feed without odds, the shot diagram in a goal card.
-   L4 (owner 16.11, reverses L3): the Live bet block (header 4365:210691: warning, label, question, prices) stays pinned under the compact header and the tabs (U11: 40 + 44); the feed scrolls under it.
-   Its fill is fill/overlay-1 over the page colour, so nothing shows through. The glow stays only on goal cards. */
-.lu-top{position:sticky;top:calc(var(--sb) + 84px);z-index:2;overflow:hidden;margin:calc(-1*var(--spacing-12)) calc(-1*var(--spacing-16)) 0;padding:var(--spacing-16) 24px;display:flex;flex-direction:column;gap:20px;background:linear-gradient(var(--fill-overlay-1),var(--fill-overlay-1)),var(--surface-container-1)}
-/* block 4425:251722 (owner, 17.11): surface/container-1 + fill/overlay-1 + a red glow, 24 on the sides, square corners, no line under it, two prices.
-   The glow is a turned ellipse (its gradientTransform, 30 %): centre 97.5 / 45.4, half-axes 445.1 and 215.9, turned by 126.57deg on 375; the same transform on 440 gives the second set */
-.lu-top::before{content:"";position:absolute;left:97.5px;top:45.4px;width:890.2px;height:431.8px;margin:-215.9px 0 0 -445.1px;transform:rotate(126.57deg);pointer-events:none;background:radial-gradient(closest-side,rgba(209,36,36,0.300) 0.0%,rgba(198,36,36,0.281) 6.2%,rgba(186,36,36,0.263) 12.5%,rgba(175,36,36,0.244) 18.8%,rgba(164,36,36,0.225) 25.0%,rgba(152,36,37,0.206) 31.2%,rgba(141,36,37,0.188) 37.5%,rgba(129,36,37,0.169) 43.8%,rgba(118,36,37,0.150) 50.0%,rgba(107,35,37,0.131) 56.2%,rgba(95,35,37,0.112) 62.5%,rgba(84,35,37,0.094) 68.8%,rgba(72,35,38,0.075) 75.0%,rgba(61,35,38,0.056) 81.2%,rgba(50,35,38,0.037) 87.5%,rgba(38,35,38,0.019) 93.8%,rgba(27,35,38,0.000) 100.0%)}
-#stage.max .lu-top::before{left:114.4px;width:951.6px;height:473.8px;margin:-236.9px 0 0 -475.8px;transform:rotate(133.97deg)}
-.lu-top>*{position:relative}
-.lu-top .legal{margin:0 calc(-1*var(--spacing-8))} /* the banner keeps its 16 from the edges, wider than the 24 of the block */
-.lu-q{display:flex;flex-direction:column;gap:var(--spacing-4)}
+/* fixture · Live updates tab, as rebuilt in L2 and restyled in L6. L4 (owner 16.11, reverses L3): the Live bet part stays pinned under the compact header and the tabs (U11: 40 + 44); the feed scrolls under it. */
+/* L6 (owner 17.11, Figma content 4365:194591): the Live bet block is compact (label, question, two prices), the legal banner sits under it, both stay pinned (L4).
+   Event cards: surface/container-2, radius 10 (raw in Figma, no token), 16 inside; a player row has the shirt with the number; a goal is the large card with the shot diagram. */
+.lu-top{position:sticky;top:calc(var(--sb) + 84px);z-index:2;margin:calc(-1*var(--spacing-12)) calc(-1*var(--spacing-16)) calc(-1*var(--spacing-8));padding-bottom:var(--spacing-8);background:var(--page)} /* the pinned part: block + banner; 8 of the page colour under the banner, so a card never touches it */
+.lu-top .legal{margin:var(--spacing-16) var(--spacing-16) 0}
+.lu-bet{position:relative;overflow:hidden;padding:var(--spacing-12) 24px var(--spacing-16);display:flex;flex-direction:column;gap:var(--spacing-12);background:var(--fill-overlay-1)}
+/* the red glow is a turned ellipse (gradientTransform of block 4425:251722, 30 %): centre 65.5 / 5, half-axes 449.9 and 212.9, turned by 138.59deg on 375; the same transform on 440 gives the second set */
+.lu-bet::before{content:"";position:absolute;left:65.5px;top:5px;width:899.8px;height:425.8px;margin:-212.9px 0 0 -449.9px;transform:rotate(138.59deg);pointer-events:none;background:radial-gradient(closest-side,rgba(209,36,36,0.300) 0.0%,rgba(198,36,36,0.281) 6.2%,rgba(186,36,36,0.263) 12.5%,rgba(175,36,36,0.244) 18.8%,rgba(164,36,36,0.225) 25.0%,rgba(152,36,37,0.206) 31.2%,rgba(141,36,37,0.188) 37.5%,rgba(129,36,37,0.169) 43.8%,rgba(118,36,37,0.150) 50.0%,rgba(107,35,37,0.131) 56.2%,rgba(95,35,37,0.112) 62.5%,rgba(84,35,37,0.094) 68.8%,rgba(72,35,38,0.075) 75.0%,rgba(61,35,38,0.056) 81.2%,rgba(50,35,38,0.037) 87.5%,rgba(38,35,38,0.019) 93.8%,rgba(27,35,38,0.000) 100.0%)}
+#stage.max .lu-bet::before{left:76.8px;width:993.8px;height:452.2px;margin:-226.1px 0 0 -496.9px;transform:rotate(145.47deg)}
+.lu-bet>*{position:relative}
+.lu-q{display:flex;flex-direction:column}
 .lu-q span{height:20px;font-weight:700;font-size:12px;line-height:20px;letter-spacing:.01em;text-transform:uppercase;color:#f45a5a} /* DS Label, red tertiary: components/label/red/tertiary/text */
-.lu-q b{font-weight:700;font-size:18px;line-height:25px;color:var(--t1)}
-.lu-top .o3{gap:var(--spacing-8)}
-.lu-top .o3 .odd:not(.sel){background:var(--odd-bg)}
+.lu-q b{font-weight:700;font-size:14px;line-height:18px;letter-spacing:.01em;color:var(--t1)}
+.lu-bet .o3{gap:var(--spacing-8)}
+.lu-bet .o3 .odd:not(.sel){background:var(--odd-bg)}
 .lu-feed{margin-bottom:calc(-1*var(--spacing-8))}
-.lu-card{margin-bottom:var(--spacing-8);border-radius:var(--radius-12);padding:calc(var(--spacing-16) + 1px) calc(var(--spacing-12) + 1px) calc(var(--spacing-12) + 1px);background:var(--fill-overlay-1);box-shadow:inset 0 0 0 1px var(--border-transparent-subtle)} /* Live/Event card */
-.lu-card.g.h{background:radial-gradient(76.4% 206% at 0% 40.5%,rgba(255,255,255,0.240) 0.0%,rgba(241,241,241,0.225) 6.2%,rgba(226,228,228,0.210) 12.5%,rgba(212,214,214,0.195) 18.8%,rgba(198,200,201,0.180) 25.0%,rgba(184,186,187,0.165) 31.2%,rgba(170,172,174,0.150) 37.5%,rgba(155,159,160,0.135) 43.8%,rgba(141,145,146,0.120) 50.0%,rgba(127,131,133,0.105) 56.2%,rgba(112,118,119,0.090) 62.5%,rgba(98,104,106,0.075) 68.8%,rgba(84,90,92,0.060) 75.0%,rgba(70,76,79,0.045) 81.2%,rgba(56,62,65,0.030) 87.5%,rgba(41,49,52,0.015) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--page)} /* goal of the home side: glow from the left */
-.lu-card.g.a{background:radial-gradient(74.5% 141.2% at 100% 41.4%,rgba(232,21,30,0.240) 0.0%,rgba(219,22,30,0.225) 6.2%,rgba(206,23,31,0.210) 12.5%,rgba(194,24,32,0.195) 18.8%,rgba(181,24,32,0.180) 25.0%,rgba(168,25,32,0.165) 31.2%,rgba(155,26,33,0.150) 37.5%,rgba(142,27,34,0.135) 43.8%,rgba(130,28,34,0.120) 50.0%,rgba(117,29,34,0.105) 56.2%,rgba(104,30,35,0.090) 62.5%,rgba(91,31,36,0.075) 68.8%,rgba(78,32,36,0.060) 75.0%,rgba(65,32,36,0.045) 81.2%,rgba(53,33,37,0.030) 87.5%,rgba(40,34,38,0.015) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--page)} /* goal of the away side: glow from the right */
-.lu-body{display:flex;flex-direction:column;gap:var(--spacing-12);padding:0 0 var(--spacing-8)}
-.lu-meta{display:flex;align-items:center;justify-content:space-between;min-height:18px}
-.lu-meta b,.lu-body>b{font-weight:700;font-size:14px;line-height:18px;letter-spacing:.01em;color:var(--t2)}
-.lu-body>b,.lu-txt{padding:0 var(--spacing-4)}
+.lu-card{margin-bottom:var(--spacing-8);border-radius:10px;padding:var(--spacing-16);display:flex;flex-direction:column;gap:var(--spacing-16);background:var(--surface-container-2);color:var(--t1)}
+.lu-min{font-weight:700;font-size:14px;line-height:18px;margin:-4px 0} /* texts of these cards are trimmed to the cap height in Figma: the negative margins take the spare line height away */
+.lu-txt{font-size:14px;line-height:22px;margin:-6px 0}
+.lu-meta{display:flex;align-items:center;justify-content:space-between;height:28px}
+.lu-meta b{font-weight:700;font-size:14px;line-height:22px}
 .lu-meta img,.lu-ph img{width:28px;height:28px;object-fit:contain;flex:none}
-.lu-title{display:flex;align-items:center;gap:var(--spacing-8);height:16px;font-weight:700;font-size:16px;line-height:16px;color:var(--t1)}
-.lu-card.g .lu-title{height:32px}
-.lu-title svg,.lu-pl svg{flex:none;display:block}
+.lu-title{display:flex;align-items:center;gap:var(--spacing-6);height:13px;font-weight:700;font-size:16px;line-height:13px}
+.lu-title svg,.lu-pl svg,.lu-pr svg{flex:none;display:block}
+.lu-rows{display:flex;flex-direction:column;gap:var(--spacing-12)}
+.lu-pr{display:flex;align-items:center;gap:10px;height:55px;padding:0 10px;border-radius:8px;background:var(--chip)} /* player row of the frame: shirt with the number, name, arrow of a substitution; 55 high, 10 inside and between, radius 8 are its raw values */
+.lu-pr .js{width:40px;height:33px;flex:none}
+.lu-pr .js svg{margin:-.5px -1px;overflow:visible}
+.lu-pr b{flex:1;min-width:0;font-weight:700;font-size:12px;line-height:20px}
+/* goal: Live/Event card of the frame */
+.lu-card.g{position:relative;overflow:hidden;gap:0;border-radius:var(--radius-12);padding:calc(var(--spacing-16) + 1px) calc(var(--spacing-12) + 1px) calc(var(--spacing-12) + 1px);box-shadow:inset 0 0 0 1px var(--border-transparent-subtle)}
+.lu-card.g>*{position:relative}
+/* its glow, 16 %, in the colour of the team (luGlow): a turned ellipse from the corner of the crest — centre 328.6 / 66.1, half-axes 850.1 and 249.1, 60.14deg on 375; second set for 440 */
+.lu-card.g>.lu-glow{position:absolute;left:328.6px;top:66.1px;width:1700.2px;height:498.2px;margin:-249.1px 0 0 -850.1px;transform:rotate(60.14deg);pointer-events:none}
+#stage.max .lu-card.g>.lu-glow{left:390.8px;width:1787.8px;height:563.4px;margin:-281.7px 0 0 -893.9px;transform:rotate(54.72deg)}
+.lu-body{display:flex;flex-direction:column;gap:var(--spacing-12);padding:0 0 var(--spacing-8)}
+.lu-card.g .lu-meta b{line-height:18px;letter-spacing:.01em}
+.lu-card.g .lu-title{height:32px;gap:var(--spacing-8);line-height:16px}
 .lu-pl{display:flex;align-items:center;gap:var(--spacing-12);padding:var(--spacing-12);border-radius:8px;background:rgba(249,250,250,.08)} /* .Live/Player row on fill/overlay-2 */
 .lu-pl div{flex:1;min-width:0}
 .lu-pl b{display:block;font-weight:700;font-size:14px;line-height:18px;letter-spacing:.01em;color:var(--t1)}
 .lu-pl span{display:block;font-size:12px;line-height:18px;color:var(--t2)}
-.lu-txt{font-size:14px;line-height:21px;color:var(--t2)}
-.lu-ph .lu-body{flex-direction:row;align-items:center;gap:var(--spacing-8);padding:0 var(--spacing-4) var(--spacing-8)}
-.lu-ph .tx{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--spacing-6)}
-.lu-ph .tx span{font-size:12px;line-height:18px;color:var(--t2)}
-.lu-ph .tx b{font-weight:700;font-size:16px;line-height:12px;color:var(--t1)}
+.lu-card.g .lu-txt{margin:0;padding:0 var(--spacing-4);line-height:21px;color:var(--t2)}
+/* kick-off, half-time, full-time: crests of both teams */
+.lu-ph{flex-direction:row;align-items:center;gap:var(--spacing-8)}
+.lu-ph .tx{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--spacing-12)}
+.lu-ph .tx span{font-weight:700;font-size:12px;line-height:9px}
+.lu-ph .tx b{font-weight:700;font-size:18px;line-height:13px}
 .lu-shot{display:block;width:calc(100% - 6px);height:auto;margin:0 auto} /* shot diagram of a goal, 311 x 198 in the frame */
 /* a new event comes in from the top and pushes the feed down; the line of the shot draws once the card has landed */
 .lu-in{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows var(--m-layout) var(--soft),opacity var(--m-std) var(--soft)}
@@ -2278,9 +2290,10 @@ function hideFixture(){$('#luNew').classList.remove('show');const fx=$('#fx');fx
 function closeFixture(){const t=topPage();t&&t.p==='fx'?pageBack():hideFixture()} // Back on a match page: to the page it was opened from (feed, league page, team page)
 
 /* ---------- fixture · Live updates tab ----------
- L2 · Figma "Live Updates with Odds" 4365:194526. On top the Live bet block: "Who scores the next goal?" with two prices, home and away (block 4425:251722, owner 17.11);
- it stays pinned under the compact header while the feed scrolls under it (L4, owner 16.11; reverses L3). The feed has no odds: Commentary (minute + text), Event (goal, card, substitution) and Phase
- (half-time, full-time, kick-off). A goal card has the glow of its side and the diagram of the shot. The block exists only while the match is played.
+ Figma "Live Updates with Odds" 4365:194526 (L2), content 4365:194591 (L6). On top the Live bet block: "Who scores the next goal?" with two prices,
+ home and away; the legal banner sits under it and both stay pinned (L4). The feed has no odds: Commentary (minute + text), Event (yellow card,
+ substitution: rows of players with the shirt), Goal (large card: scorer, assist, shot diagram, glow in the colour of the team) and Phase
+ (half-time, full-time, kick-off: crests of both teams). The block exists only while the match is played.
  Motion (owner, 16.11): a new event comes in from the top and pushes the feed down; if the feed is scrolled away nothing moves and a pill
  "1 new update" shows instead; a goal is an event like any other, the score in the header changes softly; the prices of the block move by the
  pattern of any price (animateOdd); the line of the shot draws once the card has landed.
@@ -2301,8 +2314,8 @@ const LU_KO={min:0,type:'ph',key:true,title:'Kick Off',detail:'0’'};
 const LU={m1:[
  {min:83,type:'text',text:'PSG throw bodies forward, Madrid sit deeper and look to counter.'},
  {min:78,type:'goal',side:'h',key:true,title:'Goal! Real Madrid 2 – 1',pl:[['K. Mbappé','Assist J. Bellingham']],text:'Bellingham slips it through and Mbappé finishes low into the corner.'},
- {min:71,type:'sub',side:'a',title:'Substitution',pl:[['G. Ramos','In','in'],['B. Barcola','Out','out']]},
- {min:58,type:'yc',side:'h',key:true,title:'Yellow card',pl:[['A. Güler']],text:'Booked for a late challenge in midfield.'},
+ {min:71,type:'sub',side:'a',title:'Substitution',pl:[['G. Ramos','In','in',9],['B. Barcola','Out','out',29]]},
+ {min:58,type:'yc',side:'h',key:true,title:'Yellow card',pl:[['A. Güler',,,15]],text:'Booked for a late challenge in midfield.'},
  {min:45.5,type:'ph',key:true,title:'Half-time',detail:'1 – 1'},
  {min:41,type:'goal',side:'a',key:true,title:'Goal! PSG 1 – 1',pl:[['O. Dembélé','Assist A. Hakimi']],text:'Dembélé meets the cross at the near post and heads in the equaliser.'},
  {min:23,type:'goal',side:'h',key:true,title:'Goal! Real Madrid 1 – 0',pl:[['Vinícius Jr.','Assist F. Valverde']]},LU_KO]};
@@ -2339,20 +2352,29 @@ function ntsOf(m){const inv=m.o.map(x=>1/x),p1=inv[0]/(inv[0]+inv[2]),left=(2.45
 function luChance(m){const inv=m.o.map(x=>1/x),s=inv[0]+inv[1]+inv[2],h=Math.round(inv[0]/s*100),a=Math.round(inv[2]/s*100);return [h,100-h-a,a]}
 function luPaintChance(m){const t=$('#luPct');if(!t)return;const c=luChance(m),b=document.querySelectorAll('#luBar i');b.forEach((e,i)=>e.style.flexGrow=c[i]);
  t.children[0].textContent=c[0]+'%';t.children[1].textContent=c[1]+'% draw';t.children[2].textContent=c[2]+'%'}
+/* shirt of a player row (Figma instance "player sustitut", 40 x 33), the number is live text */
+const LU_SHIRT='<path d="M26.4296 6.75001H14.8925L14.4364 0.823254C14.5288 0.845129 14.6381 0.871968 14.7626 0.900402C15.1751 0.994631 15.7523 1.11947 16.4091 1.24513C17.7184 1.49562 19.3631 1.75001 20.661 1.75001C21.9589 1.75001 23.6037 1.49562 24.913 1.24513C25.5698 1.11947 26.1469 0.994631 26.5594 0.900402C26.6835 0.872063 26.7925 0.84508 26.8846 0.823254L26.4296 6.75001Z" fill="white" fill-opacity="0.5" stroke="black" stroke-width="0.5"/><path d="M26.0777 0.41251C25.5824 0.41251 23.5777 4.12501 20.661 4.95001C17.3277 3.71251 15.7416 0.41251 15.2443 0.41251C14.8501 0.41251 10.5122 1.65498 8.73238 2.1696C8.23535 2.31331 7.78746 2.58354 7.42646 2.95417L0.81745 9.7394C0.72468 9.83464 0.705667 9.97959 0.770733 10.0955L2.74434 13.6125L5.66101 15.675L10.4609 11.1504C10.654 10.9683 10.9712 11.0995 10.9668 11.3649C10.9092 14.7933 10.661 29.671 10.661 31.35C10.661 31.9257 21.0777 33.4125 21.0777 33.4125L28.9943 32.175C28.9943 32.175 30.661 31.9257 30.661 31.35C30.661 30.7895 30.3589 19.9792 30.343 11.359C30.3425 11.096 30.6567 10.9612 30.8481 11.1416L35.661 15.675L38.5777 13.6125L40.661 9.90001L33.9008 2.96323C33.5358 2.58869 33.0822 2.31686 32.5791 2.17404C30.7677 1.65983 26.346 0.41251 26.0777 0.41251Z" fill="white"/><path d="M10.841 19L11.8285 19.9447C13.3345 21.0213 14.1738 22.4481 14.1738 23.9312C14.1736 25.3796 14.974 26.7755 16.4174 27.844L16.8165 28.1385C18.2602 29.2069 19.061 30.6028 19.061 32.0513L19.161 33.5L14.388 32.1493L11.0192 31.1105C10.8069 31.045 10.6633 30.8473 10.6666 30.6252L10.841 19Z" fill="black" fill-opacity="0.1"/><path d="M26.161 0.500011C26.161 0.500011 22.3533 5.00001 20.661 5.00001C18.9687 5.00001 15.161 0.500011 15.161 0.500011" stroke="black" stroke-linecap="round"/><path d="M35.161 16C39.4097 14.577 41.161 10 41.161 10" stroke="black" stroke-linecap="round"/><path d="M0.500125 10C1.79001 14.0996 5.82318 15.6951 5.82318 15.6951" stroke="black" stroke-linecap="round"/>';
+const luNum=n=>[...n].reduce((a,c)=>a+c.charCodeAt(0),0)%28+2;                                     // the data has no shirt numbers: a fixed one per name
+const luShirt=n=>`<span class="js"><svg width="42" height="34" viewBox="0 0 42 34" fill="none" aria-hidden="true">${LU_SHIRT}<text x="20.7" y="18.3" text-anchor="middle" font-size="12" font-weight="700" fill="#0C161C">${n}</text></svg></span>`;
+/* glow of a goal card in the colour of the team (C2: pairCols), 16 %, 16 stops because Figma mixes without premultiplying */
+function luGlow(m,side){const c=pairCols(m)[side==='h'?0:1],end=[27,35,38];
+ return `<i class="lu-glow" style="background:radial-gradient(closest-side,${Array.from({length:17},(_,i)=>`rgba(${c.map((v,k)=>Math.round(v+(end[k]-v)*i/16)).join(',')},${(.16*(1-i/16)).toFixed(3)}) ${(i*6.25).toFixed(1)}%`).join(',')})"></i>`}
 function luCard(m,e){
- if(e.type==='text')return `<div class="lu-card"><div class="lu-body"><b>${e.min}’</b><div class="lu-txt">${e.text}</div></div></div>`;
+ if(e.type==='text')return `<div class="lu-card"><b class="lu-min">${e.min}’</b><div class="lu-txt">${e.text}</div></div>`;
  const f=FX[m.id];
- if(e.type==='ph')return `<div class="lu-card lu-ph"><div class="lu-body"><img src="${IMG[f.hiImg]}" alt=""><div class="tx"><span>${e.detail}</span><b>${e.title}</b></div><img src="${IMG[f.aiImg]}" alt=""></div></div>`;
- const goal=e.type==='goal',ic=goal?LU_BALL:e.type==='yc'?LU_IC.yc:'';
- return `<div class="lu-card ${goal?'g ':''}${e.side}"${goal?tgStyle('lu-card g '+e.side,m):''}><div class="lu-body"><div class="lu-meta"><b>${e.min}’</b><img src="${IMG[e.side==='h'?f.hiImg:f.aiImg]}" alt=""></div><div class="lu-title">${ic}<span>${e.title}</span></div>${
-  (e.pl||[]).map(([n,d,i])=>`<div class="lu-pl"><div><b>${n}</b>${d?`<span>${d}</span>`:''}</div>${i?LU_IC[i]:''}</div>`).join('')}${e.text?`<div class="lu-txt">${e.text}</div>`:''}</div>${goal?luShot(e):''}</div>`;
+ if(e.type==='ph')return `<div class="lu-card lu-ph"><img src="${IMG[f.hiImg]}" alt=""><div class="tx"><span>${e.detail}</span><b>${e.title}</b></div><img src="${IMG[f.aiImg]}" alt=""></div>`;
+ const meta=`<div class="lu-meta"><b>${e.min}’</b><img src="${IMG[e.side==='h'?f.hiImg:f.aiImg]}" alt=""></div>`;
+ if(e.type==='goal')return `<div class="lu-card g ${e.side}">${luGlow(m,e.side)}<div class="lu-body">${meta}<div class="lu-title">${LU_BALL}<span>${e.title}</span></div>${
+  (e.pl||[]).map(([n,d])=>`<div class="lu-pl"><div><b>${n}</b>${d?`<span>${d}</span>`:''}</div></div>`).join('')}${e.text?`<div class="lu-txt">${e.text}</div>`:''}</div>${luShot(e)}</div>`;
+ const rows=(e.pl||[]).map(([n,d,i,num])=>`<div class="lu-pr">${luShirt(num||luNum(n))}<b>${n}</b>${i?LU_IC[i]:''}</div>`).join('');   // yellow card, substitution: rows of players; a substitution has no title, as in the frame
+ return `<div class="lu-card"><div>${meta}${e.type==='yc'?`<div class="lu-title">${LU_IC.yc}<span>${e.title}</span></div>`:''}</div>${rows||e.text?`<div class="lu-rows">${rows}${e.text?`<div class="lu-txt">${e.text}</div>`:''}</div>`:''}</div>`;
 }
 const LU_NONE='<div class="cp-empty"><b>No key events yet</b>Goals, cards and half-time will show here</div>';
 function liveHTML(m){
  const f=FX[m.id];
  if(!m.live&&!m.ft)return `<div class="cp-empty"><b>Live updates start at kick-off</b>${f.date}, ${f.time}</div>`;                     // not started: no events and no odds, so no legal texts either
  const nts=m.live&&mkt(m.id,'nts'),feed=luOf(m).filter(e=>!S.luKey||e.key).map(e=>luCard(m,e)).join('');
- return (nts?`<div class="lu-top">${LEGAL}<div class="lu-q"><span>Live bet</span><b>Who scores the next goal?</b></div><div class="o3">${[[m.hs,'h'],[m.as,'a']].map(([l,k])=>oddBtn(m.id,'nts',k,l,nts.opts.find(o=>o.k===k).v)).join('')}</div></div>`:'')+ // two prices, home and away (block 4425:251722); "No goal" stays in the data, it is not offered
+ return (nts?`<div class="lu-top"><div class="lu-bet"><div class="lu-q"><span>Live bet</span><b>Who scores the next goal?</b></div><div class="o3">${[[m.hs,'h'],[m.as,'a']].map(([l,k])=>oddBtn(m.id,'nts',k,l,nts.opts.find(o=>o.k===k).v)).join('')}</div></div>${LEGAL}</div>`:'')+ // two prices, home and away (block 4425:251722); the banner under the block, pinned with it; "No goal" stays in the data, it is not offered
   `<div class="lu-seg"><button data-luk="0"${S.luKey?'':' class="on"'}>All</button><button data-luk="1"${S.luKey?' class="on"':''}>Key Events</button></div><div class="lu-feed" id="luFeed">${feed||LU_NONE}</div>`+
   (nts?'<div class="sgfoot">+18. Juega con responsabilidad. Publi.</div>':'');
 }
