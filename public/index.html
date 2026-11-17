@@ -1103,11 +1103,20 @@ div.choice{cursor:default}
 .ox-step{display:flex;align-items:center;justify-content:space-between;height:46px;padding:0 5px;border-radius:9999px;background:var(--line-tile-bg)} /* line of Total Goals: fill/overlay-2 */
 .ox-step b{font-weight:700;font-size:16px;line-height:25px;color:var(--t1)}
 .ox-step button{flex:none;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--t1);transition:opacity var(--m-quick),transform var(--m-press)}
-.ox-step button.p{width:40px;height:40px;background:var(--fill-overlay-3)}
 .ox-step button:active{transform:scale(.97)}
 .ox-step button:disabled{opacity:.3;cursor:default;transform:none}
-.ox-step.tg{cursor:pointer} /* U6: the − / + of the Total Goals line are hidden; a tap on the chip shows them, they leave by themselves (OX_HOLD) */
-.ox-step.tg:not(.on) button{opacity:0;visibility:hidden;transition:opacity var(--m-quick),transform var(--m-press),visibility 0s var(--m-quick)}
+/* U9: − / + of the Total Goals line are always there (chip 4326:231947). At rest only the sign, text/secondary; while pressed a 40 px circle
+   of fill/overlay-3 sits under it and the sign turns white (the "+" of the frame). After the tap the circle fades out: .hit, set by setOxLine(). */
+.ox-step.tg{padding:0 3px}
+.ox-step.tg button{position:relative;width:40px;height:40px;color:var(--t2);transition:opacity var(--m-quick),transform var(--m-press),color var(--m-std) var(--ease)}
+.ox-step.tg button svg{position:relative}
+.ox-step.tg button::before{content:"";position:absolute;inset:0;border-radius:50%;background:var(--fill-overlay-3);opacity:0;transition:opacity var(--m-std) var(--ease)}
+.ox-step.tg button:not(:disabled):active{color:var(--t1);transition-duration:var(--m-quick),var(--m-press),var(--m-press)}
+.ox-step.tg button:not(:disabled):active::before{opacity:1;transition-duration:var(--m-press)}
+.ox-step.tg button.hit{animation:oxHitC var(--m-std) var(--ease)}
+.ox-step.tg button.hit::before{animation:oxHit var(--m-std) var(--ease)}
+@keyframes oxHit{from{opacity:1}}
+@keyframes oxHitC{from{color:var(--t1)}}
 .ox-step.hcs{height:48px;padding:0 var(--spacing-8);background:var(--fill-overlay-1)}
 .ox-step.hcs b+button svg{transform:scaleX(-1)}
 .ox-div{height:1px;margin:calc(var(--spacing-12) * -1) calc(var(--spacing-16) * -1);background:var(--border-transparent-subtle)}
@@ -2115,7 +2124,7 @@ function choiceBtn(mid,g,o,{code,label,icon,v,stack}){const fm=M(mid);if(fm.ft)r
    Match Result (1X2 with the implied chance, Double chance, Draw no bet) · Goals (Total Goals by line and by half, Both Teams to Score, Combinations) · Goalscorer · Handicap.
    S.ox = what is open on this page: folded blocks, the half and the line of Total Goals. S.hc = Handicap: which team's side is shown and the line (kept as the home line). */
 const CHEV='<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12.5 4.5 7 10l5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const OX_IC={m:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',p:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M10 4v12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'};
+const OX_IC={m:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M14.68 9.2a.8.8 0 0 1 0 1.6H5.33a.8.8 0 0 1 0-1.6h9.35Z" fill="currentColor"/></svg>',p:'<svg width="20" height="20" viewBox="0 0 22.2222 22.2222" fill="none"><path d="M11.1187 4.66688C11.6095 4.66708 12.0074 5.06476 12.0074 5.55556V10.2224H16.6667C17.1576 10.2224 17.5553 10.6202 17.5553 11.1111C17.5553 11.602 17.1576 11.9998 16.6667 11.9998H12.0074V16.6667C12.0074 17.1575 11.6095 17.5551 11.1187 17.5553C10.6278 17.5553 10.23 17.1576 10.23 16.6667V11.9998H5.55556C5.06464 11.9998 4.66688 11.602 4.66688 11.1111C4.66688 10.6202 5.06464 10.2224 5.55556 10.2224H10.23V5.55556C10.23 5.06464 10.6278 4.66688 11.1187 4.66688Z" fill="currentColor"/></svg>'}; // remove / add-small of the DS, as in the chip of the frame
 const OX_PER=[['ft','Full Time','ou'],['h1','1st half','ou1h'],['h2','2nd half','ou2h']];
 function oxUi(m){if(!S.ox||S.ox.mid!==m.id)S.ox={mid:m.id,mr:S.sel.some(s=>s.m===m.id&&(s.g==='dc'||s.g==='dnb')),btts:true,per:'ft',line:{}};return S.ox} // U5: Match Result opens shut; open when a pick of this match sits behind "Show more"
 /* the line shown first: the one of my pick on this market, otherwise the most even one (2.5 on the drawn match) */
@@ -2134,7 +2143,7 @@ function goalsHTML(m){
  const k=mkt(m.id,OX_PER.find(p=>p[0]===u.per)[2]),ln=oxLine(m,k),i=k.lines.findIndex(r=>r[0]===ln),[,ov,un]=k.lines[i],g=k.id+':'+ln,bt=mkt(m.id,'btts'),rb=mkt(m.id,'rbtts'),full=u.per==='ft';
  return (pers.length>1?`<div class="lu-seg ox-seg">${pers.map(([p,l])=>`<button data-oxp="${p}"${p===u.per?' class="on"':''}>${l}</button>`).join('')}</div>`:'')+
   `<div class="ox-blks" id="oxBlks"><div class="ox-blk"><div class="ox-sub"><b>Total Goals</b><small>Pick a line, then over or under.</small></div>
-  <div class="ox-step tg${u.step?' on':''}" data-oxs><button data-oxl="-1" aria-label="Lower line"${i<=0?' disabled':''}>${OX_IC.m}</button><b id="oxLv">${ln}</b><button class="p" data-oxl="1" aria-label="Higher line"${i>=k.lines.length-1?' disabled':''}>${OX_IC.p}</button></div>
+  <div class="ox-step tg"><button data-oxl="-1" aria-label="Lower line"${i<=0?' disabled':''}>${OX_IC.m}</button><b id="oxLv">${ln}</b><button data-oxl="1" aria-label="Higher line"${i>=k.lines.length-1?' disabled':''}>${OX_IC.p}</button></div>
   <div class="ox-o2" id="oxOU">${oddBtn(m.id,g,'o','Over '+ln,ov)}${oddBtn(m.id,g,'u','Under '+ln,un)}</div></div>`+
   (full&&bt?`<div class="ox-blk f">${oxHead('Both Teams to Score','btts',u.btts)}${oxFold('btts',u.btts,`<div class="ox-o2">${bt.opts.map(x=>oddBtn(m.id,'btts',x.k,x.l,x.v)).join('')}</div>`)}</div>`:'')+
   (full&&rb?`<div class="ox-blk c"><div class="ox-sub"><b>Combinations</b></div><div class="clist">${['1','2','X'].map(o=>rb.opts.find(x=>x.k===o)).map(x=>choiceBtn(m.id,'rbtts',x.k,{code:x.c,label:x.l,v:x.v,stack:true})).join('')}</div></div>`:'')+'</div>';
@@ -2158,16 +2167,8 @@ function oxToggle(key){const u=S.ox,f=document.querySelector(`[data-oxf="${key}"
 /* Goals: another half swaps the card (its height eases), another line swaps the number and the two prices; the new content rises in */
 function oxGoals(fn,after){const m=M(S.fx),c=$('#oxGoals');if(!c||!S.ox)return;fn(S.ox);smoothH(c,()=>{c.innerHTML=goalsHTML(m)});after()}
 function setOxPer(p){if(!S.ox||S.ox.per===p)return;oxGoals(u=>u.per=p,()=>soft($('#oxBlks'),RISE,T.std))}
-/* U6: − / + of the Total Goals line. Hidden at rest; a tap on the chip shows them, and after OX_HOLD without a tap on the chip they fade out.
-   The hint: the first time the chip is on screen in a session, they show and leave once by themselves. */
-const OX_HOLD=2000; // ms the buttons stay (Nik 16.11) — a pause, not a motion duration
-let oxStepT=0,oxHinted=false;
-function oxStep(){if(!S.ox)return;S.ox.step=true;$('.ox-step.tg')?.classList.add('on');clearTimeout(oxStepT);
- oxStepT=setTimeout(()=>{if(S.ox)S.ox.step=false;$('.ox-step.tg')?.classList.remove('on')},OX_HOLD)}
-function oxHint(){if(oxHinted||!S.fx)return;const c=$('.ox-step.tg');if(!c)return;const a=c.getBoundingClientRect();
- if(c.contains(document.elementFromPoint(a.left+a.width/2,a.top+a.height/2))){oxHinted=true;oxStep()}} // really on screen: not under the header, the bar or a sheet
-function setOxLine(step){const m=M(S.fx),u=S.ox;if(!u)return;oxStep();const k=mkt(m.id,OX_PER.find(p=>p[0]===u.per)[2]),r=k.lines[k.lines.findIndex(x=>x[0]===u.line[k.id])+step];if(!r)return;
- oxGoals(()=>u.line[k.id]=r[0],()=>{soft($('#oxLv'),rise(-step),T.std);soft($('#oxOU'),RISE,T.std)})} // a higher line comes down from above, a lower one rises from below
+function setOxLine(step){const m=M(S.fx),u=S.ox;if(!u)return;const k=mkt(m.id,OX_PER.find(p=>p[0]===u.per)[2]),r=k.lines[k.lines.findIndex(x=>x[0]===u.line[k.id])+step];if(!r)return;
+ oxGoals(()=>u.line[k.id]=r[0],()=>{soft($('#oxLv'),rise(-step),T.std);soft($('#oxOU'),RISE,T.std);$(`[data-oxl="${step}"]`)?.classList.add('hit')})} // U9: the circle of the pressed button fades out on the redrawn chip; a higher line comes down from above, a lower one rises from below
 function oddsHTML(m){
  const f=FX[m.id],u=oxUi(m),dc=mkt(m.id,'dc'),dnb=mkt(m.id,'dnb'),hc=mkt(m.id,'hc');
  const dcl={'1X':`${m.h} to win or draw`,'X2':`${m.a} to win or draw`,'12':`${m.h} or ${m.a} to win`};
@@ -2238,7 +2239,7 @@ function drawFixture(mid){
  ft.textContent=sc?m.sh+' - '+m.sa:f.time;fd.textContent=m.live?m.min+'’':m.ft?'FT':f.date;ft.classList.toggle('sc',sc);fd.classList.toggle('lv',!!m.live);
  if(m.live)fd.dataset.min=m.id;else fd.removeAttribute('data-min');
  [['#fxHi',m.hi],['#fxAi',m.ai]].forEach(([q,k])=>{const b=$(q).parentNode;if(TEAMS[k]){b.dataset.team=k;b.dataset.tc=m.comp}else b.removeAttribute('data-team')}); // T1: crest and name open the team page
- S.hc=null;S.ox=null;S.luNew=0;luPill();clearTimeout(oxStepT);paintFxTabs();renderMkts(mid);$('#fxScroll').scrollTop=0;$('#phone').classList.remove('fxs');S.fx=mid;
+ S.hc=null;S.ox=null;S.luNew=0;luPill();paintFxTabs();renderMkts(mid);$('#fxScroll').scrollTop=0;$('#phone').classList.remove('fxs');S.fx=mid;
 }
 function openFixture(mid){
  if(!FX[mid])return;const fx=$('#fx'),t=topPage();
@@ -2247,7 +2248,6 @@ function openFixture(mid){
  S.fxTab='odds';S.luKey=false;$('#fxTabs').scrollLeft=0;                                  // a match opens on its Odds tab
  drawFixture(mid);S.stack.push({p:'fx',id:mid,tab:'odds',key:false});teamMenu(null); // tab / key: its tab and its Key events filter, so Back returns to the page as it was left
  $('#phone').classList.add('infx');fx.classList.add('show');fx.setAttribute('aria-hidden','false');hideToast();
- setTimeout(oxHint,T.layout); // U6: once the page has arrived
 }
 /* C1: cut-out photos of the Goalscorer card (Figma has two); every other player gets the silhouette of the component */
 const GSC={mbappe:'gsc_mbappe',alvarez:'gsc_alvarez'};Object.assign(IMG,{gsc_mbappe:'assets/img/gsc_mbappe.png',gsc_alvarez:'assets/img/gsc_alvarez.png',gsc_none:'assets/img/gsc_none.png'}); // whole paths, so build.py inlines them
@@ -2675,7 +2675,7 @@ document.addEventListener('click',e=>{
  const fv=e.target.closest('[data-fxv]');if(fv){setFxTab(fv.dataset.fxv);return}
  const lk=e.target.closest('[data-luk]');if(lk){setLuKey(lk.dataset.luk==='1');return}
  if(e.target.closest('#luNew')){luTop();return}
- const ox=e.target.closest('[data-oxc],[data-oxp],[data-oxl],[data-oxs]');if(ox){if(ox.dataset.oxc)oxToggle(ox.dataset.oxc);else if(ox.dataset.oxp)setOxPer(ox.dataset.oxp);else if('oxs' in ox.dataset)oxStep();else if(!ox.disabled)setOxLine(+ox.dataset.oxl);return}
+ const ox=e.target.closest('[data-oxc],[data-oxp],[data-oxl]');if(ox){if(ox.dataset.oxc)oxToggle(ox.dataset.oxc);else if(ox.dataset.oxp)setOxPer(ox.dataset.oxp);else if(!ox.disabled)setOxLine(+ox.dataset.oxl);return}
  const hb=e.target.closest('[data-hct],[data-hcs]');if(hb){if(!hb.disabled)setHc(hb.dataset.hct,+hb.dataset.hcs||0);return}
  if(e.target.closest('#fxMore')){showToast(`Opens ${M(S.fx).h} vs ${M(S.fx).a} in DAZN Bet`,null,null,2500);return}
  const t=e.target.closest('.tile[data-fx]');if(t){openFixture(t.dataset.fx);return}
@@ -2685,7 +2685,7 @@ document.addEventListener('click',e=>{
 });
 $('#cpBack').onclick=closeComp;$('#tmBack').onclick=pageBack;
 $('#tmScroll').addEventListener('scroll',()=>{if(S.tm&&S.tm.tab==='matches')syncMd()});$('#fxBack').onclick=closeFixture;$('#fxBack2').onclick=closeFixture;
-$('#fxScroll').addEventListener('scroll',e=>{$('#phone').classList.toggle('fxs',e.target.scrollTop>150);oxHint();luSeen()});
+$('#fxScroll').addEventListener('scroll',e=>{$('#phone').classList.toggle('fxs',e.target.scrollTop>150);luSeen()});
 $('#oddsChip').onclick=()=>setOddsOn(!S.oddsOn);
 $('#liveBadge').onclick=()=>{
  if(S.day!=='today'){const k=DAYS.map(x=>x[0]),dir=k.indexOf('today')<k.indexOf(S.day)?-1:1;       // live matches are played today: LIVE on another day goes back to Today with the filter on
