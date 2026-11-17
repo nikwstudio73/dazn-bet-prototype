@@ -683,7 +683,6 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .fx{position:absolute;inset:0;z-index:7;background:#080e12;transform:translateX(100%);transition:transform var(--m-layout) var(--soft);overflow:hidden}
 .fx.show{transform:none}
 #phone.infx .status{background:transparent;z-index:9}
-#phone.infx.fxs .status{background:transparent}
 .fx-scroll{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none;overscroll-behavior:contain}
 .fx-scroll::-webkit-scrollbar{display:none}
 .fx-hero{position:relative;height:calc(192px + var(--sb));box-sizing:border-box;padding:var(--sb) 16px 0;background:radial-gradient(64.1% 138.9% at 1.3% 58.3%,rgba(255,255,255,0.220) 0.0%,rgba(241,241,241,0.206) 6.2%,rgba(226,228,228,0.193) 12.5%,rgba(212,214,214,0.179) 18.8%,rgba(198,200,201,0.165) 25.0%,rgba(184,186,187,0.151) 31.2%,rgba(170,172,174,0.138) 37.5%,rgba(155,159,160,0.124) 43.8%,rgba(141,145,146,0.110) 50.0%,rgba(127,131,133,0.096) 56.2%,rgba(112,118,119,0.083) 62.5%,rgba(98,104,106,0.069) 68.8%,rgba(84,90,92,0.055) 75.0%,rgba(70,76,79,0.041) 81.2%,rgba(56,62,65,0.028) 87.5%,rgba(41,49,52,0.014) 93.8%,rgba(27,35,38,0.000) 100.0%),radial-gradient(66.7% 100% at 100% 60%,rgba(232,21,30,0.220) 0.0%,rgba(219,22,30,0.206) 6.2%,rgba(206,23,31,0.193) 12.5%,rgba(194,24,32,0.179) 18.8%,rgba(181,24,32,0.165) 25.0%,rgba(168,25,32,0.151) 31.2%,rgba(155,26,33,0.138) 37.5%,rgba(142,27,34,0.124) 43.8%,rgba(130,28,34,0.110) 50.0%,rgba(117,29,34,0.096) 56.2%,rgba(104,30,35,0.083) 62.5%,rgba(91,31,36,0.069) 68.8%,rgba(78,32,36,0.055) 75.0%,rgba(65,32,36,0.041) 81.2%,rgba(53,33,37,0.028) 87.5%,rgba(40,34,38,0.014) 93.8%,rgba(27,35,38,0.000) 100.0%),#080e12}
@@ -704,6 +703,7 @@ html.app .scroll,html.app .sbody,html.app .ov-body{overscroll-behavior:contain} 
 .fx-tabs::-webkit-scrollbar{display:none}
 .fx-tabs span{height:40px;padding:10px 16px 0;font-weight:700;font-size:14px;line-height:18px;color:#b3b9bb;border-bottom:2px solid transparent}
 .fx-tabs span.on{color:#f9fafa;border-color:#fffa00}
+#fxTabs{position:sticky;top:calc(var(--sb) + 40px);z-index:2;background:#080e12} /* U11: the row of tabs of a match page stays pinned under the compact bar; it still scrolls sideways */
 .mkts{padding:12px 16px 32px;display:flex;flex-direction:column;gap:16px}
 .mkt{position:relative;overflow:hidden;border-radius:var(--mk-radius);padding:var(--mk-pad-t) var(--mk-pad-r) var(--mk-pad-b) var(--mk-pad-l);display:flex;flex-direction:column;gap:var(--mk-gap)}
 .mkt.soft{background:radial-gradient(59.2% 149.7% at 0% 52.1%,rgba(255,255,255,0.160) 0.0%,rgba(241,241,241,0.150) 6.2%,rgba(226,228,228,0.140) 12.5%,rgba(212,214,214,0.130) 18.8%,rgba(198,200,201,0.120) 25.0%,rgba(184,186,187,0.110) 31.2%,rgba(170,172,174,0.100) 37.5%,rgba(155,159,160,0.090) 43.8%,rgba(141,145,146,0.080) 50.0%,rgba(127,131,133,0.070) 56.2%,rgba(112,118,119,0.060) 62.5%,rgba(98,104,106,0.050) 68.8%,rgba(84,90,92,0.040) 75.0%,rgba(70,76,79,0.030) 81.2%,rgba(56,62,65,0.020) 87.5%,rgba(41,49,52,0.010) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--mk-bg)}
@@ -756,8 +756,26 @@ div.choice{cursor:default}
 .fx-more{width:100%;height:48px;border-radius:8px;background:rgba(195,209,219,.10);font-weight:700;font-size:16px;line-height:24px;color:#f8f8f8}
 #phone.infx .bar{bottom:24px}
 #phone.infx.hasbar .mkts{padding-bottom:109px}
-.fx-top{position:absolute;left:0;right:0;top:0;height:calc(var(--sb) + 40px);padding:var(--sb) 16px 0;background:#080e12;border-bottom:1px solid #3d4549;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;line-height:20px;z-index:2;opacity:0;pointer-events:none;transition:opacity var(--m-quick)}
-#phone.fxs .fx-top{opacity:1;pointer-events:auto}
+/* U11 · the header of a match page follows the finger (owner 17.11, variant C). The compact bar is 40 under the status bar; the Back button
+   stands in it from the start. While the page scrolls the first 152 px (the header, 192, minus the bar, 40) the crests and the score shrink and
+   travel into the bar; the team names go with their crests and fade, the league line and the day fade; fxHead() places them by the scroll
+   position, there are no durations. The travelling copy of the scoreboard (.fxc-l) has the box and the layout of the header, lies exactly over
+   it and takes its place as soon as the page leaves its top, so nothing of it depends on how fast the page moves under it.
+   The bar turns solid at the end of the way (.fx-bg). No half-way states (owner 17.11): the page rests only at its top or with the header
+   compact — the browser's own scroll snapping finishes the way (#fxScroll, .fx-hero, .fx-rest), as the system would in the app.
+   Reduced motion: nothing travels, the compact scoreboard fades in at once. */
+#fxScroll{scroll-snap-type:y mandatory;scroll-padding-top:calc(var(--sb) + 40px)} /* the bar covers the top of the page: the rest of the page snaps under it */
+.fx-hero,.fx-rest{scroll-snap-align:start}
+.fx-rest{min-height:calc(100% + 16px - var(--sb))} /* competition row, tabs, content. Taller than the screen under the bar: the page scrolls freely inside it, and a short tab can still keep the header compact (16 = 56 + 44 - 84) */
+.fx-top{position:absolute;left:0;right:0;top:0;height:calc(var(--sb) + 40px);z-index:2;pointer-events:none}
+.fx-bg{position:absolute;inset:0;background:#080e12;border-bottom:1px solid #3d4549;opacity:0} /* the fill of the bar; fxHead() brings it in at the end of the way */
+#fx.fxd .fx-top{pointer-events:auto} /* compact: the bar covers what scrolls under it */
+.fxc-l{position:absolute;left:0;right:0;top:0;height:calc(192px + var(--sb));box-sizing:border-box;padding:var(--sb) 16px 0;visibility:hidden;pointer-events:none}
+#fx.fxc .fxc-l,#fx.fxr .fxc-l{visibility:visible}
+#fx.fxc .fx-hero>*{visibility:hidden}
+.fxc-l img,.fxc-l span{will-change:transform}
+#fx.fxr .fxc-l,#fx.fxr .fx-bg{opacity:0;transition:opacity var(--m-quick) var(--ease)!important}
+#fx.fxr.fxd .fxc-l,#fx.fxr.fxd .fx-bg{opacity:1}
 
 /* favourite-team popup (Figma section "Betting popup") */
 .fvp{position:absolute;left:0;right:0;bottom:0;background:#0c161c;border-radius:12px 12px 0 0;z-index:22;padding:24px 16px;display:flex;flex-direction:column;gap:16px;transform:translateY(105%);transition:transform var(--m-sheet) var(--soft)} /* same native sheet motion as the betslip */
@@ -823,7 +841,7 @@ div.choice{cursor:default}
 .nv-t.has:not(.open) .nv-th u{opacity:1}
 .nv-tb>div{display:flex;flex-direction:column;gap:var(--spacing-2)}
 .nv-tb>div::after{content:"";flex:none;height:var(--spacing-2)}
-.fx-top .fx-back{left:8px;top:calc(var(--sb) + 4px)}
+.fx-top .fx-back{left:8px;top:calc(var(--sb) + 4px);pointer-events:auto}
 /* ---------- competition page · Odds tab (Figma "Odds in Competition" 3544:19722) ----------
    Covers the feed chrome; the collapsed betslip and the bottom nav stay on top of it. Sub-tabs: Competition winner, Top scorer (v3.2). */
 .comp[data-cp]{cursor:pointer}
@@ -995,9 +1013,9 @@ div.choice{cursor:default}
 .lu-seg button{flex:1;height:32px;border-radius:8px;font-weight:700;font-size:14px;line-height:18px;color:#8f9091;transition:background var(--m-quick) var(--ease),color var(--m-quick) var(--ease)} /* surface/container-1 and text/tertiary in the mode of the DS control: #0c1216, #8f9091 */
 .lu-seg button.on{background:rgba(195,209,219,.10);color:#f8f8f8} /* fill/overlay-3 and text/primary in the mode of the DS control, the same values as .fx-more */
 /* L2 · Live updates rebuilt (Figma "Live Updates with Odds" 4365:194526): the Live bet block on top, a feed without odds, the shot diagram in a goal card.
-   L4 (owner 16.11, reverses L3): the Live bet block (header 4365:210691: warning, label, question, prices) stays pinned under the compact header; the feed scrolls under it.
+   L4 (owner 16.11, reverses L3): the Live bet block (header 4365:210691: warning, label, question, prices) stays pinned under the compact header and the tabs (U11: 40 + 44); the feed scrolls under it.
    Its fill is fill/overlay-1 over the page colour, so nothing shows through. The glow stays only on goal cards. */
-.lu-top{position:sticky;top:calc(var(--sb) + 40px);z-index:2;overflow:hidden;margin:calc(-1*var(--spacing-12)) calc(-1*var(--spacing-16)) 0;padding:var(--spacing-16) 24px;display:flex;flex-direction:column;gap:20px;background:linear-gradient(var(--fill-overlay-1),var(--fill-overlay-1)),var(--surface-container-1)}
+.lu-top{position:sticky;top:calc(var(--sb) + 84px);z-index:2;overflow:hidden;margin:calc(-1*var(--spacing-12)) calc(-1*var(--spacing-16)) 0;padding:var(--spacing-16) 24px;display:flex;flex-direction:column;gap:20px;background:linear-gradient(var(--fill-overlay-1),var(--fill-overlay-1)),var(--surface-container-1)}
 /* block 4425:251722 (owner, 17.11): surface/container-1 + fill/overlay-1 + a red glow, 24 on the sides, square corners, no line under it, two prices.
    The glow is a turned ellipse (its gradientTransform, 30 %): centre 97.5 / 45.4, half-axes 445.1 and 215.9, turned by 126.57deg on 375; the same transform on 440 gives the second set */
 .lu-top::before{content:"";position:absolute;left:97.5px;top:45.4px;width:890.2px;height:431.8px;margin:-215.9px 0 0 -445.1px;transform:rotate(126.57deg);pointer-events:none;background:radial-gradient(closest-side,rgba(209,36,36,0.300) 0.0%,rgba(198,36,36,0.281) 6.2%,rgba(186,36,36,0.263) 12.5%,rgba(175,36,36,0.244) 18.8%,rgba(164,36,36,0.225) 25.0%,rgba(152,36,37,0.206) 31.2%,rgba(141,36,37,0.188) 37.5%,rgba(129,36,37,0.169) 43.8%,rgba(118,36,37,0.150) 50.0%,rgba(107,35,37,0.131) 56.2%,rgba(95,35,37,0.112) 62.5%,rgba(84,35,37,0.094) 68.8%,rgba(72,35,38,0.075) 75.0%,rgba(61,35,38,0.056) 81.2%,rgba(50,35,38,0.037) 87.5%,rgba(38,35,38,0.019) 93.8%,rgba(27,35,38,0.000) 100.0%)}
@@ -1041,7 +1059,7 @@ div.choice{cursor:default}
 .lu-in.on .dr{stroke-dashoffset:0;transition:stroke-dashoffset var(--m-layout) var(--soft) var(--m-layout)}
 .lu-in.now,.lu-in.now .lu-card,.lu-in.now .dr{transition:none}
 /* the feed is scrolled away: nothing moves, a pill under the compact header says how many events came in */
-.lu-new{position:absolute;left:50%;top:calc(var(--sb) + 40px + var(--spacing-8));z-index:3;transform:translate(-50%,calc(-1*var(--spacing-8)));opacity:0;pointer-events:none;white-space:nowrap;transition:opacity var(--m-std) var(--soft),transform var(--m-std) var(--soft)}
+.lu-new{position:absolute;left:50%;top:calc(var(--sb) + 84px + var(--spacing-8));z-index:3;transform:translate(-50%,calc(-1*var(--spacing-8)));opacity:0;pointer-events:none;white-space:nowrap;transition:opacity var(--m-std) var(--soft),transform var(--m-std) var(--soft)}
 .lu-new.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .lu-new.show:active{opacity:.6}
 @media (prefers-reduced-motion:reduce){.lu-in,.lu-in .lu-card,.lu-in.on .dr,.lu-new{transition:none}}
@@ -1240,20 +1258,22 @@ div.choice{cursor:default}
 
 
   <div class="fx" id="fx" aria-hidden="true">
-   <div class="fx-top"><button class="fx-back" id="fxBack2" aria-label="Back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.3266 15.9932L3.33337 8L11.3266 0.00679016L12.6667 1.34691L6.01362 8L12.6667 14.6531L11.3266 15.9932Z" fill="#F9FAFA"/></svg></button><span id="fxTitle"></span></div>
+   <div class="fx-top" id="fxTop"><i class="fx-bg"></i><div class="fxc-l" aria-hidden="true"><div class="fx-nav"><span id="fxcL"></span></div><div class="fx-teams"><div class="fx-team"><img id="fxcH" src="" alt=""><span id="fxcHn"></span></div><div class="fx-mid"><span id="fxcS"></span><span id="fxcM"></span></div><div class="fx-team"><img id="fxcA" src="" alt=""><span id="fxcAn"></span></div></div></div><button class="fx-back" id="fxBack" aria-label="Back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.3266 15.9932L3.33337 8L11.3266 0.00679016L12.6667 1.34691L6.01362 8L12.6667 14.6531L11.3266 15.9932Z" fill="#F9FAFA"/></svg></button></div>
    <button class="fx-follow lu-new" id="luNew" aria-live="polite"></button>
    <div class="fx-scroll" id="fxScroll">
     <div class="fx-hero">
-     <div class="fx-nav"><button class="fx-back" id="fxBack" aria-label="Back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.3266 15.9932L3.33337 8L11.3266 0.00679016L12.6667 1.34691L6.01362 8L12.6667 14.6531L11.3266 15.9932Z" fill="#F9FAFA"/></svg></button><span id="fxLeague">Spain · LaLiga</span></div>
+     <div class="fx-nav"><span id="fxLeague">Spain · LaLiga</span></div>
      <div class="fx-teams">
       <div class="fx-team"><img id="fxHi" src="" alt="">  <span id="fxH"></span></div>
       <div class="fx-mid"><span id="fxTime"></span><span id="fxDate"></span></div>
       <div class="fx-team"><img id="fxAi" src="" alt=""><span id="fxA"></span></div>
      </div>
     </div>
+    <div class="fx-rest">
     <div class="fx-comp"><div class="c"><i><img id="fxCompImg" src="assets/img/laliga.png" alt=""></i><span id="fxComp">LA Liga EA Sports</span></div><button class="fx-follow">Follow</button></div>
     <div class="fx-tabs" id="fxTabs"><span data-fxv="over">Overview</span><span>H2H</span><span class="on" data-fxv="odds">Odds</span><span data-fxv="live">Live updates</span><span>Lineups</span><span>Stats</span></div>
     <div class="mkts" id="mkts"></div>
+    </div>
    </div>
   </div>
   <div class="cp" id="cp" aria-hidden="true">
@@ -2224,13 +2244,15 @@ function overHTML(m){
 function drawFixture(mid){
  const m=M(mid),f=FX[mid];
  $('#fxLeague').textContent=f.league;$('#fxH').textContent=m.h;$('#fxA').textContent=m.a;$('#fxHi').src=IMG[f.hiImg];$('#fxAi').src=IMG[f.aiImg];$('#fxComp').textContent=f.comp;$('#fxCompImg').src=IMG[f.compImg||'laliga'];
- $('#fxTitle').textContent=m.h+' vs '+m.a;$('#fx .fx-hero').style.backgroundImage=teamGlow('fx-hero',m); // C2: the glow of the header in the colours of the two teams
+ $('#fx .fx-hero').style.backgroundImage=teamGlow('fx-hero',m); // C2: the glow of the header in the colours of the two teams
  const ft=$('#fxTime'),fd=$('#fxDate');                 // kick-off time and day; a live match shows the score and the running minute
  const sc=!!(m.live||m.ft);                             // started or finished: big white score instead of the kick-off time
  ft.textContent=sc?m.sh+' - '+m.sa:f.time;fd.textContent=m.live?m.min+'’':m.ft?'FT':f.date;ft.classList.toggle('sc',sc);fd.classList.toggle('lv',!!m.live);
  if(m.live)fd.dataset.min=m.id;else fd.removeAttribute('data-min');
+ const cs=$('#fxcS'),cm=$('#fxcM');$('#fxcH').src=$('#fxHi').src;$('#fxcA').src=$('#fxAi').src;$('#fxcHn').textContent=m.h;$('#fxcAn').textContent=m.a;$('#fxcL').textContent=f.league; // U11: the copy of the scoreboard that travels into the compact bar
+ cs.textContent=ft.textContent;cs.className=ft.className;cm.textContent=fd.textContent;cm.className=fd.className;if(m.live)cm.dataset.min=m.id;else cm.removeAttribute('data-min');
  [['#fxHi',m.hi],['#fxAi',m.ai]].forEach(([q,k])=>{const b=$(q).parentNode;if(TEAMS[k]){b.dataset.team=k;b.dataset.tc=m.comp}else b.removeAttribute('data-team')}); // T1: crest and name open the team page
- S.hc=null;S.ox=null;S.luNew=0;luPill();paintFxTabs();renderMkts(mid);$('#fxScroll').scrollTop=0;$('#phone').classList.remove('fxs');S.fx=mid;
+ S.hc=null;S.ox=null;S.luNew=0;luPill();paintFxTabs();renderMkts(mid);$('#fxScroll').scrollTop=0;S.fx=mid;fxHead();
 }
 function openFixture(mid){
  if(!FX[mid])return;const fx=$('#fx'),t=topPage();
@@ -2249,7 +2271,7 @@ function gsCard(p,num,btn){
  return `<div class="gs-card"><div class="gs-in"><div class="gs-top"><i>${num}</i><span class="gs-ph${cut?' cut':''}"><img src="${IMG[cut||k]}" alt=""></span></div>
   <div class="gs-tx"><div class="gs-nm"><span>${f}</span><b>${l}</b></div><div class="gs-cl"><img src="${crest(p.cr)}" alt="">${p.team}</div></div></div>${btn}</div>`}
 function renderMkts(mid=S.fx){const m=M(mid);$('#mkts').innerHTML=S.fxTab==='live'?liveHTML(m):S.fxTab==='over'?LEGAL+overHTML(m):LEGAL+oddsHTML(m)}
-function hideFixture(){$('#luNew').classList.remove('show');const fx=$('#fx');fx.classList.contains('left')?snap(fx,()=>fx.classList.remove('show','left')):fx.classList.remove('show');fx.setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},T.layout)}
+function hideFixture(){$('#luNew').classList.remove('show');const fx=$('#fx');fx.classList.contains('left')?snap(fx,()=>fx.classList.remove('show','left')):fx.classList.remove('show');fx.setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx')},T.layout)}
 function closeFixture(){const t=topPage();t&&t.p==='fx'?pageBack():hideFixture()} // Back on a match page: to the page it was opened from (feed, league page, team page)
 
 /* ---------- fixture · Live updates tab ----------
@@ -2346,10 +2368,11 @@ function luPush(m,e0){
  if(e.type!=='goal')return;
  const old=mkt(m.id,'nts'),now=ntsOf(m);S.nts[m.id]=now;                                                           // a goal: the prices of the Live bet block move, by the pattern of any price
  now.opts.forEach((o,i)=>{const d=o.v-old.opts[i].v;if(d)animateOdd(m.id,o.k,d>0?1:-1,'nts')});
- if(S.fx===m.id){const t=$('#fxTime');if(setTxt(t,m.sh+' - '+m.sa,false))soft(t,{opacity:0})}                      // the score in the header changes softly, nothing travels
+ if(S.fx===m.id){const t=$('#fxTime'),c=$('#fxcS'),tx=m.sh+' - '+m.sa;if(setTxt(t,tx,false))soft(t,{opacity:0});
+  if(setTxt(c,tx,false)&&c.animate)c.animate([{opacity:0},{opacity:1}],{duration:RM.matches?120:T.std,easing:SOFT});fxHead()} // the score in the header changes softly, nothing travels; U11: the copy in the compact bar fades the same way (soft() would also reset its place)
  const y=$('#scroll').scrollTop;renderFeed();$('#scroll').scrollTop=y;if(S.cp)renderComp();if(S.tm)renderTeam();renderSheet();updateBar(true);
 }
-function luEdge(){const t=$('#mkts .lu-top'),sc=$('#fxScroll'),q=sc.getBoundingClientRect(),k=sc.offsetHeight/q.height;return t?(t.getBoundingClientRect().bottom-q.top)*k:parseFloat(getComputedStyle($('#stage')).getPropertyValue('--sb'))+40} // L4: under the pinned Live bet block, or under the compact header when there is none
+function luEdge(){const t=$('#mkts .lu-top'),sc=$('#fxScroll'),q=sc.getBoundingClientRect(),k=sc.offsetHeight/q.height;return t?(t.getBoundingClientRect().bottom-q.top)*k:fxPin()} // L4: under the pinned Live bet block, or under the pinned tabs when there is none
 function luAway(){const f=$('#luFeed'),sc=$('#fxScroll');if(!f)return false;const r=f.getBoundingClientRect(),q=sc.getBoundingClientRect(),k=sc.offsetHeight/q.height;   // k: the phone is scaled on the page
  return (r.top-q.top)*k<luEdge()}                      // the top of the feed has gone under the pinned block (or the compact header)
 function luInsert(m,e){
@@ -2366,7 +2389,32 @@ function luTop(){const f=$('#luFeed'),sc=$('#fxScroll');if(!f)return;const r=f.g
  S.luNew=0;luPill();sc.scrollTo({top:Math.max(0,sc.scrollTop+(r.top-q.top)*k-luEdge()-16)})} // a jump: the browser's smooth scroll has its own curve, outside the motion tokens
 function paintFxTabs(){document.querySelectorAll('#fxTabs [data-fxv]').forEach(e=>e.classList.toggle('on',e.dataset.fxv===S.fxTab))}
 function fxKeep(){const t=topPage();if(t&&t.p==='fx'){t.tab=S.fxTab;t.key=S.luKey}}
-function setFxTab(v){if(S.fxTab===v||!S.fx)return;S.fxTab=v;S.luNew=0;luPill();fxKeep();paintFxTabs();renderMkts();restoreArrows();soft($('#mkts'),RISE,T.std)} // like the tabs of a league page: the new tab rises in
+function setFxTab(v){if(S.fxTab===v||!S.fx)return;S.fxTab=v;S.luNew=0;luPill();fxKeep();paintFxTabs();
+ const sc=$('#fxScroll'),y=sc.scrollTop;renderMkts();sc.scrollTop=Math.min(y,$('#mkts').offsetTop-fxPin());fxHead(); // U11: the header keeps its state, a compact one opens the new tab from its top
+ restoreArrows();soft($('#mkts'),RISE,T.std)} // like the tabs of a league page: the new tab rises in
+/* U11 · the header of a match page follows the scroll. FXH: the sizes in the compact bar as shares of the header ones (crest 24 of 56, score 16 of 28,
+   kick-off time 14 of 16, minute 10 of 16; owner 17.11, no Figma frame yet) and the two shares of the way: by `fade` the names, the league line
+   and the day are gone, from `solid` the bar fills in. Not motion tokens: the way is driven by the finger, nothing here has a duration;
+   the end of the way is finished by the browser's scroll snapping, with its own curve (as the jump of luTop()). */
+const FXH={crest:24/56,score:16/28,time:14/16,min:10/16,fade:.4,solid:.85};
+const fxPin=()=>$('#fxTop').offsetHeight+$('#fxTabs').offsetHeight;              // what stays pinned on top of a match page: the bar and the tabs
+function fxHead(){
+ const fx=$('#fx'),top=$('#fxTop');if(!fx||!S||!S.fx)return;
+ const y=$('#fxScroll').scrollTop,W=fx.offsetWidth,bar=top.offsetHeight,sb=bar-40,way=$('#fx .fx-hero').offsetHeight-bar,rm=RM.matches;
+ const c=v=>Math.min(1,Math.max(0,v)),p=rm?1:c(y/way),L=(a,b)=>a+(b-a)*p,H=$('#fxcH'),A=$('#fxcA'),S0=$('#fxcS'),M0=$('#fxcM'),sc=S0.classList.contains('sc');
+ const cx=e=>e.offsetLeft+e.offsetWidth/2,cy=e=>e.offsetTop+e.offsetHeight/2,kS=sc?FXH.score:FXH.time;         // centres in the header, before any move
+ const half=Math.max(S0.offsetWidth*kS,sc?M0.offsetWidth*FXH.min:0)/2+12+12;                                    // half of the text, 12 to the crest, half of a 24 crest
+ const dxH=(W/2-half-cx(H))*p,dxA=(W/2+half-cx(A))*p,dy=(sb+20-cy(H))*p,dS=(sb+(sc?15:20)-cy(S0))*p,dM=(sb+31-cy(M0))*p; // every size is read before anything is written
+ const k=L(1,FXH.crest),out=rm?0:c(1-p/FXH.fade);
+ H.style.transform=`translate(${dxH}px,${dy}px) scale(${k})`;A.style.transform=`translate(${dxA}px,${dy}px) scale(${k})`;
+ [['#fxcHn',dxH],['#fxcAn',dxA]].forEach(([q,dx])=>{const e=$(q);e.style.transform=`translate(${dx}px,${dy}px)`;e.style.opacity=out}); // a name goes with its crest and fades: they never cross
+ $('#fxcL').style.opacity=out;
+ S0.style.transform=`translateY(${dS}px) scale(${L(1,kS)})`;                                                      // score: a line of two with the minute; kick-off time: alone in the middle of the bar
+ if(sc){M0.style.transform=`translateY(${dM}px) scale(${L(1,FXH.min)})`;M0.style.opacity=''}
+ else{M0.style.transform=`translateY(${dS}px)`;M0.style.opacity=out}                                             // the day goes with the time and fades
+ $('#fxTop .fx-bg').style.opacity=rm?'':c((p-FXH.solid)/(1-FXH.solid));
+ fx.classList.toggle('fxr',rm);fx.classList.toggle('fxc',!rm&&y>0);fx.classList.toggle('fxd',rm?y>24:p>=1);     // reduced motion: the scoreboard comes in when the big crests reach the bar (64 - 40)
+}
 function setLuKey(k){if(S.luKey===k)return;S.luKey=k;S.luNew=0;luPill();fxKeep();const y=$('#fxScroll').scrollTop;renderMkts();$('#fxScroll').scrollTop=y;restoreArrows();soft($('#luFeed'),RISE,T.std)}
 
 /* ---------- competition page · Odds tab (Figma section "Odds in Competition") ----------
@@ -2519,7 +2567,7 @@ function openTeam(k,comp){
  if(S.tm){S.tm.y=$('#tmScroll').scrollTop;snap(tm,()=>tm.classList.remove('show'))}          // it lies under the match page with another team: it comes in again from the right
  const e={p:'tm',id:k,comp:cs.includes(comp)?comp:cs[0],tab:'matches'};S.stack.push(e);drawTeam(e);
  $('#phone').classList.add('intm');tm.classList.add('show');tm.setAttribute('aria-hidden','false');
- if(t){fx.classList.add('left');setTimeout(()=>{if(topPage()===e)$('#phone').classList.remove('infx','fxs')},T.layout)}
+ if(t){fx.classList.add('left');setTimeout(()=>{if(topPage()===e)$('#phone').classList.remove('infx')},T.layout)}
 }
 function hideTeam(){$('#tm').classList.remove('show');$('#tm').setAttribute('aria-hidden','true');teamMenu(null);S.tm=null;setTimeout(()=>{if(!S.tm)$('#phone').classList.remove('intm')},T.layout)}
 function pageBack(){
@@ -2681,8 +2729,9 @@ document.addEventListener('click',e=>{
  const cp=e.target.closest('.comp[data-cp],.chip[data-cp]');if(cp){openComp(cp.dataset.cp);return}
 });
 $('#cpBack').onclick=closeComp;$('#tmBack').onclick=pageBack;
-$('#tmScroll').addEventListener('scroll',()=>{if(S.tm&&S.tm.tab==='matches')syncMd()});$('#fxBack').onclick=closeFixture;$('#fxBack2').onclick=closeFixture;
-$('#fxScroll').addEventListener('scroll',e=>{$('#phone').classList.toggle('fxs',e.target.scrollTop>150);luSeen()});
+$('#tmScroll').addEventListener('scroll',()=>{if(S.tm&&S.tm.tab==='matches')syncMd()});$('#fxBack').onclick=closeFixture;
+$('#fxScroll').addEventListener('scroll',()=>{fxHead();luSeen()},{passive:true});
+if(window.ResizeObserver)new ResizeObserver(fxHead).observe($('#fx')); // the phone changes its size: the compact scoreboard keeps its place
 $('#oddsChip').onclick=()=>setOddsOn(!S.oddsOn);
 $('#liveBadge').onclick=()=>{
  if(S.day!=='today'){const k=DAYS.map(x=>x[0]),dir=k.indexOf('today')<k.indexOf(S.day)?-1:1;       // live matches are played today: LIVE on another day goes back to Today with the filter on
@@ -2818,7 +2867,7 @@ function init(){
  for(const k in CHG)delete CHG[k];Object.values(chgTimers).flat().forEach(clearTimeout);document.querySelectorAll('.cv').forEach(e=>e.classList.remove('up','dn'));
  $('#oddsChip').classList.remove('off');$('#oddsChip').setAttribute('aria-checked','true');$('#liveBadge').classList.remove('on');
  $('#sheet').classList.remove('show','editing');$('#backdrop').classList.remove('show');$('#overlay').classList.remove('show');
- $('#fx').classList.remove('show','left');$('#luNew').classList.remove('show');$('#tm').classList.remove('show');$('#tm').setAttribute('aria-hidden','true');teamMenu(null);$('#cp').classList.remove('show','mt');$('#cpLive').classList.remove('on');$('#phone').classList.remove('infx','fxs','incp','intm','limit');
+ $('#fx').classList.remove('show','left');$('#luNew').classList.remove('show');$('#tm').classList.remove('show');$('#tm').setAttribute('aria-hidden','true');teamMenu(null);$('#cp').classList.remove('show','mt');$('#cpLive').classList.remove('on');$('#phone').classList.remove('infx','incp','intm','limit');
  clearTimeout(favT);$('#fav').classList.remove('show');paintDays(false);$('#leagues').scrollLeft=0;
  renderFeed();renderSheet();updateBar();$('#scroll').scrollTop=0;
  timers=[setInterval(liveTick,2600),setInterval(minuteTick,20000)];
