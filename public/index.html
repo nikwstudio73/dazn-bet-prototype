@@ -869,25 +869,9 @@ div.choice{cursor:default}
 .cp-row .cr img{width:auto;height:auto;max-width:36px;max-height:44px} /* crests fill the 36 px slot by width; a tall one (Arsenal) may stick out, as in Figma */
 .cp-row .nm{flex:1;min-width:0;margin:0 8px 0 12px;font-weight:700;font-size:14px;line-height:18px;letter-spacing:.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cp-row .odd{flex:none;width:84px;padding-left:12px;padding-right:12px}
-/* Top scorer v3.2: two Top Picks cards, then the list */
+/* Top scorer v3.2: two Top Picks cards (the shared .gs-card, U10), then the list */
 .cp-h{font-weight:700;font-size:18px;line-height:25px;margin-bottom:12px}
 .tps{display:flex;gap:12px;margin-bottom:12px}
-.tp{flex:1;min-width:0;border-radius:10px;background:rgba(249,250,250,.08);padding:8px;display:flex;flex-direction:column;gap:12px;transition:background var(--m-quick)}
-.tp-in{height:111px;padding:0 4px;display:flex;flex-direction:column}
-.tp-top{display:flex;justify-content:space-between;align-items:flex-start;height:44px;margin-bottom:6px}
-.tp-top i{font-style:normal;font-size:16px;line-height:21px;color:#4d5457}
-.tp-top img{width:44px;height:44px;border-radius:50%;background:#242d33;object-fit:cover;object-position:center top}
-.tp-in>span{position:relative;top:-1px;height:10px;font-size:14px;line-height:10px;color:#c5c7ca;white-space:nowrap}
-.tp-in>b{position:relative;top:-1px;height:14px;margin-top:6px;font-weight:700;font-size:20px;line-height:14px;color:#f9fafa;white-space:nowrap}
-.tp-club{display:flex;align-items:center;gap:6px;height:16px;margin-top:11px;font-size:12px;line-height:16px;letter-spacing:.01em;color:#c5c7ca;white-space:nowrap}
-.tp-club img{width:16px;height:16px;object-fit:contain}
-.tp-top i,.tp-in>span,.tp-in>b,.tp-club{transition:color var(--m-quick)}
-.tp .odd{flex:none;width:auto;padding-left:12px;padding-right:12px;background:rgba(8,14,18,.64)}
-/* picked Top Pick (Figma "Pro Max size"): the whole card turns white, the price sits on a dark tile */
-.tp:has(.odd.sel){background:#f9fafa}
-.tp:has(.odd.sel) .tp-top i,.tp:has(.odd.sel) .tp-in>span,.tp:has(.odd.sel) .tp-in>b,.tp:has(.odd.sel) .tp-club{color:#080e12}
-.tp .odd.sel{background:#080e12}
-.tp .odd.sel .v{color:#f9fafa}
 .sc-row{height:69px;display:flex;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:12px}
 .sc-row:last-child{margin-bottom:0}
 .sc-row .ph{flex:none;width:44px;height:44px;border-radius:50%;background:#1b2326}
@@ -945,32 +929,39 @@ div.choice{cursor:default}
 .gs-h span{display:block;font-size:14px;line-height:18px;letter-spacing:.01em;color:#c5c7ca}
 .gs-row{display:flex;gap:12px;margin:0 -16px;padding:0 16px;overflow-x:auto;scrollbar-width:none}
 .gs-row::-webkit-scrollbar{display:none}
-/* C1 · Odds/Goalscorer card (Figma component, 210×250): cut-out photo on a hairline, name, club, price on a dark tile. Selected: the whole card turns white */
-.gs-card{flex:none;width:210px;height:250px;border-radius:12px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;
- background:radial-gradient(72.8% 84.7% at 50.2% 19%,rgba(8,14,18,0) 0%,rgba(70,74,77,.0375) 25%,rgba(131,134,136,.075) 50%,rgba(193,195,196,.1125) 75%,rgba(255,255,255,.15) 100%),var(--surface-container-1)}
-.gs-ph{position:relative;flex:none;align-self:stretch;height:122px;overflow:hidden}
+/* U10 · Odds/Goalscorer card 4295:70111, Size=Compact (4458:206255, selected 4458:206256): the one player card — the Goalscorer carousel of a match
+   (198 wide, "#9" = shirt number) and Top Picks of a competition (the two share the row, "01" = place). gsCard() in JS draws both. */
+.gs-card{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--spacing-12);padding:var(--spacing-8);border-radius:10px;background:rgba(249,250,250,.08)} /* fill/overlay-2 */
+.gs-row .gs-card{flex:none;width:198px}
+.gs-in{display:flex;flex-direction:column;gap:var(--spacing-4);padding:0 var(--spacing-4)}
+.gs-top{display:flex;justify-content:space-between;align-items:flex-start}
+.gs-top i{font-style:normal;font-size:16px;line-height:21px;color:var(--text-tertiary)}
+.gs-ph{position:relative;flex:none;width:52px;height:52px;border-radius:50%;overflow:hidden;background:var(--chip);border:1px solid var(--border-transparent-subtle);transition:border-color var(--m-quick)} /* surface/container-3 */
 .gs-ph img{display:block;width:100%;height:100%;object-fit:cover;object-position:center top}
-.gs-ph::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:rgba(249,250,250,.2)} /* border/transparent/default */
-.gs-card b{margin-top:8px;font-weight:700;font-size:16px;line-height:21px;color:var(--t1);max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color var(--m-quick)}
-.gs-card .cl{display:flex;align-items:center;gap:6px;height:20px;margin-top:2px;font-size:14px;line-height:20px;color:var(--t4);white-space:nowrap;transition:color var(--m-quick)}
-.gs-card .cl img{width:20px;height:20px;object-fit:contain}
-.gs-card .odd{flex:none;align-self:stretch;width:auto;height:40px;margin-top:auto;background:rgba(8,14,18,.64)} /* fill/scrim */
-.gs-card:has(.odd.sel){background:radial-gradient(72.8% 84.7% at 50.2% 19%,rgba(8,14,18,0) 0%,rgba(70,74,77,.0375) 25%,rgba(131,134,136,.075) 50%,rgba(193,195,196,.1125) 75%,rgba(255,255,255,.15) 100%),var(--t1)} /* surface/inverse */
-.gs-card:has(.odd.sel) b{color:var(--text-inverse)}
-.gs-card:has(.odd.sel) .cl{color:var(--tdis)}
-.gs-card:has(.odd.sel) .gs-ph::after{background:linear-gradient(90deg,rgba(61,69,73,0),#3d4549 50%,rgba(61,69,73,0))}
+.gs-ph.cut img{position:absolute;top:0;left:50%;width:auto;height:130%;max-width:none;transform:translateX(-50%)} /* a cut-out photo or the silhouette: 65 tall in the 52 circle, as in the component */
+.gs-tx{display:flex;flex-direction:column;gap:11px}
+.gs-nm{display:flex;flex-direction:column;gap:var(--spacing-8)}
+.gs-nm span{height:10px;font-size:14px;line-height:10px;color:var(--t2);white-space:nowrap} /* both lines trimmed to the cap height, as in Figma */
+.gs-nm b{height:14px;font-weight:700;font-size:20px;line-height:14px;color:var(--t1);white-space:nowrap}
+.gs-cl{display:flex;align-items:center;gap:6px;height:16px;font-weight:700;font-size:12px;line-height:16px;letter-spacing:.01em;color:var(--t2);white-space:nowrap;overflow:hidden}
+.gs-cl img{flex:none;width:16px;height:16px;object-fit:contain}
+.gs-top i,.gs-nm span,.gs-nm b,.gs-cl{transition:color var(--m-quick)}
+.gs-card .odd{flex:none;width:auto;padding-left:var(--spacing-12);padding-right:var(--spacing-12);background:rgba(8,14,18,.64)} /* fill/scrim */
+/* picked: the whole card turns white, the price sits on a dark tile */
+.gs-card:has(.odd.sel){background:var(--t1)} /* surface/inverse */
+.gs-card:has(.odd.sel) .gs-top i,.gs-card:has(.odd.sel) .gs-nm span,.gs-card:has(.odd.sel) .gs-nm b,.gs-card:has(.odd.sel) .gs-cl{color:var(--text-inverse)}
+.gs-card:has(.odd.sel) .gs-ph{border-color:var(--navoff)} /* border/full-color/strong */
 .gs-card .odd.sel{background:var(--text-inverse)} /* surface/default-0 */
-.gs-card .odd.sel .v{color:var(--odd-value-color)}
+.gs-card .odd.sel .v{color:var(--t1)}
 .mkts .gs-card .odd.res:not(.sel),.mkts .gs-card .odd.dis:not(.sel){background:rgba(8,14,18,.64)} /* finished match: the tile keeps the scrim, only the text shows Result / Disabled */
 /* the whole card or row is the tap target of its price (Top Picks, players, teams, goalscorers) */
-.tp,.sc-row,.cp-row,.gs-card{cursor:pointer}
-.tp,.gs-card{transition:background var(--m-quick),transform var(--m-press)}
-.tp:active,.gs-card:active{transform:scale(.985)}
+.sc-row,.cp-row,.gs-card{cursor:pointer}
+.gs-card{transition:background var(--m-quick),transform var(--m-press)}
+.gs-card:active{transform:scale(.985)}
 .sc-row,.cp-row{transition:opacity var(--m-press)}
 .sc-row:active,.cp-row:active{opacity:.7}
 /* a player without a photo in the Figma file: initials on the same round plate */
 .ini{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;line-height:1;letter-spacing:.02em;color:#8d9295}
-.tp-top .ini{width:44px;height:44px;border-radius:50%;background:#242d33}
 .sc-row .ph{object-fit:cover;object-position:center top}
 .fx-team img{object-fit:contain}
 .fx-mid{flex:1 1 0;min-width:0;white-space:nowrap} /* takes the space between the crests; a wide score spills evenly to both sides and never squeezes the teams */
@@ -2173,7 +2164,7 @@ function oddsHTML(m){
   (dnb?`<div class="ox-dnb"><div class="ox-sub"><b>Draw no bet</b><small>Money back if it ends in a draw.</small></div><div class="ox-o2">${dnb.opts.map((x,i)=>oddBtn(m.id,'dnb',x.k,i?m.as:m.hs,x.v)).join('')}</div></div>`:''))+
   `<button class="ox-tg" data-oxc="mr" aria-expanded="${u.mr}"><span data-lb>${u.mr?'Show less':'Show more'}</span>${CHEV_MR}</button></div></section>
   <section class="ox-s g"><div class="lu-sec">Goals</div><div class="ox-card" id="oxGoals">${goalsHTML(m)}</div></section>`+
-  (f.scorers?`<i class="ox-div"></i><section class="gs"><div class="gs-h"><b>Goalscorer</b><span>In this match</span></div><div class="gs-row">${f.scorers.map(p=>`<div class="gs-card"><span class="gs-ph"><img src="${IMG[GSC[p.k]||'gsc_none']}" alt=""></span><b>${p.n}</b><span class="cl"><img src="${crest(p.cr)}" alt="">${p.team}</span>${oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only')}</div>`).join('')}</div></section>`:'')+
+  (f.scorers?`<i class="ox-div"></i><section class="gs"><div class="gs-h"><b>Goalscorer</b><span>In this match</span></div><div class="gs-row">${f.scorers.map(p=>gsCard(p,'#'+(SHIRT[p.k]||9),oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only'))).join('')}</div></section>`:'')+
   (hc?hcHTML(m,hc):'')+(m.ft?'':`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`)+'</div>';
 }
 /* ---------- fixture · Overview tab (O1) ----------
@@ -2244,8 +2235,14 @@ function openFixture(mid){
  drawFixture(mid);S.stack.push({p:'fx',id:mid,tab:'odds',key:false});teamMenu(null); // tab / key: its tab and its Key events filter, so Back returns to the page as it was left
  $('#phone').classList.add('infx');fx.classList.add('show');fx.setAttribute('aria-hidden','false');hideToast();
 }
-/* C1: cut-out photos of the Goalscorer card (Figma has two); every other player gets the silhouette of the component */
+/* U10 · the one player card (Odds/Goalscorer card, Size=Compact). num: "#9" in a match, "01" in Top scorer. Photo: the cut-out of the component (Figma has two),
+   else the round portrait of the player, else the silhouette. A player with one name (Antony) has no first line. */
 const GSC={mbappe:'gsc_mbappe',alvarez:'gsc_alvarez'};Object.assign(IMG,{gsc_mbappe:'assets/img/gsc_mbappe.png',gsc_alvarez:'assets/img/gsc_alvarez.png',gsc_none:'assets/img/gsc_none.png'}); // whole paths, so build.py inlines them
+const SHIRT={mbappe:9,alvarez:19,dembele:10,vinicius:7,palmer:10,woltemade:27,joaopedro:20,kane:9,olise:17,pepi:9,duro:9,moreno:7,ayoze:22,cucho:19,williams:9,antony:7,gyokeres:14,salah:11,saka:7,haaland:9,foden:47,yamal:19,lautaro:10,osimhen:45,bruno:8,solanke:19,watkins:11,dybala:21,leao:10,vlahovic:9,guirassy:9}; // demo shirt numbers (working assumption of U10); anyone else: 9
+function gsCard(p,num,btn){
+ const w=p.n.split(' '),f=p.f||(w.length>1?w[0]:''),l=p.l||w.slice(f?1:0).join(' '),k=p.img!==undefined?p.img:p.ph!==undefined?p.ph:'pl_'+p.k,cut=GSC[p.k]||(k&&IMG[k]?'':'gsc_none');
+ return `<div class="gs-card"><div class="gs-in"><div class="gs-top"><i>${num}</i><span class="gs-ph${cut?' cut':''}"><img src="${IMG[cut||k]}" alt=""></span></div>
+  <div class="gs-tx"><div class="gs-nm"><span>${f}</span><b>${l}</b></div><div class="gs-cl"><img src="${crest(p.cr)}" alt="">${p.team}</div></div></div>${btn}</div>`}
 function renderMkts(mid=S.fx){const m=M(mid);$('#mkts').innerHTML=S.fxTab==='live'?liveHTML(m):S.fxTab==='over'?LEGAL+overHTML(m):LEGAL+oddsHTML(m)}
 function hideFixture(){$('#luNew').classList.remove('show');const fx=$('#fx');fx.classList.contains('left')?snap(fx,()=>fx.classList.remove('show','left')):fx.classList.remove('show');fx.setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx','fxs')},T.layout)}
 function closeFixture(){const t=topPage();t&&t.p==='fx'?pageBack():hideFixture()} // Back on a match page: to the page it was opened from (feed, league page, team page)
@@ -2377,7 +2374,7 @@ function compHTML(id){
  const tl=k=>TEAMS[k]?` data-team="${k}" data-tc="${id}"`:'';   // T1: crest and name open the team page; the rest of the row still picks the price
  const body=tab!=='scorer'
   ?`<div class="cp-table g-${id}">${c[tab].map(([k,n,v])=>`<div class="cp-row"><span class="cr"${tl(k)}><img src="${crest(k)}" alt=""></span><span class="nm"><span${tl(k)}>${n}</span></span>${oddBtn(id,tab,k,'',v,'only')}</div>`).join('')}</div>`
-  :`<div class="cp-h">Top Picks</div><div class="tps">${c.picks.map((p,i)=>`<div class="tp"><div class="tp-in"><div class="tp-top"><i>0${i+1}</i>${photoOf(p)}</div><span>${p.f}</span><b>${p.l}</b><div class="tp-club">${club(p)}</div></div>${oddBtn(id,'scorer',p.k,'',p.v,'only')}</div>`).join('')}</div>
+  :`<div class="cp-h">Top Picks</div><div class="tps">${c.picks.map((p,i)=>gsCard(p,'0'+(i+1),oddBtn(id,'scorer',p.k,'',p.v,'only'))).join('')}</div>
    <div class="sc-list">${c.scorers.map(p=>`<div class="sc-row">${photoOf(p)}<div class="tx"><b>${p.n}</b><span>${club(p)}</span></div>${oddBtn(id,'scorer',p.k,'',p.v,'only')}</div>`).join('')}</div>`;
  return LEGAL+`<div class="cp-chips">${chips}</div><div id="cpBody">${body}</div><div class="cp-foot">+18. Juega con responsabilidad. Publi.</div>`;
 }
@@ -2587,7 +2584,7 @@ const STATES=[
  {g:'Fixture',k:'Live match',n:'Every match of the feed has its page. A live one shows the score and the minute, and only the markets that still make sense for the score.',run(){openFixture('m1')}},
  {g:'Fixture',k:'Live updates',n:'Tab “Live updates” of a live match. On top the Live bet block: “Who scores the next goal?” with three prices; it stays pinned under the header while the feed scrolls under it. The feed shows the events of the match and has no odds.',run(){openFixture('m1');setFxTab('live')}},
  {g:'Fixture',k:'Live updates · goal',n:'A goal comes in: its card opens on top of the feed and pushes it down, the line of the shot draws, the score in the header changes and the prices of the Live bet block move. With the feed scrolled away nothing moves: a pill “1 new update” shows instead.',run(){openFixture('m1');setFxTab('live');S.luQ.m1=2;const c=cur;setTimeout(()=>{if(cur===c&&S.fx==='m1'&&!(S.lu.m1||[]).length)luPush(M('m1'),LQ.m1[1])},T.sheet)}},
- {g:'Fixture',k:'Goalscorer',n:'Between Goals and Handicap: a carousel of Goalscorer cards. Every player is his own pick, so several can be in the betslip; a picked card turns white.',run(){openFixture('m4');setTimeout(()=>{const f=$('#fxScroll'),g=$('#mkts .gs');if(!g)return;const r=f.getBoundingClientRect();f.scrollTop+=(g.getBoundingClientRect().top-r.top)*f.offsetHeight/r.height-160},80)}},
+ {g:'Fixture',k:'Goalscorer',n:'Between Goals and Handicap: a carousel of compact Goalscorer cards — the same card as Top Picks of a competition, with the shirt number in the corner. Every player is his own pick, so several can be in the betslip; a picked card turns white.',run(){openFixture('m4');setTimeout(()=>{const f=$('#fxScroll'),g=$('#mkts .gs');if(!g)return;const r=f.getBoundingClientRect();f.scrollTop+=(g.getBoundingClientRect().top-r.top)*f.offsetHeight/r.height-160},80)}},
  {g:'Competition',k:'Winner',n:'Odds tab of a competition (tap its header in the feed): who wins the season. One pick per market; it goes to the same betslip.',run(){openComp('ucl','win')}},
  {g:'Competition',k:'Top scorer',n:'Second sub-tab: two Top Picks cards and the list of players. A picked Top Pick turns white as a whole.',run(){openComp('ucl','scorer')}},
  /* N2 · the screens of 16 Nov. Fixed teams and leagues, so every show opens the same screen with the same numbers */
@@ -2666,7 +2663,7 @@ document.addEventListener('click',e=>{
  const tv2=e.target.closest('[data-tmv]');if(tv2){setTeamTab(tv2.dataset.tmv);return}
  const odd=e.target.closest('[data-g]');if(odd){if(!odd.classList.contains('locked'))toggleSel(odd.dataset.m,odd.dataset.g,odd.dataset.o);return}
  const rm=e.target.closest('[data-rm]');if(rm){removeSel(rm.dataset.rm);return}
- const card=e.target.closest('.tp,.sc-row,.cp-row,.gs-card');if(card){const o=card.querySelector('.odd');if(o&&!o.classList.contains('locked'))toggleSel(o.dataset.m,o.dataset.g,o.dataset.o);return} // the whole card picks its price
+ const card=e.target.closest('.sc-row,.cp-row,.gs-card');if(card){const o=card.querySelector('.odd');if(o&&!o.classList.contains('locked'))toggleSel(o.dataset.m,o.dataset.g,o.dataset.o);return} // the whole card picks its price
  const fv=e.target.closest('[data-fxv]');if(fv){setFxTab(fv.dataset.fxv);return}
  const lk=e.target.closest('[data-luk]');if(lk){setLuKey(lk.dataset.luk==='1');return}
  if(e.target.closest('#luNew')){luTop();return}
