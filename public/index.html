@@ -1063,6 +1063,9 @@ div.choice{cursor:default}
 .ox-hero{gap:0;padding-bottom:var(--spacing-8);border:1px solid var(--border-transparent-subtle);box-shadow:none} /* in the frame the 1 px stroke takes room, so the content is 317 wide */
 /* U5 · Odds/Hero · Match Result 4379:148158: shut = crests, chance and 1X2 (343 x 244); "Show more" opens Double chance and Draw no bet (343 x 591). The glow is set in % of the card, so it stretches with it, as in the two variants. */
 .ox-mr{display:flex;flex-direction:column;gap:28px}
+.ox-hero.cmp{padding-bottom:var(--spacing-16)} /* U7 · View=Compact 4458:148517 (Overview): crests, the question and the three prices, 343 x 148 */
+.ox-hero.cmp .ox-mr{gap:24px}
+.ox-hero.cmp .lu-teams b{font-size:16px;line-height:22px;letter-spacing:0;color:var(--t1)} /* heading/h6 */
 .ox-hero>.ox-fold>div>div{display:flex;flex-direction:column;gap:var(--spacing-16);padding-top:24px}
 .ox-hero .ox-sub{gap:0}
 .ox-hero .ox-sub b{height:auto;font-size:14px;line-height:18px;letter-spacing:.01em} /* label/md, as the titles of the component */
@@ -1123,16 +1126,9 @@ div.choice{cursor:default}
 .ox .gs{gap:var(--spacing-16)}
 .ox .gs-h{padding-left:var(--spacing-4)}
 /* O1 · fixture · Overview tab, Figma "B · Top Bets carousel after Match Results" 4369:236502.
-   Match Results (Odds/Market, Style=Glow) and the Top Bets carousel (Odds/Top Bet 3975:39703) take picks; Form, League position, Match info and Next matches are drawn only.
+   Match Result (U7: Odds/Hero · Match Result, View=Compact — .ox-hero.cmp) and the Top Bets carousel (Odds/Top Bet 3975:39703) take picks; Form, League position, Match info and Next matches are drawn only.
    Gradients: Figma mixes without premultiplying, so 16 stops each, as everywhere in this file. */
 .ovw{display:flex;flex-direction:column}
-.ov-mr{display:flex;flex-direction:column;gap:var(--spacing-12);padding:var(--spacing-16) var(--spacing-8) var(--spacing-12);border-radius:var(--radius-12);overflow:hidden;
- background:radial-gradient(67.2% 106.6% at 100% 49.9%,rgba(232,21,30,0.220) 0.0%,rgba(219,22,30,0.206) 6.2%,rgba(206,23,31,0.193) 12.5%,rgba(194,24,32,0.179) 18.8%,rgba(181,24,32,0.165) 25.0%,rgba(168,25,32,0.151) 31.2%,rgba(155,26,33,0.138) 37.5%,rgba(142,27,34,0.124) 43.8%,rgba(130,28,34,0.110) 50.0%,rgba(117,29,34,0.096) 56.2%,rgba(104,30,35,0.083) 62.5%,rgba(91,31,36,0.069) 68.8%,rgba(78,32,36,0.055) 75.0%,rgba(65,32,36,0.041) 81.2%,rgba(53,33,37,0.028) 87.5%,rgba(40,34,38,0.014) 93.8%,rgba(27,35,38,0.000) 100.0%),radial-gradient(62% 156.7% at 0% 52%,rgba(255,255,255,0.220) 0.0%,rgba(241,241,241,0.206) 6.2%,rgba(226,228,228,0.193) 12.5%,rgba(212,214,214,0.179) 18.8%,rgba(198,200,201,0.165) 25.0%,rgba(184,186,187,0.151) 31.2%,rgba(170,172,174,0.138) 37.5%,rgba(155,159,160,0.124) 43.8%,rgba(141,145,146,0.110) 50.0%,rgba(127,131,133,0.096) 56.2%,rgba(112,118,119,0.083) 62.5%,rgba(98,104,106,0.069) 68.8%,rgba(84,90,92,0.055) 75.0%,rgba(70,76,79,0.041) 81.2%,rgba(56,62,65,0.028) 87.5%,rgba(41,49,52,0.014) 93.8%,rgba(27,35,38,0.000) 100.0%),var(--surface-container-1)} /* "team glow": away red from the right, home white from the left, 22 % */
-.ov-mr>b{padding:0 var(--spacing-8);font-weight:700;font-size:18px;line-height:25px;color:var(--t1)}
-.ov-cr{display:flex;align-items:center;justify-content:space-between;height:59px;padding:17px 33px 2px 30px} /* .Odds/Crests, Layout=Question */
-.ov-cr img{width:40px;height:40px;object-fit:contain}
-.ov-cr img:last-child{width:36px;height:36px} /* the away crest is 36 in the frame */
-.ov-cr b{font-weight:700;font-size:18px;line-height:25px;color:var(--t1)}
 .tb{display:flex;flex-direction:column;gap:var(--spacing-12);margin-top:var(--spacing-16)}
 .tb-card{flex:none;width:283px;display:flex;flex-direction:column;border-radius:var(--radius-12);background:var(--surface-container-1);overflow:hidden}
 .tb-hd{display:flex;flex-direction:column;align-items:flex-start;gap:var(--spacing-6);padding:var(--spacing-16) var(--spacing-16) 10px;
@@ -2134,9 +2130,9 @@ const oxHead=(t,key,open)=>`<button class="ox-h" data-oxc="${key}" aria-expanded
 const CHEV_MR='<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15.5652 6.75368C15.8776 7.0661 15.8776 7.57212 15.5652 7.88454L10.5652 12.8845C10.2528 13.197 9.74677 13.197 9.43435 12.8845L4.43435 7.88454C4.12193 7.57212 4.12193 7.0661 4.43435 6.75368C4.74677 6.44126 5.25279 6.44126 5.56521 6.75368L9.99978 11.1883L14.4343 6.75368C14.7468 6.44126 15.2528 6.44126 15.5652 6.75368Z" fill="currentColor"/></svg>'; // chevron-down-medium of the component
 const oxFold=(key,open,c)=>`<div class="ox-fold${open?'':' shut'}" data-oxf="${key}"${open?'':' inert'}><div><div>${c}</div></div></div>`;
 /* crests, "Who will win?", implied chance and the three 1X2 prices: the same block on the Odds tab and in Live updates */
-function mrTop(m,x){const f=FX[m.id],c=luChance(m);
- return `<div class="lu-hd"><div class="lu-teams"><span><img src="${IMG[f.hiImg]}" alt=""></span><b>Who will win?</b><span><img src="${IMG[f.aiImg]}" alt=""></span></div>
-  <div class="lu-ch"><div class="lu-bar" id="luBar">${c.map((v,i)=>`<i style="flex-grow:${v}${barCol(m,i)}"></i>`).join('')}</div><div class="lu-pct" id="luPct"><b>${c[0]}%</b><span>${c[1]}% draw</span><b>${c[2]}%</b></div></div></div>
+function mrTop(m,x,cmp){const f=FX[m.id],c=luChance(m); // cmp: the compact view of Overview, without the chance bar
+ return `<div class="lu-hd"><div class="lu-teams"><span><img src="${IMG[f.hiImg]}" alt=""></span><b>Who will win?</b><span><img src="${IMG[f.aiImg]}" alt=""></span></div>`+(cmp?'':`
+  <div class="lu-ch"><div class="lu-bar" id="luBar">${c.map((v,i)=>`<i style="flex-grow:${v}${barCol(m,i)}"></i>`).join('')}</div><div class="lu-pct" id="luPct"><b>${c[0]}%</b><span>${c[1]}% draw</span><b>${c[2]}%</b></div></div>`)+`</div>
   <div class="o3">${[m.hs,x,m.as].map((l,i)=>oddBtn(m.id,'1x2',String(i),l,m.o[i])).join('')}</div>`}
 function goalsHTML(m){
  const u=oxUi(m),pers=OX_PER.filter(p=>mkt(m.id,p[2]));if(!pers.some(p=>p[0]===u.per))u.per='ft';
@@ -2181,7 +2177,7 @@ function oddsHTML(m){
   (hc?hcHTML(m,hc):'')+(m.ft?'':`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`)+'</div>';
 }
 /* ---------- fixture · Overview tab (O1) ----------
- Figma "B · Top Bets carousel after Match Results" 4369:236502. Match Results: the three 1X2 prices, the same picks as everywhere.
+ Figma "B · Top Bets carousel after Match Results" 4369:236502. Match Result: the card of the Odds tab in its compact view (mrTop), the same picks as everywhere.
  Top Bets: ready-made combinations of this match, each with one price; a tap on the price puts the whole combination into the betslip as one card,
  a second tap takes it out. Working assumptions (not confirmed by the owner and the PM): a Top Bet is one of the 20 picks; it leaves only as a whole;
  a locked Top Bet drops out as a whole (S.st by its key); a live or finished match has no Top Bets.
@@ -2216,8 +2212,7 @@ function overHTML(m){
  const row=(p,c,n,d)=>`<div class="ov-tr"><span class="p">${p}</span><span class="n"><img src="${c}" alt="">${n}</span>${d.map(x=>`<i>${x}</i>`).join('')}</div>`;
  const next=(comp,date,ko,t)=>`<div class="ov-ni"><div class="ov-nm"><span>${comp}</span><span>${date}</span></div><div class="tile"><div class="trow"><div class="tmain"><div class="tcol"><img src="${IMG.bell}" alt=""><div class="ko">${ko}</div></div>
   <div class="teams">${t.map(([n,c])=>`<div class="team"><div class="n"><img src="${c}" alt="">${n}</div><div class="r">-</div></div>`).join('')}</div></div><div class="cta"><div class="pc"><img src="${IMG.play}" alt=""></div><span>Watch</span></div></div></div></div>`;
- return `<div class="ovw"><div class="ov-mr"${tgStyle('ov-mr',m)}><b>Match Results</b><div class="ov-cr"><img src="${IMG[f.hiImg]}" alt=""><b>Who will win?</b><img src="${IMG[f.aiImg]}" alt=""></div>
-  <div class="o3">${[m.hs,'X',m.as].map((l,i)=>oddBtn(m.id,'1x2',String(i),l,m.o[i])).join('')}</div></div>`+
+ return `<div class="ovw"><section class="ox-s"><div class="lu-sec">Match Result</div><div class="lu-hero ox-hero cmp"${tgStyle('lu-hero ox-hero',m)}><div class="ox-mr">${mrTop(m,m.live?'X':'Draw',true)}</div></div></section>`+
   (tb.length?`<section class="tb"><div class="gs-h"><b>Top Bets</b><span>Ready-made combos for this match</span></div><div class="gs-row">${tb.map(t=>{const more=t.legs.length-3;
    return `<div class="tb-card"><div class="tb-hd"><span class="tb-lb">${TB_STAR}Top Bet</span><div class="tb-m"><b>${m.h} v ${m.a}</b><span>${lg}<i></i>${f.date}, ${f.time}</span></div></div>
    <div class="tb-body">${tbLegs(t.legs.slice(0,3))}${more>0?`<div class="tb-more">+${more} more selection${more>1?'s':''}</div>`:''}</div><div class="tb-ft">${oddBtn(m.id,'tb:'+t.id,'y','',t.v,'only')}</div></div>`}).join('')}</div></section>`:'')+
@@ -2588,7 +2583,7 @@ const STATES=[
  {g:'Limit 20',k:'Tap on a 21st odd',n:'Nothing is added and nothing is swapped. The odd presses and springs back slightly, an orange tongue slides out from behind the betslip and the counter pulses.',run(){fill20();refresh();toggleSel('m1','1x2','2')}},
  {g:'Limit 20',k:'Limit + locked bet',n:'20 selections and one of them locked: the line under Total odds explains the locked bet.',run(){fill20();S.st['m1|1x2']='locked';refresh();openSheet();toEnd()}},
  {g:'Fixture',k:'Odds tab',n:'Pre-match markets of one match (tap its tile in the feed), in groups: Match Result, Goals, Goalscorer, Handicap. Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
- {g:'Fixture',k:'Overview',n:'Tab “Overview” of a match that has not started: Match Results, then the carousel “Top Bets”. A Top Bet is a ready-made combination with one price: a tap on the price puts it into the betslip as one card, a second tap takes it out. The blocks below are drawn only.',run(){openFixture('m4');setFxTab('over')}},
+ {g:'Fixture',k:'Overview',n:'Tab “Overview” of a match that has not started: Match Result (the compact view of the card of the Odds tab), then the carousel “Top Bets”. A Top Bet is a ready-made combination with one price: a tap on the price puts it into the betslip as one card, a second tap takes it out. The blocks below are drawn only.',run(){openFixture('m4');setFxTab('over')}},
  {g:'Fixture',k:'Live match',n:'Every match of the feed has its page. A live one shows the score and the minute, and only the markets that still make sense for the score.',run(){openFixture('m1')}},
  {g:'Fixture',k:'Live updates',n:'Tab “Live updates” of a live match. On top the Live bet block: “Who scores the next goal?” with three prices; it stays pinned under the header while the feed scrolls under it. The feed shows the events of the match and has no odds.',run(){openFixture('m1');setFxTab('live')}},
  {g:'Fixture',k:'Live updates · goal',n:'A goal comes in: its card opens on top of the feed and pushes it down, the line of the shot draws, the score in the header changes and the prices of the Live bet block move. With the feed scrolled away nothing moves: a pill “1 new update” shows instead.',run(){openFixture('m1');setFxTab('live');S.luQ.m1=2;const c=cur;setTimeout(()=>{if(cur===c&&S.fx==='m1'&&!(S.lu.m1||[]).length)luPush(M('m1'),LQ.m1[1])},T.sheet)}},
