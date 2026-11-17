@@ -904,11 +904,9 @@ div.choice{cursor:default}
 .sc-row .odd.sel{background:var(--odd-sel-bg)}
 .cp-foot{padding:16px 0;font-size:12px;line-height:15px;letter-spacing:.01em;color:#c5c7ca}
 #phone.hasbar .cp-foot{padding-bottom:95px}
-/* R2 · Matches tab of a competition page (not drawn in Figma): the calendar of the feed under the tabs, then the tiles of the feed.
-   .cp.mt = the Matches tab is open. Empty day: two centred lines in the type of the chips (title) and of the footer (hint). */
+/* R2 + R4 · Matches tab of a competition page (Figma "Matches" 4308:68924): no calendar of days — the legal banner and the Matchday select stay under the tabs
+   (.tm-fix, the block of the team page), then the matchdays with their tiles. .cp-empty: two centred lines, used by the empty states of the pages. */
 .cp-tabs span[data-cpv]{cursor:pointer}
-.cp-cal{position:static;flex:none}
-.cp:not(.mt) .cp-cal{display:none}
 .cp-empty{padding:48px 0;text-align:center;font-size:12px;line-height:15px;letter-spacing:.01em;color:#c5c7ca}
 .cp-empty b{display:block;margin-bottom:var(--spacing-4);font-size:14px;line-height:18px;letter-spacing:.01em;color:#f9fafa}
 /* T1 · team page (#tm; not drawn in the new UI — the old frame 4309:169173 gives only what is on it and in which order).
@@ -943,7 +941,7 @@ div.choice{cursor:default}
 .tm-cap{margin-bottom:var(--spacing-8)}
 .tm-cap b{display:block;font-weight:700;font-size:14px;line-height:18px;letter-spacing:.01em;color:#f9fafa}
 .tm-cap span{display:block;font-size:12px;line-height:15px;letter-spacing:.01em;color:#c5c7ca}
-.tm .cp-scroll{position:relative} /* the list measures its matchdays from the scroller */
+.cp-scroll{position:relative} /* the matchdays measure their place from the scroller (toMd, mdNow): team page and Matches tab of a competition page */
 /* fixture · Goalscorer carousel under "More bets" (Figma 4199:155577, round photo) */
 .gs{display:flex;flex-direction:column;gap:12px}
 .gs-h b{display:block;font-weight:700;font-size:18px;line-height:25px;color:#fff}
@@ -1309,13 +1307,7 @@ div.choice{cursor:default}
     <button class="fx-follow">Follow</button>
    </div>
    <div class="fx-tabs cp-tabs" id="cpTabs"></div>
-   <div class="calendar cp-cal" id="cpCal">
-    <div class="cal-live"><button class="livebadge" id="cpLive">LIVE</button></div>
-    <div class="vdiv"></div>
-    <div class="days" id="cpDays"></div>
-    <div class="vdiv"></div>
-    <div class="cal-ic"><img src="assets/img/calendar.png" alt=""></div>
-   </div>
+   <div class="tm-fix" id="cpFix"></div>
    <div class="cp-scroll" id="cpScroll"></div>
   </div>
   <div class="tongue" id="tongue">You’ve reached maximum number of bets allowed.</div>
@@ -1772,7 +1764,7 @@ function won(m,g,o){
 }
 let S;
 /* st: locked picks {"match|market":'locked'} (S5: one state; any value counts as locked, the motion gallery still writes 'suspended'); lk: locked odds in the feed ["match|market|outcome"]; day: a key of DAYS; more: the matches of the days other than today and Sat 3 Jan */
-function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fxTab:'odds',luKey:false,lu:{},luQ:{},nts:{},luNew:0,mw:{},mwOut:null,luFresh:null,fav:false,cp:null,cpTab:'win',cpView:'odds',cpDay:'today',cpLive:false,stack:[],tm:null,tmMenu:null}} // cpView / cpDay / cpLive: tab, day and LIVE filter of the competition page (R2)
+function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fxTab:'odds',luKey:false,lu:{},luQ:{},nts:{},luNew:0,mw:{},mwOut:null,luFresh:null,fav:false,cp:null,cpTab:'win',cpView:'odds',cpM:{},stack:[],tm:null,tmMenu:null}} // cpView: tab of the competition page; cpM.md: the matchday its Matchday select shows (R4)
 const $=s=>document.querySelector(s);
 const M=id=>S.matches.find(m=>m.id===id)||S.ft.find(m=>m.id===id)||S.more.find(m=>m.id===id)||OUT[id];
 const f2=n=>n.toFixed(2);
@@ -1836,7 +1828,7 @@ function holdAnchor(sc,ms=800){
 /* the list changes: the old one leaves quickly, the new one comes in.
    dir -1: from the left (an earlier day), 1: from the right (a later day), 0: rises (same day, LIVE filter) */
 const swapFeed=dir=>swapList($('#feed'),$('#scroll'),renderFeed,dir);
-function swapList(f,sc,render,dir){ // f: the list that moves, sc: its scroller, render: draws the new list (the feed; the Matches tab of a competition page)
+function swapList(f,sc,render,dir){ // f: the list that moves, sc: its scroller, render: draws the new list
  const from=dir?{opacity:0,transform:`translateX(${dir*20}px)`}:{opacity:0,transform:'translateY(8px)'};
  let done=false;const go=()=>{if(done)return;done=true;render();sc.scrollTop=0;soft(f,from,T.std)};
  if(HOLD||RM.matches||!f.animate){go();return}        // ready-made states and reduced motion: no exit step
@@ -1850,7 +1842,7 @@ function setDay(d){
 }
 /* N1 · marks the selected day and brings it to the third slot of the calendar (108 px, where Today sits in Figma), as far as the strip can scroll.
    The strip slides there over --m-std with --ease, as it did before the calendar could scroll. */
-function paintDays(anim,box=$('#days'),day=S.day){ // R2: the same calendar sits on the Matches tab of a competition page (#cpDays, S.cpDay)
+function paintDays(anim,box=$('#days'),day=S.day){
  const strip=box.firstElementChild;let el;
  box.querySelectorAll('.day').forEach(e=>{const on=e.dataset.day===day;e.classList.toggle('sel',on);if(on)el=e});if(!el)return;
  const to=Math.max(0,Math.min(el.offsetLeft-108,box.scrollWidth-box.clientWidth)),dx=to-box.scrollLeft;box.scrollLeft=to;
@@ -2535,33 +2527,44 @@ function compHTML(id){
    <div class="sc-list">${c.scorers.map(p=>`<div class="sc-row">${photoOf(p)}<div class="tx"><b>${p.n}</b><span>${club(p)}</span></div>${oddBtn(id,'scorer',p.k,'',p.v,'only')}</div>`).join('')}</div>`;
  return LEGAL+`<div class="cp-chips">${chips}</div><div id="cpBody">${body}</div><div class="cp-foot">+18. Juega con responsabilidad. Publi.</div>`;
 }
-/* R2 · Matches tab: the matches of this competition on the chosen day, drawn by the feed's own tileHTML(), so prices, picks and live changes are the same objects
-   as in the feed. Odds switched off in the feed: no odds, no warning, no footer here either. A day without matches: an empty state, nothing about betting on screen. */
-function compMatchesHTML(id){
- const ms=dayList(S.cpDay).filter(m=>m.comp===id&&(!S.cpLive||m.live));
- if(!ms.length)return `<div class="cp-empty"><b>${S.cpLive?'No live matches right now':'No matches on this day'}</b>${S.cpLive?'Tap LIVE again to see all matches of the day':'Pick another day in the calendar'}</div>`;
- return (S.oddsOn?LEGAL:'')+`<div class="tiles">${ms.map(tileHTML).join('')}</div><div class="cp-foot">${S.oddsOn?'+18. Juega con responsabilidad. Publi.':''}</div>`;
+/* R2 + R4 · Matches tab: every match of this competition in the data, by matchday, oldest first, drawn by the feed's own tileHTML(), so prices, picks and
+   live changes are the same objects as in the feed. A matchday = the matches of one day of the calendar or of one added round; the next day joins it when none
+   of its clubs has played in it yet (a cup round on Tuesday and Wednesday is one matchday). Numbers count from the matchday of today (COMPS), as on a team page.
+   Odds switched off in the feed: no odds, no warning, no footer here either. */
+function compRounds(id){
+ const ms=seasonMs().filter(m=>m.comp===id).sort(msOrder),rs=[];
+ for(let i=0;i<ms.length;){
+  let j=i;while(j<ms.length&&ordOf(ms[j])===ordOf(ms[i]))j++;
+  const g=ms.slice(i,j),cur=rs[rs.length-1];i=j;
+  if(cur&&!g.some(m=>cur.clubs.has(m.hi)||cur.clubs.has(m.ai)))cur.ms.push(...g);else rs.push({ms:g,clubs:new Set()});
+  g.forEach(m=>rs[rs.length-1].clubs.add(m.hi).add(m.ai));
+ }
+ const N=COMPS_MD[id];let i0=rs.findIndex(r=>r.ms.some(m=>ordOf(m)===DAY_I.today)),n0=N;
+ if(i0<0){i0=rs.findIndex(r=>r.ms.some(m=>!m.ft));n0=N+1}
+ if(i0<0){i0=rs.length-1;n0=N-1}
+ rs.forEach((r,i)=>{r.md=n0+i-i0;const d=[...new Set(r.ms.map(dayOf))];r.day=d.length>1?d[0]+' – '+d[d.length-1]:d[0]});
+ return rs.filter(r=>r.md>0);
 }
-function renderComp(){if(!S.cp)return;$('#cpScroll').innerHTML=S.cpView==='matches'?compMatchesHTML(S.cp):compHTML(S.cp)}
+function compMatchesHTML(id){
+ return `<div id="cpList">${compRounds(id).map(r=>`<div class="tm-md" data-md="${r.md}">${capHTML('Matchday '+r.md,r.day)}<div class="tiles">${r.ms.map(tileHTML).join('')}</div></div>`).join('')}</div>`+(S.oddsOn?FOOT18:'<div class="cp-foot"></div>');
+}
+function renderComp(){if(!S.cp)return;const mt=S.cpView==='matches',sc=$('#cpScroll'),y=sc.scrollTop;if(S.tmMenu==='md')teamMenu(null);
+ $('#cpFix').innerHTML=mt?mdFixHTML('cp'):'';sc.innerHTML=mt?compMatchesHTML(S.cp):compHTML(S.cp);
+ if(mt){sc.scrollTop=y;syncMd(undefined,'cp')}}   // a re-render (a pick, a price) keeps the place in the list
 function openComp(id,tab){
  const c=CP[id];if(!c)return;if(S.fav)closeFav();closePages();
- S.cp=id;if(tab)S.cpTab=tab;S.cpView='odds';S.cpDay=S.day;S.cpLive=false;$('#cp').classList.remove('mt');$('#cpLive').classList.remove('on'); // the page opens on Odds; Matches starts on the day of the feed
+ S.cp=id;if(tab)S.cpTab=tab;S.cpView='odds';S.cpM={};teamMenu(null); // the page opens on Odds
  $('#cpLogo').src=IMG[c.img];$('#cpName').textContent=c.t;$('#cpSeason').textContent=c.season;
  const tb=$('#cpTabs');tb.scrollLeft=0;tb.innerHTML=c.tabs.map(t=>`<span${t==='Odds'?' class="on" data-cpv="odds"':t==='Matches'?' data-cpv="matches"':''}>${t}</span>`).join(''); // R2: Matches and Odds switch, the other tabs are labels
  renderComp();$('#cpScroll').scrollTop=0;
  $('#phone').classList.add('incp');$('#cp').classList.add('show');$('#cp').setAttribute('aria-hidden','false');hideToast();
 }
-function closeComp(){$('#cp').classList.remove('show');$('#cp').setAttribute('aria-hidden','true');S.cp=null;setTimeout(()=>{if(!S.cp)$('#phone').classList.remove('incp')},T.layout)}
+function closeComp(){teamMenu(null);$('#cp').classList.remove('show');$('#cp').setAttribute('aria-hidden','true');S.cp=null;setTimeout(()=>{if(!S.cp)$('#phone').classList.remove('incp')},T.layout)}
 function setCompView(v){if(S.cpView===v)return;S.cpView=v;
- $('#cp').classList.toggle('mt',v==='matches');document.querySelectorAll('#cpTabs [data-cpv]').forEach(e=>e.classList.toggle('on',e.dataset.cpv===v));
- renderComp();$('#cpScroll').scrollTop=0;if(v==='matches')paintDays(false,$('#cpDays'),S.cpDay);
+ document.querySelectorAll('#cpTabs [data-cpv]').forEach(e=>e.classList.toggle('on',e.dataset.cpv===v));
+ renderComp();$('#cpScroll').scrollTop=0;
+ if(v==='matches'){const R=compRounds(S.cp),a=R.find(r=>r.ms.some(m=>m.live))||R.find(r=>r.ms.some(m=>!m.ft))||R[R.length-1];if(a)toMd(a.md,false,'cp')} // Matches opens at the matchday being played or the next one, as a team page does
  soft($('#cpScroll'),RISE,T.std)} // the new tab rises in, like a sub-tab
-/* a day of the competition calendar, or its LIVE badge (live matches are played today: LIVE on another day goes to Today with the filter on, as in the feed) */
-function setCpDay(d,live=false){
- if(S.cpDay===d&&S.cpLive===live)return;const k=DAYS.map(x=>x[0]),dir=Math.sign(k.indexOf(d)-k.indexOf(S.cpDay));
- S.cpDay=d;S.cpLive=live;$('#cpLive').classList.toggle('on',live);
- paintDays(true,$('#cpDays'),d);swapList($('#cpScroll'),$('#cpScroll'),renderComp,dir);
-}
 function setCompTab(t){if(S.cpTab===t)return;S.cpTab=t;renderComp();$('#cpScroll').scrollTop=0;soft($('#cpBody'),RISE,T.std)} // the new list rises in, like the LIVE filter in the feed
 
 /* ---------- T1 + T2 · team page (#tm) ----------
@@ -2576,11 +2579,9 @@ const DAY_I=Object.fromEntries(DAYS.map((d,i)=>[d[0],i]));
 const ordOf=m=>m.ord!==undefined?m.ord:m.dk?DAY_I[m.dk]:m.ft?DAY_I.yest:DAY_I.today;   // place of a match in time: added finished rounds < the days of the calendar < added coming rounds
 const dayOf=m=>m.day||(m.ft?DAYS[DAY_I.yest][1]:'Today');
 /* matches of a team, oldest first; comp: only this competition. "Sat 3 Jan" repeats six matches of today for the Finished matches screen: a team does not play the same match twice */
-function teamMatches(k,comp){
- const today=S.matches.filter(m=>!m.hid),rep=m=>today.some(t=>t.comp===m.comp&&t.hi===m.hi&&t.ai===m.ai);
- return [...S.ft.filter(m=>!rep(m)),...today,...S.more].filter(m=>(m.hi===k||m.ai===k)&&(!comp||m.comp===comp))
-  .sort((a,b)=>ordOf(a)-ordOf(b)||(b.live?1:0)-(a.live?1:0)||(a.ko||'').localeCompare(b.ko||''));
-}
+const seasonMs=()=>{const today=S.matches.filter(m=>!m.hid),rep=m=>today.some(t=>t.comp===m.comp&&t.hi===m.hi&&t.ai===m.ai);return [...S.ft.filter(m=>!rep(m)),...today,...S.more]}; // every match of the data, once
+const msOrder=(a,b)=>ordOf(a)-ordOf(b)||(b.live?1:0)-(a.live?1:0)||(a.ko||'').localeCompare(b.ko||'');
+function teamMatches(k,comp){return seasonMs().filter(m=>(m.hi===k||m.ai===k)&&(!comp||m.comp===comp)).sort(msOrder)}
 /* the same list with matchday numbers: today's match carries the matchday of the feed (COMPS), the others count from it one by one */
 function teamList(k,comp){
  const ms=teamMatches(k,comp),N=+COMPS_MD[comp];let i0=ms.findIndex(m=>ordOf(m)===DAY_I.today),n0=N;
@@ -2598,7 +2599,6 @@ const capHTML=(t,s)=>`<div class="tm-cap"><b>${t}</b><span>${s}</span></div>`;
 function buildTeamPage(){
  const tm=$('#cp').cloneNode(true);tm.id='tm';tm.classList.add('tm');
  tm.querySelectorAll('[id]').forEach(e=>e.id=e.id.replace(/^cp/,'tm'));
- const fix=document.createElement('div');fix.className='tm-fix';fix.id='tmFix';tm.querySelector('.cp-cal').replaceWith(fix);
  const sub=tm.querySelector('.cp-name>span');sub.classList.add('tm-comp');sub.dataset.tmm='comp';
  const menu=document.createElement('div');menu.className='tm-menu';menu.id='tmCompMenu';menu.hidden=true;tm.querySelector('.cp-name').append(menu);
  $('#cp').after(tm);
@@ -2612,30 +2612,35 @@ function teamOverviewHTML(e){
  const md=teamList(e.id,m.comp).find(x=>x.m===m).md;
  return (S.oddsOn?LEGAL:'')+`<div class="cp-h">${m.live?'Live now':'Next match'}</div><div class="tm-md">${capHTML(CP[m.comp].t+' · Matchday '+md,dayOf(m)+(m.live?'':', '+m.ko)+(S.oddsOn?' · Match Result':''))}${tileHTML(m)}</div>`+(S.oddsOn?FOOT18:'');
 }
+/* R4 · the Matchday select is one element for two pages: p = 'tm' (team page) or 'cp' (Matches tab of a competition page). Ids are <p>MdBtn, <p>MdT, <p>MdMenu,
+   <p>List and <p>Scroll; mdSt(p) holds the matchday on show (.md), mdRounds(p) gives the items of the menu: [matchday, its day]. */
+const mdP=el=>el.closest('#tm')?'tm':'cp',mdSt=p=>p==='tm'?S.tm:S.cp?S.cpM:null;
+const mdRounds=p=>p==='tm'?teamList(S.tm.id,S.tm.comp).map(({m,md})=>[md,dayOf(m)]):compRounds(S.cp).map(r=>[r.md,r.day]);
+const mdFixHTML=p=>(S.oddsOn?LEGAL:'')+`<button class="tm-dd" id="${p}MdBtn" data-tmm="md"><span id="${p}MdT"></span>${CHEV_DD}</button><div class="tm-menu" id="${p}MdMenu" hidden></div>`;
 function renderTeam(){
  const e=S.tm;if(!e)return;const mt=e.tab==='matches';if(S.tmMenu==='md')teamMenu(null);
- $('#tmFix').innerHTML=mt?(S.oddsOn?LEGAL:'')+`<button class="tm-dd" id="tmMdBtn" data-tmm="md"><span id="tmMdT"></span>${CHEV_DD}</button><div class="tm-menu" id="tmMdMenu" hidden></div>`:'';
+ $('#tmFix').innerHTML=mt?mdFixHTML('tm'):'';
  const sc=$('#tmScroll'),y=sc.scrollTop;sc.innerHTML=mt?teamMatchesHTML(e):teamOverviewHTML(e);sc.scrollTop=y;   // a re-render (a pick, a price) keeps the place in the list
  if(mt)syncMd();
 }
 /* the matchday at the top of the list -> the label of the Matchday menu */
-function mdNow(){const sc=$('#tmScroll');let el=null;
+function mdNow(p='tm'){const sc=$('#'+p+'Scroll');let el=null;
  sc.querySelectorAll('.tm-md').forEach(g=>{if(!el&&g.offsetTop+g.offsetHeight>sc.scrollTop+12)el=g});return el}
-function syncMd(pick){const el=$('#tmMdT'),sc=$('#tmScroll'),g=el&&mdNow();if(!g)return;let md=+g.dataset.md;
- if(pick!==undefined)S.tm.md=pick;
- if(sc.scrollHeight-sc.clientHeight-sc.scrollTop<2&&S.tm.md>md)md=S.tm.md;else S.tm.md=md;   // the end of the list: a late matchday cannot reach the top, the label keeps the one that was picked
+function syncMd(pick,p='tm'){const el=$('#'+p+'MdT'),sc=$('#'+p+'Scroll'),st=mdSt(p),g=el&&st&&mdNow(p);if(!g)return;let md=+g.dataset.md;
+ if(pick!==undefined)st.md=pick;
+ if(sc.scrollHeight-sc.clientHeight-sc.scrollTop<2&&st.md>md)md=st.md;else st.md=md;   // the end of the list: a late matchday cannot reach the top, the label keeps the one that was picked
  el.textContent='Matchday '+md}
 /* bring the list to a matchday. The scroller jumps and the list travels the same distance back (the way the calendar brings a day into place), over --m-layout with --soft */
-function toMd(md,anim){
- const sc=$('#tmScroll'),g=sc.querySelector(`.tm-md[data-md="${md}"]`),list=$('#tmList');if(!g)return;
- const y0=sc.scrollTop;sc.scrollTop=g.offsetTop-12;const dy=sc.scrollTop-y0;syncMd(md);
+function toMd(md,anim,p='tm'){
+ const sc=$('#'+p+'Scroll'),g=sc.querySelector(`.tm-md[data-md="${md}"]`),list=$('#'+p+'List');if(!g)return;
+ const y0=sc.scrollTop;sc.scrollTop=g.offsetTop-12;const dy=sc.scrollTop-y0;syncMd(md,p);
  if(anim&&dy&&!HOLD&&!RM.matches&&list.animate)list.animate([{transform:`translateY(${dy}px)`},{transform:'none'}],{duration:T.layout,easing:SOFT});
 }
-function teamMenu(which){ // 'md' | 'comp' | null: open one menu (or close it when it is open), close the other
- const e=S.tm,md=$('#tmMdMenu'),cm=$('#tmCompMenu'),btn=$('#tmMdBtn'),open=which==='md'?md&&md.hidden:which==='comp'?cm.hidden:false;
- if(md)md.hidden=true;cm.hidden=true;if(btn)btn.classList.remove('open');S.tmMenu=null;
+function teamMenu(which,p='tm'){ // 'md' | 'comp' | null: open one menu (or close it when it is open), close the others; p: the page of the Matchday select
+ const e=which==='md'?mdSt(p):S.tm,md=$('#'+p+'MdMenu'),cm=$('#tmCompMenu'),btn=$('#'+p+'MdBtn'),open=which==='md'?md&&md.hidden:which==='comp'?cm.hidden:false;
+ document.querySelectorAll('.tm-menu').forEach(x=>x.hidden=true);document.querySelectorAll('.tm-dd').forEach(x=>x.classList.remove('open'));S.tmMenu=null;
  if(!open||!e)return;
- if(which==='md'){md.innerHTML=teamList(e.id,e.comp).map(({m,md:n})=>`<button data-tmd="${n}"${e.md===n?' class="on"':''}><b>Matchday ${n}</b>${dayOf(m)}</button>`).join('');
+ if(which==='md'){md.innerHTML=mdRounds(p).map(([n,d])=>`<button data-tmd="${n}"${e.md===n?' class="on"':''}><b>Matchday ${n}</b>${d}</button>`).join('');
   md.hidden=false;btn.classList.add('open');soft(md,RISE,T.quick);const on=md.querySelector('.on');if(on)md.scrollTop=on.offsetTop-md.clientHeight/2+22}
  else{const cs=teamComps(e.id);if(cs.length<2)return;cm.innerHTML=cs.map(c=>`<button data-tmc="${c}"${c===e.comp?' class="on"':''}><b>${CP[c].t}</b>${CP[c].season}</button>`).join('');cm.hidden=false;soft(cm,RISE,T.quick)}
  S.tmMenu=which;
@@ -2757,7 +2762,7 @@ const STATES=[
  {g:'Competition',k:'Top scorer',n:'Second sub-tab: two Top Picks cards and the list of players. A picked Top Pick turns white as a whole.',run(){openComp('ucl','scorer')}},
  /* N2 · the screens of 16 Nov. Fixed teams and leagues, so every show opens the same screen with the same numbers */
  {g:'Competition',k:'Relegation',n:'Third sub-tab, only for leagues: who goes down, from the most likely team. Same rules as Competition winner: one pick per market, same betslip.',run(){openComp('laliga','rel')}},
- {g:'Competition',k:'Matches',n:'Tab Matches of a competition: the calendar and the tiles of the feed, this competition only. Picks stay in sync with the feed and the betslip.',run(){openComp('laliga');setCompView('matches')}},
+ {g:'Competition',k:'Matches',n:'Tab Matches of a competition: no calendar of days — the Matchday select and the matchdays of this competition with the tiles of the feed. Picks stay in sync with the feed and the betslip.',run(){openComp('laliga');setCompView('matches')}},
  {g:'Team',k:'Matches',n:'Team page (tap a crest or a team name on a match page or in a league table): the season by matchday, opened at the current one, with the odds of the feed.',run(){openTeam('rm','laliga')}},
  {g:'Team',k:'Matchday menu',n:'The Matchday select, open: pick a matchday and the list goes to it. The current one is marked.',run(){openTeam('rm','laliga');teamMenu('md')}},
  {g:'Team',k:'Overview',n:'Tab Overview: the next match of the team in any competition, with its Match Result prices. Tap the tile to open the match.',run(){openTeam('bar','laliga');setTeamTab('overview')}},
@@ -2824,8 +2829,8 @@ function buildNav(){
 buildTeamPage();
 document.addEventListener('click',e=>{
  if(S.tmMenu&&!e.target.closest('.tm-menu,[data-tmm],#nav')){teamMenu(null);return}             // T1: a tap outside an open menu only closes it (not a click in the States panel: it sets the screen by itself)
- const mm=e.target.closest('[data-tmm]');if(mm){if(!mm.hasAttribute('disabled'))teamMenu(mm.dataset.tmm);return}
- const mdI=e.target.closest('[data-tmd]');if(mdI){teamMenu(null);toMd(+mdI.dataset.tmd,true);return}
+ const mm=e.target.closest('[data-tmm]');if(mm){if(!mm.hasAttribute('disabled'))teamMenu(mm.dataset.tmm,mdP(mm));return}
+ const mdI=e.target.closest('[data-tmd]');if(mdI){const p=mdP(mdI);teamMenu(null);toMd(+mdI.dataset.tmd,true,p);return}
  const cI=e.target.closest('[data-tmc]');if(cI){setTeamComp(cI.dataset.tmc);return}
  const tl=e.target.closest('[data-team]');if(tl){openTeam(tl.dataset.team,tl.dataset.tc);return}
  const tv2=e.target.closest('[data-tmv]');if(tv2){setTeamTab(tv2.dataset.tmv);return}
@@ -2844,7 +2849,7 @@ document.addEventListener('click',e=>{
  const cp=e.target.closest('.comp[data-cp],.chip[data-cp]');if(cp){openComp(cp.dataset.cp);return}
 });
 $('#cpBack').onclick=closeComp;$('#tmBack').onclick=pageBack;
-$('#tmScroll').addEventListener('scroll',()=>{if(S.tm&&S.tm.tab==='matches')syncMd()});$('#fxBack').onclick=closeFixture;
+$('#tmScroll').addEventListener('scroll',()=>{if(S.tm&&S.tm.tab==='matches')syncMd()});$('#cpScroll').addEventListener('scroll',()=>{if(S.cp&&S.cpView==='matches')syncMd(undefined,'cp')});$('#fxBack').onclick=closeFixture;
 $('#fxScroll').addEventListener('scroll',()=>{fxHead();luSeen()},{passive:true});
 if(window.ResizeObserver)new ResizeObserver(fxHead).observe($('#fx')); // the phone changes its size: the compact scoreboard keeps its place
 $('#oddsChip').onclick=()=>setOddsOn(!S.oddsOn);
@@ -2856,10 +2861,8 @@ $('#bar').onclick=openSheet;
 $('#backdrop').onclick=()=>{S.fav?closeFav():closeSheet()};
 $('#favX').onclick=closeFav;$('#favCta').onclick=favAdd;
 $('#favOdds').addEventListener('click',e=>{const b=e.target.closest('[data-fo]');if(!b)return;S.favPick=b.dataset.fo;document.querySelectorAll('#favOdds .odd').forEach(x=>x.classList.toggle('sel',x===b))});
-$('#cpDays').innerHTML=$('#days').innerHTML;            // R2: the calendar of a competition page is a copy of the feed's
-document.querySelectorAll('.day[data-day]').forEach(d=>d.onclick=()=>d.closest('#cpDays')?setCpDay(d.dataset.day):setDay(d.dataset.day));
-$('#cpLive').onclick=()=>setCpDay('today',S.cpDay==='today'?!S.cpLive:true);
-dragScroll($('#days'));dragScroll($('#leagues'));dragScroll($('#cpDays'));dragScroll($('#tmTabs'));dragScroll($('#cpTabs'));dragScroll($('#fx .fx-tabs'));
+document.querySelectorAll('.day[data-day]').forEach(d=>d.onclick=()=>setDay(d.dataset.day));
+dragScroll($('#days'));dragScroll($('#leagues'));dragScroll($('#tmTabs'));dragScroll($('#cpTabs'));dragScroll($('#fx .fx-tabs'));
 $('#navX').onclick=()=>$('#nav').classList.add('off');$('#navOpen').onclick=()=>$('#nav').classList.remove('off');
 $('#editBtn').onclick=()=>{S.edit=!S.edit;applyEdit()};
 $('#placeBtn').onclick=placeBet;
@@ -2983,7 +2986,7 @@ function init(){
  for(const k in CHG)delete CHG[k];Object.values(chgTimers).flat().forEach(clearTimeout);document.querySelectorAll('.cv').forEach(e=>e.classList.remove('up','dn'));
  $('#oddsChip').classList.remove('off');$('#oddsChip').setAttribute('aria-checked','true');$('#liveBadge').classList.remove('on');
  $('#sheet').classList.remove('show','editing');$('#backdrop').classList.remove('show');$('#overlay').classList.remove('show');
- $('#fx').classList.remove('show','left');$('#luNew').classList.remove('show');$('#tm').classList.remove('show');$('#tm').setAttribute('aria-hidden','true');teamMenu(null);$('#cp').classList.remove('show','mt');$('#cpLive').classList.remove('on');$('#phone').classList.remove('infx','incp','intm','limit');
+ $('#fx').classList.remove('show','left');$('#luNew').classList.remove('show');$('#tm').classList.remove('show');$('#tm').setAttribute('aria-hidden','true');teamMenu(null);$('#cp').classList.remove('show');$('#phone').classList.remove('infx','incp','intm','limit');
  clearTimeout(favT);$('#fav').classList.remove('show');paintDays(false);$('#leagues').scrollLeft=0;
  renderFeed();renderSheet();updateBar();$('#scroll').scrollTop=0;
  timers=[setInterval(liveTick,2600),setInterval(minuteTick,20000)];
