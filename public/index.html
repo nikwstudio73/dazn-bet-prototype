@@ -305,7 +305,7 @@ img{display:block}
    Same Global foundation tokens as the product UI ("Color theme", dark). One accent: white (text/primary). No brand yellow, no orange.
    Spacing on the 4 px scale (spacing-2 / 4 / 8 / 12 / 16), type 14/20 and 12/18, radii 16 > 8 and 12 > 8 (outer minus padding). */
 :root{
-  --ui-canvas:var(--surface-container-2);          /* surface/container-2 */
+  --ui-canvas:#080e12;                             /* surface/default-0: the darkest surface, as on the Design hub (owner, 17 Nov; was surface/container-2) */
   --ui-panel:var(--surface-container-1);           /* surface/container-1 */
   --ui-well:#080e12;                               /* surface/default-0 */
   --ui-line:var(--border-full-color-subtle);       /* border/full-color/subtle */
@@ -343,6 +343,7 @@ img{display:block}
 .hublink~.nav{max-height:calc(100vh - 2*var(--ui-edge) - 28px - var(--spacing-8))}
 html.shooting,html.shooting *{cursor:none!important} /* while the frame is taken: no pointer in the picture */
 html.shooting .over{visibility:hidden} /* narrow window: the panel or the size switch lies over the frame, so it steps aside for the picture */
+html.embed body{background:var(--surface-container-2)} /* the motion gallery keeps its own, lighter stage */
 html.embed .nav,html.embed .nav-open,html.embed .devsw,html.embed .shot,html.embed .hublink{display:none} /* A2: inside the motion gallery the gallery has its own controls */
 
 /* ---------- M1 · on a phone (html.app, set in <head>) ----------
