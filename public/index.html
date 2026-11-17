@@ -758,24 +758,27 @@ div.choice{cursor:default}
 #phone.infx.hasbar .mkts{padding-bottom:109px}
 /* U11 · the header of a match page follows the finger (owner 17.11, variant C). The compact bar is 40 under the status bar; the Back button
    stands in it from the start. While the page scrolls the first 152 px (the header, 192, minus the bar, 40) the crests and the score shrink and
-   travel into the bar; the team names go with their crests and fade, the league line and the day fade; fxHead() places them by the scroll
-   position, there are no durations. The travelling copy of the scoreboard (.fxc-l) has the box and the layout of the header, lies exactly over
-   it and takes its place as soon as the page leaves its top, so nothing of it depends on how fast the page moves under it.
-   The bar turns solid at the end of the way (.fx-bg). No half-way states (owner 17.11): the page rests only at its top or with the header
-   compact — the browser's own scroll snapping finishes the way (#fxScroll, .fx-hero, .fx-rest), as the system would in the app.
-   Reduced motion: nothing travels, the compact scoreboard fades in at once. */
+   travel towards the bar; the team names go with their crests and fade, the league line and the day fade; then the scoreboard itself fades,
+   and at the end of the way the bar fills in with the name of the match ("Real Madrid vs PSG"), as the compact bar always was (owner 17.11:
+   no scoreboard in the bar). fxHead() places everything by the scroll position, there are no durations. The travelling copy of the scoreboard
+   (.fxc-l) has the box and the layout of the header, lies exactly over it and takes its place as soon as the page leaves its top, so nothing
+   of it depends on how fast the page moves under it.
+   No half-way states (owner 17.11): the page rests only at its top or with the header compact — the browser's own scroll snapping finishes
+   the way (#fxScroll, .fx-hero, .fx-rest), as the system would in the app.
+   Reduced motion: nothing travels, the bar with the name of the match fades in at once. */
 #fxScroll{scroll-snap-type:y mandatory;scroll-padding-top:calc(var(--sb) + 40px)} /* the bar covers the top of the page: the rest of the page snaps under it */
 .fx-hero,.fx-rest{scroll-snap-align:start}
 .fx-rest{min-height:calc(100% + 16px - var(--sb))} /* competition row, tabs, content. Taller than the screen under the bar: the page scrolls freely inside it, and a short tab can still keep the header compact (16 = 56 + 44 - 84) */
-.fx-top{position:absolute;left:0;right:0;top:0;height:calc(var(--sb) + 40px);z-index:2;pointer-events:none}
+.fx-top{position:absolute;left:0;right:0;top:0;height:calc(var(--sb) + 40px);padding:var(--sb) 16px 0;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none}
+#fxTitle{position:relative;font-weight:700;font-size:16px;line-height:20px;opacity:0} /* the name of the match; fxHead() brings it in with the fill of the bar */
 .fx-bg{position:absolute;inset:0;background:#080e12;border-bottom:1px solid #3d4549;opacity:0} /* the fill of the bar; fxHead() brings it in at the end of the way */
 #fx.fxd .fx-top{pointer-events:auto} /* compact: the bar covers what scrolls under it */
 .fxc-l{position:absolute;left:0;right:0;top:0;height:calc(192px + var(--sb));box-sizing:border-box;padding:var(--sb) 16px 0;visibility:hidden;pointer-events:none}
-#fx.fxc .fxc-l,#fx.fxr .fxc-l{visibility:visible}
+#fx.fxc .fxc-l{visibility:visible}
 #fx.fxc .fx-hero>*{visibility:hidden}
 .fxc-l img,.fxc-l span{will-change:transform}
-#fx.fxr .fxc-l,#fx.fxr .fx-bg{opacity:0;transition:opacity var(--m-quick) var(--ease)!important}
-#fx.fxr.fxd .fxc-l,#fx.fxr.fxd .fx-bg{opacity:1}
+#fx.fxr .fx-bg,#fx.fxr #fxTitle{opacity:0;transition:opacity var(--m-quick) var(--ease)!important}
+#fx.fxr.fxd .fx-bg,#fx.fxr.fxd #fxTitle{opacity:1}
 
 /* favourite-team popup (Figma section "Betting popup") */
 .fvp{position:absolute;left:0;right:0;bottom:0;background:#0c161c;border-radius:12px 12px 0 0;z-index:22;padding:24px 16px;display:flex;flex-direction:column;gap:16px;transform:translateY(105%);transition:transform var(--m-sheet) var(--soft)} /* same native sheet motion as the betslip */
@@ -1258,7 +1261,7 @@ div.choice{cursor:default}
 
 
   <div class="fx" id="fx" aria-hidden="true">
-   <div class="fx-top" id="fxTop"><i class="fx-bg"></i><div class="fxc-l" aria-hidden="true"><div class="fx-nav"><span id="fxcL"></span></div><div class="fx-teams"><div class="fx-team"><img id="fxcH" src="" alt=""><span id="fxcHn"></span></div><div class="fx-mid"><span id="fxcS"></span><span id="fxcM"></span></div><div class="fx-team"><img id="fxcA" src="" alt=""><span id="fxcAn"></span></div></div></div><button class="fx-back" id="fxBack" aria-label="Back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.3266 15.9932L3.33337 8L11.3266 0.00679016L12.6667 1.34691L6.01362 8L12.6667 14.6531L11.3266 15.9932Z" fill="#F9FAFA"/></svg></button></div>
+   <div class="fx-top" id="fxTop"><i class="fx-bg"></i><div class="fxc-l" aria-hidden="true"><div class="fx-nav"><span id="fxcL"></span></div><div class="fx-teams"><div class="fx-team"><img id="fxcH" src="" alt=""><span id="fxcHn"></span></div><div class="fx-mid"><span id="fxcS"></span><span id="fxcM"></span></div><div class="fx-team"><img id="fxcA" src="" alt=""><span id="fxcAn"></span></div></div></div><span id="fxTitle"></span><button class="fx-back" id="fxBack" aria-label="Back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M11.3266 15.9932L3.33337 8L11.3266 0.00679016L12.6667 1.34691L6.01362 8L12.6667 14.6531L11.3266 15.9932Z" fill="#F9FAFA"/></svg></button></div>
    <button class="fx-follow lu-new" id="luNew" aria-live="polite"></button>
    <div class="fx-scroll" id="fxScroll">
     <div class="fx-hero">
@@ -2244,7 +2247,7 @@ function overHTML(m){
 function drawFixture(mid){
  const m=M(mid),f=FX[mid];
  $('#fxLeague').textContent=f.league;$('#fxH').textContent=m.h;$('#fxA').textContent=m.a;$('#fxHi').src=IMG[f.hiImg];$('#fxAi').src=IMG[f.aiImg];$('#fxComp').textContent=f.comp;$('#fxCompImg').src=IMG[f.compImg||'laliga'];
- $('#fx .fx-hero').style.backgroundImage=teamGlow('fx-hero',m); // C2: the glow of the header in the colours of the two teams
+ $('#fxTitle').textContent=m.h+' vs '+m.a;$('#fx .fx-hero').style.backgroundImage=teamGlow('fx-hero',m); // C2: the glow of the header in the colours of the two teams
  const ft=$('#fxTime'),fd=$('#fxDate');                 // kick-off time and day; a live match shows the score and the running minute
  const sc=!!(m.live||m.ft);                             // started or finished: big white score instead of the kick-off time
  ft.textContent=sc?m.sh+' - '+m.sa:f.time;fd.textContent=m.live?m.min+'’':m.ft?'FT':f.date;ft.classList.toggle('sc',sc);fd.classList.toggle('lv',!!m.live);
@@ -2392,10 +2395,11 @@ function fxKeep(){const t=topPage();if(t&&t.p==='fx'){t.tab=S.fxTab;t.key=S.luKe
 function setFxTab(v){if(S.fxTab===v||!S.fx)return;S.fxTab=v;S.luNew=0;luPill();fxKeep();paintFxTabs();
  const sc=$('#fxScroll'),y=sc.scrollTop;renderMkts();sc.scrollTop=Math.min(y,$('#mkts').offsetTop-fxPin());fxHead(); // U11: the header keeps its state, a compact one opens the new tab from its top
  restoreArrows();soft($('#mkts'),RISE,T.std)} // like the tabs of a league page: the new tab rises in
-/* U11 · the header of a match page follows the scroll. FXH: the sizes in the compact bar as shares of the header ones (crest 24 of 56, score 16 of 28,
-   kick-off time 14 of 16, minute 10 of 16; owner 17.11, no Figma frame yet) and the two shares of the way: by `fade` the names, the league line
-   and the day are gone, from `solid` the bar fills in. Not motion tokens: the way is driven by the finger, nothing here has a duration;
-   the end of the way is finished by the browser's scroll snapping, with its own curve (as the jump of luTop()). */
+/* U11 · the header of a match page follows the scroll. FXH: the sizes the scoreboard shrinks to on its way as shares of the header ones
+   (crest 24 of 56, score 16 of 28, kick-off time 14 of 16, minute 10 of 16; owner 17.11) and the two shares of the way: by `fade` the names,
+   the league line and the day are gone; between `fade` and `solid` the crests and the score fade too; from `solid` the bar and the name of
+   the match fill in. Not motion tokens: the way is driven by the finger, nothing here has a duration; the end of the way is finished by the
+   browser's scroll snapping, with its own curve (as the jump of luTop()). */
 const FXH={crest:24/56,score:16/28,time:14/16,min:10/16,fade:.4,solid:.85};
 const fxPin=()=>$('#fxTop').offsetHeight+$('#fxTabs').offsetHeight;              // what stays pinned on top of a match page: the bar and the tabs
 function fxHead(){
@@ -2405,15 +2409,16 @@ function fxHead(){
  const cx=e=>e.offsetLeft+e.offsetWidth/2,cy=e=>e.offsetTop+e.offsetHeight/2,kS=sc?FXH.score:FXH.time;         // centres in the header, before any move
  const half=Math.max(S0.offsetWidth*kS,sc?M0.offsetWidth*FXH.min:0)/2+12+12;                                    // half of the text, 12 to the crest, half of a 24 crest
  const dxH=(W/2-half-cx(H))*p,dxA=(W/2+half-cx(A))*p,dy=(sb+20-cy(H))*p,dS=(sb+(sc?15:20)-cy(S0))*p,dM=(sb+31-cy(M0))*p; // every size is read before anything is written
- const k=L(1,FXH.crest),out=rm?0:c(1-p/FXH.fade);
+ const k=L(1,FXH.crest),out=rm?0:c(1-p/FXH.fade),fill=c((p-FXH.solid)/(1-FXH.solid));
  H.style.transform=`translate(${dxH}px,${dy}px) scale(${k})`;A.style.transform=`translate(${dxA}px,${dy}px) scale(${k})`;
  [['#fxcHn',dxH],['#fxcAn',dxA]].forEach(([q,dx])=>{const e=$(q);e.style.transform=`translate(${dx}px,${dy}px)`;e.style.opacity=out}); // a name goes with its crest and fades: they never cross
  $('#fxcL').style.opacity=out;
  S0.style.transform=`translateY(${dS}px) scale(${L(1,kS)})`;                                                      // score: a line of two with the minute; kick-off time: alone in the middle of the bar
  if(sc){M0.style.transform=`translateY(${dM}px) scale(${L(1,FXH.min)})`;M0.style.opacity=''}
  else{M0.style.transform=`translateY(${dS}px)`;M0.style.opacity=out}                                             // the day goes with the time and fades
- $('#fxTop .fx-bg').style.opacity=rm?'':c((p-FXH.solid)/(1-FXH.solid));
- fx.classList.toggle('fxr',rm);fx.classList.toggle('fxc',!rm&&y>0);fx.classList.toggle('fxd',rm?y>24:p>=1);     // reduced motion: the scoreboard comes in when the big crests reach the bar (64 - 40)
+ $('#fxTop .fxc-l').style.opacity=c(1-(p-FXH.fade)/(FXH.solid-FXH.fade));                         // the scoreboard fades on its way, after the names
+ $('#fxTop .fx-bg').style.opacity=$('#fxTitle').style.opacity=rm?'':fill;                                          // then the bar fills in with the name of the match
+ fx.classList.toggle('fxr',rm);fx.classList.toggle('fxc',!rm&&y>0);fx.classList.toggle('fxd',rm?y>24:p>=1);     // reduced motion: the bar comes in when the big crests reach it (64 - 40)
 }
 function setLuKey(k){if(S.luKey===k)return;S.luKey=k;S.luNew=0;luPill();fxKeep();const y=$('#fxScroll').scrollTop;renderMkts();$('#fxScroll').scrollTop=y;restoreArrows();soft($('#luFeed'),RISE,T.std)}
 
