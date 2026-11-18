@@ -306,7 +306,7 @@ img{display:block}
    Spacing on the 4 px scale (spacing-2 / 4 / 8 / 12 / 16), type 14/20 and 12/18, radii 16 > 8 and 12 > 8 (outer minus padding). */
 :root{
   --ui-canvas:var(--surface-container-1);          /* surface/container-1: one step lighter than the darkest surface (owner, 17 Nov; was surface/container-2) */
-  --ui-panel:var(--surface-container-2);           /* surface/container-2: one step above the stage, so the panel and the buttons read as plates (owner, 17 Nov) */
+  --ui-panel:#121e23;                              /* owner's pick in the design editor (18 Nov): between surface/container-1 and container-2; not a Global foundation value */
   --ui-well:#080e12;                               /* surface/default-0 */
   --ui-line:var(--border-full-color-subtle);       /* border/full-color/subtle */
   --ui-hover:var(--fill-overlay-1);                /* fill/overlay-1 */
@@ -315,7 +315,7 @@ img{display:block}
   --ui-t1:var(--modules-color-text-primary-default);/* text/primary */
   --ui-t2:#c5c7ca;                                 /* text/secondary */
   --ui-t3:var(--text-tertiary);                    /* text/tertiary */
-  --ui-edge:var(--spacing-16);                     /* panel and switch: distance from the window edges */
+  --ui-edge:calc(var(--spacing-16) + var(--spacing-8)); /* panel, hub link and switch: 24 px from the window edges (owner, 18 Nov; was 16) */
   /* P2 · shadow of the phone on the stage: three light layers that start at the edge of the frame (11px spread = the ring) instead of one dense one,
      so it fades out evenly, with no dark halo and no visible border. Not part of the "Copy screen" picture: that one is cut at the frame */
   --ui-phone-shadow:0 8px 24px 11px rgba(0,0,0,.14),0 24px 64px 11px rgba(0,0,0,.16),0 48px 128px 11px rgba(0,0,0,.18);
@@ -2812,7 +2812,7 @@ const ICO_CH='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-h
  ICO_RE='<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.7M3 2.8v2.4h2.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function buildNav(){
  const item=(title,attrs,body)=>`<div class="nv-it" ${attrs}><div class="nv-ih"><button class="nv-ib" ${attrs.includes('data-it')?'':'id="reset"'}>${title}</button><button class="nv-re" aria-label="Start this state again" title="Start again">${ICO_RE}</button></div><div class="nv-d"><div>${body}</div></div></div>`;
- let h=item('Free play','data-free',`<p>${FREE}</p>`)+'<hr>';
+ let h=item('Free play','data-free',`<p>${FREE}</p>`); // no divider under Free play (owner, 18 Nov)
  TOPICS.forEach((t,ti)=>{
   h+=`<div class="nv-t" data-t="${ti}"><button class="nv-th" aria-expanded="false">${ICO_CH}<span>${t.g}</span><u></u><i>${t.items.length}</i></button><div class="nv-tb"><div>`+
    t.items.map((x,n)=>item(x.k,`data-tp="${ti}" data-it="${n}"`,'<p></p>'+(x.ix.length>1?`<div class="seg" role="tablist" aria-label="${STATES[x.ix[0]].sw?'Variant':'Betslip'}"><button role="tab" data-v="0">${(STATES[x.ix[0]].sw||['Collapsed'])[0]}</button><button role="tab" data-v="1">${(STATES[x.ix[0]].sw||[,'Opened'])[1]}</button></div>`:''))).join('')+
