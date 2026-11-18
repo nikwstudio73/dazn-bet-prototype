@@ -307,6 +307,7 @@ img{display:block}
 :root{
   --ui-canvas:var(--surface-container-1);          /* surface/container-1: one step lighter than the darkest surface (owner, 17 Nov; was surface/container-2) */
   --ui-panel:#121e23;                              /* owner's pick in the design editor (18 Nov): between surface/container-1 and container-2; not a Global foundation value */
+  --ui-panel-in:#141413;                           /* States panel: dark hairline inside the outer line, as in the owner's mock-up (18 Nov); not a Global foundation value */
   --ui-well:#080e12;                               /* surface/default-0 */
   --ui-line:var(--border-full-color-subtle);       /* border/full-color/subtle */
   --ui-hover:var(--fill-overlay-1);                /* fill/overlay-1 */
@@ -804,7 +805,7 @@ div.choice{cursor:default}
 
 /* navigation panel: Free play, then topics; a topic opens its states; the selected state shows what it demonstrates.
    Left text edge 20 px (labels of topics and their states 44 px), right icon axis 24 px from the panel edge. */
-.nav{position:fixed;left:var(--ui-edge);top:var(--ui-edge);width:280px;max-height:calc(100vh - 2*var(--ui-edge));display:flex;flex-direction:column;border-radius:16px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line);z-index:100;font-size:14px;line-height:20px;color:var(--ui-t2);transition:opacity .24s ease-out,transform .44s var(--soft)}
+.nav{position:fixed;left:var(--ui-edge);top:var(--ui-edge);width:280px;max-height:calc(100vh - 2*var(--ui-edge));display:flex;flex-direction:column;border-radius:16px;background:var(--ui-panel);box-shadow:0 0 0 1px var(--ui-line),inset 0 0 0 1px var(--ui-panel-in);z-index:100;font-size:14px;line-height:20px;color:var(--ui-t2);transition:opacity .24s ease-out,transform .44s var(--soft)}
 .nav.off{opacity:0;transform:translateX(-16px);pointer-events:none}
 .nav-h{flex:none;display:flex;align-items:center;justify-content:space-between;height:48px;padding:var(--spacing-4) 10px 0 20px}
 .nav-h b{font-size:12px;line-height:18px;color:var(--ui-t3)}
