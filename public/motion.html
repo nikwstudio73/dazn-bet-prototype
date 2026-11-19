@@ -246,7 +246,7 @@ const SCN={
  M01:{setup:"",play:"G.press('#feed .odd[data-m=\"m1\"][data-o=\"1\"]')"},
  /* the first .choice of the match page is Double chance, folded under "Show more" since U5: the press was played on a button nobody sees.
     Combinations in the Goals card are the first .choice that is on the page as it opens */
- M02:{setup:"openFixture('m4');G.show('#oxGoals .choice','#fxScroll')",play:"G.press('#oxGoals .choice')"},
+ M02:{setup:"openFixture('m4','odds');G.show('#oxGoals .choice','#fxScroll')",play:"G.press('#oxGoals .choice')"},
  M03:{setup:"openComp('ucl','scorer')",play:"G.press('#cpScroll .tp')"},
  M04:{setup:"openComp('ucl','win')",play:"G.press('#cpScroll .cp-row')"},
  M05:{setup:"S.sel=P3();refresh();openSheet();",play:"G.press('#placeBtn')"},
@@ -266,7 +266,7 @@ const SCN={
  M31:{setup:"",play:"G.click('#feed .odd[data-m=\"m1\"][data-o=\"0\"]');G.after(1400,()=>G.click('#feed .odd[data-m=\"m1\"][data-o=\"0\"]'))"},
  M32:{setup:"S.sel=P3();refresh();",play:"openSheet();G.after(1400,closeSheet)"},
  M34:{setup:"",play:"openFav();G.after(1600,closeFav)"},
- M35:{setup:"openFixture('m4');G.show('#fxMore','#fxScroll')",play:"G.click('#fxMore')"},
+ M35:{setup:"openFixture('m4','odds');G.show('#fxMore','#fxScroll')",play:"G.click('#fxMore')"},
  M37:{setup:"S.sel=P3();refresh();openSheet();",play:"G.click('#placeBtn');G.after(1500,()=>G.click('#ovClose'))"},
  M38:{setup:"S.sel=ONE();refresh()",play:"openFixture('m4');G.after(1400,closeFixture)"},
  M39:{setup:"",play:"openComp('ucl','win');G.after(1400,closeComp)"},
