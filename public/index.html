@@ -1096,13 +1096,13 @@ div.choice{cursor:default}
 .ox{display:flex;flex-direction:column;gap:24px}
 .ox-s{display:flex;flex-direction:column;gap:10px}
 .ox-s.g{gap:var(--spacing-8)}
-.ox-hero{gap:0;padding-bottom:var(--spacing-8);border:1px solid var(--border-transparent-subtle);box-shadow:none} /* in the frame the 1 px stroke takes room, so the content is 317 wide */
-/* U5 · Odds/Hero · Match Result 4379:148158: shut = crests, chance and 1X2 (343 x 244); "Show more" opens Double chance and Draw no bet (343 x 591). The glow is set in % of the card, so it stretches with it, as in the two variants. */
+.ox-hero{gap:0;padding-bottom:var(--spacing-16);border:1px solid var(--border-transparent-subtle);box-shadow:none} /* in the frame the 1 px stroke takes room, so the content is 317 wide; U12: no button at the bottom, so it ends 16 under the prices, as the compact view */
+/* U5 · Odds/Hero · Match Result 4379:148158, View=Expanded 4379:148157: crests, chance and 1X2, then Double chance and Draw no bet. U12 (Roey 19.11): always open, no "Show more". The glow is set in % of the card, so it stretches with it. */
 .ox-mr{display:flex;flex-direction:column;gap:28px}
-.ox-hero.cmp{padding-bottom:var(--spacing-16)} /* U7 · View=Compact 4458:148517 (Overview): crests, the question and the three prices, 343 x 148 */
+/* U7 · View=Compact 4458:148517 (Overview): crests, the question and the three prices, 343 x 148 */
 .ox-hero.cmp .ox-mr{gap:24px}
 .ox-hero.cmp .lu-teams b{font-size:16px;line-height:22px;letter-spacing:0;color:var(--t1)} /* heading/h6 */
-.ox-hero>.ox-fold>div>div{display:flex;flex-direction:column;gap:var(--spacing-16);padding-top:24px}
+.ox-hero>.ox-more{display:flex;flex-direction:column;gap:var(--spacing-16);padding-top:24px}
 .ox-hero .ox-sub{gap:0}
 .ox-hero .ox-sub b{height:auto;font-size:14px;line-height:18px;letter-spacing:.01em} /* label/md, as the titles of the component */
 .ox-tg{display:flex;align-items:center;justify-content:center;gap:var(--spacing-4);width:100%;height:36px;margin-top:var(--spacing-12);font-weight:700;font-size:12px;line-height:15px;letter-spacing:.01em;color:var(--t1)} /* text and chevron only: no fill, no blur */
@@ -1124,19 +1124,16 @@ div.choice{cursor:default}
 .ox .choice:not(.sel){background:var(--choice-soft-bg)}
 .ox-card{display:flex;flex-direction:column;gap:var(--spacing-12);padding:var(--spacing-16) var(--spacing-12) 0;border-radius:var(--radius-12);background:var(--fill-overlay-1);border:1px solid var(--border-transparent-subtle)}
 .ox-card.hc{gap:var(--spacing-16);padding-bottom:var(--spacing-16)}
-/* U8 · Odds/Goals 4471:141725: shut = the half switch and Total Goals (343 x 283); "Show more" — the button of Match Result — opens Both Teams to Score and Combinations (343 x 618).
-   Without the button (a half, a live match with neither market) the card ends 12 under the prices, as before. */
-.ox-card.gl{padding-bottom:var(--spacing-8)}
-.ox-card.gl:not(:has(.ox-tg)){padding-bottom:var(--spacing-12)}
-.ox-card .ox-tg{margin-top:0} /* the card already keeps its parts 12 apart */
+/* U8 · Odds/Goals 4471:141725: the half switch, Total Goals, then Both Teams to Score and Combinations. U12 (Roey 19.11): always open, no "Show more"; the card ends 12 under the prices. */
+.ox-card.gl{padding-bottom:var(--spacing-12)}
 .ox-blks{display:flex;flex-direction:column}
 .ox-blk{display:flex;flex-direction:column;gap:var(--spacing-16);padding:var(--spacing-12) 0 0}
 .ox-blk .ox-sub{padding:0 var(--spacing-4)}
 .ox-blk.f{padding:var(--spacing-16) 0}
-.ox-blk.f:last-child{padding-bottom:0} /* a live match has no Combinations: the button stays 12 under the prices */
+.ox-blk.f:last-child{padding-bottom:0} /* a live match has no Combinations: the card ends 12 under the prices */
 .ox-blk.c{padding:0}
 .ox-blk.f>.ox-sub,.ox-blk.c>.ox-sub{padding:0}
-.ox-blks>.ox-fold>div>div{display:flex;flex-direction:column;gap:var(--spacing-8);padding-top:calc(var(--spacing-8) + var(--spacing-12))} /* "more": 8 under Total Goals + its own 12 */
+.ox-blks>.ox-more{display:flex;flex-direction:column;gap:var(--spacing-8);padding-top:calc(var(--spacing-8) + var(--spacing-12))} /* BTTS and Combinations: 8 under Total Goals + its own 12 */
 .ox-seg button+button:not(.on)::before{content:"";position:absolute;left:0;top:6px;width:1px;height:20px;background:var(--border-transparent-subtle)} /* DS Separator between two tabs that are not selected */
 .ox-seg button{position:relative}
 .ox-seg button.on+button::before{display:none}
@@ -1164,6 +1161,10 @@ div.choice{cursor:default}
 .ox-div{height:1px;margin:calc(var(--spacing-12) * -1) calc(var(--spacing-16) * -1);background:var(--border-transparent-subtle)}
 .ox .gs{gap:var(--spacing-16)}
 .ox .gs-h{padding-left:var(--spacing-4)}
+/* U14 (Roey 19.11) · "See all" under the Goalscorer carousel: the button of Match Result (.ox-tg) opens the list of all players of the match as rows of
+   the Top scorer list (.sc-row); it folds like the old blocks of the tab (.ox-fold: height on --m-layout / --soft). Shut, the button sits 12 under the cards. */
+.ox .gs>.ox-fold{margin-top:calc(var(--spacing-16) * -1)}
+.ox .gs>.ox-tg{margin-top:calc(var(--spacing-12) - var(--spacing-16))}
 /* O1 · fixture · Overview tab, Figma "B · Top Bets carousel after Match Results" 4369:236502.
    Match Result (U7: Odds/Hero · Match Result, View=Compact — .ox-hero.cmp) and the Top Bets carousel (Odds/Top Bet 3975:39703) take picks; Form, League position, Match info and Next matches are drawn only.
    Gradients: Figma mixes without premultiplying, so 16 stops each, as everywhere in this file. */
@@ -1298,7 +1299,7 @@ div.choice{cursor:default}
     </div>
     <div class="fx-rest">
     <div class="fx-comp"><div class="c"><i><img id="fxCompImg" src="assets/img/laliga.png" alt=""></i><span id="fxComp">LA Liga EA Sports</span></div><button class="fx-follow">Follow</button></div>
-    <div class="fx-tabs" id="fxTabs"><span data-fxv="over">Overview</span><span>H2H</span><span class="on" data-fxv="odds">Odds</span><span data-fxv="live">Live updates</span><span>Lineups</span><span>Stats</span></div>
+    <div class="fx-tabs" id="fxTabs"><span class="on" data-fxv="over">Overview</span><span>H2H</span><span data-fxv="odds">Odds</span><span data-fxv="live">Live updates</span><span>Lineups</span><span>Stats</span></div>
     <div class="mkts" id="mkts"></div>
     </div>
    </div>
@@ -1769,7 +1770,7 @@ function won(m,g,o){
 }
 let S;
 /* st: locked picks {"match|market":'locked'} (S5: one state; any value counts as locked, the motion gallery still writes 'suspended'); lk: locked odds in the feed ["match|market|outcome"]; day: a key of DAYS; more: the matches of the days other than today and Sat 3 Jan */
-function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fxTab:'odds',luKey:false,lu:{},luQ:{},nts:{},luNew:0,mw:{},mwOut:null,luFresh:null,fav:false,cp:null,cpTab:'win',cpView:'odds',cpM:{},stack:[],tm:null,tmMenu:null}} // cpView: tab of the competition page; cpM.md: the matchday its Matchday select shows (R4)
+function freshState(){return {matches:INIT(),ft:FT(),more:OTHER(),day:'today',oddsOn:true,liveOnly:false,sel:[],st:{},lk:[],sheet:false,edit:false,undo:null,fx:null,fxTab:'over',luKey:false,lu:{},luQ:{},nts:{},luNew:0,mw:{},mwOut:null,luFresh:null,fav:false,cp:null,cpTab:'win',cpView:'odds',cpM:{},stack:[],tm:null,tmMenu:null}} // cpView: tab of the competition page; cpM.md: the matchday its Matchday select shows (R4)
 const $=s=>document.querySelector(s);
 const M=id=>S.matches.find(m=>m.id===id)||S.ft.find(m=>m.id===id)||S.more.find(m=>m.id===id)||OUT[id];
 const f2=n=>n.toFixed(2);
@@ -2157,13 +2158,13 @@ function choiceBtn(mid,g,o,{code,label,icon,v,stack}){const fm=M(mid);if(fm.ft)r
 const CHEV='<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12.5 4.5 7 10l5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const OX_IC={m:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M14.68 9.2a.8.8 0 0 1 0 1.6H5.33a.8.8 0 0 1 0-1.6h9.35Z" fill="currentColor"/></svg>',p:'<svg width="20" height="20" viewBox="0 0 22.2222 22.2222" fill="none"><path d="M11.1187 4.66688C11.6095 4.66708 12.0074 5.06476 12.0074 5.55556V10.2224H16.6667C17.1576 10.2224 17.5553 10.6202 17.5553 11.1111C17.5553 11.602 17.1576 11.9998 16.6667 11.9998H12.0074V16.6667C12.0074 17.1575 11.6095 17.5551 11.1187 17.5553C10.6278 17.5553 10.23 17.1576 10.23 16.6667V11.9998H5.55556C5.06464 11.9998 4.66688 11.602 4.66688 11.1111C4.66688 10.6202 5.06464 10.2224 5.55556 10.2224H10.23V5.55556C10.23 5.06464 10.6278 4.66688 11.1187 4.66688Z" fill="currentColor"/></svg>'}; // remove / add-small of the DS, as in the chip of the frame
 const OX_PER=[['ft','Full Time','ou'],['h1','1st half','ou1h'],['h2','2nd half','ou2h']];
-function oxUi(m){if(!S.ox||S.ox.mid!==m.id)S.ox={mid:m.id,mr:S.sel.some(s=>s.m===m.id&&(s.g==='dc'||s.g==='dnb')),goals:S.sel.some(s=>s.m===m.id&&(s.g==='btts'||s.g==='rbtts')),per:'ft',line:{}};return S.ox} // U5, U8: Match Result and Goals open shut; open when a pick of this match sits behind "Show more"
+function oxUi(m){if(!S.ox||S.ox.mid!==m.id)S.ox={mid:m.id,gs:false,per:'ft',line:{}};return S.ox} // U12: Match Result and Goals are always open; U14: the list of all players under the Goalscorer carousel opens shut
 /* the line shown first: the one of my pick on this market, otherwise the most even one (2.5 on the drawn match) */
 function oxLine(m,k){const u=oxUi(m);if(!k.lines.some(r=>r[0]===u.line[k.id])){const p=S.sel.find(s=>s.m===m.id&&s.g.startsWith(k.id+':'));
   const pl=p&&p.g.split(':')[1];u.line[k.id]=k.lines.some(r=>r[0]===pl)?pl:k.lines.reduce((a,r)=>Math.abs(r[1]-r[2])<Math.abs(a[1]-a[2])?r:a)[0]}return u.line[k.id]}
 const CHEV_MR='<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15.5652 6.75368C15.8776 7.0661 15.8776 7.57212 15.5652 7.88454L10.5652 12.8845C10.2528 13.197 9.74677 13.197 9.43435 12.8845L4.43435 7.88454C4.12193 7.57212 4.12193 7.0661 4.43435 6.75368C4.74677 6.44126 5.25279 6.44126 5.56521 6.75368L9.99978 11.1883L14.4343 6.75368C14.7468 6.44126 15.2528 6.44126 15.5652 6.75368Z" fill="currentColor"/></svg>'; // chevron-down-medium of the component
 const oxFold=(key,open,c)=>`<div class="ox-fold${open?'':' shut'}" data-oxf="${key}"${open?'':' inert'}><div><div>${c}</div></div></div>`;
-const oxMore=(key,open)=>`<button class="ox-tg" data-oxc="${key}" aria-expanded="${open}"><span data-lb>${open?'Show less':'Show more'}</span>${CHEV_MR}</button>`; // "Show more" / "Show less" of Match Result (U5) and Goals (U8)
+const oxMore=(key,open,off='Show more')=>`<button class="ox-tg" data-oxc="${key}" data-off="${off}" aria-expanded="${open}"><span data-lb>${open?'Show less':off}</span>${CHEV_MR}</button>`; // the button of Match Result (U5), now under the Goalscorer carousel: "See all" / "Show less" (U14)
 /* crests, "Who will win?", implied chance and the three 1X2 prices: the same block on the Odds tab and in Live updates */
 function mrTop(m,x,cmp){const f=FX[m.id],c=luChance(m); // cmp: the compact view of Overview, without the chance bar
  return `<div class="lu-hd"><div class="lu-teams"><span><img src="${IMG[f.hiImg]}" alt=""></span><b>Who will win?</b><span><img src="${IMG[f.aiImg]}" alt=""></span></div>`+(cmp?'':`
@@ -2176,10 +2177,9 @@ function goalsHTML(m){
   `<div class="ox-blks" id="oxBlks"><div class="ox-blk"><div class="ox-sub"><b>Total Goals</b><small>Pick a line, then over or under.</small></div>
   <div class="ox-step tg"><button data-oxl="-1" aria-label="Lower line"${i<=0?' disabled':''}>${OX_IC.m}</button><b id="oxLv">${ln}</b><button data-oxl="1" aria-label="Higher line"${i>=k.lines.length-1?' disabled':''}>${OX_IC.p}</button></div>
   <div class="ox-o2" id="oxOU">${oddBtn(m.id,g,'o','Over '+ln,ov)}${oddBtn(m.id,g,'u','Under '+ln,un)}</div></div>`+
-  (more?oxFold('goals',u.goals, // U8: behind "Show more"
+  (more?`<div class="ox-more">`+ // U12: Both Teams to Score and Combinations always open
    (bt?`<div class="ox-blk f"><div class="ox-sub"><b>Both Teams to Score</b></div><div class="ox-o2">${bt.opts.map(x=>oddBtn(m.id,'btts',x.k,x.l,x.v)).join('')}</div></div>`:'')+
-   (rb?`<div class="ox-blk c"><div class="ox-sub"><b>Combinations</b></div><div class="clist">${['1','2','X'].map(o=>rb.opts.find(x=>x.k===o)).map(x=>choiceBtn(m.id,'rbtts',x.k,{code:x.c,label:x.l,v:x.v,stack:true})).join('')}</div></div>`:'')):'')+'</div>'+
-  (more?oxMore('goals',u.goals):'');
+   (rb?`<div class="ox-blk c"><div class="ox-sub"><b>Combinations</b></div><div class="clist">${['1','2','X'].map(o=>rb.opts.find(x=>x.k===o)).map(x=>choiceBtn(m.id,'rbtts',x.k,{code:x.c,label:x.l,v:x.v,stack:true})).join('')}</div></div>`:'')+'</div>':'')+'</div>';
 }
 function hcHTML(m,k){
  const f=FX[m.id];if(!S.hc||S.hc.mid!==m.id)S.hc={mid:m.id,t:'h',l:k.def};
@@ -2196,7 +2196,7 @@ function setHc(t,step){const k=mkt(S.fx,'hc');if(!k||!S.hc)return;
  if(step){const away=S.hc.t==='a',list=HC_LINES.map(x=>away?-x:x).sort((a,b)=>a-b),v=list[list.indexOf(away?-S.hc.l:S.hc.l)+step];if(v===undefined)return;S.hc.l=away?-v:v}
  const y=$('#fxScroll').scrollTop;renderMkts();$('#fxScroll').scrollTop=y;soft($('#hcList'),RISE,T.std)} // the new line rises in, like a sub-tab of the competition page
 /* a folded block opens and closes in place (height on --m-layout / --soft, chevron on --m-std); nothing is drawn again */
-function oxToggle(key){const u=S.ox,f=document.querySelector(`[data-oxf="${key}"]`),h=document.querySelector(`[data-oxc="${key}"]`);if(!u||!f)return;u[key]=!u[key];f.classList.toggle('shut',!u[key]);f.inert=!u[key];h.setAttribute('aria-expanded',u[key]);const l=h.querySelector('[data-lb]');if(l)l.textContent=u[key]?'Show less':'Show more'}
+function oxToggle(key){const u=S.ox,f=document.querySelector(`[data-oxf="${key}"]`),h=document.querySelector(`[data-oxc="${key}"]`);if(!u||!f)return;u[key]=!u[key];f.classList.toggle('shut',!u[key]);f.inert=!u[key];h.setAttribute('aria-expanded',u[key]);const l=h.querySelector('[data-lb]');if(l)l.textContent=u[key]?'Show less':h.dataset.off}
 /* Goals: another half swaps the card (its height eases), another line swaps the number and the two prices; the new content rises in */
 function oxGoals(fn,after){const m=M(S.fx),c=$('#oxGoals');if(!c||!S.ox)return;fn(S.ox);smoothH(c,()=>{c.innerHTML=goalsHTML(m)});after()}
 function setOxPer(p){if(!S.ox||S.ox.per===p)return;oxGoals(u=>u.per=p,()=>soft($('#oxBlks'),RISE,T.std))}
@@ -2205,12 +2205,12 @@ function setOxLine(step){const m=M(S.fx),u=S.ox;if(!u)return;const k=mkt(m.id,OX
 function oddsHTML(m){
  const f=FX[m.id],u=oxUi(m),dc=mkt(m.id,'dc'),dnb=mkt(m.id,'dnb'),hc=mkt(m.id,'hc');
  const dcl={'1X':`${m.h} to win or draw`,'X2':`${m.a} to win or draw`,'12':`${m.h} or ${m.a} to win`};
- return `<div class="ox"><section class="ox-s"><div class="lu-sec">Match Result</div><div class="lu-hero ox-hero"${tgStyle('lu-hero ox-hero',m)}><div class="ox-mr">${mrTop(m,m.live?'X':'Draw')}</div>`+oxFold('mr',u.mr, // live: "X", as in Live updates ("Draw" with the arrow of a moving price does not fit the tile)
+ return `<div class="ox"><section class="ox-s"><div class="lu-sec">Match Result</div><div class="lu-hero ox-hero"${tgStyle('lu-hero ox-hero',m)}><div class="ox-mr">${mrTop(m,m.live?'X':'Draw')}</div><div class="ox-more">`+ // U12: Double chance and Draw no bet always open; live: "X", as in Live updates ("Draw" with the arrow of a moving price does not fit the tile)
   (dc?`<div class="ox-sub"><b>Double chance</b></div><div class="clist">${['1X','X2','12'].map(o=>dc.opts.find(x=>x.k===o)).map(x=>choiceBtn(m.id,'dc',x.k,{code:x.k,label:dcl[x.k],v:x.v,stack:true})).join('')}</div>`:'')+
-  (dnb?`<div class="ox-dnb"><div class="ox-sub"><b>Draw no bet</b><small>Money back if it ends in a draw.</small></div><div class="ox-o2">${dnb.opts.map((x,i)=>oddBtn(m.id,'dnb',x.k,i?m.as:m.hs,x.v)).join('')}</div></div>`:''))+
-  oxMore('mr',u.mr)+`</div></section>
+  (dnb?`<div class="ox-dnb"><div class="ox-sub"><b>Draw no bet</b><small>Money back if it ends in a draw.</small></div><div class="ox-o2">${dnb.opts.map((x,i)=>oddBtn(m.id,'dnb',x.k,i?m.as:m.hs,x.v)).join('')}</div></div>`:'')+`</div></div></section>
   <section class="ox-s g"><div class="lu-sec">Goals</div><div class="ox-card gl" id="oxGoals">${goalsHTML(m)}</div></section>`+
-  (f.scorers?`<i class="ox-div"></i><section class="gs"><div class="gs-h"><b>Goalscorer</b><span>In this match</span></div><div class="gs-row">${f.scorers.map(p=>gsCard(p,'#'+(SHIRT[p.k]||9),oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only'))).join('')}</div></section>`:'')+
+  (f.scorers?`<i class="ox-div"></i><section class="gs"><div class="gs-h"><b>Goalscorer</b><span>In this match</span></div><div class="gs-row">${f.scorers.map(p=>gsCard(p,'#'+(SHIRT[p.k]||9),oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only'))).join('')}</div>`+
+   oxFold('gs',u.gs,`<div class="sc-list">${f.scorers.map(gsRow(m)).join('')}</div>`)+oxMore('gs',u.gs,'See all')+'</section>':'')+
   (hc?hcHTML(m,hc):'')+(m.ft?'':`<button class="fx-more" id="fxMore">More bets on DAZN Bet</button>`)+'</div>';
 }
 /* ---------- fixture · Overview tab (O1) ----------
@@ -2218,7 +2218,8 @@ function oddsHTML(m){
  Top Bets: ready-made combinations of this match, each with one price; a tap on the price puts the whole combination into the betslip as one card,
  a second tap takes it out. Working assumptions (not confirmed by the owner and the PM): a Top Bet is one of the 20 picks; it leaves only as a whole;
  a locked Top Bet drops out as a whole (S.st by its key); a live or finished match has no Top Bets.
- Form, League position, Match info and Next matches are drawn by the frame and take no taps. */
+ Form, League position, Match info and Next matches are drawn by the frame and take no taps.
+ O2 (Roey 19.11): the order of DAZN Scores — Match Result, Match info, League position, Form, then Top Bets (Roey's doc: "Below the FORM section"), Next matches. */
 Object.assign(IMG,{t_ala:'assets/img/t_ala.png',t_rso:'assets/img/t_rso.png',t_ben:'assets/img/t_ben.png'}); // whole paths, so build.py inlines them
 const TB={m4:[ // the drawn match: legs and prices of the frame (the second and third card of the frame are placeholders, so they get their own content)
  {id:'1',v:14.20,legs:[['Real Madrid to win','Match Results'],['Over 2.5','Total Goals'],['Mbappé to score','Anytime Goalscorer'],['Both Teams To Score','Yes'],['Over 0.5','Total Goals - 1st Half']]},
@@ -2250,15 +2251,15 @@ function overHTML(m){
  const next=(comp,date,ko,t)=>`<div class="ov-ni"><div class="ov-nm"><span>${comp}</span><span>${date}</span></div><div class="tile"><div class="trow"><div class="tmain"><div class="tcol"><img src="${IMG.bell}" alt=""><div class="ko">${ko}</div></div>
   <div class="teams">${t.map(([n,c])=>`<div class="team"><div class="n"><img src="${c}" alt="">${n}</div><div class="r">-</div></div>`).join('')}</div></div><div class="cta"><div class="pc"><img src="${IMG.play}" alt=""></div><span>Watch</span></div></div></div></div>`;
  return `<div class="ovw"><section class="ox-s"><div class="lu-sec">Match Result</div><div class="lu-hero ox-hero cmp"${tgStyle('lu-hero ox-hero',m)}><div class="ox-mr">${mrTop(m,m.live?'X':'Draw',true)}</div></div></section>`+
+  `<section class="ov-s mi"><div class="ov-t">Match info</div><div class="ov-ir">${OV_IC.cal}<div><b>${m.live||m.ft?'Today':f.date}, ${m.ko||f.time}</b><span>Weather condition: Good</span></div></div><i class="ov-dv"></i>
+   <div class="ov-ir">${OV_IC.pin}<div><b>${m4?'Santiago Bernabeu, Madrid':m.h+' stadium'}</b><span>${m4?'Capacity: 83,186 · ':''}Pitch condition: Good</span></div></div><i class="ov-dv"></i>
+   <div class="ov-ir">${OV_IC.ref}<div><b>Ramon Angel Diaz</b></div></div></section>
+  <section class="ov-s lg"><div class="ov-t">League  position</div><div class="ov-tbl"><div class="ov-tr hd"><span class="n">Team</span><i>MP</i><i>GD</i><i>PTS</i></div>${row(1,H,m.h,[19,'+24',49])}${row(3,A,m.a,[19,'+14',40])}</div><div class="ov-all">See all${OV_IC.chev}</div></section>
+  <section class="ov-s fm"><div class="ov-t">Form</div>${form(m.h,H,pill(A,0,0,H,'')+pill(H,4,2,IMG.t_ala,'w')+pill(IMG.t_rso,3,1,H,'l',1))}${form(m.a,A,pill(A,0,0,H,'')+pill(A,4,2,IMG.t_rso,'w')+pill(IMG.t_ala,1,3,A,'w',1))}</section>`+
   (tb.length?`<section class="tb"><div class="gs-h"><b>Top Bets</b><span>Ready-made combos for this match</span></div><div class="gs-row">${tb.map(t=>{const more=t.legs.length-3;
    return `<div class="tb-card"><div class="tb-hd"><span class="tb-lb">${TB_STAR}Top Bet</span><div class="tb-m"><b>${m.h} v ${m.a}</b><span>${lg}<i></i>${f.date}, ${f.time}</span></div></div>
    <div class="tb-body">${tbLegs(t.legs.slice(0,3))}${more>0?`<div class="tb-more">+${more} more selection${more>1?'s':''}</div>`:''}</div><div class="tb-ft">${oddBtn(m.id,'tb:'+t.id,'y','',t.v,'only')}</div></div>`}).join('')}</div></section>`:'')+
-  `<section class="ov-s fm"><div class="ov-t">Form</div>${form(m.h,H,pill(A,0,0,H,'')+pill(H,4,2,IMG.t_ala,'w')+pill(IMG.t_rso,3,1,H,'l',1))}${form(m.a,A,pill(A,0,0,H,'')+pill(A,4,2,IMG.t_rso,'w')+pill(IMG.t_ala,1,3,A,'w',1))}</section>
-  <section class="ov-s lg"><div class="ov-t">League  position</div><div class="ov-tbl"><div class="ov-tr hd"><span class="n">Team</span><i>MP</i><i>GD</i><i>PTS</i></div>${row(1,H,m.h,[19,'+24',49])}${row(3,A,m.a,[19,'+14',40])}</div><div class="ov-all">See all${OV_IC.chev}</div></section>
-  <section class="ov-s mi"><div class="ov-t">Match info</div><div class="ov-ir">${OV_IC.cal}<div><b>${m.live||m.ft?'Today':f.date}, ${m.ko||f.time}</b><span>Weather condition: Good</span></div></div><i class="ov-dv"></i>
-   <div class="ov-ir">${OV_IC.pin}<div><b>${m4?'Santiago Bernabeu, Madrid':m.h+' stadium'}</b><span>${m4?'Capacity: 83,186 · ':''}Pitch condition: Good</span></div></div><i class="ov-dv"></i>
-   <div class="ov-ir">${OV_IC.ref}<div><b>Ramon Angel Diaz</b></div></div></section>
-  <section class="ov-s nx"><div class="ov-t">Next matches</div><div class="ov-nx">${next('Champions League · Semi final','27 Sep. 2026','21.00',[[m.h,H],['Bayern Munich',crest('bay')]])}${next('Europa League · Final','20 Sep. 2026','21.00',[[m.a,A],['Benfica',IMG.t_ben]])}</div></section>
+  `<section class="ov-s nx"><div class="ov-t">Next matches</div><div class="ov-nx">${next('Champions League · Semi final','27 Sep. 2026','21.00',[[m.h,H],['Bayern Munich',crest('bay')]])}${next('Europa League · Final','20 Sep. 2026','21.00',[[m.a,A],['Benfica',IMG.t_ben]])}</div></section>
   <div class="sgfoot ov-ft">+18. Juega con responsabilidad. Publi.</div></div>`;
 }
 /* fills the match page (T1: openFixture() puts it on screen and on the stack of pages) */
@@ -2275,12 +2276,12 @@ function drawFixture(mid){
  [['#fxHi',m.hi],['#fxAi',m.ai]].forEach(([q,k])=>{const b=$(q).parentNode;if(TEAMS[k]){b.dataset.team=k;b.dataset.tc=m.comp}else b.removeAttribute('data-team')}); // T1: crest and name open the team page
  S.hc=null;S.ox=null;S.luNew=0;luPill();paintFxTabs();renderMkts(mid);$('#fxScroll').scrollTop=0;S.fx=mid;fxHead();
 }
-function openFixture(mid){
+function openFixture(mid,tab='over'){ // tab: a States item can open the page on its Odds tab
  if(!FX[mid])return;const fx=$('#fx'),t=topPage();
  if(t&&t.p==='fx')S.stack.pop();                                                        // a match page over a match page: it takes its place
  else if(fx.classList.contains('show'))snap(fx,()=>fx.classList.remove('show','left')); // the element lies left of the screen with an earlier match: it comes in again from the right
- S.fxTab='odds';S.luKey=false;$('#fxTabs').scrollLeft=0;                                  // a match opens on its Odds tab
- drawFixture(mid);S.stack.push({p:'fx',id:mid,tab:'odds',key:false});teamMenu(null); // tab / key: its tab and its Key events filter, so Back returns to the page as it was left
+ S.fxTab=tab;S.luKey=false;$('#fxTabs').scrollLeft=0;                                     // U13: a match opens on its Overview tab, as in DAZN Scores
+ drawFixture(mid);S.stack.push({p:'fx',id:mid,tab,key:false});teamMenu(null); // tab / key: its tab and its Key events filter, so Back returns to the page as it was left
  $('#phone').classList.add('infx');fx.classList.add('show');fx.setAttribute('aria-hidden','false');hideToast();
 }
 /* U10 · the one player card (Odds/Goalscorer card, Size=Compact). num: "#9" in a match, "01" in Top scorer. Photo: the cut-out of the component (Figma has two),
@@ -2291,6 +2292,9 @@ function gsCard(p,num,btn){
  const w=p.n.split(' '),f=p.f||(w.length>1?w[0]:''),l=p.l||w.slice(f?1:0).join(' '),k=p.img!==undefined?p.img:p.ph!==undefined?p.ph:'pl_'+p.k,cut=GSC[p.k]||(k&&IMG[k]?'':'gsc_none');
  return `<div class="gs-card"><div class="gs-in"><div class="gs-top"><i>${num}</i><span class="gs-ph${cut?' cut':''}"><img src="${IMG[cut||k]}" alt=""></span></div>
   <div class="gs-tx"><div class="gs-nm"><span>${f}</span><b>${l}</b></div><div class="gs-cl"><img src="${crest(p.cr)}" alt="">${p.team}</div></div></div>${btn}</div>`}
+/* U14 · a player of the match as a row of the Top scorer list (.sc-row v3.2): round photo (or initials), name, club, the same pick as his card in the carousel */
+const gsRow=m=>p=>{const k=p.img!==undefined?p.img:p.ph!==undefined?p.ph:'pl_'+p.k;
+ return `<div class="sc-row">${photoOf(p,k&&IMG[k]?k:'')}<div class="tx"><b>${p.n}</b><span><img src="${crest(p.cr)}" alt="">${p.team}</span></div>${oddBtn(m.id,'gs:'+p.k,'y','',p.v,'only')}</div>`};
 function renderMkts(mid=S.fx){const m=M(mid);$('#mkts').innerHTML=S.fxTab==='live'?liveHTML(m):S.fxTab==='over'?LEGAL+overHTML(m):LEGAL+oddsHTML(m)}
 function hideFixture(){$('#luNew').classList.remove('show');const fx=$('#fx');fx.classList.contains('left')?snap(fx,()=>fx.classList.remove('show','left')):fx.classList.remove('show');fx.setAttribute('aria-hidden','true');S.fx=null;setTimeout(()=>{if(!S.fx)$('#phone').classList.remove('infx')},T.layout)}
 function closeFixture(){const t=topPage();t&&t.p==='fx'?pageBack():hideFixture()} // Back on a match page: to the page it was opened from (feed, league page, team page)
@@ -2690,7 +2694,7 @@ function pageBack(){
   if(u&&S.tm!==u)snap(tm,()=>{drawTeam(u);tm.classList.add('show');tm.setAttribute('aria-hidden','false');$('#phone').classList.add('intm')}); // its element showed a later team: put this one back under the match page
   hideFixture();
  }else{
-  if(u){S.fxTab=u.tab||'odds';S.luKey=!!u.key;if(S.fx!==u.id||!fx.classList.contains('left'))snap(fx,()=>{drawFixture(u.id);fx.classList.add('show','left')});                    // its element showed a later match: put this one back, left of the screen
+  if(u){S.fxTab=u.tab||'over';S.luKey=!!u.key;if(S.fx!==u.id||!fx.classList.contains('left'))snap(fx,()=>{drawFixture(u.id);fx.classList.add('show','left')});                    // its element showed a later match: put this one back, left of the screen
    fx.classList.remove('left');fx.setAttribute('aria-hidden','false');$('#phone').classList.add('infx')}
   hideTeam();
  }
@@ -2746,12 +2750,12 @@ const STATES=[
  {g:'Limit 20',k:'20 picks',v:'sheet',n:'20 selections in the sheet: the number is only in the header, “Betslip 20”. No extra message.',run(){fill20();refresh();openSheet()}},
  {g:'Limit 20',k:'Tap on a 21st odd',n:'Nothing is added and nothing is swapped. The odd presses and springs back slightly, an orange tongue slides out from behind the betslip and the counter pulses.',run(){fill20();refresh();toggleSel('m1','1x2','2')}},
  {g:'Limit 20',k:'Limit + locked bet',n:'20 selections and one of them locked: the line under Total odds explains the locked bet.',run(){fill20();S.st['m1|1x2']='locked';refresh();openSheet();toEnd()}},
- {g:'Fixture',k:'Odds tab',n:'Pre-match markets of one match (tap its tile in the feed), in groups: Match Result, Goals, Goalscorer, Handicap. Picks stay in sync with the feed and the betslip.',run(){openFixture('m4')}},
- {g:'Fixture',k:'Overview',n:'Tab “Overview” of a match that has not started: Match Result (the compact view of the card of the Odds tab), then the carousel “Top Bets”. A Top Bet is a ready-made combination with one price: a tap on the price puts it into the betslip as one card, a second tap takes it out. The blocks below are drawn only.',run(){openFixture('m4');setFxTab('over')}},
- {g:'Fixture',k:'Live match',n:'Every match of the feed has its page. A live one shows the score and the minute; the goal lines start above the goals already scored, the rest of the markets is as before kick-off (demo prices).',run(){openFixture('m1')}},
+ {g:'Fixture',k:'Odds tab',n:'Pre-match markets of one match (tap its tile in the feed), in groups: Match Result, Goals, Goalscorer, Handicap. Picks stay in sync with the feed and the betslip.',run(){openFixture('m4','odds')}},
+ {g:'Fixture',k:'Overview',n:'Tab “Overview” of a match that has not started — a match page opens on it: Match Result (the compact view of the card of the Odds tab), Match info, League position, Form, then the carousel “Top Bets”. A Top Bet is a ready-made combination with one price: a tap on the price puts it into the betslip as one card, a second tap takes it out. The blocks below are drawn only.',run(){openFixture('m4')}},
+ {g:'Fixture',k:'Live match',n:'Every match of the feed has its page. A live one shows the score and the minute; the goal lines start above the goals already scored, the rest of the markets is as before kick-off (demo prices).',run(){openFixture('m1','odds')}},
  {g:'Fixture',k:'Live updates',n:'Tab “Live updates” of a live match. On top the Live bet block (“Who will win?” with three prices until a moment changes the question), the legal banner under it; both stay pinned while the feed scrolls under them. The feed shows the events of the match and has no odds.',run(){openFixture('m1');setFxTab('live')}},
  {g:'Fixture',k:'Live updates · goal',n:'A goal comes in: its card opens on top of the feed and pushes it down, the line of the shot draws, the score in the header changes and the prices of the Live bet block come back with arrows. With the feed scrolled away nothing moves: a pill “1 new update” shows instead.',run(){openFixture('m1');setFxTab('live');S.luQ.m1=2;const c=cur;luTm.go=setTimeout(()=>{if(cur===c&&S.fx==='m1'&&!(S.lu.m1||[]).length)luMoment(M('m1'),'goal',LQ.m1[1])},T.sheet)}},
- {g:'Fixture',k:'Goalscorer',n:'Between Goals and Handicap: a carousel of compact Goalscorer cards — the same card as Top Picks of a competition, with the shirt number in the corner. Every player is his own pick, so several can be in the betslip; a picked card turns white.',run(){openFixture('m4');setTimeout(()=>{const f=$('#fxScroll'),g=$('#mkts .gs');if(!g)return;const r=f.getBoundingClientRect();f.scrollTop+=(g.getBoundingClientRect().top-r.top)*f.offsetHeight/r.height-160},80)}},
+ {g:'Fixture',k:'Goalscorer',n:'Between Goals and Handicap: a carousel of compact Goalscorer cards — the same card as Top Picks of a competition, with the shirt number in the corner. Every player is his own pick, so several can be in the betslip; a picked card turns white. “See all” under the cards opens all players of the match as rows, as in Top scorer; a pick is the same in both.',run(){openFixture('m4','odds');setTimeout(()=>{const f=$('#fxScroll'),g=$('#mkts .gs');if(!g)return;const r=f.getBoundingClientRect();f.scrollTop+=(g.getBoundingClientRect().top-r.top)*f.offsetHeight/r.height-160},80)}},
  /* L5 · moments of a match, each in both variants. The moment starts T.sheet after the screen is up, so the change is seen; prices are fixed, the same on every show */
  ...[['At rest','No moment yet. A: the block asks “Who will win?”. B: no widget and no odds on the tab.',()=>{}],
   ['Goal','A goal: its card comes in, the prices are under lock for a moment, then “Who scores the next goal?” comes back with arrows.',m=>luMoment(m,'goal',LQ.m1[1])],
