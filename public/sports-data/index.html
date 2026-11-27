@@ -65,23 +65,18 @@ img{display:block}
 /* фон: fixed, картинка отдельным слоем — её opacity ведёт скролл (1 → 0.3) */
 .bg-fix{position:fixed;top:0;left:0;right:0;height:900px;pointer-events:none;z-index:0}
 .bg-img{position:absolute;inset:0;will-change:opacity}
-/* Картинка героя: на широких экранах растягивается на всю ширину (фидбек
-   06.08.2026), на ≤1573 держит масштаб макета (высота 900 → ширина 1572.9,
-   прижата вправо — на 1440 пиксель в пиксель кадр макета). Формула
-   max(100vw, 1573px) = поведение cover для окна vw×900, записанное
-   абсолютно — чтобы фон, шторка и уголки (fixed-attachment) считали
-   размер одинаково. Прозрачность едина, ведётся переменной из JS. */
+/* Картинка hero (Schedule 3.0, hero-section 11024:19272): фон с игроками
+   и все три градиента запечены в один JPG 1440×628 @2x. Ширина max(100vw,
+   1440px): на 1440 пиксель в пиксель, шире — тянется, уже — держит масштаб
+   и прижата вправо (игроки справа остаются в кадре). Фон, шторка и уголки
+   шапки таблицы считают размер одинаково; прозрачность ведёт JS (1 → 0.3). */
 .bg-img,.cover-img,.cbg-img{opacity:var(--img-o,1);
-  background-image:url("assets/hero.jpg");background-repeat:no-repeat;
-  background-position:right top;background-size:max(100vw,1573px) auto}
-.bg-grad{position:absolute;inset:0;
-  background-image:
-    linear-gradient(to top,  #080E12 0%, #080E12 27.43%, rgba(0,0,0,0) 91.45%),
-    linear-gradient(to bottom,#070C10 0%, rgba(0,0,0,0) 34.78%);
-  background-repeat:no-repeat,no-repeat;background-size:100% 100%,100% 100%}
+  background-image:url("assets/pl/hero-pl.jpg");background-repeat:no-repeat;
+  background-position:right top;background-size:max(100vw,1440px) auto}
+.bg-grad{display:none}
 /* padding, а не margin-top у .stack: топбар fixed и hero absolute вне потока,
    margin первого потокового ребёнка схлопнулся бы через .frame-in и сдвинул кадр */
-.frame-in{position:relative;z-index:1;padding-top:545px}
+.frame-in{position:relative;z-index:1;padding-top:548px}
 
 /* «Шторка» над линией шапки таблицы: фиксированная плашка 0..head-top,
    которая рисует ровно те же пиксели, что и фон страницы (та же картинка
@@ -95,68 +90,49 @@ img{display:block}
   background:var(--semantic-base-surface-full-color-default)}
 .cover-img,.cover-grad{position:absolute;top:0;left:0;right:0;height:900px}
 .cover-img{will-change:opacity}
-.cover-grad{background-image:
-    linear-gradient(to top,  #080E12 0%, #080E12 27.43%, rgba(0,0,0,0) 91.45%),
-    linear-gradient(to bottom,#070C10 0%, rgba(0,0,0,0) 34.78%);
-  background-repeat:no-repeat,no-repeat;background-size:100% 100%,100% 100%}
+.cover-grad{display:none}
 
-/* ---------------- топбар (fixed) ---------------- */
+/* ---------------- топбар (fixed): header-desktop, Scrolled=true ---------------- */
 .topbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;flex-direction:column}
-.tb-header{width:100%;background:var(--color-azure-5-85);backdrop-filter:blur(5px);
-  -webkit-backdrop-filter:blur(5px);display:flex;flex-direction:column}
+.tb-header{width:100%;background:rgba(8,14,18,.85);display:flex;flex-direction:column}
 .tb-in{height:64px;display:flex;align-items:center;justify-content:space-between;
   padding:0 var(--gutter)}
-.tb-logo{width:32px;height:32px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tb-l{display:flex;align-items:center;gap:40px}
+.tb-logo{width:32px;height:32px;flex:0 0 auto;display:flex}
 .tb-logo img{width:32px;height:32px}
-.tb-nav{flex:1 0 0;min-width:0;max-height:64px;padding-left:40px;display:flex;align-items:stretch}
 .tb-list1{display:flex;align-items:center;gap:32px}
-.tb-list2{display:flex;align-items:center;gap:var(--spacer-md);margin-left:auto}
-.tb-link{font-weight:400;font-size:15.875px;line-height:normal;color:var(--color-grey-98);
-  text-align:center;white-space:nowrap;text-shadow:0 0 10px rgba(0,0,0,.4)}
-.tb-link.on{font-weight:var(--weight-bold);color:var(--color-yellow-50)}
-.tb-menu{display:flex;align-items:center;justify-content:center;gap:5px}
+.tb-link{font-weight:400;font-size:16px;line-height:16px;color:var(--semantic-base-text-default);
+  white-space:nowrap;display:flex;align-items:center;gap:5px}
+.tb-link.on{font-weight:var(--weight-bold);color:#F7FF1A}
 .ic16{width:16px;height:16px;flex:0 0 auto}
-.tb-search{display:flex;align-items:center;justify-content:center;padding:8px;border-radius:8px}
-.tb-search img{width:18px;height:18px}
-.tb-av-out{border:1px solid var(--color-azure-17);border-radius:20.5px;padding:1.5px;
-  display:flex;align-items:flex-start}
-.tb-av{width:38px;height:38px;border:1px solid var(--color-azure-17);border-radius:19px;
-  overflow:hidden;position:relative}
-.tb-av img{position:absolute;top:0;left:-14.09px;width:71.16px;height:41.37px;max-width:none}
-.tb-avwrap{height:50px;display:flex;align-items:center}
-.tb-subwrap{padding-right:var(--spacer-md)}
-.tb-sub{display:flex;align-items:center;justify-content:center;overflow:hidden;
-  padding:7px 21px 7px 17px;border:1px solid var(--color-orange-47);border-radius:5px;
-  background:rgba(255,255,255,0);box-shadow:0 4px 32px 4px rgba(237,225,1,.12)}
-.tb-sub span{font-weight:var(--weight-bold);font-size:13px;line-height:12px;text-align:center;
-  white-space:nowrap;background:linear-gradient(to right,var(--color-orange-47) 0%,
-  var(--color-yellow-74) 49.99%,var(--color-orange-47) 99.98%);
+.tb-r{display:flex;align-items:center;gap:var(--spacer-md)}
+.tb-search{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px}
+.tb-search img{width:24px;height:24px}
+.tb-follow{width:116px;height:36px}
+/* Subscribe: xs, рамка 1px градиент #F2AF3D→#FBED7D, фон scrim 64% */
+.tb-sub{height:32px;display:flex;align-items:center;padding:0 12px;border-radius:8px;
+  border:1px solid transparent;
+  background:linear-gradient(rgba(8,14,18,.64),rgba(8,14,18,.64)) padding-box,
+    linear-gradient(90deg,#F2AF3D,#FBED7D) border-box}
+.tb-sub span{font-weight:var(--weight-bold);font-size:12px;line-height:1;letter-spacing:.01em;
+  white-space:nowrap;background:linear-gradient(90deg,#F2AF3D,#FBED7D);
   -webkit-background-clip:text;background-clip:text;color:transparent}
-.tb-ring{position:relative;width:38px;height:38px;display:flex;align-items:center;justify-content:center}
-.tb-ring img{width:38px;height:38px}
-.tb-ring b{position:absolute;left:1.5px;top:1.5px;width:35px;height:35px;display:flex;
-  align-items:center;justify-content:center;font-weight:400;font-size:20px;line-height:20px;
-  color:var(--color-grey-98)}
+.tb-avatar{width:36px;height:36px}
 
-/* ---------------- hero-текст ---------------- */
-/* топбар вне потока, поэтому top тот же макетный 349 от верха страницы */
-.wrap{position:absolute;left:var(--gutter);top:349px;width:375px;
-  max-width:calc(100% - var(--gutter)*2);height:170px;will-change:opacity}
-.wrap-in{position:absolute;left:0;top:0;display:flex;flex-direction:column;
-  gap:var(--spacer-md);align-items:flex-start;justify-content:center}
-.wrap-col{display:flex;flex-direction:column;gap:var(--spacer-xs);align-items:flex-start;max-width:375px}
-.h1{width:593px;max-width:calc(100vw - var(--gutter)*2);
-  font-weight:var(--weight-bold);font-size:42px;line-height:48px;color:var(--color-grey-98)}
-.sub{width:375px;max-width:100%;font-weight:400;font-size:18px;line-height:27px;color:var(--color-grey-98)}
-.dots{position:absolute;left:0;right:0;top:126px;display:flex;flex-direction:column;align-items:flex-start}
-.dots-in{padding:10px 0;display:flex;flex-direction:column;align-items:flex-start}
-.dots-row{display:flex;align-items:center;justify-content:center;gap:var(--spacer-xs);
-  padding:var(--spacer-xs) var(--spacer-sm);border-radius:99px}
-.dot-a{position:relative;width:32px;height:8px;border-radius:99px;overflow:hidden;
-  background:var(--semantic-base-surface-transparent-dark-backdrop)}
-.dot-a i{position:absolute;left:0;top:0;width:8px;height:8px;border-radius:99px;
-  background:var(--semantic-base-surface-strong)}
-.dot{width:8px;height:8px;border-radius:50px;background:var(--semantic-base-surface-transparent-dark-backdrop)}
+/* ---------------- hero-текст (.hero-content 11024:19274) ---------------- */
+/* топбар вне потока, поэтому top — от верха страницы: 48 + 196 = 244 */
+.wrap{position:absolute;left:var(--gutter);top:244px;width:439px;
+  max-width:calc(100% - var(--gutter)*2);display:flex;flex-direction:column;gap:var(--spacer-xs);
+  align-items:flex-start;will-change:opacity}
+.hero-logo{width:64px;height:64px}
+.h1{font-weight:var(--weight-bold);font-size:48px;line-height:1.2;
+  color:var(--semantic-base-text-default);text-shadow:0 2px 16px rgba(8,14,18,.36)}
+.sub{padding:var(--spacer-xs) 0;font-weight:400;font-size:18px;line-height:23px;color:#C5C7CA}
+.hero-btns{padding-top:var(--spacer-md)}
+.btn-follow{width:192px;height:48px;display:flex;align-items:center;justify-content:center;
+  gap:var(--spacer-xs);padding:12px;border:0;border-radius:8px;background:#F9FAFA;cursor:pointer;
+  font-family:inherit;font-weight:var(--weight-bold);font-size:16px;line-height:1;color:#080E12}
+.btn-follow img{width:24px;height:24px}
 
 /* ---------------- табы + таблица ---------------- */
 /* .stack начинается на 545: полоса табов несёт свои pt 24 / pb 16,
@@ -165,22 +141,25 @@ img{display:block}
 .stack{position:relative;width:100%;display:flex;flex-direction:column;gap:24px;
   padding-bottom:var(--spacer-5xl)}
 .navstrip{position:sticky;top:var(--topbar-h);z-index:90;
-  padding:var(--spacer-lg) 0 var(--spacer-md)}
+  padding:var(--spacer-xl) 0 var(--spacer-sm)}
 /* Подложки под табами нет намеренно: таблица клипается по линии своей
    sticky-шапки (JS, clip-path), поэтому строки до табов не доезжают —
    табы всегда лежат на чистом фоне, как в макете 27:10244. */
 .tabs{display:flex;align-items:center;gap:var(--spacer-xs);padding:0 var(--gutter);
   flex-wrap:wrap;row-gap:var(--spacer-xs)}
 .tag{display:flex;align-items:center;justify-content:center;gap:var(--spacer-xxs);
-  padding:var(--spacer-xxs) var(--spacer-md);border-radius:8px;overflow:hidden;flex:0 0 auto}
-.tag span{font-weight:var(--weight-bold);font-size:var(--size-caption-sm);line-height:1.5;
-  white-space:nowrap;color:var(--semantic-base-text-default)}
+  height:36px;padding:var(--spacer-xxs) var(--spacer-md);border-radius:8px;overflow:hidden;flex:0 0 auto;
+  background:var(--semantic-base-surface-full-color-subtle)}
+.tag span{font-weight:var(--weight-bold);font-size:var(--size-caption-sm);line-height:18px;
+  letter-spacing:.01em;white-space:nowrap;color:var(--semantic-base-text-default)}
 .tag-ic{position:relative;width:24px;height:24px;flex:0 0 auto;overflow:hidden}
 .tag-ic img{position:absolute;max-width:none}
 .tag-sheets{background:var(--semantic-base-surface-full-color-sheets)}
 .tag-subtle{background:var(--semantic-base-surface-full-color-subtle)}
-.tag-active{background:#FFFFFF}
-.tag-active span{color:var(--semantic-base-text-strong);line-height:1.45}
+.tag-active{background:#F9FAFA}
+.tag-active span{color:var(--semantic-base-text-strong)}
+/* иконки табов экспортированы светлыми; у выбранного таба — тёмные */
+.tag-active .tag-ic img{filter:brightness(0)}
 /* две колонки: таблица + легенда (кадр 53:22980), выровнены по верху */
 .stand-cols{display:flex;gap:var(--spacer-xl);padding:0 var(--gutter);
   align-items:flex-start}
@@ -257,11 +236,7 @@ img{display:block}
 .corner-r{right:-1px;clip-path:path('M0,0 A14,14 0 0 1 14,14 L14,0 Z')}
 .cbg{position:absolute;inset:0}
 .cbg-img{background-attachment:fixed}
-.cbg-grad{background-image:
-    linear-gradient(to top,  #080E12 0%, #080E12 27.43%, rgba(0,0,0,0) 91.45%),
-    linear-gradient(to bottom,#070C10 0%, rgba(0,0,0,0) 34.78%);
-  background-repeat:no-repeat,no-repeat;background-attachment:fixed,fixed;
-  background-position:top,top;background-size:100% 900px,100% 900px}
+.cbg-grad{display:none}
 .hgrp-l{flex:1 0 0;min-width:0;display:flex;align-items:center}
 .sec{display:flex;overflow:hidden}
 .sec-pos{flex:0 0 auto;align-items:flex-start;padding:var(--spacer-lg) var(--spacer-md)}
@@ -285,9 +260,10 @@ img{display:block}
 .sec-rank{width:56px;flex:0 0 auto;align-items:center;justify-content:center}
 .sec-team{flex:1 0 0;min-width:180px;max-width:320px;height:100%;display:flex;align-items:center;
   gap:var(--spacer-xs);padding:var(--spacer-md);overflow:hidden}
-.crest{flex:0 0 auto;display:flex;align-items:center;overflow:hidden;border-radius:9999px;
-  background:var(--semantic-base-surface-full-color-subtle)}
-.crest img{width:24px;height:24px;object-fit:cover;pointer-events:none}
+/* герб 24: экспорт клубов — бокс 64 с полями (герб ≈ 2/3), поэтому
+   картинка 36 центрируется в боксе 24 и сам герб выходит ≈24 */
+.crest{flex:0 0 24px;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.crest img{width:36px;height:36px;flex:0 0 36px;margin:-6px;pointer-events:none}
 .cw{display:flex;align-items:center;align-self:stretch}
 .form{flex:0 0 auto;display:flex;align-items:center;justify-content:flex-end;gap:4px;overflow:hidden}
 .chip{width:24px;height:24px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
@@ -363,9 +339,9 @@ img{display:block}
 /* ---------------- переключаемые табы Standings/Squad ---------------- */
 .tag-sw{cursor:pointer}
 .tag-sw:not(.tag-active){background:var(--semantic-base-surface-full-color-subtle)}
-.tag-sw:not(.tag-active) span{color:var(--semantic-base-text-default);line-height:1.5}
+.tag-sw:not(.tag-active) span{color:var(--semantic-base-text-default)}
 /* иконка трофея экспортирована тёмной под активный чип — на тёмном чипе инвертируем */
-.tag-sw:not(.tag-active) .tag-ic img{filter:invert(1)}
+
 .tag-sw .tag-ic svg{color:var(--semantic-base-text-default)}
 .tag-sw.tag-active .tag-ic svg{color:var(--semantic-base-text-strong)}
 
@@ -638,7 +614,28 @@ img{display:block}
    Карточка тянется на любую ширину: колонки статуса 140, команды делят
    остаток поровну, центр счёта min 152 — общая ось для всех стейтов. */
 .sc-outer{display:flex;flex-direction:column;gap:var(--spacer-xl);
-  padding:0 var(--gutter);margin-top:var(--spacer-md)}
+  padding:0 var(--gutter);margin-top:var(--spacer-xs)}
+/* селектор месяцев: календарь 56 + табы 100×64, стрелки поверх третьего
+   таба (x 262 от начала табов, как в макете); весь блок — opacity 0.3 */
+.sc-months{display:flex;align-items:center;gap:var(--spacer-md);height:64px;opacity:.3}
+.sc-cal{width:56px;height:56px;flex:0 0 56px;display:flex;align-items:center;justify-content:center;
+  border:0;border-radius:8px;background:rgba(249,250,250,.04);cursor:pointer}
+.sc-cal img{width:32px;height:32px}
+.sc-mnav{position:relative;display:flex;height:64px}
+.sc-month{width:100px;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:8px 12px;border:0;border-bottom:2px solid transparent;border-radius:8px;background:none;cursor:pointer;
+  font-family:inherit;color:var(--semantic-base-text-default)}
+.sc-month b{font-weight:var(--weight-bold);font-size:16px;line-height:21px}
+.sc-month span{font-weight:400;font-size:14px;line-height:21px;color:#C5C7CA}
+.sc-month.on{border-bottom-color:#F7FF1A;border-radius:0}
+.sc-month.on b,.sc-month.on span{color:#F7FF1A}
+.sc-mctl{position:absolute;left:262px;top:0;width:115px;height:64px;display:flex;align-items:center;
+  justify-content:flex-end;gap:var(--spacer-xs);padding:16px 0 16px 64px;
+  background:linear-gradient(to left,#080E12 0%,rgba(8,14,18,.95) 61%,rgba(8,14,18,0) 100%)}
+.sc-arrow{width:32px;height:32px;flex:0 0 32px;display:flex;align-items:center;justify-content:center;
+  border:1px solid #3D4549;border-radius:50%;background:rgba(8,14,18,.64);cursor:pointer}
+.sc-arrow img{width:16px;height:16px}
+.sc-arrow.off{opacity:.32}
 .sc-outer[hidden]{display:none}
 /* день: 4% белого, r18, p24, g24 */
 .sc-day{display:flex;flex-direction:column;gap:var(--spacer-lg);padding:var(--spacer-lg);
@@ -777,28 +774,24 @@ img{display:block}
   </div>
   <div class="frame-in">
 
-    <!-- Container (топбар, fixed) -->
+    <!-- header-desktop (Logged in - Subscribe, Scrolled=true), fixed -->
     <div class="topbar">
       <div class="tb-header"><div class="tb-in">
-        <a class="tb-logo" href="#"><img src="assets/logo.svg" alt="DAZN" width="32" height="32"></a>
-        <div class="tb-nav">
-          <div class="tb-list1">
+        <div class="tb-l">
+          <a class="tb-logo" href="#"><img src="assets/logo.svg" alt="DAZN" width="32" height="32"></a>
+          <nav class="tb-list1">
             <a class="tb-link on" href="#">Home</a>
-            <div class="tb-menu"><span class="tb-link">All sports</span>
-              <img class="ic16" src="assets/chevron.svg" alt="" width="16" height="16"></div>
+            <a class="tb-link" href="#">All sports<img class="ic16" src="assets/chevron.svg" alt="" width="16" height="16"></a>
             <a class="tb-link" href="#">Live TV</a>
-            <a class="tb-link" href="#">Fixtures</a>
-          </div>
-          <div class="tb-list2">
-            <a class="tb-search" href="#"><img src="assets/search.svg" alt="" width="18" height="18"></a>
-            <div class="tb-menu">
-              <div class="tb-avwrap"><div class="tb-av-out"><div class="tb-av">
-                <img src="assets/avatar.png" alt=""></div></div></div>
-              <img class="ic16" src="assets/chevron.svg" alt="" width="16" height="16">
-            </div>
-            <div class="tb-subwrap"><div class="tb-sub"><span>Subscribe</span></div></div>
-            <div class="tb-ring"><img src="assets/ring.svg" alt="" width="38" height="38"><b>L</b></div>
-          </div>
+            <a class="tb-link" href="#">Schedule</a>
+            <a class="tb-link" href="#">News</a>
+          </nav>
+        </div>
+        <div class="tb-r">
+          <a class="tb-search" href="#" aria-label="Search"><img src="assets/pl/ic-search.png" alt="" width="24" height="24"></a>
+          <img class="tb-follow" src="assets/pl/hd-follow.png" alt="Followed teams" width="116" height="36">
+          <a class="tb-sub" href="#"><span>Subscribe</span></a>
+          <img class="tb-avatar" src="assets/pl/hd-avatar.png" alt="Profile" width="36" height="36">
         </div>
       </div></div>
     </div>
@@ -806,15 +799,14 @@ img{display:block}
     <!-- шторка: копия фона над линией шапки, прячет уезжающие строки -->
     <div class="cover"><div class="cover-img" id="coverImg"></div><div class="cover-grad"></div></div>
 
-    <!-- content-wrapper (hero-текст) -->
+    <!-- .hero-content 11024:19274: лого, заголовок, подзаголовок, Follow -->
     <div class="wrap" id="hero">
-      <div class="wrap-in"><div class="wrap-col">
-        <div class="h1">Bundesliga on DAZN</div>
-        <div class="sub">All the matches, all the stories, all in one place. Powered by DAZN &amp; FIBA</div>
-      </div></div>
-      <div class="dots"><div class="dots-in"><div class="dots-row">
-        <div class="dot-a"><i></i></div><div class="dot"></div><div class="dot"></div>
-      </div></div></div>
+      <img class="hero-logo" src="assets/pl/pl-logo.png" alt="Premier League" width="64" height="64">
+      <div>
+        <h1 class="h1">Premier League</h1>
+        <p class="sub">Arsenal - Manchester City | Sunday from 5:30 PM</p>
+        <div class="hero-btns"><button class="btn-follow"><img src="assets/pl/ic-star.png" alt="" width="24" height="24">Follow</button></div>
+      </div>
     </div>
 
     <!-- Frame 2147227627 -->
@@ -822,43 +814,24 @@ img{display:block}
       <!-- Navigation: sticky-полоса -->
       <div class="navstrip" id="navstrip">
         <div class="tabs">
-          <div class="tag tag-sheets"><div class="tag-ic">
-            <img src="assets/ic_home.svg" alt="" style="inset:11.75% 12.5% 12.5% 12.5%"></div><span>Home</span></div>
-          <!-- таб Schedule (Schedule 3.0) — второй в полосе, сразу после Home
-               (решение Nik 27.11.2026); иконка-плейсхолдер до появления в DS -->
-          <div class="tag tag-subtle tag-sw" id="tabSchedule" role="button" tabindex="0"><div class="tag-ic">
-            <svg viewBox="0 0 24 24" width="24" height="24" style="position:absolute;inset:0" fill="currentColor" aria-hidden="true">
-              <path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 2a7 7 0 1 1 0 14 7 7 0 0 1 0-14Zm-1 2v5.4l4.3 2.6 1-1.7-3.3-2V7h-2Z"/>
-            </svg></div><span>Schedule</span></div>
-          <div class="tag tag-sheets"><div class="tag-ic">
-            <img src="assets/ic_games.svg" alt="" style="inset:9.78% 12.92% 14.49% 12.92%"></div><span>Games</span></div>
-          <div class="tag tag-subtle"><div class="tag-ic">
-            <img src="assets/ic_orig.svg" alt="" style="left:50%;top:50%;width:17.988px;height:18.008px;transform:translate(-50%,-50%)"></div><span>Originals</span></div>
-          <div class="tag tag-subtle"><div class="tag-ic">
-            <img src="assets/ic_arch.png" alt="" style="inset:0;width:24px;height:24.333px;object-fit:cover"></div><span>Archive</span></div>
-          <div class="tag tag-active tag-sw" id="tabStandings" role="button" tabindex="0"><div class="tag-ic">
-            <img src="assets/ic_stand.svg" alt="" style="inset:0;width:24px;height:24px"></div><span>Standings</span></div>
-          <!-- новый таб (в макете навигации его нет — добавлен по задаче);
-               иконка-плейсхолдер до появления в DS -->
-          <div class="tag tag-subtle tag-sw" id="tabSquad" role="button" tabindex="0"><div class="tag-ic">
-            <svg viewBox="0 0 24 24" width="24" height="24" style="position:absolute;inset:0" fill="currentColor" aria-hidden="true">
-              <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2.2c-4.1 0-7.4 2.1-7.4 4.7V20h14.8v-1.1c0-2.6-3.3-4.7-7.4-4.7Z"/>
-            </svg></div><span>Squad</span></div>
-          <!-- таб Fixtures (в маке навигация без него) -->
-          <div class="tag tag-subtle tag-sw" id="tabFixtures" role="button" tabindex="0"><div class="tag-ic">
-            <svg viewBox="0 0 24 24" width="24" height="24" style="position:absolute;inset:0" fill="currentColor" aria-hidden="true">
-              <path d="M7 3v2H5.5A1.5 1.5 0 0 0 4 6.5v13A1.5 1.5 0 0 0 5.5 21h13a1.5 1.5 0 0 0 1.5-1.5v-13A1.5 1.5 0 0 0 18.5 5H17V3h-2v2H9V3H7Zm-1 7h12v9H6v-9Z"/>
-            </svg></div><span>Fixtures</span></div>
+          <!-- Tabs / Rounded-corners 11024:19296; кликабельны Schedule и Table (третий) -->
+          <div class="tag"><div class="tag-ic"><img src="assets/pl/tab-home.png" alt="" style="inset:0;width:24px;height:24px"></div><span>Home</span></div>
+          <div class="tag tag-active tag-sw" id="tabSchedule" role="button" tabindex="0"><div class="tag-ic">
+            <img src="assets/pl/tab-schedule.png" alt="" style="inset:0;width:24px;height:24px"></div><span>Schedule</span></div>
+          <div class="tag tag-sw" id="tabStandings" role="button" tabindex="0"><div class="tag-ic">
+            <img src="assets/pl/tab-table.png" alt="" style="inset:0;width:24px;height:24px"></div><span>Table</span></div>
+          <div class="tag"><div class="tag-ic"><img src="assets/pl/tab-originals.png" alt="" style="inset:0;width:24px;height:24px"></div><span>Originals</span></div>
+          <div class="tag"><div class="tag-ic"><img src="assets/pl/tab-games.png" alt="" style="inset:0;width:24px;height:24px"></div><span>Games</span></div>
         </div>
       </div>
 
       <!-- вью Standings: таблица + легенда справа (кадр 53:22980,
            обновление 11.08.2026 — легенда занимает остаток ширины) -->
-      <div class="view-standings" id="viewStandings">
+      <div class="view-standings" id="viewStandings" hidden>
       <div class="stand-cols">
       <!-- таблица; заголовок с сезоном — часть компонента table desktop 63:39494 -->
       <div class="table-outer">
-        <div class="tbl-title"><span class="tt-name">Bundesliga</span><span class="tt-season">25/26</span></div>
+        <div class="tbl-title"><span class="tt-name">Premier League</span><span class="tt-season">26/27</span></div>
         <div class="table" id="table">
             <div class="row-head">
               <i class="corner corner-l"><i class="cbg cbg-img"></i><i class="cbg cbg-grad"></i></i>
@@ -884,18 +857,18 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">1</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">Bayern München</p>
+                  <div class="crest"><img src="assets/schedule/club-arsenal.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Arsenal</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">25</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">9</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">1</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">17</p></div></div>
                 <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">7</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">99</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">32</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+67</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">82</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+10</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">28</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
                       <div class="chip c-W"><p class="t-xs">W</p></div>
@@ -912,22 +885,22 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">2</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">Bayer 04 Leverkusen</p>
+                  <div class="crest"><img src="assets/schedule/club-brighton-hove-albion.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Brighton &amp; Hove Albion</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">19</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">12</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">72</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">43</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+29</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">69</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">7</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">1</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">26</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">9</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+17</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">22</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
                       <div class="chip c-W"><p class="t-xs">W</p></div>
-                      <div class="chip c-D"><p class="t-xs">D</p></div>
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
                       <div class="chip c-D"><p class="t-xs">D</p></div>
@@ -940,24 +913,24 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">3</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">Eintracht Frankfurt</p>
+                  <div class="crest"><img src="assets/schedule/club-manchester-city.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Manchester City</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">17</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">9</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">68</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">46</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+22</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">60</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">7</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">1</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">22</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">14</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+8</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">22</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
                       <div class="chip c-W"><p class="t-xs">W</p></div>
+                      <div class="chip c-W"><p class="t-xs">W</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
-                      <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
                   </div>
                 </div></div>
@@ -968,25 +941,25 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">4</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">Borussia Dortmund</p>
+                  <div class="crest"><img src="assets/schedule/club-liverpool.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Liverpool</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">17</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
                 <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">6</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">71</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">51</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+20</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">57</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">3</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">18</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">10</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+8</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">21</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
-                      <div class="chip c-W"><p class="t-xs">W</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
-                      <div class="chip c-W"><p class="t-xs">W</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
                   </div>
                 </div></div>
               </div>
@@ -996,25 +969,25 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">5</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">SC Freiburg</p>
+                  <div class="crest"><img src="assets/schedule/club-afc-bournemouth.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Bournemouth</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">16</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">7</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">46</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">51</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-5</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">55</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">5</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">3</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">18</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">14</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+4</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">18</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
-                      <div class="chip c-W"><p class="t-xs">W</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
                       <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-W"><p class="t-xs">W</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
                   </div>
                 </div></div>
               </div>
@@ -1024,25 +997,25 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">6</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">1. FSV Mainz 05</p>
+                  <div class="crest"><img src="assets/schedule/club-brentford.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Brentford</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">14</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">10</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">55</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">44</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+11</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">52</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">4</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">5</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">20</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+9</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">17</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
                       <div class="chip c-D"><p class="t-xs">D</p></div>
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
                   </div>
                 </div></div>
               </div>
@@ -1052,25 +1025,25 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">7</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">RB Leipzig</p>
+                  <div class="crest"><img src="assets/schedule/club-leeds-united.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Leeds United</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">13</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">12</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">53</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">48</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">4</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">5</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">14</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">9</p></div></div>
                 <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+5</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">51</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">17</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
                       <div class="chip c-D"><p class="t-xs">D</p></div>
-                      <div class="chip c-D"><p class="t-xs">D</p></div>
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
                       <div class="chip c-D"><p class="t-xs">D</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
                   </div>
                 </div></div>
               </div>
@@ -1080,24 +1053,24 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">8</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">SV Werder Bremen</p>
+                  <div class="crest"><img src="assets/schedule/club-chelsea.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Chelsea</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">14</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">9</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">54</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">57</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-3</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">51</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">5</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">1</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">20</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">20</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">0</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">16</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
-                      <div class="chip c-W"><p class="t-xs">W</p></div>
-                      <div class="chip c-W"><p class="t-xs">W</p></div>
-                      <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-W"><p class="t-xs">W</p></div>
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-W"><p class="t-xs">W</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
                   </div>
                 </div></div>
@@ -1108,25 +1081,25 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">9</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">VfB Stuttgart</p>
+                  <div class="crest"><img src="assets/schedule/club-everton.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Everton</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">4</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">4</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">12</p></div></div>
                 <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">14</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">8</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">64</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">53</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+11</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">50</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-2</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">16</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
                   </div>
                 </div></div>
               </div>
@@ -1136,25 +1109,25 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">10</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">Borussia Mönchengladbach</p>
+                  <div class="crest"><img src="assets/schedule/club-tottenham-hotspur.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Tottenham Hotspur</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">13</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">6</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">56</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">57</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-1</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">45</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">4</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">3</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">12</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+1</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">15</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
-                      <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-D"><p class="t-xs">D</p></div>
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-W"><p class="t-xs">W</p></div>
                   </div>
                 </div></div>
               </div>
@@ -1164,25 +1137,25 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">11</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">VfL Wolfsburg</p>
+                  <div class="crest"><img src="assets/schedule/club-hull-city.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Hull City</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">12</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">7</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">56</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">54</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">3</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">5</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">13</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
                 <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">+2</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">43</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">14</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
                       <div class="chip c-D"><p class="t-xs">D</p></div>
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
-                      <div class="chip c-W"><p class="t-xs">W</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
                   </div>
                 </div></div>
               </div>
@@ -1192,25 +1165,25 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">12</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">FC Augsburg</p>
+                  <div class="crest"><img src="assets/schedule/club-aston-villa.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Aston Villa</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">12</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">7</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">35</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">51</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-16</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">43</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">3</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">5</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">14</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">17</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-3</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">14</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
-                      <div class="chip c-W"><p class="t-xs">W</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-D"><p class="t-xs">D</p></div>
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
                   </div>
                 </div></div>
               </div>
@@ -1220,23 +1193,23 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">13</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">1. FC Union Berlin</p>
+                  <div class="crest"><img src="assets/schedule/club-newcastle-united.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Newcastle United</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
                 <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">7</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">35</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">55</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-20</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">40</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">3</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">4</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">15</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">18</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-3</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">13</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-D"><p class="t-xs">D</p></div>
                   </div>
@@ -1248,22 +1221,78 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">14</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">FC St. Pauli</p>
+                  <div class="crest"><img src="assets/schedule/club-coventry-city.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Coventry City</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">8</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">8</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">28</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">41</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-13</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">32</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">4</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">0</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">13</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">21</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-8</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">12</p></div></div>
+                <div class="cw"><div class="sec sec-168">
+                  <div class="form">
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-W"><p class="t-xs">W</p></div>
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-W"><p class="t-xs">W</p></div>
+                  </div>
+                </div></div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="ind-w"></div>
+              <div class="grp-l"><div class="grp-l-in">
+                <div class="sec sec-rank"><p class="t-md c-white">15</p></div>
+                <div class="sec sec-team">
+                  <div class="crest"><img src="assets/schedule/club-fulham.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Fulham</p>
+                </div>
+              </div></div>
+              <div class="grp-r">
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">2</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">5</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">13</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-2</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">11</p></div></div>
+                <div class="cw"><div class="sec sec-168">
+                  <div class="form">
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                  </div>
+                </div></div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="ind-w"></div>
+              <div class="grp-l"><div class="grp-l-in">
+                <div class="sec sec-rank"><p class="t-md c-white">16</p></div>
+                <div class="sec sec-team">
+                  <div class="crest"><img src="assets/schedule/club-ipswich-town.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Ipswich Town</p>
+                </div>
+              </div></div>
+              <div class="grp-r">
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">3</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">2</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">15</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">22</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-7</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">11</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
                       <div class="chip c-W"><p class="t-xs">W</p></div>
-                      <div class="chip c-D"><p class="t-xs">D</p></div>
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
@@ -1274,83 +1303,27 @@ img{display:block}
             <div class="row">
               <div class="ind-w"></div>
               <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sec-rank"><p class="t-md c-white">15</p></div>
-                <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">TSG Hoffenheim</p>
-                </div>
-              </div></div>
-              <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">8</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">8</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">46</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">68</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-22</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">32</p></div></div>
-                <div class="cw"><div class="sec sec-168">
-                  <div class="form">
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
-                      <div class="chip c-D"><p class="t-xs">D</p></div>
-                      <div class="chip c-D"><p class="t-xs">D</p></div>
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
-                      <div class="chip c-W"><p class="t-xs">W</p></div>
-                  </div>
-                </div></div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="ind-w"><div class="ind" style="background:#D12424"></div></div>
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sec-rank"><p class="t-md c-white">16</p></div>
-                <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">1. FC Heidenheim</p>
-                </div>
-              </div></div>
-              <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">8</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">5</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">37</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">64</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-27</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">29</p></div></div>
-                <div class="cw"><div class="sec sec-168">
-                  <div class="form">
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
-                      <div class="chip c-W"><p class="t-xs">W</p></div>
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
-                      <div class="chip c-D"><p class="t-xs">D</p></div>
-                  </div>
-                </div></div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="ind-w"><div class="ind" style="background:#D12424"></div></div>
-              <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">17</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">Holstein Kiel</p>
+                  <div class="crest"><img src="assets/schedule/club-nottingham-forest.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Nottingham Forest</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">6</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">7</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">49</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">80</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-31</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">25</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">2</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">3</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">9</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">15</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-6</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">9</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
-                      <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-W"><p class="t-xs">W</p></div>
                   </div>
                 </div></div>
               </div>
@@ -1360,24 +1333,80 @@ img{display:block}
               <div class="grp-l"><div class="grp-l-in">
                 <div class="sec sec-rank"><p class="t-md c-white">18</p></div>
                 <div class="sec sec-team">
-                  <div class="crest"><img src="assets/crest.png" alt="" width="28" height="28"></div>
-                  <p class="t-md c-def grow">VfL Bochum</p>
+                  <div class="crest"><img src="assets/schedule/club-sunderland.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Sunderland</p>
                 </div>
               </div></div>
               <div class="grp-r">
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">6</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">7</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">33</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">67</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-34</p></div></div>
-                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">25</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">2</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">3</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">8</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">17</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-9</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">9</p></div></div>
                 <div class="cw"><div class="sec sec-168">
                   <div class="form">
                       <div class="chip c-D"><p class="t-xs">D</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-W"><p class="t-xs">W</p></div>
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                  </div>
+                </div></div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="ind-w"><div class="ind" style="background:#D12424"></div></div>
+              <div class="grp-l"><div class="grp-l-in">
+                <div class="sec sec-rank"><p class="t-md c-white">19</p></div>
+                <div class="sec sec-team">
+                  <div class="crest"><img src="assets/schedule/club-manchester-united.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Manchester United</p>
+                </div>
+              </div></div>
+              <div class="grp-r">
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">1</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">5</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">14</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">23</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-9</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">8</p></div></div>
+                <div class="cw"><div class="sec sec-168">
+                  <div class="form">
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-D"><p class="t-xs">D</p></div>
+                  </div>
+                </div></div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="ind-w"><div class="ind" style="background:#D12424"></div></div>
+              <div class="grp-l"><div class="grp-l-in">
+                <div class="sec sec-rank"><p class="t-md c-white">20</p></div>
+                <div class="sec sec-team">
+                  <div class="crest"><img src="assets/schedule/club-crystal-palace.png" alt="" width="28" height="28"></div>
+                  <p class="t-md c-def grow">Crystal Palace</p>
+                </div>
+              </div></div>
+              <div class="grp-r">
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">11</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">2</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">1</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">12</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">27</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md t-reg c-sub">-15</p></div></div>
+                <div class="cw"><div class="sec sec-56"><p class="t-md c-def">7</p></div></div>
+                <div class="cw"><div class="sec sec-168">
+                  <div class="form">
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
+                      <div class="chip c-W"><p class="t-xs">W</p></div>
+                      <div class="chip c-L"><p class="t-xs">L</p></div>
                       <div class="chip c-L"><p class="t-xs">L</p></div>
                   </div>
                 </div></div>
@@ -1409,252 +1438,280 @@ img{display:block}
             <div class="m-rank">1</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">Bayern München</span>
+              <span class="m-tname">Arsenal</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">25</div>
-              <div class="m-cell">7</div>
-              <div class="m-cell">2</div>
-              <div class="m-cell">+67</div>
-              <div class="m-cell m-pt">82</div>
+              <div class="m-cell">9</div>
+              <div class="m-cell">1</div>
+              <div class="m-cell">24</div>
+              <div class="m-cell">+10</div>
+              <div class="m-cell m-pt">28</div>
           </div>
           <div class="m-row">
             <div class="m-ind"><i style="background:#79E99C"></i></div>
             <div class="m-rank">2</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">Bayer 04 Leverkusen</span>
+              <span class="m-tname">Brighton & Hove Albion</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">19</div>
-              <div class="m-cell">12</div>
-              <div class="m-cell">3</div>
-              <div class="m-cell">+29</div>
-              <div class="m-cell m-pt">69</div>
+              <div class="m-cell">7</div>
+              <div class="m-cell">1</div>
+              <div class="m-cell">26</div>
+              <div class="m-cell">+17</div>
+              <div class="m-cell m-pt">22</div>
           </div>
           <div class="m-row">
             <div class="m-ind"><i style="background:#79E99C"></i></div>
             <div class="m-rank">3</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">Eintracht Frankfurt</span>
+              <span class="m-tname">Manchester City</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">17</div>
-              <div class="m-cell">9</div>
-              <div class="m-cell">8</div>
-              <div class="m-cell">+22</div>
-              <div class="m-cell m-pt">60</div>
+              <div class="m-cell">7</div>
+              <div class="m-cell">1</div>
+              <div class="m-cell">26</div>
+              <div class="m-cell">+8</div>
+              <div class="m-cell m-pt">22</div>
           </div>
           <div class="m-row">
             <div class="m-ind"><i style="background:#79E99C"></i></div>
             <div class="m-rank">4</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">Borussia Dortmund</span>
+              <span class="m-tname">Liverpool</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">17</div>
               <div class="m-cell">6</div>
-              <div class="m-cell">11</div>
-              <div class="m-cell">+20</div>
-              <div class="m-cell m-pt">57</div>
+              <div class="m-cell">3</div>
+              <div class="m-cell">25</div>
+              <div class="m-cell">+8</div>
+              <div class="m-cell m-pt">21</div>
           </div>
           <div class="m-row">
             <div class="m-ind"><i style="background:#1183FF"></i></div>
             <div class="m-rank">5</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">SC Freiburg</span>
+              <span class="m-tname">AFC Bournemouth</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">16</div>
-              <div class="m-cell">7</div>
-              <div class="m-cell">11</div>
-              <div class="m-cell">-5</div>
-              <div class="m-cell m-pt">55</div>
+              <div class="m-cell">5</div>
+              <div class="m-cell">3</div>
+              <div class="m-cell">26</div>
+              <div class="m-cell">+4</div>
+              <div class="m-cell m-pt">18</div>
           </div>
           <div class="m-row">
             <div class="m-ind"><i style="background:#FFFA00"></i></div>
             <div class="m-rank">6</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">1. FSV Mainz 05</span>
+              <span class="m-tname">Brentford</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">14</div>
-              <div class="m-cell">10</div>
-              <div class="m-cell">10</div>
-              <div class="m-cell">+11</div>
-              <div class="m-cell m-pt">52</div>
+              <div class="m-cell">4</div>
+              <div class="m-cell">5</div>
+              <div class="m-cell">25</div>
+              <div class="m-cell">+9</div>
+              <div class="m-cell m-pt">17</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">7</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">RB Leipzig</span>
+              <span class="m-tname">Leeds United</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">13</div>
-              <div class="m-cell">12</div>
-              <div class="m-cell">9</div>
+              <div class="m-cell">4</div>
+              <div class="m-cell">5</div>
+              <div class="m-cell">25</div>
               <div class="m-cell">+5</div>
-              <div class="m-cell m-pt">51</div>
+              <div class="m-cell m-pt">17</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">8</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">SV Werder Bremen</span>
+              <span class="m-tname">Chelsea</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">14</div>
-              <div class="m-cell">9</div>
-              <div class="m-cell">11</div>
-              <div class="m-cell">-3</div>
-              <div class="m-cell m-pt">51</div>
+              <div class="m-cell">5</div>
+              <div class="m-cell">1</div>
+              <div class="m-cell">28</div>
+              <div class="m-cell">0</div>
+              <div class="m-cell m-pt">16</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">9</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">VfB Stuttgart</span>
+              <span class="m-tname">Everton</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">14</div>
-              <div class="m-cell">8</div>
-              <div class="m-cell">12</div>
-              <div class="m-cell">+11</div>
-              <div class="m-cell m-pt">50</div>
+              <div class="m-cell">4</div>
+              <div class="m-cell">4</div>
+              <div class="m-cell">26</div>
+              <div class="m-cell">-2</div>
+              <div class="m-cell m-pt">16</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">10</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">Borussia Mönchengladbach</span>
+              <span class="m-tname">Tottenham Hotspur</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">13</div>
-              <div class="m-cell">6</div>
-              <div class="m-cell">15</div>
-              <div class="m-cell">-1</div>
-              <div class="m-cell m-pt">45</div>
+              <div class="m-cell">4</div>
+              <div class="m-cell">3</div>
+              <div class="m-cell">27</div>
+              <div class="m-cell">+1</div>
+              <div class="m-cell m-pt">15</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">11</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">VfL Wolfsburg</span>
+              <span class="m-tname">Hull City</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">12</div>
-              <div class="m-cell">7</div>
-              <div class="m-cell">15</div>
+              <div class="m-cell">3</div>
+              <div class="m-cell">5</div>
+              <div class="m-cell">26</div>
               <div class="m-cell">+2</div>
-              <div class="m-cell m-pt">43</div>
+              <div class="m-cell m-pt">14</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">12</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">FC Augsburg</span>
+              <span class="m-tname">Aston Villa</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">12</div>
-              <div class="m-cell">7</div>
-              <div class="m-cell">15</div>
-              <div class="m-cell">-16</div>
-              <div class="m-cell m-pt">43</div>
+              <div class="m-cell">3</div>
+              <div class="m-cell">5</div>
+              <div class="m-cell">26</div>
+              <div class="m-cell">-3</div>
+              <div class="m-cell m-pt">14</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">13</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">1. FC Union Berlin</span>
+              <span class="m-tname">Newcastle United</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">11</div>
-              <div class="m-cell">7</div>
-              <div class="m-cell">16</div>
-              <div class="m-cell">-20</div>
-              <div class="m-cell m-pt">40</div>
+              <div class="m-cell">3</div>
+              <div class="m-cell">4</div>
+              <div class="m-cell">27</div>
+              <div class="m-cell">-3</div>
+              <div class="m-cell m-pt">13</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">14</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">FC St. Pauli</span>
+              <span class="m-tname">Coventry City</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">8</div>
-              <div class="m-cell">8</div>
-              <div class="m-cell">18</div>
-              <div class="m-cell">-13</div>
-              <div class="m-cell m-pt">32</div>
+              <div class="m-cell">4</div>
+              <div class="m-cell">0</div>
+              <div class="m-cell">30</div>
+              <div class="m-cell">-8</div>
+              <div class="m-cell m-pt">12</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">15</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">TSG Hoffenheim</span>
+              <span class="m-tname">Fulham</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">8</div>
-              <div class="m-cell">8</div>
-              <div class="m-cell">18</div>
-              <div class="m-cell">-22</div>
-              <div class="m-cell m-pt">32</div>
+              <div class="m-cell">2</div>
+              <div class="m-cell">5</div>
+              <div class="m-cell">27</div>
+              <div class="m-cell">-2</div>
+              <div class="m-cell m-pt">11</div>
           </div>
           <div class="m-row">
-            <div class="m-ind"><i style="background:#D12424"></i></div>
+            <div class="m-ind"></div>
             <div class="m-rank">16</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">1. FC Heidenheim</span>
+              <span class="m-tname">Ipswich Town</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">8</div>
-              <div class="m-cell">5</div>
-              <div class="m-cell">21</div>
-              <div class="m-cell">-27</div>
-              <div class="m-cell m-pt">29</div>
+              <div class="m-cell">3</div>
+              <div class="m-cell">2</div>
+              <div class="m-cell">29</div>
+              <div class="m-cell">-7</div>
+              <div class="m-cell m-pt">11</div>
           </div>
           <div class="m-row">
-            <div class="m-ind"><i style="background:#D12424"></i></div>
+            <div class="m-ind"></div>
             <div class="m-rank">17</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">Holstein Kiel</span>
+              <span class="m-tname">Nottingham Forest</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">6</div>
-              <div class="m-cell">7</div>
-              <div class="m-cell">21</div>
-              <div class="m-cell">-31</div>
-              <div class="m-cell m-pt">25</div>
+              <div class="m-cell">2</div>
+              <div class="m-cell">3</div>
+              <div class="m-cell">29</div>
+              <div class="m-cell">-6</div>
+              <div class="m-cell m-pt">9</div>
           </div>
           <div class="m-row">
             <div class="m-ind"><i style="background:#D12424"></i></div>
             <div class="m-rank">18</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">VfL Bochum</span>
+              <span class="m-tname">Sunderland</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">6</div>
-              <div class="m-cell">7</div>
-              <div class="m-cell">21</div>
-              <div class="m-cell">-34</div>
-              <div class="m-cell m-pt">25</div>
+              <div class="m-cell">2</div>
+              <div class="m-cell">3</div>
+              <div class="m-cell">29</div>
+              <div class="m-cell">-9</div>
+              <div class="m-cell m-pt">9</div>
+          </div>
+          <div class="m-row">
+            <div class="m-ind"><i style="background:#D12424"></i></div>
+            <div class="m-rank">19</div>
+            <div class="m-team">
+              <span class="m-crest"><img src="assets/crest.png" alt=""></span>
+              <span class="m-tname">Manchester United</span>
+            </div>
+              <div class="m-cell">34</div>
+              <div class="m-cell">1</div>
+              <div class="m-cell">5</div>
+              <div class="m-cell">28</div>
+              <div class="m-cell">-9</div>
+              <div class="m-cell m-pt">8</div>
+          </div>
+          <div class="m-row">
+            <div class="m-ind"><i style="background:#D12424"></i></div>
+            <div class="m-rank">20</div>
+            <div class="m-team">
+              <span class="m-crest"><img src="assets/crest.png" alt=""></span>
+              <span class="m-tname">Crystal Palace</span>
+            </div>
+              <div class="m-cell">34</div>
+              <div class="m-cell">2</div>
+              <div class="m-cell">1</div>
+              <div class="m-cell">31</div>
+              <div class="m-cell">-15</div>
+              <div class="m-cell m-pt">7</div>
           </div>
         </div>
         <div class="m-table" id="mTableShort" hidden>
@@ -1670,198 +1727,220 @@ img{display:block}
             <div class="m-rank">1</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">Bayern München</span>
+              <span class="m-tname">Arsenal</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">+67</div>
-              <div class="m-cell m-pt">82</div>
+              <div class="m-cell">+10</div>
+              <div class="m-cell m-pt">28</div>
           </div>
           <div class="m-row">
             <div class="m-ind"><i style="background:#79E99C"></i></div>
             <div class="m-rank">2</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">Bayer 04 Leverkusen</span>
+              <span class="m-tname">Brighton & Hove Albion</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">+29</div>
-              <div class="m-cell m-pt">69</div>
+              <div class="m-cell">+17</div>
+              <div class="m-cell m-pt">22</div>
           </div>
           <div class="m-row">
             <div class="m-ind"><i style="background:#79E99C"></i></div>
             <div class="m-rank">3</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">Eintracht Frankfurt</span>
+              <span class="m-tname">Manchester City</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">+22</div>
-              <div class="m-cell m-pt">60</div>
+              <div class="m-cell">+8</div>
+              <div class="m-cell m-pt">22</div>
           </div>
           <div class="m-row">
             <div class="m-ind"><i style="background:#79E99C"></i></div>
             <div class="m-rank">4</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">Borussia Dortmund</span>
+              <span class="m-tname">Liverpool</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">+20</div>
-              <div class="m-cell m-pt">57</div>
+              <div class="m-cell">+8</div>
+              <div class="m-cell m-pt">21</div>
           </div>
           <div class="m-row">
             <div class="m-ind"><i style="background:#1183FF"></i></div>
             <div class="m-rank">5</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">SC Freiburg</span>
+              <span class="m-tname">AFC Bournemouth</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">-5</div>
-              <div class="m-cell m-pt">55</div>
+              <div class="m-cell">+4</div>
+              <div class="m-cell m-pt">18</div>
           </div>
           <div class="m-row">
             <div class="m-ind"><i style="background:#FFFA00"></i></div>
             <div class="m-rank">6</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">1. FSV Mainz 05</span>
+              <span class="m-tname">Brentford</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">+11</div>
-              <div class="m-cell m-pt">52</div>
+              <div class="m-cell">+9</div>
+              <div class="m-cell m-pt">17</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">7</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">RB Leipzig</span>
+              <span class="m-tname">Leeds United</span>
             </div>
               <div class="m-cell">34</div>
               <div class="m-cell">+5</div>
-              <div class="m-cell m-pt">51</div>
+              <div class="m-cell m-pt">17</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">8</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">SV Werder Bremen</span>
+              <span class="m-tname">Chelsea</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">-3</div>
-              <div class="m-cell m-pt">51</div>
+              <div class="m-cell">0</div>
+              <div class="m-cell m-pt">16</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">9</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">VfB Stuttgart</span>
+              <span class="m-tname">Everton</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">+11</div>
-              <div class="m-cell m-pt">50</div>
+              <div class="m-cell">-2</div>
+              <div class="m-cell m-pt">16</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">10</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">Borussia Mönchengladbach</span>
+              <span class="m-tname">Tottenham Hotspur</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">-1</div>
-              <div class="m-cell m-pt">45</div>
+              <div class="m-cell">+1</div>
+              <div class="m-cell m-pt">15</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">11</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">VfL Wolfsburg</span>
+              <span class="m-tname">Hull City</span>
             </div>
               <div class="m-cell">34</div>
               <div class="m-cell">+2</div>
-              <div class="m-cell m-pt">43</div>
+              <div class="m-cell m-pt">14</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">12</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">FC Augsburg</span>
+              <span class="m-tname">Aston Villa</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">-16</div>
-              <div class="m-cell m-pt">43</div>
+              <div class="m-cell">-3</div>
+              <div class="m-cell m-pt">14</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">13</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">1. FC Union Berlin</span>
+              <span class="m-tname">Newcastle United</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">-20</div>
-              <div class="m-cell m-pt">40</div>
+              <div class="m-cell">-3</div>
+              <div class="m-cell m-pt">13</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">14</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">FC St. Pauli</span>
+              <span class="m-tname">Coventry City</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">-13</div>
-              <div class="m-cell m-pt">32</div>
+              <div class="m-cell">-8</div>
+              <div class="m-cell m-pt">12</div>
           </div>
           <div class="m-row">
             <div class="m-ind"></div>
             <div class="m-rank">15</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">TSG Hoffenheim</span>
+              <span class="m-tname">Fulham</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">-22</div>
-              <div class="m-cell m-pt">32</div>
+              <div class="m-cell">-2</div>
+              <div class="m-cell m-pt">11</div>
           </div>
           <div class="m-row">
-            <div class="m-ind"><i style="background:#D12424"></i></div>
+            <div class="m-ind"></div>
             <div class="m-rank">16</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">1. FC Heidenheim</span>
+              <span class="m-tname">Ipswich Town</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">-27</div>
-              <div class="m-cell m-pt">29</div>
+              <div class="m-cell">-7</div>
+              <div class="m-cell m-pt">11</div>
           </div>
           <div class="m-row">
-            <div class="m-ind"><i style="background:#D12424"></i></div>
+            <div class="m-ind"></div>
             <div class="m-rank">17</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">Holstein Kiel</span>
+              <span class="m-tname">Nottingham Forest</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">-31</div>
-              <div class="m-cell m-pt">25</div>
+              <div class="m-cell">-6</div>
+              <div class="m-cell m-pt">9</div>
           </div>
           <div class="m-row">
             <div class="m-ind"><i style="background:#D12424"></i></div>
             <div class="m-rank">18</div>
             <div class="m-team">
               <span class="m-crest"><img src="assets/crest.png" alt=""></span>
-              <span class="m-tname">VfL Bochum</span>
+              <span class="m-tname">Sunderland</span>
             </div>
               <div class="m-cell">34</div>
-              <div class="m-cell">-34</div>
-              <div class="m-cell m-pt">25</div>
+              <div class="m-cell">-9</div>
+              <div class="m-cell m-pt">9</div>
+          </div>
+          <div class="m-row">
+            <div class="m-ind"><i style="background:#D12424"></i></div>
+            <div class="m-rank">19</div>
+            <div class="m-team">
+              <span class="m-crest"><img src="assets/crest.png" alt=""></span>
+              <span class="m-tname">Manchester United</span>
+            </div>
+              <div class="m-cell">34</div>
+              <div class="m-cell">-9</div>
+              <div class="m-cell m-pt">8</div>
+          </div>
+          <div class="m-row">
+            <div class="m-ind"><i style="background:#D12424"></i></div>
+            <div class="m-rank">20</div>
+            <div class="m-team">
+              <span class="m-crest"><img src="assets/crest.png" alt=""></span>
+              <span class="m-tname">Crystal Palace</span>
+            </div>
+              <div class="m-cell">34</div>
+              <div class="m-cell">-15</div>
+              <div class="m-cell m-pt">7</div>
           </div>
         </div>
       </div>
@@ -1879,7 +1958,7 @@ img{display:block}
               <li class="lg-item"><i class="lg-ind" style="background:#79E99C"></i>Champions League</li>
               <li class="lg-item"><i class="lg-ind" style="background:#1183FF"></i>Europa League</li>
               <li class="lg-item"><i class="lg-ind" style="background:#FFFA00"></i>Conference League qualification</li>
-              <li class="lg-item"><i class="lg-ind" style="background:#D12424"></i>Relegation play-off</li>
+              <li class="lg-item"><i class="lg-ind" style="background:#D12424"></i>Relegation</li>
             </ul>
             <div class="lg-div"></div>
             <ul class="lg-group">
@@ -1904,7 +1983,17 @@ img{display:block}
       </div>
 
       <!-- вью Schedule 1:1 по экрану 11024:19307 (Schedule 3.0) -->
-      <div class="sc-outer" id="viewSchedule" hidden>
+      <div class="sc-outer" id="viewSchedule">
+        <!-- .months 11024:19864 (в макете весь блок на opacity 0.3) -->
+        <div class="sc-months">
+          <button class="sc-cal" aria-label="Calendar"><img src="assets/pl/ic-calendar.png" alt="" width="32" height="32"></button>
+          <div class="sc-mnav"><button class="sc-month"><b>Oct</b><span>2026</span></button><button class="sc-month on"><b>Nov</b><span>2026</span></button><button class="sc-month"><b>Dec</b><span>2026</span></button>
+            <div class="sc-mctl">
+              <button class="sc-arrow off" aria-label="Previous"><img src="assets/pl/ic-chev-l.png" alt="" width="16" height="16"></button>
+              <button class="sc-arrow" aria-label="Next"><img src="assets/pl/ic-chev-r.png" alt="" width="16" height="16"></button>
+            </div>
+          </div>
+        </div>
         <section class="sc-day">
           <h2 class="sc-dayh"><b>Friday,</b> <span>Nov 27</span></h2>
           <div class="sc-tiles">
@@ -2012,1240 +2101,7 @@ img{display:block}
         </section>
       </div>
 
-      <!-- вью Squad: сетка карточек по секции 101:10662 -->
-      <div class="squad-outer" id="viewSquad" hidden>
-        <!-- переключатель вида: в макете его нет — собран в стиле тегов,
-             иконки-плейсхолдеры до появления в DS -->
-        <div class="sq-toolbar">
-          <div class="vsw" role="group" aria-label="View">
-            <button class="vsw-btn vsw-active" id="vswCards" aria-pressed="true" title="Cards">
-              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M4 4h7v7H4V4Zm9 0h7v7h-7V4ZM4 13h7v7H4v-7Zm9 0h7v7h-7v-7Z"/></svg>
-            </button>
-            <button class="vsw-btn" id="vswList" aria-pressed="false" title="List">
-              <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M4 5h16v2.5H4V5Zm0 5.75h16v2.5H4v-2.5ZM4 16.5h16V19H4v-2.5Z"/></svg>
-            </button>
-          </div>
-        </div>
-        <div class="sq-cards" id="squadCards">
-          <section class="sq-group">
-            <h2 class="sq-h">Goalkeepers</h2>
-            <div class="sq-grid">
-          <div class="card">
-            <img class="card-img" src="assets/neuer.png" alt="Manuel Neuer">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">1</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Manuel</p>
-                <p class="card-last">Neuer</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/neuer.png" alt="Manuel Neuer">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">1</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Manuel</p>
-                <p class="card-last">Neuer</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/neuer.png" alt="Manuel Neuer">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">1</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Manuel</p>
-                <p class="card-last">Neuer</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-            </div>
-          </section>
-          <section class="sq-group">
-            <h2 class="sq-h">Defenders</h2>
-            <div class="sq-grid">
-          <div class="card">
-            <img class="card-img" src="assets/upamecano.png" alt="Dayot Upamecano">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">2</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Dayot</p>
-                <p class="card-last">Upamecano</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/upamecano.png" alt="Dayot Upamecano">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">2</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Dayot</p>
-                <p class="card-last">Upamecano</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/upamecano.png" alt="Dayot Upamecano">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">2</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Dayot</p>
-                <p class="card-last">Upamecano</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/upamecano.png" alt="Dayot Upamecano">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">2</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Dayot</p>
-                <p class="card-last">Upamecano</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/upamecano.png" alt="Dayot Upamecano">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">2</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Dayot</p>
-                <p class="card-last">Upamecano</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/upamecano.png" alt="Dayot Upamecano">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">2</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Dayot</p>
-                <p class="card-last">Upamecano</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-            </div>
-          </section>
-          <section class="sq-group">
-            <h2 class="sq-h">Midfielders</h2>
-            <div class="sq-grid">
-          <div class="card">
-            <img class="card-img" src="assets/kimmich.png" alt="Joshua Kimmich">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">6</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Joshua</p>
-                <p class="card-last">Kimmich</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/kimmich.png" alt="Joshua Kimmich">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">6</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Joshua</p>
-                <p class="card-last">Kimmich</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/kimmich.png" alt="Joshua Kimmich">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">6</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Joshua</p>
-                <p class="card-last">Kimmich</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/kimmich.png" alt="Joshua Kimmich">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">6</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Joshua</p>
-                <p class="card-last">Kimmich</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/kimmich.png" alt="Joshua Kimmich">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">6</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Joshua</p>
-                <p class="card-last">Kimmich</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/kimmich.png" alt="Joshua Kimmich">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">6</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Joshua</p>
-                <p class="card-last">Kimmich</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/kimmich.png" alt="Joshua Kimmich">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">6</p>
-              <img class="card-flag" src="assets/flag-de.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Joshua</p>
-                <p class="card-last">Kimmich</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-            </div>
-          </section>
-          <section class="sq-group">
-            <h2 class="sq-h">Forwards</h2>
-            <div class="sq-grid">
-          <div class="card">
-            <img class="card-img" src="assets/olise.png" alt="Michael Olise">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">17</p>
-              <img class="card-flag" src="assets/flag-fr.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Michael</p>
-                <p class="card-last">Olise</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/olise.png" alt="Michael Olise">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">17</p>
-              <img class="card-flag" src="assets/flag-fr.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Michael</p>
-                <p class="card-last">Olise</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/olise.png" alt="Michael Olise">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">17</p>
-              <img class="card-flag" src="assets/flag-fr.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Michael</p>
-                <p class="card-last">Olise</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/olise.png" alt="Michael Olise">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">17</p>
-              <img class="card-flag" src="assets/flag-fr.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Michael</p>
-                <p class="card-last">Olise</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <img class="card-img" src="assets/olise.png" alt="Michael Olise">
-            <div class="card-grad"></div>
-            <div class="card-right">
-              <p class="card-num">17</p>
-              <img class="card-flag" src="assets/flag-fr.svg" alt="">
-            </div>
-            <div class="card-panel">
-              <div class="card-name">
-                <p class="card-first">Michael</p>
-                <p class="card-last">Olise</p>
-              </div>
-              <div class="card-boxes">
-                <div class="card-box"><b class="card-bval">187cm</b><span class="card-blabel">Height</span></div>
-                <div class="card-box"><b class="card-bval">33</b><span class="card-blabel">Age</span></div>
-                <div class="card-box"><b class="card-bval">FW</b><span class="card-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-            </div>
-          </section>
-        </div>
-        <div class="table sq-table" id="squadTable" hidden>
-            <div class="row-head sq-head">
-              <i class="corner corner-l"><i class="cbg cbg-img"></i><i class="cbg cbg-grad"></i></i>
-              <i class="corner corner-r"><i class="cbg cbg-img"></i><i class="cbg cbg-grad"></i></i>
-              <div class="hgrp-l">
-                <div class="sec sqh-num"><p class="t-sm">Num</p></div>
-                <div class="sec sec-hteam"><p class="t-sm grow">Name</p></div>
-              </div>
-              <div class="sq-right">
-                <div class="sec sqc-nat hs"><p class="t-sm">Nationality</p></div>
-                <div class="sec sqc-w68 hs"><p class="t-sm">Age</p></div>
-                <div class="sec sqc-w68 hs"><p class="t-sm">Height</p></div>
-                <div class="sec sqc-w68 hs"><p class="t-sm">Position</p></div>
-              </div>
-            </div>
-          <div class="sq-tbody">
-          <div class="sqg">
-            <p class="sqg-h">Goalkeepers</p>
-            <div class="sqg-rows">
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">1</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/neuer.png" alt=""></span>
-                  <p class="t-md c-def grow">Manuel Neuer</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">GK</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">1</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/neuer.png" alt=""></span>
-                  <p class="t-md c-def grow">Manuel Neuer</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">GK</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">1</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/neuer.png" alt=""></span>
-                  <p class="t-md c-def grow">Manuel Neuer</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">GK</p></div>
-              </div>
-            </div>
-            </div>
-          </div>
-          <div class="sqg">
-            <p class="sqg-h">Defenders</p>
-            <div class="sqg-rows">
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">2</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/upamecano.png" alt=""></span>
-                  <p class="t-md c-def grow">Dayot Upamecano</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">CB</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">2</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/upamecano.png" alt=""></span>
-                  <p class="t-md c-def grow">Dayot Upamecano</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">CB</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">2</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/upamecano.png" alt=""></span>
-                  <p class="t-md c-def grow">Dayot Upamecano</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">CB</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">2</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/upamecano.png" alt=""></span>
-                  <p class="t-md c-def grow">Dayot Upamecano</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">CB</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">2</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/upamecano.png" alt=""></span>
-                  <p class="t-md c-def grow">Dayot Upamecano</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">CB</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">2</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/upamecano.png" alt=""></span>
-                  <p class="t-md c-def grow">Dayot Upamecano</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">CB</p></div>
-              </div>
-            </div>
-            </div>
-          </div>
-          <div class="sqg">
-            <p class="sqg-h">Midfielders</p>
-            <div class="sqg-rows">
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">6</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/kimmich.png" alt=""></span>
-                  <p class="t-md c-def grow">Joshua Kimmich</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">DM</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">6</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/kimmich.png" alt=""></span>
-                  <p class="t-md c-def grow">Joshua Kimmich</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">DM</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">6</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/kimmich.png" alt=""></span>
-                  <p class="t-md c-def grow">Joshua Kimmich</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">DM</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">6</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/kimmich.png" alt=""></span>
-                  <p class="t-md c-def grow">Joshua Kimmich</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">DM</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">6</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/kimmich.png" alt=""></span>
-                  <p class="t-md c-def grow">Joshua Kimmich</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">DM</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">6</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/kimmich.png" alt=""></span>
-                  <p class="t-md c-def grow">Joshua Kimmich</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">DM</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">6</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/kimmich.png" alt=""></span>
-                  <p class="t-md c-def grow">Joshua Kimmich</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Ger</b><img class="sq-natf" src="assets/flag-de.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">DM</p></div>
-              </div>
-            </div>
-            </div>
-          </div>
-          <div class="sqg">
-            <p class="sqg-h">Forwards</p>
-            <div class="sqg-rows">
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">17</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/olise.png" alt=""></span>
-                  <p class="t-md c-def grow">Michael Olise</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Fra</b><img class="sq-natf" src="assets/flag-fr.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">FW</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">17</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/olise.png" alt=""></span>
-                  <p class="t-md c-def grow">Michael Olise</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Fra</b><img class="sq-natf" src="assets/flag-fr.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">FW</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">17</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/olise.png" alt=""></span>
-                  <p class="t-md c-def grow">Michael Olise</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Fra</b><img class="sq-natf" src="assets/flag-fr.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">FW</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">17</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/olise.png" alt=""></span>
-                  <p class="t-md c-def grow">Michael Olise</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Fra</b><img class="sq-natf" src="assets/flag-fr.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">FW</p></div>
-              </div>
-            </div>
-            <div class="row sq-row">
-              <div class="grp-l"><div class="grp-l-in">
-                <div class="sec sqc-num"><p class="t-md c-white">17</p></div>
-                <div class="sec sec-team">
-                  <span class="sq-ava"><img src="assets/olise.png" alt=""></span>
-                  <p class="t-md c-def grow">Michael Olise</p>
-                </div>
-              </div></div>
-              <div class="sq-right">
-                <div class="sec sqc-nat"><b class="sq-natc">Fra</b><img class="sq-natf" src="assets/flag-fr.svg" alt=""></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">33</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">187cm</p></div>
-                <div class="sec sqc-w68"><p class="t-md t-reg c-sub">FW</p></div>
-              </div>
-            </div>
-            </div>
-          </div>
-          </div>
-        </div>
-        <div class="mq" id="squadMList" hidden>
-        <section class="mq-group">
-          <h2 class="sq-h">Goalkeepers</h2>
-          <div class="mq-card">
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/neuer.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">1</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Manuel Neuer</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">GK</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/neuer.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">1</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Manuel Neuer</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">GK</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/neuer.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">1</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Manuel Neuer</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">GK</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section class="mq-group">
-          <h2 class="sq-h">Defenders</h2>
-          <div class="mq-card">
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/upamecano.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">2</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Dayot Upamecano</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">CB</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/upamecano.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">2</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Dayot Upamecano</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">CB</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/upamecano.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">2</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Dayot Upamecano</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">CB</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/upamecano.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">2</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Dayot Upamecano</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">CB</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/upamecano.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">2</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Dayot Upamecano</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">CB</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/upamecano.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">2</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Dayot Upamecano</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">CB</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section class="mq-group">
-          <h2 class="sq-h">Midfielders</h2>
-          <div class="mq-card">
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/kimmich.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">6</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Joshua Kimmich</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">DM</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/kimmich.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">6</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Joshua Kimmich</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">DM</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/kimmich.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">6</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Joshua Kimmich</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">DM</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/kimmich.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">6</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Joshua Kimmich</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">DM</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/kimmich.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">6</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Joshua Kimmich</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">DM</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/kimmich.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">6</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Joshua Kimmich</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">DM</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/kimmich.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">6</b><img class="mq-flag" src="assets/flag-de.svg" alt=""></div>
-                  <p class="mq-pname">Joshua Kimmich</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">DM</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section class="mq-group">
-          <h2 class="sq-h">Forwards</h2>
-          <div class="mq-card">
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/olise.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">17</b><img class="mq-flag" src="assets/flag-fr.svg" alt=""></div>
-                  <p class="mq-pname">Michael Olise</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">FW</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/olise.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">17</b><img class="mq-flag" src="assets/flag-fr.svg" alt=""></div>
-                  <p class="mq-pname">Michael Olise</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">FW</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/olise.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">17</b><img class="mq-flag" src="assets/flag-fr.svg" alt=""></div>
-                  <p class="mq-pname">Michael Olise</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">FW</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/olise.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">17</b><img class="mq-flag" src="assets/flag-fr.svg" alt=""></div>
-                  <p class="mq-pname">Michael Olise</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">FW</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-            <div class="mq-div"></div>
-            <div class="mq-tile">
-              <div class="mq-thead">
-                <span class="mq-ava"><img src="assets/olise.png" alt=""></span>
-                <div class="mq-meta">
-                  <div class="mq-numrow"><b class="mq-num">17</b><img class="mq-flag" src="assets/flag-fr.svg" alt=""></div>
-                  <p class="mq-pname">Michael Olise</p>
-                </div>
-              </div>
-              <div class="mq-boxes">
-                <div class="mq-box"><b class="mq-bval">187cm</b><span class="mq-blabel">Height</span></div>
-                <div class="mq-box"><b class="mq-bval">33</b><span class="mq-blabel">Age</span></div>
-                <div class="mq-box"><b class="mq-bval">FW</b><span class="mq-blabel">Position</span></div>
-              </div>
-            </div>
-          </div>
-        </section>
-        </div>
-      </div>
 
-      <!-- вью Fixtures 1:1 по кадру 338:51838 -->
-      <div class="fx-outer" id="viewFixtures" hidden>
-        <div class="fx-months">
-          <button class="fx-month"><b>Aug</b><span>2025</span></button>
-          <button class="fx-month"><b>Sept</b><span>2025</span></button>
-          <button class="fx-month"><b>Oct</b><span>2025</span></button>
-          <button class="fx-month"><b>Nov</b><span>2025</span></button>
-          <button class="fx-month"><b>Dec</b><span>2025</span></button>
-          <button class="fx-month"><b>Jan</b><span>2026</span></button>
-          <button class="fx-month"><b>Mar</b><span>2026</span></button>
-          <button class="fx-month fx-month-on"><b>Apr</b><span>2026</span></button>
-          <button class="fx-month"><b>May</b><span>2026</span></button>
-        </div>
-        <div class="fx-card">
-          <div class="fx-head"><p><b>Matchweek 8, </b><span>13 Aug - 15 Aug</span></p></div>
-          <div class="fx-body">
-          <div class="fx-day">
-            <p class="fx-dayh"><b>Today,</b> <span>Sep 8</span></p>
-            <div class="fx-matches">
-            <div class="fx-match">
-              <div class="fx-team fx-home">
-                <span class="fx-tname">Bayern München</span>
-                <span class="fx-logo"><img src="assets/crest.png" alt=""></span>
-              </div>
-              <div class="fx-status"><div class="fx-live"><b class="fx-score">0</b><span class="fx-min">79’</span><b class="fx-score">3</b></div></div>
-              <div class="fx-team fx-away">
-                <span class="fx-logo"><img src="assets/crest.png" alt=""></span>
-                <span class="fx-tname">VfL Bochum</span>
-              </div>
-            </div>
-            <div class="fx-match">
-              <div class="fx-team fx-home">
-                <span class="fx-tname">Bayer 04 Leverkusen</span>
-                <span class="fx-logo"><img src="assets/crest.png" alt=""></span>
-              </div>
-              <div class="fx-status"><div class="fx-live"><b class="fx-score">2</b><span class="fx-min">72’</span><b class="fx-score">1</b></div></div>
-              <div class="fx-team fx-away">
-                <span class="fx-logo"><img src="assets/crest.png" alt=""></span>
-                <span class="fx-tname">RB Leipzig</span>
-              </div>
-            </div>
-            <div class="fx-match">
-              <div class="fx-team fx-home">
-                <span class="fx-tname">Eintracht Frankfurt</span>
-                <span class="fx-logo"><img src="assets/crest.png" alt=""></span>
-              </div>
-              <div class="fx-status"><div class="fx-live"><b class="fx-score">2</b><span class="fx-min">64’</span><b class="fx-score">3</b></div></div>
-              <div class="fx-team fx-away">
-                <span class="fx-logo"><img src="assets/crest.png" alt=""></span>
-                <span class="fx-tname">SV Werder Bremen</span>
-              </div>
-            </div>
-            <div class="fx-match">
-              <div class="fx-team fx-home">
-                <span class="fx-tname">Borussia Dortmund</span>
-                <span class="fx-logo"><img src="assets/crest.png" alt=""></span>
-              </div>
-              <div class="fx-status"><b class="fx-time">16:00</b></div>
-              <div class="fx-team fx-away">
-                <span class="fx-logo"><img src="assets/crest.png" alt=""></span>
-                <span class="fx-tname">VfB Stuttgart</span>
-              </div>
-            </div>
-            </div>
-          </div>
-          <div class="fx-day">
-            <p class="fx-dayh"><b>Sunday,</b> <span>Sep 9</span></p>
-            <div class="fx-matches">
-            <div class="fx-match">
-              <div class="fx-team fx-home">
-                <span class="fx-tname">SC Freiburg</span>
-                <span class="fx-logo"><img src="assets/crest.png" alt=""></span>
-              </div>
-              <div class="fx-status"><div class="fx-live"><b class="fx-score">0</b><span class="fx-min">21’</span><b class="fx-score">2</b></div></div>
-              <div class="fx-team fx-away">
-                <span class="fx-logo"><img src="assets/crest.png" alt=""></span>
-                <span class="fx-tname">1. FSV Mainz 05</span>
-              </div>
-            </div>
-            <div class="fx-match">
-              <div class="fx-team fx-home">
-                <span class="fx-tname">Borussia Mönchengladbach</span>
-                <span class="fx-logo"><img src="assets/crest.png" alt=""></span>
-              </div>
-              <div class="fx-status"><b class="fx-time">16:00</b></div>
-              <div class="fx-team fx-away">
-                <span class="fx-logo"><img src="assets/crest.png" alt=""></span>
-                <span class="fx-tname">VfL Wolfsburg</span>
-              </div>
-            </div>
-            </div>
-          </div>
-          <div class="fx-day">
-            <p class="fx-dayh"><b>Monday,</b> <span>Sep 10</span></p>
-            <div class="fx-matches">
-            <div class="fx-match">
-              <div class="fx-team fx-home">
-                <span class="fx-tname">FC Augsburg</span>
-                <span class="fx-logo"><img src="assets/crest.png" alt=""></span>
-              </div>
-              <div class="fx-status"><b class="fx-time">13:00</b></div>
-              <div class="fx-team fx-away">
-                <span class="fx-logo"><img src="assets/crest.png" alt=""></span>
-                <span class="fx-tname">1. FC Union Berlin</span>
-              </div>
-            </div>
-            </div>
-          </div>
-          </div>
-        </div>
-      </div>
     </div>
 
   </div>
@@ -3271,68 +2127,42 @@ img{display:block}
     document.documentElement.style.setProperty('--head-top', (TOPBAR + strip.offsetHeight + gap) + 'px');
     // в карточном виде Squad липкой шапки таблицы нет — шторка заканчивается
     // на нижней кромке полосы табов; в табличных видах — на линии шапки
-    var noHead = (view === 'squad' && sqMode === 'cards') || view === 'fixtures' || view === 'schedule';
+    var noHead = view === 'schedule';
     var coverH = noHead ? (TOPBAR + strip.offsetHeight) : (TOPBAR + strip.offsetHeight + gap);
     document.documentElement.style.setProperty('--cover-h', coverH + 'px');
   }
 
-  // ---- переключатель вида внутри Squad: карточки / таблица ----
-  var sqMode = 'cards';
-  var sqCards = document.getElementById('squadCards'), sqTable = document.getElementById('squadTable');
-  var sqML = document.getElementById('squadMList');
-  var vswC = document.getElementById('vswCards'), vswL = document.getElementById('vswList');
-  function setSquadMode(m){
-    sqMode = m;
-    sqCards.hidden = m !== 'cards';
-    sqTable.hidden = m !== 'list';
-    sqML.hidden = m !== 'list';   // мобильный список; медиа решает, какой из двух видим
-    vswC.classList.toggle('vsw-active', m === 'cards');
-    vswL.classList.toggle('vsw-active', m === 'list');
-    vswC.setAttribute('aria-pressed', m === 'cards');
-    vswL.setAttribute('aria-pressed', m === 'list');
-    layout(); onScroll();
-  }
-  vswC.addEventListener('click', function(){ setSquadMode('cards'); });
-  vswL.addEventListener('click', function(){ setSquadMode('list'); });
-
-  // ---- переключение вью Standings / Squad / Fixtures ----
-  var viewS = document.getElementById('viewStandings'), viewQ = document.getElementById('viewSquad');
-  var viewF = document.getElementById('viewFixtures'), viewC = document.getElementById('viewSchedule');
-  var tabS = document.getElementById('tabStandings'), tabQ = document.getElementById('tabSquad');
-  var tabF = document.getElementById('tabFixtures'), tabC = document.getElementById('tabSchedule');
-  var VIEWS = ['standings','schedule','squad','fixtures'];
-  var view = 'standings';
+  // ---- переключение вью: Schedule (по умолчанию, как в макете) / Table ----
+  // Table — внутреннее имя 'standings'; в ссылке — #table
+  var viewS = document.getElementById('viewStandings'), viewC = document.getElementById('viewSchedule');
+  var tabS = document.getElementById('tabStandings'), tabC = document.getElementById('tabSchedule');
+  var HASH = { schedule: '', standings: '#table' };
+  var view = 'schedule';
   function setView(v){
     view = v;
     viewS.hidden = v !== 'standings';
     viewC.hidden = v !== 'schedule';
-    viewQ.hidden = v !== 'squad';
-    viewF.hidden = v !== 'fixtures';
-    [[tabS,'standings'],[tabC,'schedule'],[tabQ,'squad'],[tabF,'fixtures']].forEach(function(p){
+    [[tabS,'standings'],[tabC,'schedule']].forEach(function(p){
       p[0].classList.toggle('tag-active', v === p[1]);
-      p[0].classList.toggle('tag-subtle', v !== p[1]);
     });
-    // ссылка вида …#schedule открывает нужный таб сразу
-    if (history.replaceState) history.replaceState(null, '', v === 'standings' ? location.pathname : '#' + v);
+    if (history.replaceState) history.replaceState(null, '', location.pathname + location.search + HASH[v]);
     layout(); onScroll();
   }
   tabS.addEventListener('click', function(){ setView('standings'); });
   tabC.addEventListener('click', function(){ setView('schedule'); });
-  tabQ.addEventListener('click', function(){ setView('squad'); });
-  tabF.addEventListener('click', function(){ setView('fixtures'); });
-  // месяцы fixtures: визуальное переключение активного
-  document.querySelectorAll('.fx-month').forEach(function(b){
+  // месяцы расписания: визуальное переключение активного
+  document.querySelectorAll('.sc-month').forEach(function(b){
     b.addEventListener('click', function(){
-      document.querySelectorAll('.fx-month').forEach(function(x){ x.classList.remove('fx-month-on'); });
-      b.classList.add('fx-month-on');
+      document.querySelectorAll('.sc-month').forEach(function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
     });
   });
 
   function onScroll(){
     var y = window.scrollY;
     // дистанция коллапса: от натуральной позиции табов до припина под топбаром
-    // (на 1440 = 569 − 88 = 481)
-    var D = Math.max(1, stack.offsetTop + 24 - (TOPBAR + 24));
+    // (на 1440 = 580 − 96 = 484)
+    var D = Math.max(1, stack.offsetTop - TOPBAR);
     var p = Math.min(1, y / D);
     // 1 → 0.3, как в 27:10244; одна переменная ведёт фон, шторку и уголки шапки
     document.documentElement.style.setProperty('--img-o', (1 - 0.7 * p).toFixed(3));
@@ -3371,8 +2201,7 @@ img{display:block}
   // страховка от пропущенного resize и перелома табов на новую строку:
   // высота полосы табов меняется → пересчитать линию шапки
   if (window.ResizeObserver) new ResizeObserver(function(){ layout(); onScroll(); }).observe(strip);
-  var hv = location.hash.slice(1);
-  if (VIEWS.indexOf(hv) > 0) setView(hv);
+  if (location.hash === '#table') setView('standings');
   layout(); onScroll();
 })();
 </script>
