@@ -62,14 +62,14 @@ img{display:block}
   position:relative;width:100%;min-width:320px;
   background-color:var(--semantic-base-surface-full-color-default);
 }
-/* фон: fixed, картинка отдельным слоем — её opacity ведёт скролл (1 → 0.3) */
+/* фон: fixed, картинка отдельным слоем — её opacity ведёт скролл (1 → 0.08) */
 .bg-fix{position:fixed;top:0;left:0;right:0;height:900px;pointer-events:none;z-index:0}
 .bg-img{position:absolute;inset:0;will-change:opacity}
 /* Картинка hero (Schedule 3.0, hero-section 11024:19272): фон с игроками
    и все три градиента запечены в один JPG 1440×628 @2x. Ширина max(100vw,
    1440px): на 1440 пиксель в пиксель, шире — тянется, уже — держит масштаб
    и прижата вправо (игроки справа остаются в кадре). Фон, шторка и уголки
-   шапки таблицы считают размер одинаково; прозрачность ведёт JS (1 → 0.3). */
+   шапки таблицы считают размер одинаково; прозрачность ведёт JS (1 → 0.08). */
 .bg-img,.cover-img,.cbg-img{opacity:var(--img-o,1);
   background-image:url("assets/pl/hero-pl.jpg");background-repeat:no-repeat;
   background-position:right top;background-size:max(100vw,1440px) auto}
@@ -2164,8 +2164,9 @@ img{display:block}
     // (на 1440 = 580 − 96 = 484)
     var D = Math.max(1, stack.offsetTop - TOPBAR);
     var p = Math.min(1, y / D);
-    // 1 → 0.3, как в 27:10244; одна переменная ведёт фон, шторку и уголки шапки
-    document.documentElement.style.setProperty('--img-o', (1 - 0.7 * p).toFixed(3));
+    // 1 → 0.08: к припину табов картинка почти не видна (фидбек 27.11.2026,
+    // было 0.3 по кадру 27:10244); одна переменная ведёт фон, шторку и уголки шапки
+    document.documentElement.style.setProperty('--img-o', (1 - 0.92 * p).toFixed(3));
     hero.style.opacity  = Math.max(0, 1 - y / (D * 0.62)).toFixed(3);
     hud.textContent = window.innerWidth + '\u00d7' + window.innerHeight
       + ' \u00b7 table ' + Math.round(table.getBoundingClientRect().width)
