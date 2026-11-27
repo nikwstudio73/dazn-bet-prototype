@@ -676,11 +676,43 @@ img{display:block}
   line-height:1;letter-spacing:.01em;color:var(--semantic-base-text-default);white-space:nowrap}
 .sc-live i{width:4px;height:4px;border-radius:50%;background:currentColor}
 /* левая колонка: Notify Me (38, p0 12, g4, 8% белого, pill) / лейбл FT */
-.sc-notify{display:inline-flex;align-items:center;gap:4px;height:38px;padding:0 12px;
-  border:0;border-radius:100px;background:rgba(249,250,250,.08);cursor:pointer;
+.sc-notify{display:inline-flex;align-items:center;gap:4px;flex:0 0 auto;height:38px;padding:0 12px;
+  border:0;border-radius:100px;background-color:rgba(249,250,250,.08);cursor:pointer;
+  overflow:hidden;white-space:nowrap;
   font-family:inherit;font-weight:var(--weight-bold);font-size:12px;line-height:1.52;
   color:var(--semantic-base-text-default)}
-.sc-notify img{width:20px;height:20px}
+/* анимация уведомлений (кадры 11019:9295). Три состояния:
+   off  — 98: контурный колокольчик, «Notify Me», фон 8%
+   on   — 135: залитый, «Notifications on», фон 4%, справа отступ 16
+   icon — 44: залитый жёлтый #F7FF1A, без текста, фон #FBED7D 15%
+   Ширины меряются JS по тексту; длительности и кривые — в JS (TUNE). */
+.sc-notify[data-s="on"]{background-color:rgba(249,250,250,.04);padding-right:16px}
+.sc-notify[data-s="icon"]{background-color:rgba(251,237,125,.15)}
+.nb-ic{position:relative;width:20px;height:20px;flex:0 0 20px}
+.nb-ic i{position:absolute;inset:0;background-color:#F9FAFA;
+  -webkit-mask:var(--m) center/20px 20px no-repeat;mask:var(--m) center/20px 20px no-repeat}
+.nb-o{--m:url("assets/pl/bell-outline.png")}
+.nb-f{--m:url("assets/pl/bell-filled.png");opacity:0}
+.sc-notify[data-s="on"] .nb-o,.sc-notify[data-s="icon"] .nb-o{opacity:0}
+.sc-notify[data-s="on"] .nb-f,.sc-notify[data-s="icon"] .nb-f{opacity:1}
+.sc-notify[data-s="icon"] .nb-f{background-color:#F7FF1A}
+.nb-txt{position:relative;align-self:stretch;flex:1 1 auto;min-width:0}
+.nb-t{position:absolute;left:0;top:50%;transform:translateY(-50%)}
+.nb-t1{opacity:0}
+.sc-notify[data-s="on"] .nb-t0,.sc-notify[data-s="icon"] .nb-t0{opacity:0}
+.sc-notify[data-s="on"] .nb-t1{opacity:1}
+/* панель настройки анимации (открывается с ?tune в адресе) */
+.tune{position:fixed;right:12px;bottom:52px;z-index:210;width:280px;padding:12px;border-radius:12px;
+  background:rgba(8,14,18,.92);border:1px solid #3D4549;color:#F9FAFA;
+  font:400 12px/1.4 var(--font-primary-font),sans-serif;display:flex;flex-direction:column;gap:8px}
+.tune b{font-weight:700;font-size:13px}
+.tune label{display:grid;grid-template-columns:92px 1fr;align-items:center;gap:8px;color:#C5C7CA}
+.tune input{width:100%;min-width:0;height:26px;padding:0 6px;border:1px solid #3D4549;border-radius:6px;
+  background:#0C161C;color:#F9FAFA;font:inherit}
+.tune .tune-row{display:flex;gap:6px}
+.tune button{flex:1;height:28px;border:0;border-radius:6px;background:#242D33;color:#F9FAFA;
+  font:700 12px/1 var(--font-primary-font),sans-serif;cursor:pointer}
+.tune .tune-note{color:#8D9295;font-size:11px}
 .sc-ft{padding:0 12px;font-weight:var(--weight-bold);font-size:18px;line-height:1.38;
   color:var(--semantic-base-text-default)}
 /* правая колонка: Watch / Watch Replay (40, p10 12, g6, pill) или Watch on партнёр */
@@ -2012,7 +2044,7 @@ img{display:block}
           <h2 class="sc-dayh"><b>Today,</b> <span>Nov 28</span></h2>
           <div class="sc-tiles">
             <div class="sc-card is-live">
-              <div class="sc-col sc-col-l"><button class="sc-notify"><img src="assets/schedule/ic-bell.png" alt="" width="20" height="20"><span>Notify Me</span></button></div>
+              <div class="sc-col sc-col-l"><button class="sc-notify" type="button" data-s="off" aria-pressed="false"><span class="nb-ic" aria-hidden="true"><i class="nb-o"></i><i class="nb-f"></i></span><span class="nb-txt"><span class="nb-t nb-t0">Notify Me</span><span class="nb-t nb-t1">Notifications on</span></span></button></div>
               <div class="sc-content">
                 <div class="sc-team sc-home"><span class="sc-tname">Leeds United</span><span class="sc-logo"><img src="assets/schedule/club-leeds-united.png" alt=""></span></div>
                 <div class="sc-center"><span class="sc-cell"><b class="sc-score">1</b></span><span class="sc-slot"><span class="sc-live"><i></i>51’</span></span><span class="sc-cell"><b class="sc-score">0</b></span></div>
@@ -2021,7 +2053,7 @@ img{display:block}
               <div class="sc-col sc-col-r"><div class="sc-partner"><span>Watch on</span><img src="assets/schedule/bc-bbc.png" alt="BBC Sport" width="64" height="24"></div></div>
             </div>
             <div class="sc-card is-live">
-              <div class="sc-col sc-col-l"><button class="sc-notify"><img src="assets/schedule/ic-bell.png" alt="" width="20" height="20"><span>Notify Me</span></button></div>
+              <div class="sc-col sc-col-l"><button class="sc-notify" type="button" data-s="off" aria-pressed="false"><span class="nb-ic" aria-hidden="true"><i class="nb-o"></i><i class="nb-f"></i></span><span class="nb-txt"><span class="nb-t nb-t0">Notify Me</span><span class="nb-t nb-t1">Notifications on</span></span></button></div>
               <div class="sc-content">
                 <div class="sc-team sc-home"><span class="sc-tname">Manchester United</span><span class="sc-logo"><img src="assets/schedule/club-manchester-united.png" alt=""></span></div>
                 <div class="sc-center"><span class="sc-cell"><b class="sc-score">2</b></span><span class="sc-slot"><span class="sc-live"><i></i>51’</span></span><span class="sc-cell"><b class="sc-score">1</b></span></div>
@@ -2030,7 +2062,7 @@ img{display:block}
               <div class="sc-col sc-col-r"><button class="sc-watch"><img src="assets/schedule/ic-play.png" alt="" width="20" height="20"><span>Watch</span></button></div>
             </div>
             <div class="sc-card is-time">
-              <div class="sc-col sc-col-l"><button class="sc-notify"><img src="assets/schedule/ic-bell.png" alt="" width="20" height="20"><span>Notify Me</span></button></div>
+              <div class="sc-col sc-col-l"><button class="sc-notify" type="button" data-s="off" aria-pressed="false"><span class="nb-ic" aria-hidden="true"><i class="nb-o"></i><i class="nb-f"></i></span><span class="nb-txt"><span class="nb-t nb-t0">Notify Me</span><span class="nb-t nb-t1">Notifications on</span></span></button></div>
               <div class="sc-content">
                 <div class="sc-team sc-home"><span class="sc-tname">Ipswich Town</span><span class="sc-logo"><img src="assets/schedule/club-ipswich-town.png" alt=""></span></div>
                 <div class="sc-center"><span class="sc-cell"></span><span class="sc-slot"><span class="sc-time">17:30</span></span><span class="sc-cell"></span></div>
@@ -2044,7 +2076,7 @@ img{display:block}
           <h2 class="sc-dayh"><b>Sunday,</b> <span>Nov 29</span></h2>
           <div class="sc-tiles">
             <div class="sc-card is-time">
-              <div class="sc-col sc-col-l"><button class="sc-notify"><img src="assets/schedule/ic-bell.png" alt="" width="20" height="20"><span>Notify Me</span></button></div>
+              <div class="sc-col sc-col-l"><button class="sc-notify" type="button" data-s="off" aria-pressed="false"><span class="nb-ic" aria-hidden="true"><i class="nb-o"></i><i class="nb-f"></i></span><span class="nb-txt"><span class="nb-t nb-t0">Notify Me</span><span class="nb-t nb-t1">Notifications on</span></span></button></div>
               <div class="sc-content">
                 <div class="sc-team sc-home"><span class="sc-tname">Everton</span><span class="sc-logo"><img src="assets/schedule/club-everton.png" alt=""></span></div>
                 <div class="sc-center"><span class="sc-cell"></span><span class="sc-slot"><span class="sc-time">12:00</span></span><span class="sc-cell"></span></div>
@@ -2053,7 +2085,7 @@ img{display:block}
               <div class="sc-col sc-col-r"><button class="sc-watch"><img src="assets/schedule/ic-play.png" alt="" width="20" height="20"><span>Watch</span></button></div>
             </div>
             <div class="sc-card is-time">
-              <div class="sc-col sc-col-l"><button class="sc-notify"><img src="assets/schedule/ic-bell.png" alt="" width="20" height="20"><span>Notify Me</span></button></div>
+              <div class="sc-col sc-col-l"><button class="sc-notify" type="button" data-s="off" aria-pressed="false"><span class="nb-ic" aria-hidden="true"><i class="nb-o"></i><i class="nb-f"></i></span><span class="nb-txt"><span class="nb-t nb-t0">Notify Me</span><span class="nb-t nb-t1">Notifications on</span></span></button></div>
               <div class="sc-content">
                 <div class="sc-team sc-home"><span class="sc-tname">Brighton &amp; Hove Albion</span><span class="sc-logo"><img src="assets/schedule/club-brighton-hove-albion.png" alt=""></span></div>
                 <div class="sc-center"><span class="sc-cell"></span><span class="sc-slot"><span class="sc-time">14:05</span></span><span class="sc-cell"></span></div>
@@ -2062,7 +2094,7 @@ img{display:block}
               <div class="sc-col sc-col-r"><button class="sc-watch"><img src="assets/schedule/ic-play.png" alt="" width="20" height="20"><span>Watch</span></button></div>
             </div>
             <div class="sc-card is-time">
-              <div class="sc-col sc-col-l"><button class="sc-notify"><img src="assets/schedule/ic-bell.png" alt="" width="20" height="20"><span>Notify Me</span></button></div>
+              <div class="sc-col sc-col-l"><button class="sc-notify" type="button" data-s="off" aria-pressed="false"><span class="nb-ic" aria-hidden="true"><i class="nb-o"></i><i class="nb-f"></i></span><span class="nb-txt"><span class="nb-t nb-t0">Notify Me</span><span class="nb-t nb-t1">Notifications on</span></span></button></div>
               <div class="sc-content">
                 <div class="sc-team sc-home"><span class="sc-tname">Crystal Palace</span><span class="sc-logo"><img src="assets/schedule/club-crystal-palace.png" alt=""></span></div>
                 <div class="sc-center"><span class="sc-cell"></span><span class="sc-slot"><span class="sc-time">14:05</span></span><span class="sc-cell"></span></div>
@@ -2071,7 +2103,7 @@ img{display:block}
               <div class="sc-col sc-col-r"><button class="sc-watch"><img src="assets/schedule/ic-play.png" alt="" width="20" height="20"><span>Watch</span></button></div>
             </div>
             <div class="sc-card is-time">
-              <div class="sc-col sc-col-l"><button class="sc-notify"><img src="assets/schedule/ic-bell.png" alt="" width="20" height="20"><span>Notify Me</span></button></div>
+              <div class="sc-col sc-col-l"><button class="sc-notify" type="button" data-s="off" aria-pressed="false"><span class="nb-ic" aria-hidden="true"><i class="nb-o"></i><i class="nb-f"></i></span><span class="nb-txt"><span class="nb-t nb-t0">Notify Me</span><span class="nb-t nb-t1">Notifications on</span></span></button></div>
               <div class="sc-content">
                 <div class="sc-team sc-home"><span class="sc-tname">Fulham</span><span class="sc-logo"><img src="assets/schedule/club-fulham.png" alt=""></span></div>
                 <div class="sc-center"><span class="sc-cell"></span><span class="sc-slot"><span class="sc-time">14:05</span></span><span class="sc-cell"></span></div>
@@ -2080,7 +2112,7 @@ img{display:block}
               <div class="sc-col sc-col-r"><button class="sc-watch"><img src="assets/schedule/ic-play.png" alt="" width="20" height="20"><span>Watch</span></button></div>
             </div>
             <div class="sc-card is-time">
-              <div class="sc-col sc-col-l"><button class="sc-notify"><img src="assets/schedule/ic-bell.png" alt="" width="20" height="20"><span>Notify Me</span></button></div>
+              <div class="sc-col sc-col-l"><button class="sc-notify" type="button" data-s="off" aria-pressed="false"><span class="nb-ic" aria-hidden="true"><i class="nb-o"></i><i class="nb-f"></i></span><span class="nb-txt"><span class="nb-t nb-t0">Notify Me</span><span class="nb-t nb-t1">Notifications on</span></span></button></div>
               <div class="sc-content">
                 <div class="sc-team sc-home"><span class="sc-tname">Sunderland</span><span class="sc-logo"><img src="assets/schedule/club-sunderland.png" alt=""></span></div>
                 <div class="sc-center"><span class="sc-cell"></span><span class="sc-slot"><span class="sc-time">14:05</span></span><span class="sc-cell"></span></div>
@@ -2089,7 +2121,7 @@ img{display:block}
               <div class="sc-col sc-col-r"><button class="sc-watch"><img src="assets/schedule/ic-play.png" alt="" width="20" height="20"><span>Watch</span></button></div>
             </div>
             <div class="sc-card is-time">
-              <div class="sc-col sc-col-l"><button class="sc-notify"><img src="assets/schedule/ic-bell.png" alt="" width="20" height="20"><span>Notify Me</span></button></div>
+              <div class="sc-col sc-col-l"><button class="sc-notify" type="button" data-s="off" aria-pressed="false"><span class="nb-ic" aria-hidden="true"><i class="nb-o"></i><i class="nb-f"></i></span><span class="nb-txt"><span class="nb-t nb-t0">Notify Me</span><span class="nb-t nb-t1">Notifications on</span></span></button></div>
               <div class="sc-content">
                 <div class="sc-team sc-home"><span class="sc-tname">Arsenal</span><span class="sc-logo"><img src="assets/schedule/club-arsenal.png" alt=""></span></div>
                 <div class="sc-center"><span class="sc-cell"></span><span class="sc-slot"><span class="sc-time">16:30</span></span><span class="sc-cell"></span></div>
@@ -2195,6 +2227,89 @@ img{display:block}
   }
   mF.addEventListener('click', function(){ setMView('full'); });
   mS.addEventListener('click', function(){ setMView('short'); });
+
+  // ---- анимация уведомлений: Notify Me → Notifications on → жёлтый колокольчик ----
+  // Фазы: expand (растяжение + смена текста), hold (пауза на чтение),
+  // collapse (текст гаснет за textOut, затем пилюля сжимается в иконку),
+  // revert (клик по иконке — обратно в Notify Me). Значения правятся
+  // панелью ?tune и сохраняются в браузере.
+  var TUNE_DEF = { expand: 250, expandEase: 'cubic-bezier(.2,0,0,1)', hold: 1500, textOut: 100,
+    collapse: 300, collapseEase: 'cubic-bezier(.4,0,.2,1)', revert: 250, revertEase: 'cubic-bezier(.2,0,0,1)' };
+  var TUNE = Object.assign({}, TUNE_DEF);
+  try { Object.assign(TUNE, JSON.parse(localStorage.getItem('notifyTune') || '{}')); } catch (e) {}
+  var NB_ICON_W = 44;
+  function nbWidths(b){
+    var t0 = b.querySelector('.nb-t0'), t1 = b.querySelector('.nb-t1');
+    return { off: 12 + 20 + 4 + t0.offsetWidth + 12, on: 12 + 20 + 4 + t1.offsetWidth + 16, icon: NB_ICON_W };
+  }
+  function nbSet(b, st, w){ b.dataset.s = st; b.style.width = w + 'px'; b.setAttribute('aria-pressed', st !== 'off'); }
+  function nbTr(el, list){ el.style.transition = list.join(','); }
+  function nbAnim(b){
+    var W = nbWidths(b), q = function(s){ return b.querySelector(s); };
+    var t0 = q('.nb-t0'), t1 = q('.nb-t1'), io = q('.nb-o'), iF = q('.nb-f');
+    clearTimeout(b._t1); clearTimeout(b._t2);
+    if (b.dataset.s === 'off') {
+      var E = +TUNE.expand, ee = TUNE.expandEase;
+      nbTr(b, ['width ' + E + 'ms ' + ee, 'background-color ' + E + 'ms ' + ee, 'padding-right ' + E + 'ms ' + ee]);
+      nbTr(t0, ['opacity ' + Math.round(E * .4) + 'ms linear']);
+      nbTr(t1, ['opacity ' + Math.round(E * .6) + 'ms linear ' + Math.round(E * .4) + 'ms']);
+      nbTr(io, ['opacity ' + E + 'ms linear']); nbTr(iF, ['opacity ' + E + 'ms linear', 'background-color ' + E + 'ms ' + ee]);
+      nbSet(b, 'on', W.on);
+      b._t1 = setTimeout(function(){
+        var C = +TUNE.collapse, ce = TUNE.collapseEase, d = +TUNE.textOut;
+        nbTr(t1, ['opacity ' + d + 'ms linear']);
+        nbTr(b, ['width ' + C + 'ms ' + ce + ' ' + d + 'ms', 'background-color ' + C + 'ms ' + ce + ' ' + d + 'ms',
+                 'padding-right ' + C + 'ms ' + ce + ' ' + d + 'ms']);
+        nbTr(iF, ['background-color ' + C + 'ms ' + ce + ' ' + d + 'ms']);
+        nbSet(b, 'icon', W.icon);
+      }, E + (+TUNE.hold));
+    } else {
+      var R = +TUNE.revert, re = TUNE.revertEase;
+      nbTr(b, ['width ' + R + 'ms ' + re, 'background-color ' + R + 'ms ' + re, 'padding-right ' + R + 'ms ' + re]);
+      nbTr(t1, ['opacity 0ms']);
+      nbTr(t0, ['opacity ' + Math.round(R * .6) + 'ms linear ' + Math.round(R * .4) + 'ms']);
+      nbTr(io, ['opacity ' + R + 'ms linear']); nbTr(iF, ['opacity ' + R + 'ms linear', 'background-color ' + R + 'ms ' + re]);
+      nbSet(b, 'off', W.off);
+    }
+  }
+  var nbBtns = [].slice.call(document.querySelectorAll('.sc-notify'));
+  function nbInit(){
+    nbBtns.forEach(function(b){
+      b.style.transition = 'none';
+      b.querySelectorAll('.nb-t,.nb-ic i').forEach(function(x){ x.style.transition = 'none'; });
+      clearTimeout(b._t1); nbSet(b, 'off', nbWidths(b).off);
+    });
+  }
+  nbBtns.forEach(function(b){ b.addEventListener('click', function(){ nbAnim(b); }); });
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(nbInit);
+
+  if (/[?&]tune(=|&|$)/.test(location.search)) {
+    var F = [['expand','Expand, ms'],['expandEase','Expand ease'],['hold','Hold, ms'],['textOut','Text out, ms'],
+             ['collapse','Collapse, ms'],['collapseEase','Collapse ease'],['revert','Revert, ms'],['revertEase','Revert ease']];
+    var p = document.createElement('div'); p.className = 'tune';
+    p.innerHTML = '<b>Notify animation</b>' + F.map(function(f){
+      return '<label>' + f[1] + '<input data-k="' + f[0] + '" value="' + TUNE[f[0]] + '"></label>'; }).join('')
+      + '<div class="tune-row"><button data-a="reset">Reset buttons</button><button data-a="copy">Copy values</button></div>'
+      + '<div class="tune-row"><button data-a="def">Defaults</button></div>'
+      + '<div class="tune-note">Ease: CSS easing, напр. cubic-bezier(.2,0,0,1), ease-out, linear</div>';
+    document.body.appendChild(p);
+    p.addEventListener('input', function(e){
+      var k = e.target.dataset.k; if (!k) return;
+      TUNE[k] = e.target.value;
+      try { localStorage.setItem('notifyTune', JSON.stringify(TUNE)); } catch (err) {}
+    });
+    p.addEventListener('click', function(e){
+      var a = e.target.dataset.a;
+      if (a === 'reset') nbInit();
+      if (a === 'def') { TUNE = Object.assign({}, TUNE_DEF); try { localStorage.removeItem('notifyTune'); } catch (err) {}
+        p.querySelectorAll('input').forEach(function(i){ i.value = TUNE[i.dataset.k]; }); }
+      if (a === 'copy') {
+        var txt = F.map(function(f){ return f[0] + ': ' + TUNE[f[0]]; }).join('; ');
+        (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function(){ e.target.textContent = 'Copied'; },
+          function(){ prompt('Values', txt); });
+      }
+    });
+  }
 
   hud.addEventListener('click', function(){ hud.style.display = 'none'; });
   window.addEventListener('scroll', onScroll, {passive:true});
