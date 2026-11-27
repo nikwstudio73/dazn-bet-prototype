@@ -701,6 +701,31 @@ img{display:block}
 .nb-t1{opacity:0}
 .sc-notify[data-s="on"] .nb-t0,.sc-notify[data-s="icon"] .nb-t0{opacity:0}
 .sc-notify[data-s="on"] .nb-t1{opacity:1}
+/* ---- вариант «Стало» (.sc-b), референс premierleague.com, 27.11.2026 ----
+   1) герб в боксе 48 без пустых полей (экспорт — бокс 64 с полями, поэтому
+      картинка 64 центрируется в 48): видимый отступ имя → герб = 8
+   2) видимая дистанция герб → центр = 16
+   3) центр — тёмная плашка min 96×40, r8, #080E12 40%: время / счёт /
+      счёт + live-пилюля; ширина min 96, чтобы гербы во всех строках стояли
+      на одной линии (у PL плашка по тексту — гербы гуляют)
+   4) счёт 24 Bold вместо 32 — иерархию держит плашка */
+.sc-b .sc-content{gap:var(--spacer-md)}
+.sc-b .sc-logo{width:48px;height:48px;flex:0 0 48px;display:flex;align-items:center;justify-content:center}
+.sc-b .sc-logo img{width:64px;height:64px;flex:0 0 64px;margin:-8px}
+.sc-b .sc-center{min-width:96px;height:40px;padding:0 12px;gap:6px;border-radius:8px;
+  background:rgba(8,14,18,.4)}
+.sc-b .sc-cell,.sc-b .sc-slot{min-width:0;height:auto}
+.sc-b .sc-cell:empty{display:none}
+.sc-b .sc-score{font-size:24px;line-height:32px}
+.sc-b .sc-dash{font-size:18px;line-height:24px}
+.sc-b .sc-time{font-size:16px;line-height:24px}
+/* переключатель было / стало — справа под хедером, виден только во вкладке Schedule */
+.cmp-sw{position:fixed;top:80px;right:var(--gutter);z-index:95;display:flex;padding:3px;gap:2px;
+  border-radius:10px;background:rgba(8,14,18,.85);border:1px solid #3D4549;
+  box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.cmp-b{height:30px;padding:0 14px;border:0;border-radius:7px;background:none;cursor:pointer;
+  font:700 13px/1 var(--font-primary-font),sans-serif;color:#C5C7CA}
+.cmp-b.on{background:#F9FAFA;color:#080E12}
 /* панель настройки анимации (открывается с ?tune в адресе) */
 .tune{position:fixed;right:12px;bottom:52px;z-index:210;width:280px;padding:12px;border-radius:12px;
   background:rgba(8,14,18,.92);border:1px solid #3D4549;color:#F9FAFA;
@@ -2016,6 +2041,11 @@ img{display:block}
 
       <!-- вью Schedule 1:1 по экрану 11024:19307 (Schedule 3.0) -->
       <div class="sc-outer" id="viewSchedule">
+        <!-- сравнение «было / стало» по референсу premierleague.com (27.11.2026) -->
+        <div class="cmp-sw" role="group" aria-label="Сравнение карточек">
+          <button class="cmp-b on" data-cmp="a" type="button">Было</button>
+          <button class="cmp-b" data-cmp="b" type="button">Стало</button>
+        </div>
         <!-- .months 11024:19864 (в макете весь блок на opacity 0.3) -->
         <div class="sc-months">
           <button class="sc-cal" aria-label="Calendar"><img src="assets/pl/ic-calendar.png" alt="" width="32" height="32"></button>
@@ -2227,6 +2257,18 @@ img{display:block}
   }
   mF.addEventListener('click', function(){ setMView('full'); });
   mS.addEventListener('click', function(){ setMView('short'); });
+
+  // ---- сравнение карточек «было / стало» (?cmp=b открывает «стало») ----
+  var cmpBtns = [].slice.call(document.querySelectorAll('.cmp-b'));
+  function setCmp(v){
+    viewC.classList.toggle('sc-b', v === 'b');
+    cmpBtns.forEach(function(b){ b.classList.toggle('on', b.dataset.cmp === v); });
+    var u = new URL(location.href);
+    if (v === 'b') u.searchParams.set('cmp', 'b'); else u.searchParams.delete('cmp');
+    if (history.replaceState) history.replaceState(null, '', u.pathname + u.search + u.hash);
+  }
+  cmpBtns.forEach(function(b){ b.addEventListener('click', function(){ setCmp(b.dataset.cmp); }); });
+  if (/[?&]cmp=b(&|$)/.test(location.search)) setCmp('b');
 
   // ---- анимация уведомлений: Notify Me → Notifications on → жёлтый колокольчик ----
   // Фазы: expand (растяжение; старый текст гаснет за oldTextOut, новый
